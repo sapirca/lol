@@ -1,0 +1,28 @@
+# Ignore secrets.py for security
+secrets.py
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Virtual environments
+venv/
+.env/
+
+# System files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Content folder
+/content/

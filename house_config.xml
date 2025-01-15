@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<house>
+    <main_door>
+        <type>Wooden</type>
+        <color>Brown</color>
+        <locked>true</locked>
+    </main_door>
+    <garage_door>
+        <type>Automatic</type>
+        <color>White</color>
+        <locked>false</locked>
+    </garage_door>
+    <windows>
+        <window id="1">
+            <type>Sliding</type>
+            <open>true</open>
+        </window>
+        <window id="2">
+            <type>Casement</type>
+            <open>false</open>
+        </window>
+    </windows>
+</house>
