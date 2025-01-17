@@ -19,10 +19,9 @@ venv/
 
 # System files
 .DS_Store
+./.DS_Store
 Thumbs.db
 .idea/
 .vscode/
 *.swp
 
-# Content folder
-.content/
