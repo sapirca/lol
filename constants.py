@@ -9,3 +9,6 @@ DEFAULT_BACKEND = "GPT"
 
 # API timeout settings (in seconds)
 API_TIMEOUT = 10
+
+# XML sequence tag
+XSEQUENCE_TAG = "xsequence"

@@ -15,11 +15,6 @@ class LLMBackend:
         """Generate a response based on the provided prompt."""
         raise NotImplementedError("Subclasses must implement this method.")
 
-    # TODO(sapir): remove this
-    def generate_stub(self, prompt):
-        """Generate a stub response for testing purposes."""
-        return f"[Stub-{self.name}]: This is a fake response."
-
 class GPTBackend(LLMBackend):
     def generate_response(self, prompt):
         """Generate a response using GPT backend."""
@@ -66,5 +61,19 @@ class GeminiBackend(LLMBackend):
 
 class StubBackend(LLMBackend):
     def generate_response(self, prompt):
-        """Generate a response using Stub backend."""
-        return f"[Stub-{self.name}]: Simulated response to '{prompt}'"
+        """Generate a response using Stub backend with a valid xLights sequence."""
+        sequnece = """<?xml version="1.0" encoding="UTF-8"?>
+                    <xsequence BaseChannel="0" ChanCtrlBasic="0" ChanCtrlColor="0" FixedPointTiming="1" ModelBlending="true">
+                    <head>
+                    <version>2024.19</version>
+                    </head>
+                    <steps>
+                    <step>
+                        <number>1</number>
+                        <animation>Simple Animation</animation>
+                    </step>
+                    </steps>
+                    </xsequence>
+                    """
+        
+        return f"[Stub-{self.name}]: Simulated response. with new '{sequnece}'"
