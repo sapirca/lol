@@ -1,7 +1,6 @@
 
 # Main prompt for light show generation
-intro_prompt = """
-You are an AI assistant specializing in crafting light sequences that suit the played music. Your task is to generate a visually engaging light show for the provided song using the xLights software. You will analyze the provided EDM music and create an XSQ sequence file based on the given template.
+intro_prompt = """You are an AI assistant specializing in crafting light sequences that suit the played music. Your task is to generate a visually engaging light show for the provided song using the xLights software. You will analyze the provided EDM music and create an XSQ sequence file based on the given template.
 
 Objectives:
 1. Analyze the song: Thoroughly understand its structure, energy levels, and mood.
