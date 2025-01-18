@@ -4,6 +4,7 @@ from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
 from knowledge import knowledge_prompts
 from chat_history import ChatHistory
+from sequence_manager import SequenceManager
 
 class MainController:
     """
@@ -17,6 +18,7 @@ class MainController:
         self.initial_prompt_added = False
         self.house_config = self._load_house_config()
         self.should_add_knowledge = config.get("should_add_knowledge", False)
+        self.sequence_manager = SequenceManager("sequence_skeleton.xml")
         self._initialize_backends()
 
     def _initialize_backends(self):
@@ -67,23 +69,25 @@ class MainController:
         except Exception as e:
             return f"Error loading house configuration: {e}"
 
+
     def communicate(self, user_input):
         """Generate a response to the user's input."""
         backend = self.select_backend()
 
-        # Prepare the prompt
+        latest_sequence = self.sequence_manager.get_latest_sequence()
+
         if not self.initial_prompt_added:
             # Add the initial prompt to the chat history
             initial_prompt = get_full_prompt(self.house_config)
-            # TODO(sapir): Should this tagged as system or user?
             self.chat_history.add_message("system", initial_prompt)
             self.initial_prompt_added = True
         
         # Add user input to chat history
         self.chat_history.add_message("user", user_input)
-      
-        prompt = self.chat_history.get_context()
-      
+
+        # Prepare the prompt with the latest sequence
+        prompt = self.chat_history.get_context() + f"\n\nAnimation Sequence:\n{latest_sequence}"
+
         # Generate response
         if self.use_stub:
             response = backend.generate_stub(prompt)
@@ -93,5 +97,10 @@ class MainController:
         # Add AI response to chat history
         self.chat_history.add_message("assistant", response)
 
-        return response
+        # Check if the response contains a sequence to add
+        if "<sequence>" in response:
+            sequence_xml = response[response.find("<sequence>") : response.find("</sequence>") + 11]
+            step_number = len(self.sequence_manager.steps) + 1
+            self.sequence_manager.add_sequence(step_number, sequence_xml)
 
+        return response
