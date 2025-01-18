@@ -3,6 +3,7 @@ from backends import GPTBackend, ClaudeBackend, GeminiBackend, CustomLLMBackend,
 from config import config
 from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
+from knowledge import knowledge_prompts
 
 class MainController:
     """
@@ -13,6 +14,7 @@ class MainController:
         self.use_stub = config.get("use_stub", False)
         self.selected_backend = config.get("selected_backend", None)
         self.house_config = self._load_house_config()
+        self.should_add_knowledge = config.get("should_add_knowledge", False)
         self._initialize_backends()
 
     def _initialize_backends(self):
@@ -52,7 +54,13 @@ class MainController:
     def communicate(self, user_input):
         """Generate a response to the user's input."""
         backend = self.select_backend()
-        prompt = get_full_prompt(self.house_config) + f"\nUser input: {user_input}"
+        prompt = get_full_prompt(self.house_config)
+
+        if self.should_add_knowledge:
+            prompt += "\n" + "\n".join(knowledge_prompts)
+
+        prompt += f"\nUser input: {user_input}"
+
         if self.use_stub:
             return backend.generate_stub(prompt)
         return backend.generate_response(prompt)
