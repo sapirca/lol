@@ -43,14 +43,19 @@ class MainController:
 
         if self.use_stub:
             # Ensure only the StubBackend is used if the stub flag is on
-            if "StubBackend" in self.backends:
-                return self.backends["StubBackend"]
-            else:
+            stub_backend = self.backends.get("StubBackend")
+            if not stub_backend:
                 raise ValueError("StubBackend is not registered.")
+            return stub_backend
 
-        if self.selected_backend and self.selected_backend in self.backends:
-            return self.backends[self.selected_backend]
-        
+        if self.selected_backend:
+            selected_backend = self.backends.get(self.selected_backend)
+            if selected_backend:
+                return selected_backend
+
+            print(f"Warning: Selected backend '{self.selected_backend}' not found, choosing randomly.")
+
+        # Randomly select a backend if no valid selection is specified
         return random.choice(list(self.backends.values()))
 
     def _load_house_config(self):
@@ -65,11 +70,28 @@ class MainController:
     def communicate(self, user_input):
         """Generate a response to the user's input."""
         backend = self.select_backend()
-        prompt = get_full_prompt(self.house_config)
 
-        if self.should_add_knowledge:
-            prompt += "\n" + "\n".join(knowledge_prompts)
+        # Prepare the prompt
+        if not self.initial_prompt_added:
+            # Add the initial prompt to the chat history
+            initial_prompt = get_full_prompt(self.house_config)
+            # TODO(sapir): Should this tagged as system or user?
+            self.chat_history.add_message("system", initial_prompt)
+            self.initial_prompt_added = True
+        
+        # Add user input to chat history
+        self.chat_history.add_message("user", user_input)
+      
+        prompt = self.chat_history.get_context()
+      
+        # Generate response
+        if self.use_stub:
+            response = backend.generate_stub(prompt)
+        else:
+            response = backend.generate_response(prompt)
 
-        prompt += f"\nUser input: {user_input}"
+        # Add AI response to chat history
+        self.chat_history.add_message("assistant", response)
 
-        return backend.generate_response(prompt)
+        return response
+
