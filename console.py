@@ -16,18 +16,18 @@ if __name__ == "__main__":
 
     # Open a file to log the session
     with open(log_filename, "a") as log_file:
-        log_file.write(f"Session started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        log_file.write(f"SYSTEM: Session started at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         print("MainController is ready. Type 'exit' to quit.")
         while True:
             user_input = input("You: ")
             if user_input.lower() == 'exit':
                 print("Exiting. Goodbye!")
-                log_file.write(f"Session ended at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                log_file.write(f"SYSTEM: Session ended at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
                 break
 
             response = controller.communicate(user_input)
-            print(f"AI: {response}")
+            print(f">> {response}\n")
 
             # Write input and output to the log file
-            log_file.write(f"You: {user_input}\n")
-            log_file.write(f"AI: {response}\n")
+            log_file.write(f"YOU: {user_input}\n")
+            log_file.write(f"AGENT: {response}\n\n")

@@ -17,7 +17,7 @@ class LLMBackend:
 
     def generate_stub(self, prompt):
         """Generate a stub response for testing purposes."""
-        return f"[Stub-{self.name}]: This is a fake response to '{prompt}'."
+        return f"[Stub-{self.name}]: This is a fake response."
 
 class GPTBackend(LLMBackend):
     def generate_response(self, prompt):
