@@ -2,17 +2,17 @@
 from datetime import datetime
 import os
 from main_controller import MainController
+from constants import LOG_DIR
 
 if __name__ == "__main__":
     # Initialize the MainController
     controller = MainController()
 
     # Ensure the logs directory exists
-    log_dir = "logs"
-    os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(LOG_DIR, exist_ok=True)
 
     # Generate a log file name with date and time in the logs directory
-    log_filename = os.path.join(log_dir, datetime.now().strftime("conversation_log_%Y-%m-%d_%H-%M-%S.txt"))
+    log_filename = os.path.join(LOG_DIR, datetime.now().strftime("conversation_log_%Y-%m-%d_%H-%M-%S.txt"))
 
     # Open a file to log the session
     with open(log_filename, "a") as log_file:

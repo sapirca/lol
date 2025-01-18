@@ -1,7 +1,7 @@
-
 import openai
 import requests
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
+from constants import API_TIMEOUT
 
 class LLMBackend:
     """
@@ -15,6 +15,7 @@ class LLMBackend:
         """Generate a response based on the provided prompt."""
         raise NotImplementedError("Subclasses must implement this method.")
 
+    # TODO(sapir): remove this
     def generate_stub(self, prompt):
         """Generate a stub response for testing purposes."""
         return f"[Stub-{self.name}]: This is a fake response."
@@ -40,7 +41,8 @@ class ClaudeBackend(LLMBackend):
             response = requests.post(
                 "https://api.claude.ai/v1/complete",
                 json={"prompt": prompt, "max_tokens": 150},
-                headers={"Authorization": f"Bearer {CLAUDE_API_KEY}"}
+                headers={"Authorization": f"Bearer {CLAUDE_API_KEY}"},
+                timeout=API_TIMEOUT
             )
             response.raise_for_status()
             return response.json().get("completion", "[Claude Error]: No response")
@@ -54,15 +56,15 @@ class GeminiBackend(LLMBackend):
             response = requests.post(
                 "https://api.gemini.ai/v1/query",
                 json={"query": prompt, "max_tokens": 150},
-                headers={"Authorization": f"Bearer {GEMINI_API_KEY}"}
+                headers={"Authorization": f"Bearer {GEMINI_API_KEY}"},
+                timeout=API_TIMEOUT
             )
             response.raise_for_status()
             return response.json().get("response", "[Gemini Error]: No response")
         except Exception as e:
             return f"[Gemini Error]: {str(e)}"
 
-class CustomLLMBackend(LLMBackend):
+class StubBackend(LLMBackend):
     def generate_response(self, prompt):
-        """Generate a response using CustomLLM backend."""
-        # Placeholder: Replace with actual API call for CustomLLM
-        return f"[CustomLLM]: Simulated response to '{prompt}'"
+        """Generate a response using Stub backend."""
+        return f"[Stub-{self.name}]: Simulated response to '{prompt}'"

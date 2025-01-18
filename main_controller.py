@@ -1,18 +1,20 @@
 import random
-from backends import GPTBackend, ClaudeBackend, GeminiBackend, CustomLLMBackend, LLMBackend
-from config import config
+from backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend
 from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
 from knowledge import knowledge_prompts
+from chat_history import ChatHistory
 
 class MainController:
     """
     MainController that interacts with a human and selects responses from multiple LLM backends.
     """
-    def __init__(self):
+    def __init__(self, config):
         self.backends = {}
         self.use_stub = config.get("use_stub", False)
         self.selected_backend = config.get("selected_backend", None)
+        self.chat_history = ChatHistory()
+        self.initial_prompt_added = False
         self.house_config = self._load_house_config()
         self.should_add_knowledge = config.get("should_add_knowledge", False)
         self._initialize_backends()
@@ -23,7 +25,7 @@ class MainController:
             "GPTBackend": GPTBackend,
             "ClaudeBackend": ClaudeBackend,
             "GeminiBackend": GeminiBackend,
-            "CustomLLMBackend": CustomLLMBackend
+            "StubBackend": StubBackend
         }
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(backend_class(backend_name))
@@ -38,8 +40,17 @@ class MainController:
         """Select a backend based on the configuration or random selection."""
         if not self.backends:
             raise ValueError("No backends available.")
+
+        if self.use_stub:
+            # Ensure only the StubBackend is used if the stub flag is on
+            if "StubBackend" in self.backends:
+                return self.backends["StubBackend"]
+            else:
+                raise ValueError("StubBackend is not registered.")
+
         if self.selected_backend and self.selected_backend in self.backends:
             return self.backends[self.selected_backend]
+        
         return random.choice(list(self.backends.values()))
 
     def _load_house_config(self):
@@ -61,6 +72,4 @@ class MainController:
 
         prompt += f"\nUser input: {user_input}"
 
-        if self.use_stub:
-            return backend.generate_stub(prompt)
         return backend.generate_response(prompt)

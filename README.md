@@ -100,10 +100,6 @@ This project implements an AI agent that communicates with users using multiple 
    ```bash
    python -m console
    ```
-   **Run the Console Simulation**:
-   ```bash
-   python -m simulations.simulation
-   ```
 
 2. **Interact with the AI**:
    - Type your input when prompted (`You:`).
@@ -112,6 +108,15 @@ This project implements an AI agent that communicates with users using multiple 
 3. **Log Files**:
    - Each session creates a log file named `conversation_log_<date>_<time>.txt` in the project directory.
    - Logs include timestamps, user inputs, and AI responses.
+
+### Running Tests
+1. **Run the Test File**:
+   ```bash
+   python -m unittest test_main_controller.py
+   ```
+
+2. **Expected Behavior**:
+   - The test file ensures the `communicate` method in `MainController` works as expected, including proper handling of chat history and backend interactions.
 
 ---
 

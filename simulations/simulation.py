@@ -2,9 +2,10 @@
 
 from main_controller import MainController
 from simulations.user_inputs import user_inputs
+from config import config
 
 if __name__ == "__main__":
-    controller = MainController()
+    controller = MainController(config)
 
     print("Running AI Agent Simulation...")
     print("Using backend in stub mode for testing.")
