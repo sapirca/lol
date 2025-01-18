@@ -100,6 +100,10 @@ This project implements an AI agent that communicates with users using multiple 
    ```bash
    python -m console
    ```
+   **Run the Console Simulation**:
+   ```bash
+   python simulation.py
+   ```
 
 2. **Interact with the AI**:
    - Type your input when prompted (`You:`).

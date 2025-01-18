@@ -43,3 +43,6 @@ Ask clarifying questions to refine the light show based on user preferences (e.g
 """
 
 prompts_list = [light_show_prompt, explanation_prompt, clarification_prompt]
+
+def get_full_prompt(house_config):
+    return intro_prompt + "\n" + "\n".join(prompts_list) + f"\n\nHouse Configuration:\n{house_config}"
