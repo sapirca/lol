@@ -6,7 +6,10 @@ def send_message(event=None):
     if user_message:
         chat_window.config(state=tk.NORMAL)
         chat_window.insert(tk.END, f"You: {user_message}\n")
+        chat_window.tag_add("user", "end-2l linestart", "end-1l")
         chat_window.insert(tk.END, "System: This is a static reply.\n")
+        chat_window.tag_add("system", "end-2l linestart", "end-1l")
+        chat_window.tag_configure("system", justify="right")
         chat_window.config(state=tk.DISABLED)
         chat_window.see(tk.END)
         user_input.delete("1.0", tk.END)
