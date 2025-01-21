@@ -46,8 +46,8 @@ def initialize_chat():
     chat_window.insert(tk.END, "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n", "system_message")
     chat_window.tag_add("system_label", "1.0", "1.8")
     chat_window.tag_add("system_message", "1.8", "end-1c")
-    chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
-    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT, spacing1=1, spacing3=5)
+    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT, spacing1=1, spacing3=5)
     chat_window.config(state=tk.DISABLED)
 
 # Create the main window
