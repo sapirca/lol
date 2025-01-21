@@ -1,15 +1,22 @@
 import tkinter as tk
 from tkinter import scrolledtext
 
+# Alignment flags
+USER_ALIGNMENT = "right"
+SYSTEM_ALIGNMENT = "left"
+
 def send_message(event=None):
     user_message = user_input.get("1.0", tk.END).strip()
     if user_message:
         chat_window.config(state=tk.NORMAL)
-        chat_window.insert(tk.END, f"You: {user_message}\n")
-        chat_window.tag_add("user", "end-2l linestart", "end-1l")
-        chat_window.insert(tk.END, "System: This is a static reply.\n")
-        chat_window.tag_add("system", "end-2l linestart", "end-1l")
-        chat_window.tag_configure("system", justify="right")
+        chat_window.insert(tk.END, f"You: {user_message}\n\n")  # Added spacing after user message
+        chat_window.tag_add("user", "end-3l linestart", "end-2l")
+        chat_window.tag_configure("user", justify=USER_ALIGNMENT)
+
+        chat_window.insert(tk.END, "System: This is a static reply.\n\n")  # Added spacing after system message
+        chat_window.tag_add("system", "end-3l linestart", "end-2l")
+        chat_window.tag_configure("system", justify=SYSTEM_ALIGNMENT)
+
         chat_window.config(state=tk.DISABLED)
         chat_window.see(tk.END)
         user_input.delete("1.0", tk.END)
@@ -19,10 +26,17 @@ def handle_keypress(event):
         send_message()
         return "break"  # Prevent default newline behavior
 
+def initialize_chat():
+    chat_window.config(state=tk.NORMAL)
+    chat_window.insert(tk.END, "System: Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n")  # Added spacing after initial system message
+    chat_window.tag_add("system", "1.0", "end-1c")
+    chat_window.tag_configure("system", justify=SYSTEM_ALIGNMENT)
+    chat_window.config(state=tk.DISABLED)
+
 # Create the main window
 root = tk.Tk()
 root.title("Chat App")
-root.geometry("400x500")
+root.geometry("800x500")
 
 # Create a frame for the chat window
 chat_frame = tk.Frame(root)
@@ -45,6 +59,9 @@ user_input.bind("<Shift-Return>", lambda event: None)  # Allow new line on Shift
 # Create a send button
 send_button = tk.Button(input_frame, text="Send", command=send_message)
 send_button.pack(side=tk.RIGHT, padx=5, pady=5)
+
+# Initialize chat
+initialize_chat()
 
 # Start the application
 root.mainloop()
