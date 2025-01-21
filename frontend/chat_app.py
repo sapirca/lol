@@ -22,9 +22,12 @@ def send_message(event=None):
         chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
         chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
 
+        # Call the main controller for the system reply
+        system_reply = main_controller(user_message)
+
         # Add system message with label, color, and timestamp
         chat_window.insert(tk.END, f"[{current_time}] System:\n", "system_label")
-        chat_window.insert(tk.END, "This is a static reply.\n\n", "system_message")
+        chat_window.insert(tk.END, f"{system_reply}\n\n", "system_message")
         chat_window.tag_add("system_label", "end-5l linestart", "end-4l")
         chat_window.tag_add("system_message", "end-4l linestart", "end-2l")
         chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
@@ -33,6 +36,16 @@ def send_message(event=None):
         chat_window.config(state=tk.DISABLED)
         chat_window.see(tk.END)
         user_input.delete("1.0", tk.END)
+
+def main_controller(user_message):
+    """Handles the business logic for user input and generates a system reply."""
+    # Replace this logic with your actual business logic
+    if user_message.lower() == "hello":
+        return "Hi there! How can I assist you today?"
+    elif user_message.lower() == "bye":
+        return "Goodbye! Have a great day!"
+    else:
+        return "I'm not sure how to respond to that."
 
 def handle_keypress(event):
     if event.keysym == "Return" and not event.state & 1:  # Enter without Shift
