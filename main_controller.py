@@ -75,6 +75,7 @@ class MainController:
         self.chat_history.add_message("user", user_input)
         prompt = self.chat_history.get_context() + f"\n\nAnimation Sequence ({XSEQUENCE_TAG}) is:\n\n{latest_sequence}"
         response = backend.generate_response(prompt)
+        # TODO(sapir) sequences --? Save the Sequence? Print the Sequence?  
         self.chat_history.add_message("assistant", response)
         parsed_response = self.response_manager.parse_response(response)
 
