@@ -65,9 +65,23 @@ def load_chat_content(chat_history):
     """Loads chat history into the chat window using the provided content."""
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
-    for entry in chat_history:
-        chat_window.insert(tk.END, f"[{entry['timestamp']}] {entry['sender']}:\n", f"{entry['sender'].lower()}_label")
-        chat_window.insert(tk.END, f"{entry['message']}\n\n", f"{entry['sender'].lower()}_message")
+    if not chat_history:
+        # Initialize with a welcome message if history is empty
+        current_time = datetime.now().strftime("%H:%M:%S")
+        chat_window.insert(tk.END, f"[{current_time}] System:\n", "system_label")
+        chat_window.insert(tk.END, "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n", "system_message")
+        chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+    else:
+        for entry in chat_history:
+            chat_window.insert(tk.END, f"[{entry['timestamp']}] {entry['sender']}:\n", f"{entry['sender'].lower()}_label")
+            chat_window.insert(tk.END, f"{entry['message']}\n\n", f"{entry['sender'].lower()}_message")
+            if entry['sender'].lower() == 'system':
+                chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
+                chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+            elif entry['sender'].lower() == 'you':
+                chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
+                chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
     chat_window.config(state=tk.DISABLED)
 
 def create_or_increment_untitled():
@@ -117,7 +131,6 @@ def initialize_chat():
     """Initializes the chat window with the untitled chat."""
     untitled_file = create_or_increment_untitled()
     chat_history = get_chat_history(untitled_file)
-    
     load_chat_content(chat_history)
 
 # Create the main window
