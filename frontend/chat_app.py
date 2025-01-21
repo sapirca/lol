@@ -9,13 +9,22 @@ def send_message(event=None):
     user_message = user_input.get("1.0", tk.END).strip()
     if user_message:
         chat_window.config(state=tk.NORMAL)
-        chat_window.insert(tk.END, f"You: {user_message}\n\n")  # Added spacing after user message
-        chat_window.tag_add("user", "end-3l linestart", "end-2l")
-        chat_window.tag_configure("user", justify=USER_ALIGNMENT)
 
-        chat_window.insert(tk.END, "System: This is a static reply.\n\n")  # Added spacing after system message
-        chat_window.tag_add("system", "end-3l linestart", "end-2l")
-        chat_window.tag_configure("system", justify=SYSTEM_ALIGNMENT)
+        # Add user message with label and color
+        chat_window.insert(tk.END, "You:\n", "user_label")
+        chat_window.insert(tk.END, f"{user_message}\n\n", "user_message")
+        chat_window.tag_add("user_label", "end-4l linestart", "end-3l")
+        chat_window.tag_add("user_message", "end-3l linestart", "end-1l")
+        chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
+        chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
+
+        # Add system message with label and color
+        chat_window.insert(tk.END, "System:\n", "system_label")
+        chat_window.insert(tk.END, "This is a static reply.\n\n", "system_message")
+        chat_window.tag_add("system_label", "end-4l linestart", "end-3l")
+        chat_window.tag_add("system_message", "end-3l linestart", "end-1l")
+        chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
 
         chat_window.config(state=tk.DISABLED)
         chat_window.see(tk.END)
@@ -28,9 +37,12 @@ def handle_keypress(event):
 
 def initialize_chat():
     chat_window.config(state=tk.NORMAL)
-    chat_window.insert(tk.END, "System: Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n")  # Added spacing after initial system message
-    chat_window.tag_add("system", "1.0", "end-1c")
-    chat_window.tag_configure("system", justify=SYSTEM_ALIGNMENT)
+    chat_window.insert(tk.END, "System:\n", "system_label")
+    chat_window.insert(tk.END, "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n", "system_message")
+    chat_window.tag_add("system_label", "1.0", "1.6")
+    chat_window.tag_add("system_message", "1.6", "end-1c")
+    chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
     chat_window.config(state=tk.DISABLED)
 
 # Create the main window
