@@ -12,7 +12,19 @@ UNTITLED_CHAT_FILE = "untitled.json"  # Default chat file for initialization
 USER_ALIGNMENT = "left"
 SYSTEM_ALIGNMENT = "left"
 
+# Global variable to track the active chat file
+active_chat_file = UNTITLED_CHAT_FILE
+
+def save_chat_to_file(chat_file, new_entry):
+    """Saves a new entry to the specified chat file."""
+    file_path = os.path.join(CHAT_FOLDER_PATH, chat_file)
+    chat_history = get_chat_history(chat_file)
+    chat_history.append(new_entry)
+    with open(file_path, "w") as file:
+        json.dump(chat_history, file, indent=4)
+
 def send_message(event=None):
+    global active_chat_file
     user_message = user_input.get("1.0", tk.END).strip()
     if user_message:
         chat_window.config(state=tk.NORMAL)
@@ -28,6 +40,9 @@ def send_message(event=None):
         chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
         chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
 
+        # Save user message to the active chat file
+        save_chat_to_file(active_chat_file, {"timestamp": current_time, "sender": "You", "message": user_message})
+
         # Call the main controller for the system reply
         system_reply = main_controller(user_message)
 
@@ -38,6 +53,9 @@ def send_message(event=None):
         chat_window.tag_add("system_message", "end-4l linestart", "end-2l")
         chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+
+        # Save system reply to the active chat file
+        save_chat_to_file(active_chat_file, {"timestamp": current_time, "sender": "System", "message": system_reply})
 
         chat_window.config(state=tk.DISABLED)
         chat_window.see(tk.END)
@@ -61,8 +79,13 @@ def get_chat_history(chat_key):
             return json.load(file)
     return []
 
-def load_chat_content(chat_history):
-    """Loads chat history into the chat window using the provided content."""
+def load_chat_content(chat_file):
+    """Loads chat history into the chat window using the provided content and sets the active chat file."""
+    global active_chat_file
+    active_chat_file = chat_file
+
+        # Retrieve the most recent content from the file
+    chat_history = get_chat_history(chat_file)
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
     if not chat_history:
@@ -118,7 +141,7 @@ def populate_chat_list():
         file_path = os.path.join(CHAT_FOLDER_PATH, chat_file)
         with open(file_path, "r") as file:
             chat_content = json.load(file)  # Load the chat content
-        chat_button = tk.Button(chat_list_frame, text=chat_name, command=lambda content=chat_content: load_chat_content(content))
+        chat_button = tk.Button(chat_list_frame, text=chat_name, command=lambda file=chat_file: load_chat_content(file))
         chat_button.pack(fill=tk.X, pady=2)
 
 def handle_keypress(event):
@@ -131,7 +154,7 @@ def initialize_chat():
     """Initializes the chat window with the untitled chat."""
     untitled_file = create_or_increment_untitled()
     chat_history = get_chat_history(untitled_file)
-    load_chat_content(chat_history)
+    load_chat_content(untitled_file)
 
 # Create the main window
 root = tk.Tk()

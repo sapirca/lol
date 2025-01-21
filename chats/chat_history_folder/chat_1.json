@@ -13,5 +13,15 @@
         "timestamp": "10:01:30",
         "sender": "System",
         "message": "Hi there!"
+    },
+    {
+        "timestamp": "00:42:22",
+        "sender": "You",
+        "message": "chat 1"
+    },
+    {
+        "timestamp": "00:42:22",
+        "sender": "System",
+        "message": "I'm not sure how to respond to that."
     }
 ]
