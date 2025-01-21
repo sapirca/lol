@@ -23,6 +23,17 @@ def save_chat_to_file(chat_file, new_entry):
     with open(file_path, "w") as file:
         json.dump(chat_history, file, indent=4)
 
+def append_message_to_window(timestamp, sender, message):
+    """Adds a message to the chat window with proper formatting and colors."""
+    chat_window.insert(tk.END, f"[{timestamp}] {sender}:\n", f"{sender.lower()}_label")
+    chat_window.insert(tk.END, f"{message}\n\n", f"{sender.lower()}_message")
+    if sender.lower() == "system":
+        chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+    elif sender.lower() == "you":
+        chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
+        chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
+
 def send_message(event=None):
     global active_chat_file
     user_message = user_input.get("1.0", tk.END).strip()
@@ -32,13 +43,8 @@ def send_message(event=None):
         # Get the current time
         current_time = datetime.now().strftime("%H:%M:%S")
 
-        # Add user message with label, color, and timestamp
-        chat_window.insert(tk.END, f"[{current_time}] You:\n", "user_label")
-        chat_window.insert(tk.END, f"{user_message}\n\n", "user_message")
-        chat_window.tag_add("user_label", "end-5l linestart", "end-4l")
-        chat_window.tag_add("user_message", "end-4l linestart", "end-2l")
-        chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
-        chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
+        # Add user message
+        append_message_to_window(current_time, "You", user_message)
 
         # Save user message to the active chat file
         save_chat_to_file(active_chat_file, {"timestamp": current_time, "sender": "You", "message": user_message})
@@ -46,13 +52,8 @@ def send_message(event=None):
         # Call the main controller for the system reply
         system_reply = main_controller(user_message)
 
-        # Add system message with label, color, and timestamp
-        chat_window.insert(tk.END, f"[{current_time}] System:\n", "system_label")
-        chat_window.insert(tk.END, f"{system_reply}\n\n", "system_message")
-        chat_window.tag_add("system_label", "end-5l linestart", "end-4l")
-        chat_window.tag_add("system_message", "end-4l linestart", "end-2l")
-        chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
-        chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+        # Add system reply
+        append_message_to_window(current_time, "System", system_reply)
 
         # Save system reply to the active chat file
         save_chat_to_file(active_chat_file, {"timestamp": current_time, "sender": "System", "message": system_reply})
@@ -84,27 +85,17 @@ def load_chat_content(chat_file):
     global active_chat_file
     active_chat_file = chat_file
 
-        # Retrieve the most recent content from the file
+    # Retrieve the most recent content from the file
     chat_history = get_chat_history(chat_file)
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
     if not chat_history:
         # Initialize with a welcome message if history is empty
         current_time = datetime.now().strftime("%H:%M:%S")
-        chat_window.insert(tk.END, f"[{current_time}] System:\n", "system_label")
-        chat_window.insert(tk.END, "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n", "system_message")
-        chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
-        chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+        append_message_to_window(current_time, "System", "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!")
     else:
         for entry in chat_history:
-            chat_window.insert(tk.END, f"[{entry['timestamp']}] {entry['sender']}:\n", f"{entry['sender'].lower()}_label")
-            chat_window.insert(tk.END, f"{entry['message']}\n\n", f"{entry['sender'].lower()}_message")
-            if entry['sender'].lower() == 'system':
-                chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
-                chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
-            elif entry['sender'].lower() == 'you':
-                chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
-                chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
+            append_message_to_window(entry['timestamp'], entry['sender'], entry['message'])
     chat_window.config(state=tk.DISABLED)
 
 def create_or_increment_untitled():
@@ -138,9 +129,6 @@ def populate_chat_list():
 
     for chat_file in chat_files:
         chat_name = os.path.splitext(chat_file)[0]  # Use filename without extension as chat name
-        file_path = os.path.join(CHAT_FOLDER_PATH, chat_file)
-        with open(file_path, "r") as file:
-            chat_content = json.load(file)  # Load the chat content
         chat_button = tk.Button(chat_list_frame, text=chat_name, command=lambda file=chat_file: load_chat_content(file))
         chat_button.pack(fill=tk.X, pady=2)
 
@@ -153,7 +141,6 @@ def handle_keypress(event):
 def initialize_chat():
     """Initializes the chat window with the untitled chat."""
     untitled_file = create_or_increment_untitled()
-    chat_history = get_chat_history(untitled_file)
     load_chat_content(untitled_file)
 
 # Create the main window
