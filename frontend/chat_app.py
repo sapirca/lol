@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
+from datetime import datetime
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -10,19 +11,22 @@ def send_message(event=None):
     if user_message:
         chat_window.config(state=tk.NORMAL)
 
-        # Add user message with label and color
-        chat_window.insert(tk.END, "You:\n", "user_label")
+        # Get the current time
+        current_time = datetime.now().strftime("%H:%M:%S")
+
+        # Add user message with label, color, and timestamp
+        chat_window.insert(tk.END, f"[{current_time}] You:\n", "user_label")
         chat_window.insert(tk.END, f"{user_message}\n\n", "user_message")
-        chat_window.tag_add("user_label", "end-4l linestart", "end-3l")
-        chat_window.tag_add("user_message", "end-3l linestart", "end-1l")
+        chat_window.tag_add("user_label", "end-5l linestart", "end-4l")
+        chat_window.tag_add("user_message", "end-4l linestart", "end-2l")
         chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
         chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
 
-        # Add system message with label and color
-        chat_window.insert(tk.END, "System:\n", "system_label")
+        # Add system message with label, color, and timestamp
+        chat_window.insert(tk.END, f"[{current_time}] System:\n", "system_label")
         chat_window.insert(tk.END, "This is a static reply.\n\n", "system_message")
-        chat_window.tag_add("system_label", "end-4l linestart", "end-3l")
-        chat_window.tag_add("system_message", "end-3l linestart", "end-1l")
+        chat_window.tag_add("system_label", "end-5l linestart", "end-4l")
+        chat_window.tag_add("system_message", "end-4l linestart", "end-2l")
         chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
 
@@ -37,10 +41,11 @@ def handle_keypress(event):
 
 def initialize_chat():
     chat_window.config(state=tk.NORMAL)
-    chat_window.insert(tk.END, "System:\n", "system_label")
+    current_time = datetime.now().strftime("%H:%M:%S")
+    chat_window.insert(tk.END, f"[{current_time}] System:\n", "system_label")
     chat_window.insert(tk.END, "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n", "system_message")
-    chat_window.tag_add("system_label", "1.0", "1.6")
-    chat_window.tag_add("system_message", "1.6", "end-1c")
+    chat_window.tag_add("system_label", "1.0", "1.8")
+    chat_window.tag_add("system_message", "1.8", "end-1c")
     chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
     chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
     chat_window.config(state=tk.DISABLED)
