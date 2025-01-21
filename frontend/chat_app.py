@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import scrolledtext
 
 # Alignment flags
-USER_ALIGNMENT = "right"
+USER_ALIGNMENT = "left"
 SYSTEM_ALIGNMENT = "left"
 
 def send_message(event=None):
