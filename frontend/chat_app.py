@@ -1,6 +1,12 @@
 import tkinter as tk
 from tkinter import scrolledtext
 from datetime import datetime
+import os
+import json
+
+# Constants
+CHAT_FOLDER_PATH = "chats/chat_history_folder"  # Folder where chat files are stored
+UNTITLED_CHAT_FILE = "untitled.json"  # Default chat file for initialization
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -47,37 +53,95 @@ def main_controller(user_message):
     else:
         return "I'm not sure how to respond to that."
 
+def get_chat_history(chat_key):
+    """Retrieves chat history from a file based on chat_key."""
+    file_path = os.path.join(CHAT_FOLDER_PATH, chat_key)
+    if os.path.exists(file_path):
+        with open(file_path, "r") as file:
+            return json.load(file)
+    return []
+
+def load_chat_content(chat_history):
+    """Loads chat history into the chat window using the provided content."""
+    chat_window.config(state=tk.NORMAL)
+    chat_window.delete("1.0", tk.END)
+    for entry in chat_history:
+        chat_window.insert(tk.END, f"[{entry['timestamp']}] {entry['sender']}:\n", f"{entry['sender'].lower()}_label")
+        chat_window.insert(tk.END, f"{entry['message']}\n\n", f"{entry['sender'].lower()}_message")
+    chat_window.config(state=tk.DISABLED)
+
+def create_or_increment_untitled():
+    """Ensures an untitled chat file exists or increments its name if one already exists."""
+    untitled_path = os.path.join(CHAT_FOLDER_PATH, UNTITLED_CHAT_FILE)
+    if os.path.exists(untitled_path):
+        counter = 1
+        while True:
+            new_untitled_file = f"untitled_{counter}.json"
+            new_untitled_path = os.path.join(CHAT_FOLDER_PATH, new_untitled_file)
+            if not os.path.exists(new_untitled_path):
+                return new_untitled_file
+            counter += 1
+    else:
+        return UNTITLED_CHAT_FILE
+
+def populate_chat_list():
+    """Populates the chat list on the left UI bar by reading filenames in the chat history folder."""
+    if not os.path.exists(CHAT_FOLDER_PATH):
+        os.makedirs(CHAT_FOLDER_PATH)  # Create the folder if it doesn't exist
+
+    # Ensure the untitled chat exists
+    untitled_file = create_or_increment_untitled()
+    untitled_path = os.path.join(CHAT_FOLDER_PATH, untitled_file)
+    if not os.path.exists(untitled_path):
+        with open(untitled_path, "w") as file:
+            json.dump([], file)
+
+    # Add untitled chat to the top of the list
+    chat_files = [untitled_file] + [f for f in os.listdir(CHAT_FOLDER_PATH) if f.endswith(".json") and f != untitled_file]
+
+    for chat_file in chat_files:
+        chat_name = os.path.splitext(chat_file)[0]  # Use filename without extension as chat name
+        file_path = os.path.join(CHAT_FOLDER_PATH, chat_file)
+        with open(file_path, "r") as file:
+            chat_content = json.load(file)  # Load the chat content
+        chat_button = tk.Button(chat_list_frame, text=chat_name, command=lambda content=chat_content: load_chat_content(content))
+        chat_button.pack(fill=tk.X, pady=2)
+
 def handle_keypress(event):
+    """Handles the Enter key press to send messages."""
     if event.keysym == "Return" and not event.state & 1:  # Enter without Shift
         send_message()
         return "break"  # Prevent default newline behavior
 
 def initialize_chat():
-    chat_window.config(state=tk.NORMAL)
-    current_time = datetime.now().strftime("%H:%M:%S")
-    chat_window.insert(tk.END, f"[{current_time}] System:\n", "system_label")
-    chat_window.insert(tk.END, "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!\n\n", "system_message")
-    chat_window.tag_add("system_label", "1.0", "1.8")
-    chat_window.tag_add("system_message", "1.8", "end-1c")
-    chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT, spacing1=1, spacing3=5)
-    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT, spacing1=1, spacing3=5)
-    chat_window.config(state=tk.DISABLED)
+    """Initializes the chat window with the untitled chat."""
+    untitled_file = create_or_increment_untitled()
+    chat_history = get_chat_history(untitled_file)
+    
+    load_chat_content(chat_history)
 
 # Create the main window
 root = tk.Tk()
 root.title("Chat App")
-root.geometry("800x500")
+root.geometry("1000x500")
+
+# Create a frame for the left chat list
+chat_list_frame = tk.Frame(root, width=200, bg="#2c2c2c")
+chat_list_frame.pack(side=tk.LEFT, fill=tk.Y)
+
+# Populate the chat list
+populate_chat_list()
 
 # Create a frame for the chat window
 chat_frame = tk.Frame(root)
-chat_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+chat_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state=tk.DISABLED, height=20, width=50)
 chat_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the input
-input_frame = tk.Frame(root)
+input_frame = tk.Frame(chat_frame)
 input_frame.pack(padx=10, pady=10, fill=tk.X)
 
 # Create a text widget for user input

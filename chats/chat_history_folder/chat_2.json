@@ -1,0 +1,27 @@
+[
+    {
+        "timestamp": "11:30:00",
+        "sender": "System",
+        "message": "Hello! Welcome back to this chat."
+    },
+    {
+        "timestamp": "11:31:00",
+        "sender": "You",
+        "message": "Thanks! I need some help with my task."
+    },
+    {
+        "timestamp": "11:32:15",
+        "sender": "System",
+        "message": "Of course! What do you need assistance with?"
+    },
+    {
+        "timestamp": "11:33:45",
+        "sender": "You",
+        "message": "I need clarification on the instructions."
+    },
+    {
+        "timestamp": "11:34:10",
+        "sender": "System",
+        "message": "Sure! Let me provide you with the details."
+    }
+]
