@@ -2,18 +2,27 @@ import openai
 import requests
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 from constants import API_TIMEOUT
+from logger import Logger
 
 class LLMBackend:
     """
     Base class for LLM backends.
     Each backend should inherit from this class and implement the generate_response method.
     """
-    def __init__(self, name):
+    def __init__(self, name, logger):
         self.name = name
+        self.logger = logger
 
     def generate_response(self, prompt):
         """Generate a response based on the provided prompt."""
         raise NotImplementedError("Subclasses must implement this method.")
+
+    def log_tokens(self, prompt, response):
+        """Log the number of tokens sent and received."""
+        prompt_tokens = len(prompt.split())
+        response_tokens = len(response.split())
+        log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
+        self.logger.add_message(tag=f"{self.name} Token Log", content=log_message)
 
 class GPTBackend(LLMBackend):
     def generate_response(self, prompt):
@@ -25,7 +34,9 @@ class GPTBackend(LLMBackend):
                 prompt=prompt,
                 max_tokens=150
             )
-            return response.choices[0].text.strip()
+            response_text = response.choices[0].text.strip()
+            self.log_tokens(prompt, response_text)
+            return response_text
         except Exception as e:
             return f"[GPT Error]: {str(e)}"
 
@@ -40,7 +51,9 @@ class ClaudeBackend(LLMBackend):
                 timeout=API_TIMEOUT
             )
             response.raise_for_status()
-            return response.json().get("completion", "[Claude Error]: No response")
+            response_text = response.json().get("completion", "[Claude Error]: No response")
+            self.log_tokens(prompt, response_text)
+            return response_text
         except Exception as e:
             return f"[Claude Error]: {str(e)}"
 
@@ -55,25 +68,29 @@ class GeminiBackend(LLMBackend):
                 timeout=API_TIMEOUT
             )
             response.raise_for_status()
-            return response.json().get("response", "[Gemini Error]: No response")
+            response_text = response.json().get("response", "[Gemini Error]: No response")
+            self.log_tokens(prompt, response_text)
+            return response_text
         except Exception as e:
             return f"[Gemini Error]: {str(e)}"
 
 class StubBackend(LLMBackend):
     def generate_response(self, prompt):
         """Generate a response using Stub backend with a valid xLights sequence."""
-        sequnece = """<?xml version="1.0" encoding="UTF-8"?>
-                    <xsequence BaseChannel="0" ChanCtrlBasic="0" ChanCtrlColor="0" FixedPointTiming="1" ModelBlending="true">
-                    <head>
-                    <version>2024.19</version>
-                    </head>
-                    <steps>
-                    <step>
-                        <number>1</number>
-                        <animation>Simple Animation</animation>
-                    </step>
-                    </steps>
-                    </xsequence>
-                    """
-        
-        return f"[Stub-{self.name}]: Simulated response. with new '{sequnece}'"
+        sequence = (
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            "<xsequence BaseChannel=\"0\" ChanCtrlBasic=\"0\" ChanCtrlColor=\"0\" FixedPointTiming=\"1\" ModelBlending=\"true\">"
+            "<head>"
+            "<version>2024.19</version>"
+            "</head>"
+            "<steps>"
+            "<step>"
+            "<number>1</number>"
+            "<animation>Simple Animation</animation>"
+            "</step>"
+            "</steps>"
+            "</xsequence>"
+        )
+        response_text = f"[Stub-{self.name}]: Simulated response with new '{sequence}'"
+        self.log_tokens(prompt, response_text)
+        return response_text

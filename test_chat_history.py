@@ -65,6 +65,19 @@ class TestChatHistory(unittest.TestCase):
         self.assertEqual(history[1]["role"], "assistant")
         self.assertEqual(history[1]["content"], "Hi there!")
 
+    def test_get_context_excludes_animations(self):
+        self.chat_history.add_message("user", "What is the best light effect?")
+        self.chat_history.add_message("assistant", "A soft blue ripple effect is great.")
+        self.chat_history.add_message("animation", "<xsequence>...</xsequence>")
+
+        context = self.chat_history.get_context()
+
+        # Verify that "animation" is excluded from the context
+        self.assertNotIn("<animation>", context)
+        self.assertIn("<user>: What is the best light effect?", context)
+        self.assertIn("<assistant>: A soft blue ripple effect is great.", context)
+
+
     def test_load_chat_history(self):
         self.chat_history.add_message("user", "Hello!")
         self.chat_history.add_message("assistant", "Hi there!")

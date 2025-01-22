@@ -1,174 +1,150 @@
 import unittest
-from unittest.mock import MagicMock
+import os
 from main_controller import MainController
 from chat_history import ChatHistory
-from backends import StubBackend
-from constants import XSEQUENCE_TAG
+from sequence_manager import SequenceManager
+from constants import XSEQUENCE_TAG, ANIMATION_OUT_TEMP_DIR
 import xml.etree.ElementTree as ET
 
 class TestMainController(unittest.TestCase):
     def setUp(self):
-        """Set up the MainController with a stub backend."""
+        # Initialize MainController with test configuration
         self.config = {
             "use_stub": True,
-            "selected_backend": None,
-            "should_add_knowledge": False
+            "selected_backend": "StubBackend",
+            "should_add_knowledge": False,
         }
         self.controller = MainController(self.config)
+        self.chat_history = self.controller.chat_history
+        self.sequence_manager = self.controller.sequence_manager
+
+        # Create necessary directories for testing
+        os.makedirs(ANIMATION_OUT_TEMP_DIR, exist_ok=True)
+
+    def tearDown(self):
+        # Cleanup temp files and directories
+        if os.path.exists(ANIMATION_OUT_TEMP_DIR):
+            for file in os.listdir(ANIMATION_OUT_TEMP_DIR):
+                os.remove(os.path.join(ANIMATION_OUT_TEMP_DIR, file))
 
     def test_initial_prompt_added(self):
-        """Test that the initial prompt is added to the chat history only once."""
+        """Test that the initial prompt is added to the chat history."""
         user_input = "What is the best light effect for a calm section?"
+        self.controller.communicate(user_input)
+        context = self.chat_history.get_context()
+        self.assertTrue(context.startswith("<system>: You are an AI assistant specializing"), "Initial prompt is not added correctly.")
 
-        response = self.controller.communicate(user_input)
-
-        # Check that the initial prompt is in the chat history
-        context = self.controller.chat_history.get_context()
-        self.assertIn("You are an AI assistant specializing", context)
-
-        # Check that the user input and response are also in the chat history
-        self.assertIn(user_input, context)
-        self.assertIn("[Stub-StubBackend]:", response)
-
-    def test_initial_prompt_only_once(self):
-        """Test that the initial prompt is added only once to the chat history."""
-        first_input = "What is the best light effect for a calm section?"
-        second_input = "What colors should I use for a romantic section?"
-
-        # Communicate twice
-        self.controller.communicate(first_input)
-        self.controller.communicate(second_input)
-
-        # Check that the initial prompt appears only once
-        context = self.controller.chat_history.get_context()
-        initial_prompt_count = context.count("You are an AI assistant specializing")
-        self.assertEqual(initial_prompt_count, 1, "Initial prompt was added more than once.")
-
-    def test_initial_prompt_order(self):
-        """Test that the initial prompt is added at the beginning of the chat history."""
-        user_input = "What is the best light effect for a calm section?"
-
-        response = self.controller.communicate(user_input)
-
-        # Get the chat history context
-        context = self.controller.chat_history.get_context()
-
-        # Check that the initial prompt is the first message
-        lines = context.split("\n")
-        
-        self.assertTrue(
-            lines[0] == "system: You are an AI assistant specializing in crafting light sequences that suit the played music. Your task is to generate a visually engaging light show for the provided song using the xLights software. You will analyze the provided EDM music and create an XSQ sequence file based on the given template.",
-            "Initial prompt is not at the beginning of the chat history."
-        )
-
-    def test_multiple_user_inputs(self):
-        """Test that multiple user inputs are handled correctly."""
+    def test_user_input_and_responses_order(self):
+        """Test that user inputs and responses are added to the chat history in the correct order."""
         user_inputs = [
-            "What is the best light effect for a fast-paced drop section?",
-            "What colors should I use for a romantic section?"
+            "What is the best light effect for a calm section?",
+            "y"
         ]
 
+        responses = []
         for user_input in user_inputs:
-            response = self.controller.communicate(user_input)
+            responses.append(self.controller.communicate(user_input))
 
-        # Check that all user inputs are in the chat history
-        context = self.controller.chat_history.get_context()
-        for user_input in user_inputs:
-            self.assertIn(user_input, context)
+        # Filter out 'animation' role entries
+        filtered_history = [msg for msg in self.controller.chat_history.history if msg["role"] != "animation"]
 
-        # Check that the stub responses are included
-        self.assertIn("[Stub-StubBackend]:", context)
+        # Verify the length of filtered history
+        expected_length = 1 + len(user_inputs) * 2  # 1 system message + 2 messages (user, assistant) per input
+        self.assertEqual(len(filtered_history), expected_length, "Filtered chat history does not match expected length.")
 
-    def test_backend_selection_with_stub(self):
-        """Test that the StubBackend is used when the stub flag is on."""
-        user_input = "What is the timing for a drop?"
+        # Verify the initial system message
+        self.assertEqual(filtered_history[0]["role"], "system", "First message is not a system message.")
+        self.assertTrue(
+            "You are an AI assistant specializing" in filtered_history[0]["content"],
+            "Initial system message content is incorrect."
+        )
 
-        # Ensure only the StubBackend is selected
-        backend = self.controller.select_backend()
-        self.assertEqual(backend.name, "StubBackend")
+        # Verify user inputs and assistant responses
+        for i, user_input in enumerate(user_inputs):
+            user_message = filtered_history[1 + i * 2]
+            assistant_message = filtered_history[2 + i * 2]
 
-        response = self.controller.communicate(user_input)
-        self.assertIn("[Stub-StubBackend]:", response)
+            self.assertEqual(user_message["role"], "user", f"Message {i + 1} is not a user message.")
+            self.assertEqual(user_message["content"], user_input, f"User input {i + 1} is incorrect.")
 
-    # TODO(SAPIR): Get context as array
-    # def test_user_input_and_responses_order(self):
-    #     """Test that user inputs and responses are added to the chat history in the correct order."""
-    #     user_inputs = [
-    #         "What is the best light effect for a calm section?",
-    #         "What colors should I use for a romantic section?"
-    #     ]
-
-    #     responses = []
-    #     for user_input in user_inputs:
-    #         responses.append(self.controller.communicate(user_input))
-
-    #     # Get the chat history context
-    #     context = self.controller.chat_history.get_context()
-    #     lines = context.split("\n")
-
-    #     # Verify the order: initial prompt, user inputs, and responses
-    #     self.assertTrue(
-    #         lines[0] == "system: You are an AI assistant specializing in crafting light sequences that suit the played music. Your task is to generate a visually engaging light show for the provided song using the xLights software. You will analyze the provided EDM music and create an XSQ sequence file based on the given template.",
-    #         "Initial prompt is not at the beginning of the chat history."
-    #     )
-
-    #     for i, user_input in enumerate(user_inputs):
-    #         user_index = len(lines) - len(user_inputs) * 2 + i * 2  # Dynamic index for user input
-    #         response_index = user_index + 1  # Response immediately follows the user input
-
-    #         self.assertEqual(lines[user_index], f"user: {user_input}", f"User input {i + 1} is not in the correct order.")
-    #         self.assertEqual(lines[response_index], f"assistant: {responses[i]}", f"Response {i + 1} is not in the correct order.")
+            self.assertEqual(assistant_message["role"], "assistant", f"Message {i + 1} is not an assistant message.")
+            self.assertTrue(
+                responses[i] in assistant_message["content"],
+                f"Assistant response {i + 1} does not match the expected response."
+            )
 
     def test_sequence_flow(self):
         """Test the sequence flow: initial skeleton sequence and updates."""
-        # Verify initial sequence matches the skeleton file
-        with open("sequence_skeleton.xml", "r") as skeleton_file:
-            expected_initial_sequence = skeleton_file.read().strip()
-        
-        initial_sequence = self.controller.sequence_manager.get_latest_sequence().strip()
+        tree = ET.parse("sequence_skeleton.xml")
+        expected_initial_sequence = ET.tostring(tree.getroot(), encoding="unicode")
 
-        # Normalize both sequences by parsing and converting back to strings
-        expected_tree = ET.fromstring(expected_initial_sequence)
-        initial_tree = ET.fromstring(initial_sequence)
-        expected_normalized = ET.tostring(expected_tree, encoding="unicode")
-        initial_normalized = ET.tostring(initial_tree, encoding="unicode")
+        # Verify the initial sequence matches the skeleton
+        initial_sequence = self.controller.sequence_manager.get_latest_sequence()
+        self.assertEqual(
+            initial_sequence.strip(),
+            expected_initial_sequence.strip(),
+            "Initial sequence skeleton does not match the file."
+        )
 
-        self.assertEqual(initial_normalized, expected_normalized, "Initial sequence skeleton does not match the file.")
-        self.assertEqual(len(self.controller.sequence_manager.steps), 1, "Number of sequences is not as expected.")
-
-        # Simulate first update
+        # Simulate first user input
         user_input_1 = "Add a simple animation for the intro section."
-        response_1 = self.controller.communicate(user_input_1)
+        output_1 = self.controller.communicate(user_input_1)
+        self.assertIn("Approve to save this animation to the sequence manager?", output_1, "Approval prompt not returned.")
 
-        expected_sequence_update = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-            <xsequence BaseChannel=\"0\" ChanCtrlBasic=\"0\" ChanCtrlColor=\"0\" FixedPointTiming=\"1\" ModelBlending=\"true\">
-            <head>
-            <version>2024.19</version>
-            </head>
-            <steps>
-            <step>
-            <number>1</number>
-            <animation>Simple Animation</animation>
-            </step>
-            </steps>
-            </xsequence>
-            """
-
+        # Simulate user approval (saving the sequence)
+        save_output_1 = self.controller.communicate("y")
         updated_sequence_1 = self.controller.sequence_manager.get_latest_sequence()
-        self.assertNotEqual(expected_sequence_update, updated_sequence_1, "Sequence was not updated after first response.")
-        self.assertEqual(len(self.controller.sequence_manager.steps), 2, "Number of sequences is not 2.")
+        self.assertNotEqual(initial_sequence, updated_sequence_1, "Sequence was not updated after user approval.")
+        self.assertIn("Animation saved successfully as step", save_output_1, "Save confirmation not returned.")
 
-        # Simulate second update
+        # Simulate second user input
         user_input_2 = "Add a more dynamic animation for the drop section."
-        response_2 = self.controller.communicate(user_input_2)
+        output_2 = self.controller.communicate(user_input_2)
+        self.assertIn("Approve to save this animation to the sequence manager?", output_2, "Approval prompt not returned.")
 
+        # Simulate user rejection (not saving the sequence)
+        reject_output_2 = self.controller.communicate("n")
         updated_sequence_2 = self.controller.sequence_manager.get_latest_sequence()
-        
-        # Assert number of sequences in manager
-        self.assertNotEqual(expected_sequence_update, updated_sequence_2, "Sequence was not updated after second response.")
-        self.assertEqual(len(self.controller.sequence_manager.steps), 3, "Number of sequences is not 3.")
+        self.assertEqual(
+            updated_sequence_1,
+            updated_sequence_2,
+            "Sequence was incorrectly updated after user rejection."
+        )
+        self.assertIn("Animation discarded.", reject_output_2, "Rejection confirmation not returned.")
+
+
+    def test_response_manager_parse_logic(self):
+        """Test parsed response handling for reasoning, consistency justification, and sequence."""
+        user_input = "Add a new light sequence for the chorus section."
+        response = self.controller.communicate(user_input)
+        self.assertIn("animation has been stored", response.lower(), "Parsed response did not indicate animation handling.")
+
+    def test_temp_animation_management(self):
+        """Test the handling of temporary animation files."""
+        user_input = "Create a new animation for the verse section."
+        self.controller.communicate(user_input)
+        self.assertIsNotNone(self.controller.temp_animation_path, "Temp animation path was not set.")
+        self.assertTrue(os.path.exists(self.controller.temp_animation_path), "Temp animation file was not created.")
+
+        # Simulate user approval
+        approval_response = self.controller.handle_user_approval("y")
+        self.assertIn("Animation saved successfully", approval_response, "Animation approval did not save the sequence.")
+        self.assertFalse(os.path.exists(self.controller.temp_animation_path), "Temp animation file was not deleted after approval.")
+
+    def test_invalid_user_response(self):
+        """Test handling of invalid user responses during approval."""
+        user_input = "Generate an animation."
+        self.controller.communicate(user_input)
+
+        invalid_response = self.controller.handle_user_approval("maybe")
+        self.assertIn("Invalid response", invalid_response, "Invalid response was not handled correctly.")
+
+    def test_chat_history_finalization(self):
+        """Test chat history finalization and saving to logs."""
+        self.controller.shutdown()
+        log_dir = "chats/finals"
+        files = os.listdir(log_dir)
+        self.assertTrue(any(file.startswith("final_chat_log_") for file in files), "Final chat log was not saved.")
 
 if __name__ == "__main__":
-    result = unittest.main(exit=False)
-    if result.result.wasSuccessful():
-        print("All tests passed successfully!")
+    unittest.main(argv=[''], exit=False)

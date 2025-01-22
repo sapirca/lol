@@ -1,3 +1,4 @@
+# /Users/sapir/repos/lol/response_manager.py
 from constants import XSEQUENCE_TAG
 import re
 
@@ -7,10 +8,11 @@ class ResponseManager:
 
     def parse_response(self, response):
         result = {
+            "response_wo_animation": None,
             "reasoning": None,
-            "animation_sequence": None,
+            "consistency_justification": None,
             "requested_actions": [],
-            "consistency_justification": None
+            "animation_sequence": None,
         }
 
         if "<?xml" in response and f"</{XSEQUENCE_TAG}>" in response:
@@ -19,7 +21,9 @@ class ResponseManager:
             sequence_xml = response[sequence_start:sequence_end]
             result["animation_sequence"] = sequence_xml
 
-            response = response[:sequence_start] + response[sequence_end:]
+            # Save the response without the animation
+            result["response_wo_animation"] = response[:sequence_start] + response[sequence_end:]
+            response = result["response_wo_animation"]
 
         tags = re.findall(r"<([a-zA-Z0-9_]+)>(.*?)</\1>", response, re.DOTALL)
         for tag, content in tags:

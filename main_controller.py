@@ -1,33 +1,32 @@
+
+# main_controller.py
 import random
 from backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend
 from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
-from chat_history import ChatHistory
 from sequence_manager import SequenceManager
-from constants import XSEQUENCE_TAG, ANIMATION_OUT_TEMP_DIR
 from response_manager import ResponseManager
+from constants import XSEQUENCE_TAG, ANIMATION_OUT_TEMP_DIR
+from logger import Logger
 import os
-from datetime import datetime
+
 
 class MainController:
     def __init__(self, config):
         self.backends = {}
         self.use_stub = config.get("use_stub", False)
         self.selected_backend = config.get("selected_backend", None)
-        self.chat_history = ChatHistory()
-        self.initial_prompt_added = False
         self.house_config = self._load_house_config()
         self.sequence_manager = SequenceManager("sequence_skeleton.xml")
         self.response_manager = ResponseManager(self.sequence_manager)
-        self.log_file = self._initialize_log()
+        self.logger = Logger()
+        self.initial_prompt_added = False
         self.wait_for_response = False
         self.temp_animation_path = None
         self._initialize_backends()
 
     def shutdown(self):
-        """Finalize chat history and close the log file."""
-        self.chat_history.finalize()
-        self.log_file.close()
+        self.logger.finalize()
         print("Session finalized. Logs saved.")
 
     def _initialize_backends(self):
@@ -38,16 +37,8 @@ class MainController:
             "StubBackend": StubBackend
         }
         for backend_name, backend_class in backend_mapping.items():
-            self.register_backend(backend_class(backend_name))
+            self.register_backend(backend_class(backend_name, self.logger))
 
-    def _initialize_log(self):
-        log_dir = "logs"
-        os.makedirs(log_dir, exist_ok=True)
-        log_filename = os.path.join(log_dir, datetime.now().strftime("conversation_log_%Y-%m-%d_%H-%M-%S.txt"))
-        return open(log_filename, "a")
-
-    def _log_message(self, sender, message):
-        self.log_file.write(f"{sender}: {message}\n\n")
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):
@@ -83,7 +74,10 @@ class MainController:
 
     def communicate(self, user_input):
         if self.wait_for_response:
-            return self.handle_user_approval(user_input)
+          self.logger.add_message("lol_visible_user", user_input)
+          visible_system_message = self.handle_user_approval(user_input)
+          self.logger.add_message("lol_visible_system", visible_system_message)
+          return {"system": visible_system_message}
 
         backend = self.select_backend()
 
@@ -91,22 +85,31 @@ class MainController:
 
         if not self.initial_prompt_added:
             initial_prompt = get_full_prompt(self.house_config)
-            self.chat_history.add_message("system", initial_prompt)
-            self._log_message("system", initial_prompt)
+            self.logger.add_message("lol_inital_prompt_context","System: " + initial_prompt)
+            self.logger.add_message("lol_animation", latest_sequence)  # Log initial animation
             self.initial_prompt_added = True
+
         
-        self.chat_history.add_message("user", user_input)
-        self._log_message("user", user_input)
+        self.logger.add_message("lol_visible_user_context", "User: " + user_input)
 
-        prompt = self.chat_history.get_context() + f"\n\nAnimation Sequence ({XSEQUENCE_TAG}) is:\n\n{latest_sequence}"
+        # Construct the full prompt for the LLM
+        prompt = self.logger.get_context_to_llm() + f"\n\nAnimation Sequence ({XSEQUENCE_TAG}) is:\n\n{latest_sequence}"
+        self.logger.add_message("lol_system_final_prompt", prompt)
         response = backend.generate_response(prompt)
-
-        self.chat_history.add_message("assistant", response)
-        self._log_message("assistant", response)
+        self.logger.add_message("lol_raw_response", response)
 
         parsed_response = self.response_manager.parse_response(response)
 
-        return self.act_on_response(parsed_response)
+        assistant_response = parsed_response.get("response_wo_animation", "")
+        self.logger.add_message("lol_visible_assistant_context", "Assistant: " + assistant_response + "The animationed was trimmed out")
+
+        system_response = self.act_on_response(parsed_response)
+        self.logger.add_message("lol_visible_system", system_response)
+
+        return {
+            "assistant": assistant_response,
+            "system": system_response
+        }
 
     def act_on_response(self, processed_response):
         reasoning = processed_response.get("reasoning")
@@ -116,6 +119,7 @@ class MainController:
         output = ""
 
         if animation_sequence:
+            # Write the animation to a temp file
             output_dir = ANIMATION_OUT_TEMP_DIR
             os.makedirs(output_dir, exist_ok=True)
 
@@ -125,23 +129,17 @@ class MainController:
             with open(self.temp_animation_path, "w") as temp_file:
                 temp_file.write(animation_sequence)
 
-            # Save the animation sequence to chat history with label "animation"
-            self.chat_history.add_message("animation", animation_sequence)
-            self._log_message("animation", animation_sequence)
-
+            self.logger.add_message("lol_system", "generated temp_animation.xml for the user's observation")
             self.wait_for_response = True
 
-            output += f"The animation has been stored in {self.temp_animation_path}.\n"
-            output += "For the full reasoning and consistency, see log file.\n"
-            output += "Simulate the file in xlight, edit and update the animation.\n"
-            output += "Approve to save this animation to the sequence manager? (y/n): "
+            output += f"An animation sequence was generated and saved in  {self.temp_animation_path}.\n"
+            output += "Simulate or edit the file using xLights. Edit the animation file in needed.\n"
+            output += " Approve to save this animation to the sequence manager once done. Approve? (y/n): "
 
         else:
             output += "No animation sequence provided in the LLM response.\n"
 
-        actions = []
         for action in processed_response.get("requested_actions", []):
-            actions.append({"action": action["action"], "content": action["content"]})
             output += f"Unhandled action: {action['action']}\n"
 
         return output
@@ -151,6 +149,7 @@ class MainController:
             step_number = len(self.sequence_manager.steps) + 1
             with open(self.temp_animation_path, "r") as temp_file:
                 animation_sequence = temp_file.read()
+            self.logger.add_message("lol_animation", animation_sequence) # log every sequence update
             self.sequence_manager.add_sequence(step_number, animation_sequence)
             self.delete_temp_file(self.temp_animation_path)
             self.wait_for_response = False
@@ -169,14 +168,10 @@ class MainController:
             if os.path.exists(absolute_path):
                 os.remove(absolute_path)
                 if not os.path.exists(absolute_path):
-                    self._log_message("system", f"Temp file {absolute_path} was successfully deleted.")
+                    self.logger.add_message("lol_system", f"Temp file {absolute_path} was successfully deleted.")
                 else:
-                    self._log_message("system", f"Error: Temp file {absolute_path} still exists after deletion attempt.")
+                    self.logger.add_message("lol_system", f"Error: Temp file {absolute_path} still exists after deletion attempt.")
             else:
-                self._log_message("system", f"Temp file {absolute_path} does not exist. No deletion necessary.")
-        except PermissionError:
-            self._log_message("system", f"Permission denied while trying to delete {absolute_path}.")
-        except FileNotFoundError:
-            self._log_message("system", f"File {absolute_path} not found during deletion.")
+                self.logger.add_message("lol_system", f"Temp file {absolute_path} does not exist.")
         except Exception as e:
-            self._log_message("system", f"An unexpected error occurred while deleting {absolute_path}: {e}")
+            self.logger.add_message("lol_system", f"An error occurred while deleting {absolute_path}: {e}")

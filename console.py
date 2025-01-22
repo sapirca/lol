@@ -1,28 +1,25 @@
-import os
-import sys
 from main_controller import MainController
 from config import config
 
-if __name__ == "__main__":
-    # Ensure proper module resolution
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../lol'))
-
-    # Initialize MainController with configuration
+def main():
     controller = MainController(config)
+    print("System initialized. Type 'exit' to quit.")
 
-    print("AI Agent Console. Type 'exit' to quit.")
-
-    while True:
-        try:
+    try:
+        while True:
             user_input = input("You: ")
             if user_input.lower() == "exit":
-                print("Shutting down...")
+                print("Exiting. Goodbye!")
                 controller.shutdown()
-                print("Goodbye!")
                 break
 
-            output = controller.communicate(user_input)
-            print(f"AI: {output}")
+            responses = controller.communicate(user_input)
+            for role, message in responses.items():
+                print(f"{role.capitalize()}: {message}")
 
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
+    except KeyboardInterrupt:
+        print("\nSession interrupted. Exiting.")
+        controller.shutdown()
+
+if __name__ == "__main__":
+    main()

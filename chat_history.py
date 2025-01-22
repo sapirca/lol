@@ -23,8 +23,12 @@ class ChatHistory:
         self._cache_history()
 
     def get_context(self):
-        """Prepare the chat history to be sent to the LLM."""
-        return "\n".join([f"<{msg['role']}>: {msg['content']}" for msg in self.history])
+        """Prepare the chat history to be sent to the LLM, excluding animation tags."""
+        return "\n".join([
+            f"<{msg['role']}>: {msg['content']}"
+            for msg in self.history
+            if msg["role"] != "animation"
+        ])
 
     def _cache_history(self):
         """Save chat history to a snapshot file."""
