@@ -119,6 +119,10 @@ class MainController:
             with open(self.temp_animation_path, "w") as temp_file:
                 temp_file.write(animation_sequence)
 
+            # Save the animation sequence to chat history with label "animation"
+            self.chat_history.add_message("animation", animation_sequence)
+            self._log_message("animation", animation_sequence)
+
             self.wait_for_response = True
 
             output += f"The animation has been stored in {self.temp_animation_path}.\n"
@@ -127,7 +131,7 @@ class MainController:
             output += "Approve to save this animation to the sequence manager? (y/n): "
 
         else:
-            output += "No animation sequence provided in the llm response.\n"
+            output += "No animation sequence provided in the LLM response.\n"
 
         actions = []
         for action in processed_response.get("requested_actions", []):
