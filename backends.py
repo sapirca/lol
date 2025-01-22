@@ -22,7 +22,7 @@ class LLMBackend:
         prompt_tokens = len(prompt.split())
         response_tokens = len(response.split())
         log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
-        self.logger.add_message(tag=f"{self.name} Token Log", content=log_message)
+        self.logger.add_message(tag=f"system_log {self.name} - Tokens", content=log_message, visible=False, context=False) 
 
 class GPTBackend(LLMBackend):
     def generate_response(self, prompt):

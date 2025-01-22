@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 
 class SequenceManager:
-    def __init__(self, skeleton_file):
+    def __init__(self, skeleton_file, logger):
         self.skeleton_file = skeleton_file
+        self.logger = logger
         self.sequence_data = None
         self.steps = []
         self._load_sequence_skeleton()
@@ -18,12 +19,23 @@ class SequenceManager:
             raise RuntimeError(f"Error loading sequence skeleton: {e}")
 
     def add_sequence(self, step_number, sequence_xml):
-        """Add a new sequence to the manager."""
+        """Add a new sequence to the manager and log the update."""
         step = {"step": step_number, "sequence": sequence_xml}
         self.steps.append(step)
+        self.logger.add_message("animation_update", f"Animation updated for step {step_number}", visible=False, context=False)
 
     def get_latest_sequence(self):
         """Return the latest sequence available."""
         if not self.steps:
             return None
         return self.steps[-1]["sequence"]
+
+    def get_all_sequences(self):
+        """Return all sequences as a list."""
+        return [step["sequence"] for step in self.steps]
+
+    def load_sequences(self, sequences):
+        """Load sequences from a list."""
+        self.steps = []
+        for i, sequence in enumerate(sequences):
+            self.steps.append({"step": i, "sequence": sequence})
