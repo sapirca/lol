@@ -10,21 +10,36 @@ from logger import Logger
 import os
 from datetime import datetime
 import json
+from config import config as basic_config
 
 class MainController:
-    def __init__(self, config):
-        self.backends = {}
-        self.use_stub = config.get("use_stub", False)
-        self.selected_backend = config.get("selected_backend", None)
-        self.house_config = self._load_house_config()
+    def __init__(self, snapshot_dir=None):
+        """Initialize the MainController, optionally loading from a snapshot."""
         self.logger = Logger()
-        self.sequence_manager = SequenceManager("sequence_skeleton.xml", self.logger)
-        self.response_manager = ResponseManager(self.sequence_manager)
-        self.config = config
-        self.initial_prompt_added = False
+        self.backends = {}
+        self.house_config = self._load_house_config()
         self.wait_for_response = False
         self.temp_animation_path = None
         self._initialize_backends()
+        self.sequence_manager = SequenceManager("sequence_skeleton.xml", self.logger)
+
+        if snapshot_dir is not None:
+            try:
+                self._load_from_snapshot(snapshot_dir)
+                self.initial_prompt_added = True
+            except Exception as e:
+                raise RuntimeError(f"Failed to load snapshot from {snapshot_dir}: {e}")
+        else:
+            # Default initialization if no snapshot is provided
+            self.initial_prompt_added = False
+            self.config = basic_config
+            
+
+        # Shared initialization logic
+        self.use_stub = self.config.get("use_stub", False)
+        self.selected_backend = self.config.get("selected_backend", None)
+        self.response_manager = ResponseManager(self.sequence_manager)
+
 
     def shutdown(self):
         # Create a dedicated snapshot folder with timestamp
@@ -46,13 +61,21 @@ class MainController:
             with open(animation_file, "w") as file:
                 file.write(animation)
 
-        # Save the logger snapshot file
-        logger_snapshot_file = os.path.join(snapshot_dir, "logger_snapshot.json")
-        self.logger.finalize(logger_snapshot_file)
+          # Save logs to logs.json
+        logs_json_file = os.path.join(snapshot_dir, "logs.json")
+        with open(logs_json_file, "w") as file:
+            json.dump(self.logger.logs, file, indent=4)  # Save only the logs data
+
+        # Finalize the logger
+        self.logger.finalize()
 
         print(f"Session finalized. Snapshot saved in {snapshot_dir}.")
 
-    def load_from_snapshot(self, snapshot_dir):
+    def get_visible_chat(self):
+        """Retrieve all visible chat messages from the logger, including their tags/labels."""
+        return [(log['timestamp'], log['content'], log['tag']) for log in self.logger.logs if log['visible'] and 'timestamp' in log]
+
+    def _load_from_snapshot(self, snapshot_dir):
         if not os.path.exists(snapshot_dir):
             raise FileNotFoundError(f"Snapshot directory '{snapshot_dir}' does not exist.")
 
@@ -63,11 +86,12 @@ class MainController:
         ]
         for file_name in required_files:
             if not os.path.exists(os.path.join(snapshot_dir, file_name)):
-                raise FileNotFoundError(f"Required file '{file_name}' is missing in the snapshot directory.")
+                error_msg = f"Required file '{file_name}' is missing in the snapshot directory."
+                raise FileNotFoundError(error_msg)
 
         animations_dir = os.path.join(snapshot_dir, "animations")
         if not os.path.exists(animations_dir):
-            raise FileNotFoundError(f"Animations directory is missing in the snapshot directory.")
+            raise FileNotFoundError("Animations directory is missing in the snapshot directory.")
 
         # Load logs
         snapshot_log_file = os.path.join(snapshot_dir, "logs.json")
@@ -143,9 +167,9 @@ class MainController:
         if self.wait_for_response:
           # User response for agent action (e.g., store to memory, update animation)
           # This does not need to be added to the LLM context.
-          self.logger.add_message("action_user", user_input, visible=True, context=False) # Need to add info that this is internal_actions communication
+          self.logger.add_message("user_input", user_input, visible=True, context=False) # Need to add info that this is internal_actions communication
           visible_system_message = self.handle_user_approval(user_input)
-          self.logger.add_message("action_system", visible_system_message, visible=True, context=False) # Need to add info that this is internal_actions communication
+          self.logger.add_message("system_output", visible_system_message, visible=True, context=False) # Need to add info that this is internal_actions communication
           return {"system": visible_system_message}
 
         backend = self.select_backend()
@@ -178,10 +202,10 @@ class MainController:
         assistant_response = parsed_response.get("response_wo_animation", "")
       # Add this trimmed short response to the context
         # for better understanding.
-        self.logger.add_message("assistant_trimmed", "Assistant: " + assistant_response + " The animation was trimmed out", visible=True, context=True) 
+        self.logger.add_message("assistant", "Assistant: " + assistant_response + " The animation was trimmed out", visible=True, context=True) 
 
         system_response = self.act_on_response(parsed_response)
-        self.logger.add_message("action_system", system_response, visible=True, context=False) # Information about agent actions shared 
+        self.logger.add_message("system_output", system_response, visible=True, context=False) # Information about agent actions shared 
         # with the user.
 
         return {

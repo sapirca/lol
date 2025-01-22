@@ -1,8 +1,7 @@
 from main_controller import MainController
-from config import config
 
 def main():
-    controller = MainController(config)
+    controller = MainController()
     print("System initialized. Type 'exit' to quit.")
 
     try:
