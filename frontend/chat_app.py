@@ -113,7 +113,7 @@ def load_chat_content(snapshot_folder):
         unsaved_warning.title("Unsaved Changes")
         unsaved_warning.geometry("300x150")
 
-        label = tk.Label(unsaved_warning, text="Current chat is not saved. Do you want to continue?", wraplength=250)
+        label = tk.Label(unsaved_warning, text="System doesn't save automatically. Use Save button. Agree to exit?", wraplength=250)
         label.pack(pady=10)
 
         def proceed():
@@ -227,13 +227,6 @@ def populate_snapshot_list():
     snapshot_folders = [f for f in os.listdir(LOGS_FOLDER_PATH) if os.path.isdir(os.path.join(LOGS_FOLDER_PATH, f))]
 
     for snapshot_folder in snapshot_folders:
-        save_button = tk.Button(
-            chat_list_frame,
-            text=f"Save {snapshot_folder}",
-            command=save_chat
-        )
-        save_button.pack(fill=tk.X, pady=2)
-
         snapshot_button = tk.Button(
             chat_list_frame,
             text=snapshot_folder,
