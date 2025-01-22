@@ -23,5 +23,15 @@
         "timestamp": "11:34:10",
         "sender": "System",
         "message": "Sure! Let me provide you with the details."
+    },
+    {
+        "timestamp": "10:55:56",
+        "sender": "You",
+        "message": "bla bla"
+    },
+    {
+        "timestamp": "10:55:56",
+        "sender": "System",
+        "message": "I'm not sure how to respond to that."
     }
 ]

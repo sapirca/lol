@@ -25,14 +25,19 @@ def save_chat_to_file(chat_file, new_entry):
 
 def append_message_to_window(timestamp, sender, message):
     """Adds a message to the chat window with proper formatting and colors."""
-    chat_window.insert(tk.END, f"[{timestamp}] {sender}:\n", f"{sender.lower()}_label")
-    chat_window.insert(tk.END, f"{message}\n\n", f"{sender.lower()}_message")
+    label_tag = f"{sender.lower()}_label"
+    message_tag = f"{sender.lower()}_message"
+    
+    chat_window.insert(tk.END, f"[{timestamp}] {sender}:\n", label_tag)
+    chat_window.insert(tk.END, f"{message}\n\n", message_tag)
+    
     if sender.lower() == "system":
-        chat_window.tag_configure("system_label", foreground="lime", justify=SYSTEM_ALIGNMENT)
-        chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure(label_tag, foreground="lime", justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
     elif sender.lower() == "you":
-        chat_window.tag_configure("user_label", foreground="hot pink", justify=USER_ALIGNMENT)
-        chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
+        chat_window.tag_configure(label_tag, foreground="hot pink", justify=USER_ALIGNMENT)
+        chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
+
 
 def send_message(event=None):
     global active_chat_file
@@ -98,19 +103,12 @@ def load_chat_content(chat_file):
             append_message_to_window(entry['timestamp'], entry['sender'], entry['message'])
     chat_window.config(state=tk.DISABLED)
 
-def create_or_increment_untitled():
-    """Ensures an untitled chat file exists or increments its name if one already exists."""
+def create_or_override_untitled():
+    """Ensures the untitled chat file is created or overrides the existing one."""
     untitled_path = os.path.join(CHAT_FOLDER_PATH, UNTITLED_CHAT_FILE)
-    if os.path.exists(untitled_path):
-        counter = 1
-        while True:
-            new_untitled_file = f"untitled_{counter}.json"
-            new_untitled_path = os.path.join(CHAT_FOLDER_PATH, new_untitled_file)
-            if not os.path.exists(new_untitled_path):
-                return new_untitled_file
-            counter += 1
-    else:
-        return UNTITLED_CHAT_FILE
+    with open(untitled_path, "w") as file:
+        json.dump([], file)
+    return UNTITLED_CHAT_FILE
 
 def populate_chat_list():
     """Populates the chat list on the left UI bar by reading filenames in the chat history folder."""
@@ -118,7 +116,7 @@ def populate_chat_list():
         os.makedirs(CHAT_FOLDER_PATH)  # Create the folder if it doesn't exist
 
     # Ensure the untitled chat exists
-    untitled_file = create_or_increment_untitled()
+    untitled_file = create_or_override_untitled()
     untitled_path = os.path.join(CHAT_FOLDER_PATH, untitled_file)
     if not os.path.exists(untitled_path):
         with open(untitled_path, "w") as file:
@@ -140,7 +138,7 @@ def handle_keypress(event):
 
 def initialize_chat():
     """Initializes the chat window with the untitled chat."""
-    untitled_file = create_or_increment_untitled()
+    untitled_file = create_or_override_untitled()
     load_chat_content(untitled_file)
 
 # Create the main window
