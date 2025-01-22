@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+                    <xsequence BaseChannel="0" ChanCtrlBasic="0" ChanCtrlColor="0" FixedPointTiming="1" ModelBlending="true">
+                    <head>
+                    <version>2024.19</version>
+                    </head>
+                    <steps>
+                    <step>
+                        <number>1</number>
+                        <animation>Simple Animation</animation>
+                    </step>
+                    </steps>
+                    </xsequence>

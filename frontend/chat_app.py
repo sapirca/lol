@@ -38,7 +38,6 @@ def append_message_to_window(timestamp, sender, message):
         chat_window.tag_configure(label_tag, foreground="hot pink", justify=USER_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
 
-
 def send_message(event=None):
     global active_chat_file
     user_message = user_input.get("1.0", tk.END).strip()
@@ -55,7 +54,7 @@ def send_message(event=None):
         save_chat_to_file(active_chat_file, {"timestamp": current_time, "sender": "You", "message": user_message})
 
         # Call the main controller for the system reply
-        system_reply = main_controller(user_message)
+        system_reply = backend(user_message)
 
         # Add system reply
         append_message_to_window(current_time, "System", system_reply)
@@ -67,7 +66,7 @@ def send_message(event=None):
         chat_window.see(tk.END)
         user_input.delete("1.0", tk.END)
 
-def main_controller(user_message):
+def backend(user_message):
     """Handles the business logic for user input and generates a system reply."""
     # Replace this logic with your actual business logic
     if user_message.lower() == "hello":
@@ -127,7 +126,11 @@ def populate_chat_list():
 
     for chat_file in chat_files:
         chat_name = os.path.splitext(chat_file)[0]  # Use filename without extension as chat name
-        chat_button = tk.Button(chat_list_frame, text=chat_name, command=lambda file=chat_file: load_chat_content(file))
+        chat_button = tk.Button(
+            chat_list_frame,
+            text=chat_name,
+            command=lambda file=chat_file: load_chat_content(file)
+        )
         chat_button.pack(fill=tk.X, pady=2)
 
 def handle_keypress(event):
@@ -158,7 +161,7 @@ chat_frame = tk.Frame(root)
 chat_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
 # Create a scrolled text widget for the chat window
-chat_window = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state=tk.DISABLED, height=20, width=50)
+chat_window = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state=tk.DISABLED, height=20, width=50, bg="#2c2c2c", fg="#ffffff", insertbackground="#ffffff")
 chat_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the input
