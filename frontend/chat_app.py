@@ -42,6 +42,15 @@ def append_message_to_window(timestamp, sender, message):
         chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
 
 def send_message(event=None):
+    global controller
+    user_message = user_input.get("1.0", tk.END).strip()
+    if user_message:
+        # Check if the user wants to exit
+        if user_message.lower() == "exit":
+            if controller:
+                controller.shutdown()  # Ensure the controller finalizes and saves state
+            root.destroy()  # Close the application
+            return
     user_message = user_input.get("1.0", tk.END).strip()
     if user_message:
         chat_window.config(state=tk.NORMAL)
@@ -85,11 +94,54 @@ def close_current_chat():
 
     # Clear global references to free resources
     controller = None
-    active_chat_snapshot = None
+    active_chat_snapshot = None # TODO(sapir) remove the snapshots
+
+def save_chat():
+    """Saves the current chat session explicitly."""
+    global controller, active_chat_snapshot
+    if controller:
+        try:
+            controller.shutdown()  # Save the current session state
+            save_status_label.config(text=f"Saved changes to snapshot", fg="light gray")
+        except Exception as e:
+            save_status_label.config(text=f"Failed to save chat: {str(e)}", fg="red")
 
 def load_chat_content(snapshot_folder):
-    """Load chat content after saving the current chat session."""
-    close_current_chat()  # Save and exit the current chat before loading a new one
+    """Load chat content and alert if the current chat is unsaved."""
+    if controller and controller.logger.logs:
+        unsaved_warning = tk.Toplevel(root)
+        unsaved_warning.title("Unsaved Changes")
+        unsaved_warning.geometry("300x150")
+
+        label = tk.Label(unsaved_warning, text="Current chat is not saved. Do you want to continue?", wraplength=250)
+        label.pack(pady=10)
+
+        def proceed():
+            unsaved_warning.destroy()
+            _load_chat(snapshot_folder)
+
+        def cancel():
+            unsaved_warning.destroy()
+
+        button_frame = tk.Frame(unsaved_warning)
+        button_frame.pack(pady=10)
+
+        yes_button = tk.Button(button_frame, text="Yes", command=proceed)
+        yes_button.pack(side=tk.LEFT, padx=5)
+
+        no_button = tk.Button(button_frame, text="No", command=cancel)
+        no_button.pack(side=tk.RIGHT, padx=5)
+
+    else:
+        _load_chat(snapshot_folder)
+
+def _load_chat(snapshot_folder):
+    """Load chat content and alert if the current chat is unsaved."""
+    if controller:
+        # Alert user if current chat is not saved
+        if not controller.logger.logs:  # Assuming the logger's logs indicate changes
+            print("Warning: Current chat session is not saved!")
+    """Load chat content without saving the current chat session."""
     """Loads chat history into the chat window using the selected snapshot folder."""
     global active_chat_snapshot
     active_chat_snapshot = snapshot_folder
@@ -117,17 +169,21 @@ def load_chat_content(snapshot_folder):
             append_message_to_window(timestamp, sender, message)
     chat_window.config(state=tk.DISABLED)
 
-def create_or_reset_untitled_chat():
-    """Ensure an untitled chat session exists and is initialized."""
+def create_or_ensure_untitled_chat():
+    """Ensure an untitled chat session exists without resetting."""
     global controller, active_chat_snapshot
-    close_current_chat()  # Ensure any existing chat is closed
+    if controller is None or active_chat_snapshot != "untitled":
+        # Initialize untitled session only if it doesn't exist
+        controller = MainController()
+        active_chat_snapshot = "untitled"
 
-    # untitled_folder = os.path.abspath(os.path.join(LOGS_FOLDER_PATH, "untitled"))
-    # if not os.path.exists(untitled_folder):
-    #     os.makedirs(untitled_folder, exist_ok=True)
+    chat_window.config(state=tk.NORMAL)
+    chat_window.delete("1.0", tk.END)
+    current_time = datetime.now().strftime("%H:%M:%S")
+    append_message_to_window(current_time, "System", "Welcome to the untitled chat session!")
+    chat_window.config(state=tk.DISABLED)
 
-    # new controller!
-    controller = MainController()
+    print(f"Untitled chat session ensured")
     active_chat_snapshot = "untitled"
 
     chat_window.config(state=tk.NORMAL)
@@ -137,6 +193,8 @@ def create_or_reset_untitled_chat():
     chat_window.config(state=tk.DISABLED)
 
     print(f"Untitled chat session initialized in")
+
+
 
 def create_new_chat():
     """Creates a new empty chat session."""
@@ -169,6 +227,13 @@ def populate_snapshot_list():
     snapshot_folders = [f for f in os.listdir(LOGS_FOLDER_PATH) if os.path.isdir(os.path.join(LOGS_FOLDER_PATH, f))]
 
     for snapshot_folder in snapshot_folders:
+        save_button = tk.Button(
+            chat_list_frame,
+            text=f"Save {snapshot_folder}",
+            command=save_chat
+        )
+        save_button.pack(fill=tk.X, pady=2)
+
         snapshot_button = tk.Button(
             chat_list_frame,
             text=snapshot_folder,
@@ -180,7 +245,7 @@ def populate_snapshot_list():
     untitled_button = tk.Button(
         chat_list_frame,
         text="untitled",
-        command=create_or_reset_untitled_chat
+        command=create_or_ensure_untitled_chat
     )
     untitled_button.pack(fill=tk.X, pady=2)
 
@@ -213,9 +278,18 @@ populate_snapshot_list()
 chat_frame = tk.Frame(root)
 chat_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
+# Add a save button to the top of the chat window
+save_button = tk.Button(chat_frame, text="Save Chat", command=save_chat)
+save_button.pack(side=tk.TOP, padx=5, pady=5, anchor="ne")
+
+# Add a status label for saving feedback
+save_status_label = tk.Label(chat_frame, text="", fg="light gray", anchor="w", bg="#2c2c2c")
+save_status_label.pack(side=tk.TOP, fill=tk.X, padx=5)
+
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state=tk.DISABLED, height=20, width=50, bg="#2c2c2c", fg="#ffffff", insertbackground="#ffffff")
 chat_window.pack(fill=tk.BOTH, expand=True)
+
 
 # Create a frame for the input
 input_frame = tk.Frame(chat_frame)
