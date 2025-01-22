@@ -5,7 +5,7 @@ import os
 import json
 
 # Constants
-CHAT_FOLDER_PATH = "chats/chat_history_folder"  # Folder where chat files are stored
+CHAT_FOLDER_PATH = "chats/fake_ui"  # Folder where chat files are stored
 UNTITLED_CHAT_FILE = "untitled.json"  # Default chat file for initialization
 
 # Alignment flags

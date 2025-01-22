@@ -24,6 +24,12 @@ class MainController:
         self.temp_animation_path = None
         self._initialize_backends()
 
+    def shutdown(self):
+        """Finalize chat history and close the log file."""
+        self.chat_history.finalize()
+        self.log_file.close()
+        print("Session finalized. Logs saved.")
+
     def _initialize_backends(self):
         backend_mapping = {
             "GPTBackend": GPTBackend,
