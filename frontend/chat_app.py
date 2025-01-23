@@ -264,9 +264,6 @@ root.geometry("1000x500")
 chat_list_frame = tk.Frame(root, width=200, bg="#2c2c2c")
 chat_list_frame.pack(side=tk.LEFT, fill=tk.Y)
 
-# Populate the snapshot list
-populate_snapshot_list()
-
 # Create a frame for the chat window
 chat_frame = tk.Frame(root)
 chat_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.BOTH, expand=True)
@@ -283,7 +280,6 @@ save_status_label.pack(side=tk.TOP, fill=tk.X, padx=5)
 chat_window = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state=tk.DISABLED, height=20, width=50, bg="#2c2c2c", fg="#ffffff", insertbackground="#ffffff")
 chat_window.pack(fill=tk.BOTH, expand=True)
 
-
 # Create a frame for the input
 input_frame = tk.Frame(chat_frame)
 input_frame.pack(padx=10, pady=10, fill=tk.X)
@@ -298,5 +294,8 @@ user_input.bind("<Shift-Return>", lambda event: None)  # Allow new line on Shift
 send_button = tk.Button(input_frame, text="Send", command=send_message)
 send_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
+
+# Populate the snapshot list
+populate_snapshot_list()
 # Start the application
 root.mainloop()

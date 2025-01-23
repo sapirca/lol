@@ -23,4 +23,5 @@ venv/
 Thumbs.db
 .idea/
 *.swp
-
+.vscode/
+.vscode/launch.json
