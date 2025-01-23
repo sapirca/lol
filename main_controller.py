@@ -234,7 +234,7 @@ class MainController:
             self.logger.add_log("Generated temp_animation.xml for the user's observation.")
             self.wait_for_response = True
 
-            output += f"An animation sequence was generated and saved in {self.temp_animation_path}.\n"
+            output += f"An animation sequence was generated and saved in {self.temp_animation_path}\n"
             output += "Simulate or edit the file using xLights. Edit the animation file if needed.\n"
             output += "Approve to save this animation to the sequence manager once done. Approve? (y/n): "
 

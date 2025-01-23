@@ -4,6 +4,10 @@ from datetime import datetime
 import os
 import json
 from main_controller import MainController
+import re
+import subprocess
+import platform
+from constants import ANIMATION_OUT_TEMP_DIR
 
 # Constants
 LOGS_FOLDER_PATH = "logs"  # Folder where system snapshots are stored
@@ -24,13 +28,55 @@ def initialize_main_controller(snapshot_folder):
     controller = MainController(snapshot_path)
 
 def append_message_to_window(timestamp, sender, message):
-    """Adds a message to the chat window with proper formatting and colors."""
+    """Adds a message to the chat window with proper formatting and clickable links."""
     label_tag = f"{sender.lower()}_label"
     message_tag = f"{sender.lower()}_message"
 
     chat_window.insert(tk.END, f"[{timestamp}] {sender}:\n", label_tag)
-    chat_window.insert(tk.END, f"{message}\n\n", message_tag)
 
+    def open_file_in_editor(event, file_path):
+        """Opens the file in the default editor based on the platform."""
+        try:
+            system_platform = platform.system()
+            if system_platform == "Darwin":  # macOS
+                subprocess.run(["open", file_path], check=True)
+            elif system_platform == "Linux":  # Linux
+                subprocess.run(["xdg-open", file_path], check=True)
+            elif system_platform == "Windows":  # Windows
+                subprocess.run(["start", file_path], shell=True, check=True)
+            else:
+                print(f"Unsupported platform: {system_platform}")
+        except Exception as e:
+            print(f"Failed to open file: {file_path}. Error: {e}")
+
+    def add_link(text, link_tag, file_path):
+        start = chat_window.index(tk.INSERT)
+        chat_window.insert(tk.END, text)
+        end = chat_window.index(tk.INSERT)
+        chat_window.tag_add(link_tag, start, end)
+        chat_window.tag_config(link_tag, foreground="light blue", underline=1)
+        chat_window.tag_bind(link_tag, "<Button-1>", lambda e: open_file_in_editor(e, file_path))
+
+
+    working_dir = os.getcwd()
+    full_path = os.path.join(working_dir, ANIMATION_OUT_TEMP_DIR)
+    absolute_path = os.path.abspath(full_path)
+    # Match file paths that start with ANIMATION_OUT_TEMP_DIR
+    file_links = re.finditer(rf"({re.escape(absolute_path)}[^\s]+)", message)  # Match full file path
+    last_end = 0
+
+    for match in file_links:
+        chat_window.insert(tk.END, message[last_end:match.start()], message_tag)
+
+        # Use the matched group directly as the file path
+        file_path = match.group()
+        add_link(file_path, f"link_{match.start()}", file_path)
+        last_end = match.end()
+
+    chat_window.insert(tk.END, message[last_end:], message_tag)
+    chat_window.insert(tk.END, "\n\n")
+
+    # Style the labels
     if sender.lower() == "system":
         chat_window.tag_configure(label_tag, foreground="lime", justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
@@ -40,6 +86,7 @@ def append_message_to_window(timestamp, sender, message):
     elif sender.lower() == "you":
         chat_window.tag_configure(label_tag, foreground="hot pink", justify=USER_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
+
 
 def send_message(event=None):
     global controller
