@@ -21,11 +21,14 @@ SYSTEM_ALIGNMENT = "left"
 active_chat_snapshot = None
 controller = None  # Will be initialized dynamically based on selected snapshot
 
+
 def initialize_main_controller(snapshot_folder):
     """Initialize the MainController with the selected snapshot folder."""
     global controller
-    snapshot_path = os.path.abspath(os.path.join(LOGS_FOLDER_PATH, snapshot_folder))
+    snapshot_path = os.path.abspath(
+        os.path.join(LOGS_FOLDER_PATH, snapshot_folder))
     controller = MainController(snapshot_path)
+
 
 def append_message_to_window(timestamp, sender, message):
     """Adds a message to the chat window with proper formatting and clickable links."""
@@ -55,18 +58,20 @@ def append_message_to_window(timestamp, sender, message):
         end = chat_window.index(tk.INSERT)
         chat_window.tag_add(link_tag, start, end)
         chat_window.tag_config(link_tag, foreground="light blue", underline=1)
-        chat_window.tag_bind(link_tag, "<Button-1>", lambda e: open_file_in_editor(e, file_path))
-
+        chat_window.tag_bind(link_tag, "<Button-1>",
+                             lambda e: open_file_in_editor(e, file_path))
 
     working_dir = os.getcwd()
     full_path = os.path.join(working_dir, ANIMATION_OUT_TEMP_DIR)
     absolute_path = os.path.abspath(full_path)
     # Match file paths that start with ANIMATION_OUT_TEMP_DIR
-    file_links = re.finditer(rf"({re.escape(absolute_path)}[^\s]+)", message)  # Match full file path
+    file_links = re.finditer(rf"({re.escape(absolute_path)}[^\s]+)",
+                             message)  # Match full file path
     last_end = 0
 
     for match in file_links:
-        chat_window.insert(tk.END, message[last_end:match.start()], message_tag)
+        chat_window.insert(tk.END, message[last_end:match.start()],
+                           message_tag)
 
         # Use the matched group directly as the file path
         file_path = match.group()
@@ -78,13 +83,19 @@ def append_message_to_window(timestamp, sender, message):
 
     # Style the labels
     if sender.lower() == "system":
-        chat_window.tag_configure(label_tag, foreground="lime", justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure(label_tag,
+                                  foreground="lime",
+                                  justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
     elif sender.lower() == "assistant":
-        chat_window.tag_configure(label_tag, foreground="yellow", justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure(label_tag,
+                                  foreground="yellow",
+                                  justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
     elif sender.lower() == "you":
-        chat_window.tag_configure(label_tag, foreground="hot pink", justify=USER_ALIGNMENT)
+        chat_window.tag_configure(label_tag,
+                                  foreground="hot pink",
+                                  justify=USER_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
 
 
@@ -95,7 +106,8 @@ def send_message(event=None):
         # Check if the user wants to exit
         if user_message.lower() == "exit":
             if controller:
-                controller.shutdown()  # Ensure the controller finalizes and saves state
+                controller.shutdown(
+                )  # Ensure the controller finalizes and saves state
             root.destroy()  # Close the application
             return
     user_message = user_input.get("1.0", tk.END).strip()
@@ -111,19 +123,20 @@ def send_message(event=None):
         # Save user message to the chat history
         # Chat saving now handled internally by MainController
 
-        # Call the MainController for the system reply 
-       # Call the MainController for the system reply
+        # Call the MainController for the system reply
+        # Call the MainController for the system reply
         replies = controller.communicate(user_message)
 
         # Add system reply
         for tag, system_reply in replies.items():
             if tag == 'assistant':
-                append_message_to_window(current_time, 'Assistant', system_reply)
+                append_message_to_window(current_time, 'Assistant',
+                                         system_reply)
             elif tag == 'system':
                 append_message_to_window(current_time, 'System', system_reply)
             else:
-                append_message_to_window(current_time, tag.capitalize(), system_reply)
-
+                append_message_to_window(current_time, tag.capitalize(),
+                                         system_reply)
 
         # # Save system reply to the chat history
         # save_chat_to_file(UNTITLED_CHAT_FILE, {"timestamp": current_time, "sender": "System", "message": system_reply})
@@ -131,6 +144,7 @@ def send_message(event=None):
         chat_window.config(state=tk.DISABLED)
         chat_window.see(tk.END)
         user_input.delete("1.0", tk.END)
+
 
 def close_current_chat():
     """Gracefully close the current chat controller, saving changes if necessary."""
@@ -141,7 +155,8 @@ def close_current_chat():
 
     # Clear global references to free resources
     controller = None
-    active_chat_snapshot = None # TODO(sapir) remove the snapshots
+    active_chat_snapshot = None  # TODO(sapir) remove the snapshots
+
 
 def save_chat():
     """Saves the current chat session explicitly."""
@@ -149,9 +164,12 @@ def save_chat():
     if controller:
         try:
             controller.shutdown()  # Save the current session state
-            save_status_label.config(text=f"Saved changes to snapshot", fg="light gray")
+            save_status_label.config(text=f"Saved changes to snapshot",
+                                     fg="light gray")
         except Exception as e:
-            save_status_label.config(text=f"Failed to save chat: {str(e)}", fg="red")
+            save_status_label.config(text=f"Failed to save chat: {str(e)}",
+                                     fg="red")
+
 
 def load_chat_content(snapshot_folder):
     """Load chat content and alert if the current chat is unsaved."""
@@ -160,7 +178,11 @@ def load_chat_content(snapshot_folder):
         unsaved_warning.title("Unsaved Changes")
         unsaved_warning.geometry("300x150")
 
-        label = tk.Label(unsaved_warning, text="System doesn't save automatically. Use Save button. Agree to exit?", wraplength=250)
+        label = tk.Label(
+            unsaved_warning,
+            text=
+            "System doesn't save automatically. Use Save button. Agree to exit?",
+            wraplength=250)
         label.pack(pady=10)
 
         def proceed():
@@ -181,6 +203,7 @@ def load_chat_content(snapshot_folder):
 
     else:
         _load_chat(snapshot_folder)
+
 
 def _load_chat(snapshot_folder):
     """Load chat content and alert if the current chat is unsaved."""
@@ -204,7 +227,9 @@ def _load_chat(snapshot_folder):
     if not chat_history:
         # Initialize with a welcome message if history is empty
         current_time = datetime.now().strftime("%H:%M:%S")
-        append_message_to_window(current_time, "System", "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!")
+        append_message_to_window(
+            current_time, "System",
+            "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!")
     else:
         for timestamp, message, tag in chat_history:
             if tag == 'user_input':
@@ -215,6 +240,7 @@ def _load_chat(snapshot_folder):
                 sender = 'System'
             append_message_to_window(timestamp, sender, message)
     chat_window.config(state=tk.DISABLED)
+
 
 def create_or_ensure_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
@@ -227,7 +253,8 @@ def create_or_ensure_untitled_chat():
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
     current_time = datetime.now().strftime("%H:%M:%S")
-    append_message_to_window(current_time, "System", "Welcome to the untitled chat session!")
+    append_message_to_window(current_time, "System",
+                             "Welcome to the untitled chat session!")
     chat_window.config(state=tk.DISABLED)
 
     print(f"Untitled chat session ensured")
@@ -236,11 +263,11 @@ def create_or_ensure_untitled_chat():
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
     current_time = datetime.now().strftime("%H:%M:%S")
-    append_message_to_window(current_time, "System", "Welcome to the untitled chat session!")
+    append_message_to_window(current_time, "System",
+                             "Welcome to the untitled chat session!")
     chat_window.config(state=tk.DISABLED)
 
     print(f"Untitled chat session initialized in")
-
 
 
 def create_new_chat():
@@ -250,7 +277,8 @@ def create_new_chat():
 
     # Create a unique folder for the new chat
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_chat_folder = os.path.abspath(os.path.join(LOGS_FOLDER_PATH, f"snapshot_{timestamp}"))
+    new_chat_folder = os.path.abspath(
+        os.path.join(LOGS_FOLDER_PATH, f"snapshot_{timestamp}"))
     os.makedirs(new_chat_folder, exist_ok=True)
 
     # Initialize a new controller for the new chat
@@ -261,32 +289,34 @@ def create_new_chat():
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
     current_time = datetime.now().strftime("%H:%M:%S")
-    append_message_to_window(current_time, "System", "Welcome to a new chat session!")
+    append_message_to_window(current_time, "System",
+                             "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)
 
     print(f"New chat session created: {new_chat_folder}")
+
 
 def populate_snapshot_list():
     """Populates the snapshot list on the left UI bar by reading directories in the logs folder."""
     for widget in chat_list_frame.winfo_children():
         widget.destroy()  # Clear existing buttons
 
-    snapshot_folders = [f for f in os.listdir(LOGS_FOLDER_PATH) if os.path.isdir(os.path.join(LOGS_FOLDER_PATH, f))]
+    snapshot_folders = [
+        f for f in os.listdir(LOGS_FOLDER_PATH)
+        if os.path.isdir(os.path.join(LOGS_FOLDER_PATH, f))
+    ]
 
     for snapshot_folder in snapshot_folders:
         snapshot_button = tk.Button(
             chat_list_frame,
             text=snapshot_folder,
-            command=lambda folder=snapshot_folder: load_chat_content(folder)
-        )
+            command=lambda folder=snapshot_folder: load_chat_content(folder))
         snapshot_button.pack(fill=tk.X, pady=2)
 
     # Always add a button for the untitled chat at the top
-    untitled_button = tk.Button(
-        chat_list_frame,
-        text="untitled",
-        command=create_or_ensure_untitled_chat
-    )
+    untitled_button = tk.Button(chat_list_frame,
+                                text="untitled",
+                                command=create_or_ensure_untitled_chat)
     untitled_button.pack(fill=tk.X, pady=2)
 
     # Click on the last button to load its chat
@@ -299,8 +329,15 @@ def handle_keypress(event):
     """Handles the Enter key press to send messages."""
     if event.keysym == "Return" and not event.state & 1:  # Enter without Shift
         send_message()
-        user_input.delete("1.0", tk.END)  # Clear the input field after sending the message
+        try:
+            if user_input.winfo_exists():  # Check if the widget still exists
+                user_input.delete("1.0", tk.END)  # Clear the input field
+            else:
+                print("user_input widget does not exist!")
+        except Exception as e:
+            print(f"Error: {e}")
         return "break"  # Prevent default newline behavior
+
 
 # Create the main window
 root = tk.Tk()
@@ -316,15 +353,26 @@ chat_frame = tk.Frame(root)
 chat_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
 # Add a save button to the top of the chat window
-save_button = tk.Button(chat_frame, text="Save Chat", command=save_chat)
+save_button = tk.Button(chat_frame, text="Snapshot", command=save_chat)
 save_button.pack(side=tk.TOP, padx=5, pady=5, anchor="ne")
 
 # Add a status label for saving feedback
-save_status_label = tk.Label(chat_frame, text="", fg="light gray", anchor="w", bg="#2c2c2c")
+save_status_label = tk.Label(chat_frame,
+                             text="",
+                             fg="light gray",
+                             anchor="w",
+                             bg="#2c2c2c")
 save_status_label.pack(side=tk.TOP, fill=tk.X, padx=5)
 
 # Create a scrolled text widget for the chat window
-chat_window = scrolledtext.ScrolledText(chat_frame, wrap=tk.WORD, state=tk.DISABLED, height=20, width=50, bg="#2c2c2c", fg="#ffffff", insertbackground="#ffffff")
+chat_window = scrolledtext.ScrolledText(chat_frame,
+                                        wrap=tk.WORD,
+                                        state=tk.DISABLED,
+                                        height=20,
+                                        width=50,
+                                        bg="#2c2c2c",
+                                        fg="#ffffff",
+                                        insertbackground="#ffffff")
 chat_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the input
@@ -335,12 +383,12 @@ input_frame.pack(padx=10, pady=10, fill=tk.X)
 user_input = tk.Text(input_frame, height=3, wrap=tk.WORD)
 user_input.pack(side=tk.LEFT, padx=5, pady=5, fill=tk.X, expand=True)
 user_input.bind("<Return>", handle_keypress)
-user_input.bind("<Shift-Return>", lambda event: None)  # Allow new line on Shift+Enter
+user_input.bind("<Shift-Return>",
+                lambda event: None)  # Allow new line on Shift+Enter
 
 # Create a send button
 send_button = tk.Button(input_frame, text="Send", command=send_message)
 send_button.pack(side=tk.RIGHT, padx=5, pady=5)
-
 
 # Populate the snapshot list
 populate_snapshot_list()

@@ -12,7 +12,9 @@ from datetime import datetime
 import json
 from config import config as basic_config
 
+
 class MainController:
+
     def __init__(self, snapshot_dir=None):
         """Initialize the MainController, optionally loading from a snapshot."""
         self.logger = Logger()
@@ -21,30 +23,31 @@ class MainController:
         self.wait_for_response = False
         self.temp_animation_path = None
         self._initialize_backends()
-        self.sequence_manager = SequenceManager("sequence_skeleton.xml", self.logger)
+        self.sequence_manager = SequenceManager("sequence_skeleton.xml",
+                                                self.logger)
 
         if snapshot_dir is not None:
             try:
                 self._load_from_snapshot(snapshot_dir)
                 self.initial_prompt_added = True
             except Exception as e:
-                raise RuntimeError(f"Failed to load snapshot from {snapshot_dir}: {e}")
+                raise RuntimeError(
+                    f"Failed to load snapshot from {snapshot_dir}: {e}")
         else:
             # Default initialization if no snapshot is provided
             self.initial_prompt_added = False
             self.config = basic_config
-            
 
         # Shared initialization logic
         self.use_stub = self.config.get("use_stub", False)
         self.selected_backend = self.config.get("selected_backend", None)
         self.response_manager = ResponseManager(self.sequence_manager)
 
-
     def shutdown(self):
         # Create a dedicated snapshot folder with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        snapshot_dir = os.path.join(self.logger.log_dir, f"snapshot_{timestamp}")
+        snapshot_dir = os.path.join(self.logger.log_dir,
+                                    f"snapshot_{timestamp}")
         os.makedirs(snapshot_dir, exist_ok=True)
 
         # Save configuration
@@ -61,10 +64,11 @@ class MainController:
             with open(animation_file, "w") as file:
                 file.write(animation)
 
-          # Save logs to logs.json
+        # Save logs to logs.json
         logs_json_file = os.path.join(snapshot_dir, "logs.json")
         with open(logs_json_file, "w") as file:
-            json.dump(self.logger.logs, file, indent=4)  # Save only the logs data
+            json.dump(self.logger.logs, file,
+                      indent=4)  # Save only the logs data
 
         # Finalize the logger
         self.logger.finalize()
@@ -73,17 +77,17 @@ class MainController:
 
     def get_visible_chat(self):
         """Retrieve all visible chat messages from the logger, including their tags/labels."""
-        return [(log['timestamp'], log['content'], log['tag']) for log in self.logger.logs if log['visible'] and 'timestamp' in log]
+        return [(log['timestamp'], log['content'], log['tag'])
+                for log in self.logger.logs
+                if log['visible'] and 'timestamp' in log]
 
     def _load_from_snapshot(self, snapshot_dir):
         if not os.path.exists(snapshot_dir):
-            raise FileNotFoundError(f"Snapshot directory '{snapshot_dir}' does not exist.")
+            raise FileNotFoundError(
+                f"Snapshot directory '{snapshot_dir}' does not exist.")
 
         # Check required files
-        required_files = [
-            "logs.json",
-            "config.json"
-        ]
+        required_files = ["logs.json", "config.json"]
         for file_name in required_files:
             if not os.path.exists(os.path.join(snapshot_dir, file_name)):
                 error_msg = f"Required file '{file_name}' is missing in the snapshot directory."
@@ -91,7 +95,8 @@ class MainController:
 
         animations_dir = os.path.join(snapshot_dir, "animations")
         if not os.path.exists(animations_dir):
-            raise FileNotFoundError("Animations directory is missing in the snapshot directory.")
+            raise FileNotFoundError(
+                "Animations directory is missing in the snapshot directory.")
 
         # Load logs
         snapshot_log_file = os.path.join(snapshot_dir, "logs.json")
@@ -119,17 +124,18 @@ class MainController:
         except Exception as e:
             raise ValueError(f"Error loading animations: {e}")
 
-        self.logger.add_log(f"Snapshot loaded successfully from {snapshot_dir}.")
+        self.logger.add_log(
+            f"Snapshot loaded successfully from {snapshot_dir}.")
 
     def _initialize_backends(self):
         backend_mapping = {
-            "GPTBackend": GPTBackend,
-            "ClaudeBackend": ClaudeBackend,
-            "GeminiBackend": GeminiBackend,
-            "StubBackend": StubBackend
+            "GPT": GPTBackend,
+            "Claude": ClaudeBackend,
+            "Gemini": GeminiBackend,
+            "Stub": StubBackend
         }
         for backend_name, backend_class in backend_mapping.items():
-            self.register_backend(backend_class(backend_name, self.logger))
+            self.register_backend(backend_class(self.logger))
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):
@@ -141,9 +147,9 @@ class MainController:
             raise ValueError("No backends available.")
 
         if self.use_stub:
-            stub_backend = self.backends.get("StubBackend")
+            stub_backend = self.backends.get("Stub")
             if not stub_backend:
-                raise ValueError("StubBackend is not registered.")
+                raise ValueError("Stub backend is not registered.")
             return stub_backend
 
         if self.selected_backend:
@@ -151,7 +157,9 @@ class MainController:
             if selected_backend:
                 return selected_backend
 
-            print(f"Warning: Selected backend '{self.selected_backend}' not found, choosing randomly.")
+            print(
+                f"Warning: Selected backend '{self.selected_backend}' not found, choosing randomly."
+            )
 
         return random.choice(list(self.backends.values()))
 
@@ -165,12 +173,19 @@ class MainController:
 
     def communicate(self, user_input):
         if self.wait_for_response:
-          # User response for agent action (e.g., store to memory, update animation)
-          # This does not need to be added to the LLM context.
-          self.logger.add_message("user_input", user_input, visible=True, context=False) # Need to add info that this is internal_actions communication
-          visible_system_message = self.handle_user_approval(user_input)
-          self.logger.add_message("system_output", visible_system_message, visible=True, context=False) # Need to add info that this is internal_actions communication
-          return {"system": visible_system_message}
+            # User response for agent action (e.g., store to memory, update animation)
+            # This does not need to be added to the LLM context.
+            self.logger.add_message(
+                "user_input", user_input, visible=True, context=False
+            )  # Need to add info that this is internal_actions communication
+            visible_system_message = self.handle_user_approval(user_input)
+            self.logger.add_message(
+                "system_output",
+                visible_system_message,
+                visible=True,
+                context=False
+            )  # Need to add info that this is internal_actions communication
+            return {"system": visible_system_message}
 
         backend = self.select_backend()
 
@@ -179,43 +194,64 @@ class MainController:
         if not self.initial_prompt_added:
             initial_prompt = get_full_prompt(self.house_config)
             # Ensure the main instructions are always sent to the LLM for proper context.
-            self.logger.add_message("initial_prompt_context", "System: " + initial_prompt, visible=False, context=True) 
+            self.logger.add_message("initial_prompt_context",
+                                    "System: " + initial_prompt,
+                                    visible=False,
+                                    context=True)
             # Always send the original animation structure to the LLM for reference.
-            self.logger.add_message("initial_animation", latest_sequence, visible=False, context=True)  
+            self.logger.add_message("initial_animation",
+                                    latest_sequence,
+                                    visible=False,
+                                    context=True)
             self.initial_prompt_added = True
 
-        self.logger.add_message("user_input", "User: " + user_input, visible=True, context=True)
+        self.logger.add_message("user_input",
+                                "User: " + user_input,
+                                visible=True,
+                                context=True)
 
         # Construct the full prompt for the LLM
-        prompt = self.logger.get_context_to_llm() + f"\n\nAnimation Sequence ({XSEQUENCE_TAG}) is:\n\n{latest_sequence}"
-        
+        prompt = self.logger.get_context_to_llm(
+        ) + f"\n\nAnimation Sequence ({XSEQUENCE_TAG}) is:\n\n{latest_sequence}"
+
         # Avoid passing the full prompt history to reduce redundancy as it already includes all animations. We send the LLM
         # only the most updated animation (and the initial animation structure).
-        self.logger.add_message("final_prompt", prompt, visible=False, context=False) 
-        
+        self.logger.add_message("final_prompt",
+                                prompt,
+                                visible=False,
+                                context=False)
+
         response = backend.generate_response(prompt)
         # The raw response contains a WIP animation which does not need to be added to the context.
-        self.logger.add_message("llm_raw_response", response, visible=False, context=False) 
+        self.logger.add_message("llm_raw_response",
+                                response,
+                                visible=False,
+                                context=False)
 
         parsed_response = self.response_manager.parse_response(response)
 
-        assistant_response = parsed_response.get("response_wo_animation", "")
-      # Add this trimmed short response to the context
+        assistant_response = parsed_response.get("response_wo_animation",
+                                                 "") or ""
+        # Add this trimmed short response to the context
         # for better understanding.
-        self.logger.add_message("assistant", "Assistant: " + assistant_response + " The animation was trimmed out", visible=True, context=True) 
+        self.logger.add_message("assistant",
+                                "Assistant: " + assistant_response +
+                                " The animation was trimmed out",
+                                visible=True,
+                                context=True)
 
         system_response = self.act_on_response(parsed_response)
-        self.logger.add_message("system_output", system_response, visible=True, context=False) # Information about agent actions shared 
+        self.logger.add_message(
+            "system_output", system_response, visible=True,
+            context=False)  # Information about agent actions shared
         # with the user.
 
-        return {
-            "assistant": assistant_response,
-            "system": system_response
-        }
+        return {"assistant": assistant_response, "system": system_response}
 
     def act_on_response(self, processed_response):
         reasoning = processed_response.get("reasoning")
-        consistency_justification = processed_response.get("consistency_justification")
+        consistency_justification = processed_response.get(
+            "consistency_justification")
         animation_sequence = processed_response.get("animation_sequence")
 
         output = ""
@@ -231,7 +267,8 @@ class MainController:
             with open(self.temp_animation_path, "w") as temp_file:
                 temp_file.write(animation_sequence)
 
-            self.logger.add_log("Generated temp_animation.xml for the user's observation.")
+            self.logger.add_log(
+                "Generated temp_animation.xml for the user's observation.")
             self.wait_for_response = True
 
             output += f"An animation sequence was generated and saved in {self.temp_animation_path}\n"
@@ -251,7 +288,10 @@ class MainController:
             step_number = len(self.sequence_manager.steps) + 1
             with open(self.temp_animation_path, "r") as temp_file:
                 animation_sequence = temp_file.read()
-            self.logger.add_message("animation_update", animation_sequence, visible=False, context=False) # log every sequence update
+            self.logger.add_message("animation_update",
+                                    animation_sequence,
+                                    visible=False,
+                                    context=False)  # log every sequence update
             self.sequence_manager.add_sequence(step_number, animation_sequence)
             self.delete_temp_file(self.temp_animation_path)
             self.wait_for_response = False
@@ -264,7 +304,8 @@ class MainController:
             self.logger.add_log("Animation discarded by user.")
             return "Animation discarded.\n"
 
-        self.logger.add_log("Invalid response received during approval process.")
+        self.logger.add_log(
+            "Invalid response received during approval process.")
         return "Invalid response. Please reply with 'y' or 'n'.\n"
 
     def delete_temp_file(self, file_path):
@@ -273,10 +314,15 @@ class MainController:
             if os.path.exists(absolute_path):
                 os.remove(absolute_path)
                 if not os.path.exists(absolute_path):
-                    self.logger.add_log(f"Temp file {absolute_path} was successfully deleted.")
+                    self.logger.add_log(
+                        f"Temp file {absolute_path} was successfully deleted.")
                 else:
-                    self.logger.add_log(f"Error: Temp file {absolute_path} still exists after deletion attempt.")
+                    self.logger.add_log(
+                        f"Error: Temp file {absolute_path} still exists after deletion attempt."
+                    )
             else:
-                self.logger.add_log(f"Temp file {absolute_path} does not exist.")
+                self.logger.add_log(
+                    f"Temp file {absolute_path} does not exist.")
         except Exception as e:
-            self.logger.add_log(f"An error occurred while deleting {absolute_path}: {e}")
+            self.logger.add_log(
+                f"An error occurred while deleting {absolute_path}: {e}")

@@ -1,14 +1,14 @@
 import openai
 import requests
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
-from constants import API_TIMEOUT
-from logger import Logger
+
 
 class LLMBackend:
     """
     Base class for LLM backends.
     Each backend should inherit from this class and implement the generate_response method.
     """
+
     def __init__(self, name, logger):
         self.name = name
         self.logger = logger
@@ -22,75 +22,129 @@ class LLMBackend:
         prompt_tokens = len(prompt.split())
         response_tokens = len(response.split())
         log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
-        self.logger.add_message(tag=f"system_log {self.name} - Tokens", content=log_message, visible=False, context=False) 
+        self.logger.add_message(tag=f"system_log {self.name} - Tokens",
+                                content=log_message,
+                                visible=False,
+                                context=False)
+
 
 class GPTBackend(LLMBackend):
+
+    def __init__(self, logger):
+        super().__init__("GPT", logger)
+        self.api_key = OPENAI_API_KEY
+
     def generate_response(self, prompt):
-        """Generate a response using GPT backend."""
+        """
+        Communicates with the GPT backend using OpenAI's API.
+
+        Args:
+            prompt (str): The input prompt to send to GPT.
+
+        Returns:
+            str: The response from GPT.
+        """
         try:
-            openai.api_key = OPENAI_API_KEY
-            response = openai.Completion.create(
-                engine="text-davinci-003",
-                prompt=prompt,
-                max_tokens=150
-            )
-            response_text = response.choices[0].text.strip()
+            response = openai.ChatCompletion.create(
+                model="gpt-4-mini",  # Updated to use GPT-4o-mini
+                messages=[{
+                    "role": "system",
+                    "content": "You are a helpful assistant."
+                }, {
+                    "role": "user",
+                    "content": prompt
+                }],
+                max_tokens=150,
+                api_key=self.api_key)
+            response_text = response.choices[0].message.content.strip()
             self.log_tokens(prompt, response_text)
             return response_text
         except Exception as e:
-            return f"[GPT Error]: {str(e)}"
+            print(f"Error communicating with GPT: {e}")
+            return "Error: Unable to connect to GPT backend."
+
 
 class ClaudeBackend(LLMBackend):
+
+    def __init__(self, logger):
+        super().__init__("Claude", logger)
+        self.api_key = CLAUDE_API_KEY
+
     def generate_response(self, prompt):
-        """Generate a response using Claude backend."""
+        """
+        Communicates with the Claude backend.
+
+        Args:
+            prompt (str): The input prompt to send to Claude.
+
+        Returns:
+            str: The response from Claude.
+        """
         try:
-            response = requests.post(
-                "https://api.claude.ai/v1/complete",
-                json={"prompt": prompt, "max_tokens": 150},
-                headers={"Authorization": f"Bearer {CLAUDE_API_KEY}"},
-                timeout=API_TIMEOUT
-            )
+            url = "https://api.anthropic.com/v1/claude"  # Replace with the actual API endpoint
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {"prompt": prompt, "max_tokens": 150}
+            response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
-            response_text = response.json().get("completion", "[Claude Error]: No response")
+            response_text = response.json().get("completion", "").strip()
             self.log_tokens(prompt, response_text)
             return response_text
         except Exception as e:
-            return f"[Claude Error]: {str(e)}"
+            print(f"Error communicating with Claude: {e}")
+            return "Error: Unable to connect to Claude backend."
+
 
 class GeminiBackend(LLMBackend):
+
+    def __init__(self, logger):
+        super().__init__("Gemini", logger)
+        self.api_key = GEMINI_API_KEY
+
     def generate_response(self, prompt):
-        """Generate a response using Gemini backend."""
+        """
+        Communicates with the Gemini backend.
+
+        Args:
+            prompt (str): The input prompt to send to Gemini.
+
+        Returns:
+            str: The response from Gemini.
+        """
         try:
-            response = requests.post(
-                "https://api.gemini.ai/v1/query",
-                json={"query": prompt, "max_tokens": 150},
-                headers={"Authorization": f"Bearer {GEMINI_API_KEY}"},
-                timeout=API_TIMEOUT
-            )
+            url = "https://api.gemini.com/v1/ai"  # Replace with the actual API endpoint
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            payload = {"input": prompt, "max_tokens": 150}
+            response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
-            response_text = response.json().get("response", "[Gemini Error]: No response")
+            response_text = response.json().get("output", "").strip()
             self.log_tokens(prompt, response_text)
             return response_text
         except Exception as e:
-            return f"[Gemini Error]: {str(e)}"
+            print(f"Error communicating with Gemini: {e}")
+            return "Error: Unable to connect to Gemini backend."
+
 
 class StubBackend(LLMBackend):
+
+    def __init__(self, logger):
+        super().__init__("Stub", logger)
+
     def generate_response(self, prompt):
-        """Generate a response using Stub backend with a valid xLights sequence."""
-        sequence = (
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-            "<xsequence BaseChannel=\"0\" ChanCtrlBasic=\"0\" ChanCtrlColor=\"0\" FixedPointTiming=\"1\" ModelBlending=\"true\">"
-            "<head>"
-            "<version>2024.19</version>"
-            "</head>"
-            "<steps>"
-            "<step>"
-            "<number>1</number>"
-            "<animation>Simple Animation</animation>"
-            "</step>"
-            "</steps>"
-            "</xsequence>"
-        )
-        response_text = f"[Stub-{self.name}]: Simulated response with new '{sequence}'"
+        """
+        Stub backend that returns a fixed response for testing purposes.
+
+        Args:
+            prompt (str): The input prompt.
+
+        Returns:
+            str: A fixed response for testing.
+        """
+        response_text = "This is a stubbed response."
         self.log_tokens(prompt, response_text)
         return response_text
