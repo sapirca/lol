@@ -13,13 +13,14 @@ class LLMBackend:
         self.name = name
         self.logger = logger
 
-    def generate_response(self, prompt):
-        """Generate a response based on the provided prompt."""
+    def generate_response(self, messages):
+        """Generate a response based on the provided messages array."""
         raise NotImplementedError("Subclasses must implement this method.")
 
-    def log_tokens(self, prompt, response):
+    def log_tokens(self, messages, response):
         """Log the number of tokens sent and received."""
-        prompt_tokens = len(prompt.split())
+        prompt_tokens = sum(
+            len(message["content"].split()) for message in messages)
         response_tokens = len(response.split())
         log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
         self.logger.add_message(tag=f"system_log {self.name} - Tokens",
@@ -34,12 +35,12 @@ class GPTBackend(LLMBackend):
         super().__init__("GPT", logger)
         self.api_key = OPENAI_API_KEY
 
-    def generate_response(self, prompt):
+    def generate_response(self, messages):
         """
         Communicates with the GPT backend using OpenAI's API.
 
         Args:
-            prompt (str): The input prompt to send to GPT.
+            messages (list): The array of messages to send to GPT.
 
         Returns:
             str: The response from GPT.
@@ -47,17 +48,11 @@ class GPTBackend(LLMBackend):
         try:
             response = openai.ChatCompletion.create(
                 model="gpt-4-mini",  # Updated to use GPT-4o-mini
-                messages=[{
-                    "role": "system",
-                    "content": "You are a helpful assistant."
-                }, {
-                    "role": "user",
-                    "content": prompt
-                }],
+                messages=messages,
                 max_tokens=150,
                 api_key=self.api_key)
             response_text = response.choices[0].message.content.strip()
-            self.log_tokens(prompt, response_text)
+            self.log_tokens(messages, response_text)
             return response_text
         except Exception as e:
             print(f"Error communicating with GPT: {e}")
@@ -70,17 +65,18 @@ class ClaudeBackend(LLMBackend):
         super().__init__("Claude", logger)
         self.api_key = CLAUDE_API_KEY
 
-    def generate_response(self, prompt):
+    def generate_response(self, messages):
         """
         Communicates with the Claude backend.
 
         Args:
-            prompt (str): The input prompt to send to Claude.
+            messages (list): The array of messages to send to Claude.
 
         Returns:
             str: The response from Claude.
         """
         try:
+            prompt = "\n".join([message["content"] for message in messages])
             url = "https://api.anthropic.com/v1/claude"  # Replace with the actual API endpoint
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
@@ -90,7 +86,7 @@ class ClaudeBackend(LLMBackend):
             response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
             response_text = response.json().get("completion", "").strip()
-            self.log_tokens(prompt, response_text)
+            self.log_tokens(messages, response_text)
             return response_text
         except Exception as e:
             print(f"Error communicating with Claude: {e}")
@@ -103,17 +99,18 @@ class GeminiBackend(LLMBackend):
         super().__init__("Gemini", logger)
         self.api_key = GEMINI_API_KEY
 
-    def generate_response(self, prompt):
+    def generate_response(self, messages):
         """
         Communicates with the Gemini backend.
 
         Args:
-            prompt (str): The input prompt to send to Gemini.
+            messages (list): The array of messages to send to Gemini.
 
         Returns:
             str: The response from Gemini.
         """
         try:
+            prompt = "\n".join([message["content"] for message in messages])
             url = "https://api.gemini.com/v1/ai"  # Replace with the actual API endpoint
             headers = {
                 "Authorization": f"Bearer {self.api_key}",
@@ -123,7 +120,7 @@ class GeminiBackend(LLMBackend):
             response = requests.post(url, headers=headers, json=payload)
             response.raise_for_status()
             response_text = response.json().get("output", "").strip()
-            self.log_tokens(prompt, response_text)
+            self.log_tokens(messages, response_text)
             return response_text
         except Exception as e:
             print(f"Error communicating with Gemini: {e}")
@@ -135,16 +132,36 @@ class StubBackend(LLMBackend):
     def __init__(self, logger):
         super().__init__("Stub", logger)
 
-    def generate_response(self, prompt):
+    def generate_response(self, messages):
         """
         Stub backend that returns a fixed response for testing purposes.
 
         Args:
-            prompt (str): The input prompt.
+            messages (list): The array of messages to process.
 
         Returns:
-            str: A fixed response for testing.
+            str: A fixed response for testing, occasionally including an animation sequence.
         """
+        import random
+
         response_text = "This is a stubbed response."
-        self.log_tokens(prompt, response_text)
+
+        # Randomly include an animation sequence in the response
+        if random.choice([True, False]):
+            sequence = (
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+                "<xsequence BaseChannel=\"0\" ChanCtrlBasic=\"0\" ChanCtrlColor=\"0\" FixedPointTiming=\"1\" ModelBlending=\"true\">"
+                "<head>"
+                "<version>2024.19</version>"
+                "</head>"
+                "<steps>"
+                "<step>"
+                "<number>1</number>"
+                "<animation>Simple Animation</animation>"
+                "</step>"
+                "</steps>"
+                "</xsequence>")
+            response_text += f"\n{sequence}"
+
+        self.log_tokens(messages, response_text)
         return response_text

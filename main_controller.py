@@ -210,18 +210,34 @@ class MainController:
                                 visible=True,
                                 context=True)
 
-        # Construct the full prompt for the LLM
-        prompt = self.logger.get_context_to_llm(
-        ) + f"\n\nAnimation Sequence ({XSEQUENCE_TAG}) is:\n\n{latest_sequence}"
+        # Build the messages array for the LLM
+        messages = []
+        messages.append({"role": "system", "content": initial_prompt})
 
-        # Avoid passing the full prompt history to reduce redundancy as it already includes all animations. We send the LLM
-        # only the most updated animation (and the initial animation structure).
-        self.logger.add_message("final_prompt",
-                                prompt,
-                                visible=False,
-                                context=False)
+        # Add all logged context to the messages
+        for log in self.logger.logs:
+            if log['context']:
+                if log['tag'] == 'initial_prompt_context' or log[
+                        'tag'] == 'initial_animation':
+                    role = "system"
+                elif log['tag'] == 'user_input':
+                    role = "user"
+                elif log['tag'] == 'assistant':
+                    role = "assistant"
+                else:
+                    raise Exception(
+                        f"Unexpected log tag: {log['tag']} context: True")
+                messages.append({"role": role, "content": log['content']})
 
-        response = backend.generate_response(prompt)
+        messages.append({
+            "role":
+            "system",
+            "content":
+            f"Latest Animation Sequence ({XSEQUENCE_TAG}):\n{latest_sequence}"
+        })
+
+        response = backend.generate_response(messages)
+
         # The raw response contains a WIP animation which does not need to be added to the context.
         self.logger.add_message("llm_raw_response",
                                 response,
