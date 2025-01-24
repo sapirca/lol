@@ -1,21 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xsequence BaseChannel="0" ChanCtrlBasic="0" ChanCtrlColor="0" FixedPointTiming="1"
   ModelBlending="true">
   <head>
     <version>2024.19</version>
-    <author></author>
-    <author-email></author-email>
-    <author-website></author-website>
+    <author />
+    <author-email />
+    <author-website />
     <song>Nikki</song>
     <artist>Worakls</artist>
     <album>Orchestra</album>
-    <MusicURL></MusicURL>
-    <comment></comment>
+    <MusicURL />
+    <comment />
     <sequenceTiming>50 ms</sequenceTiming>
     <sequenceType>Media</sequenceType>
-    <mediaFile>/Users/sapir/Documents/LOL/Worakls - Nikki.mp3</mediaFile>
+    <mediaFile>/Users/sapir/repos/lol/art_installations/songs</mediaFile>
     <sequenceDuration>331.547</sequenceDuration>
-    <imageDir></imageDir>
+    <imageDir />
   </head>
   <nextid>1</nextid>
   <Jukebox />
@@ -55,79 +54,129 @@
   </DisplayElements>
   <ElementEffects>
     <Element type="timing" name="New Timing">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="fade" duration="200" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Windows">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="color" color="#FFFFFF" duration="400" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Trees">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="twinkle" color="#FF0000" duration="300" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Roofline">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="pulse" color="#00FF00" duration="500" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Garage_doors">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="strobe" color="#0000FF" duration="100" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Fence">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="fade" color="#FFFFFF" duration="200" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Icicles_strings">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="twinkle" color="#FFFF00" duration="300" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Arches-5">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="pulse" color="#FF00FF" duration="500" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Arches-4">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="strobe" color="#00FFFF" duration="100" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Arches-3">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="pulse" color="#FFFFFF" duration="500" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Arches-2">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="twinkle" color="#00FF00" duration="300" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Icicles">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="fade" color="#FFFFFF" duration="200" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Window Frame-6">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="strobe" color="#FF0000" duration="100" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Window Frame-5">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="twinkle" color="#FFFFFF" duration="300" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Tree-2">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="pulse" color="#FF00FF" duration="500" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Tree">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="fade" color="#0000FF" duration="200" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Poly Line-3">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="fade" color="#FFFF00" duration="200" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Poly Line-2">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="twinkle" color="#00FF00" duration="300" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Window Frame">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="strobe" color="#00FFFF" duration="100" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Window Frame-2">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="pulse" color="#FFFFFF" duration="500" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Window Frame-3">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="fade" color="#FF0000" duration="200" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Window Frame-4">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="twinkle" color="#FFFF00" duration="300" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Poly Line">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="fade" color="#00FF00" duration="200" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Poly Line-4">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="twinkle" color="#00FF00" duration="300" />
+      </EffectLayer>
     </Element>
     <Element type="model" name="Arches">
-      <EffectLayer />
+      <EffectLayer>
+        <Effect type="pulse" color="#FF00FF" duration="500" />
+      </EffectLayer>
     </Element>
   </ElementEffects>
   <lastView>0</lastView>
