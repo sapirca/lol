@@ -25,3 +25,6 @@ Thumbs.db
 *.swp
 .vscode/
 .vscode/launch.json
+
+# lol specific
+animation_output/
