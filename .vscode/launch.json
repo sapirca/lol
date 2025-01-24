@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/frontend/chat_app.py",
             "console": "integratedTerminal",
-            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
+            
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
@@ -18,7 +18,6 @@
             "request": "launch",
             "program": "${workspaceFolder}/test_main_controller.py",
             "console": "integratedTerminal",
-            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
@@ -29,7 +28,6 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
@@ -40,7 +38,6 @@
             "request": "launch",
             "program": "${workspaceFolder}/console.py",
             "console": "integratedTerminal",
-            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
