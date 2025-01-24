@@ -1,0 +1,49 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Chat App",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/frontend/chat_app.py",
+            "console": "integratedTerminal",
+            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Test MainController",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/test_main_controller.py",
+            "console": "integratedTerminal",
+            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Debug Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Run Console",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/console.py",
+            "console": "integratedTerminal",
+            "python": "/Users/sapir/miniconda3/envs/lol_agent/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        }
+    ]
+}
