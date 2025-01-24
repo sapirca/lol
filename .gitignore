@@ -25,4 +25,4 @@ Thumbs.db
 *.swp
 
 # lol specific
-animation_output/
+animation_output/temp_animation.xml

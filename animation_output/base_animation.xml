@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsequence BaseChannel="0" ChanCtrlBasic="0" ChanCtrlColor="0" FixedPointTiming="1"
+    ModelBlending="true">
+    <head>
+        <version>2024.19</version>
+        <author></author>
+        <author-email></author-email>
+        <author-website></author-website>
+        <song>Nikki</song>
+        <artist>Worakls</artist>
+        <album>Orchestra</album>
+        <MusicURL></MusicURL>
+        <comment></comment>
+        <sequenceTiming>50 ms</sequenceTiming>
+        <sequenceType>Media</sequenceType>
+        <mediaFile>/Users/sapir/Documents/LOL/Worakls - Nikki.mp3</mediaFile>
+        <sequenceDuration>331.547</sequenceDuration>
+        <imageDir></imageDir>
+    </head>
+    <nextid>1</nextid>
+    <Jukebox />
+    <ColorPalettes />
+    <EffectDB />
+    <DataLayers>
+        <DataLayer lor_params="0" channel_offset="0" num_channels="0" num_frames="0"
+            data="&lt;rendered: erase-mode&gt;" source="&lt;auto-generated&gt;" name="Nutcracker" />
+    </DataLayers>
+    <DisplayElements>
+        <Element collapsed="0" type="timing" name="New Timing" visible="1" views="Master View"
+            active="1" />
+        <Element collapsed="0" type="model" name="Windows" visible="1" />
+        <Element collapsed="0" type="model" name="Trees" visible="1" />
+        <Element collapsed="0" type="model" name="Roofline" visible="1" />
+        <Element collapsed="0" type="model" name="Garage_doors" visible="1" />
+        <Element collapsed="0" type="model" name="Fence" visible="1" />
+        <Element collapsed="0" type="model" name="Icicles_strings" visible="1" />
+        <Element collapsed="0" type="model" name="Arches-5" visible="1" />
+        <Element collapsed="0" type="model" name="Arches-4" visible="1" />
+        <Element collapsed="0" type="model" name="Arches-3" visible="1" />
+        <Element collapsed="0" type="model" name="Arches-2" visible="1" />
+        <Element collapsed="0" type="model" name="Icicles" visible="1" />
+        <Element collapsed="0" type="model" name="Window Frame-6" visible="1" />
+        <Element collapsed="0" type="model" name="Window Frame-5" visible="1" />
+        <Element collapsed="0" type="model" name="Tree-2" visible="1" />
+        <Element collapsed="0" type="model" name="Tree" visible="1" />
+        <Element collapsed="0" type="model" name="Poly Line-3" visible="1" />
+        <Element collapsed="0" type="model" name="Poly Line-2" visible="1" />
+        <Element collapsed="0" type="model" name="Window Frame" visible="1" />
+        <Element collapsed="0" type="model" name="Window Frame-2" visible="1" />
+        <Element collapsed="0" type="model" name="Window Frame-3" visible="1" />
+        <Element collapsed="0" type="model" name="Window Frame-4" visible="1" />
+        <Element collapsed="0" type="model" name="Poly Line" visible="1" />
+        <Element collapsed="0" type="model" name="Poly Line-4" visible="1" />
+        <Element collapsed="0" type="model" name="Arches" visible="1" />
+    </DisplayElements>
+    <ElementEffects>
+        <Element type="timing" name="New Timing">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Windows">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Trees">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Roofline">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Garage_doors">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Fence">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Icicles_strings">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Arches-5">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Arches-4">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Arches-3">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Arches-2">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Icicles">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Window Frame-6">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Window Frame-5">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Tree-2">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Tree">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Poly Line-3">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Poly Line-2">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Window Frame">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Window Frame-2">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Window Frame-3">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Window Frame-4">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Poly Line">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Poly Line-4">
+            <EffectLayer />
+        </Element>
+        <Element type="model" name="Arches">
+            <EffectLayer />
+        </Element>
+    </ElementEffects>
+    <lastView>0</lastView>
+    <TimingTags>
+        <Tag number="0" position="-1" />
+        <Tag number="1" position="-1" />
+        <Tag number="2" position="-1" />
+        <Tag number="3" position="-1" />
+        <Tag number="4" position="-1" />
+        <Tag number="5" position="-1" />
+        <Tag number="6" position="-1" />
+        <Tag number="7" position="-1" />
+        <Tag number="8" position="-1" />
+        <Tag number="9" position="-1" />
+    </TimingTags>
+</xsequence>

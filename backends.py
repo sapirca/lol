@@ -2,6 +2,8 @@ import openai
 import requests
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
+GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
+
 
 class LLMBackend:
     """
@@ -34,29 +36,31 @@ class GPTBackend(LLMBackend):
     def __init__(self, logger):
         super().__init__("GPT", logger)
         self.api_key = OPENAI_API_KEY
+        self.api_url = GPT_4O_MINI_API_URL
+        self.model = "gpt-4o-mini"  # get from config
+        self.client = openai.OpenAI(api_key=self.api_key)
 
     def generate_response(self, messages):
-        """
-        Communicates with the GPT backend using OpenAI's API.
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
 
-        Args:
-            messages (list): The array of messages to send to GPT.
-
-        Returns:
-            str: The response from GPT.
-        """
+        data = {
+            "messages": messages,
+        }
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4-mini",  # Updated to use GPT-4o-mini
-                messages=messages,
-                max_tokens=150,
-                api_key=self.api_key)
-            response_text = response.choices[0].message.content.strip()
+            completion = self.client.chat.completions.create(model=self.model,
+                                                             messages=messages)
+
+            print("Assistant: " + completion.choices[0].message.content)
+
+            response_text = completion.choices[0].message.content.strip()
             self.log_tokens(messages, response_text)
             return response_text
         except Exception as e:
+            self.logger.error(f"Error communicating with GPT API: {e}")
             print(f"Error communicating with GPT: {e}")
-            return "Error: Unable to connect to GPT backend."
 
 
 class ClaudeBackend(LLMBackend):

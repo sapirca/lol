@@ -3,11 +3,19 @@ import json
 from datetime import datetime, timedelta
 import threading
 
+
 def count_words(text):
     """Utility function to count words in a given text."""
     return len(text.split())
 
+
+def estimate_tokens(words):
+    """Estimate the number of tokens based on word count."""
+    return int(words * 1.33 + 0.5)  # Round up to nearest integer
+
+
 class Logger:
+
     def __init__(self, log_dir="logs", snapshot_interval=30):
         """Initialize the logger with optional periodic snapshot caching."""
         self.log_dir = log_dir
@@ -20,7 +28,7 @@ class Logger:
     def add_message(self, tag, content, visible, context):
         """Add a message to the log with specific tags and flags."""
         words = count_words(content)
-        tokens_estimation = int(words * 1.33 + 0.5)  # Round up to nearest integer
+        tokens_estimation = estimate_tokens(words)
         self.logs.append({
             "tag": tag,
             "content": content,
@@ -34,9 +42,9 @@ class Logger:
     def add_log(self, content):
         """Add a system log with predefined tags and flags."""
         words = count_words(content)
-        tokens_estimation = int(words * 1.33 + 0.5)  # Round up to nearest integer
+        tokens_estimation = estimate_tokens(words)
         self.logs.append({
-            "tag": "system_log",
+            "tag": "info_log",
             "content": content,
             "visible": False,
             "context": False,
@@ -45,13 +53,31 @@ class Logger:
             "timestamp": datetime.now().isoformat()
         })
 
+    def error(self, content):
+        """Log an error message."""
+        words = count_words(content)
+        tokens_estimation = estimate_tokens(words)
+        self.logs.append({
+            "tag": "error_log",
+            "content": content,
+            "visible": True,
+            "context": False,
+            "words": words,
+            "tokens_estimation": tokens_estimation,
+            "timestamp": datetime.now().isoformat()
+        })
+
     def finalize(self):
         """Save all logs to a file and add a summary log."""
-        total_sent_tokens = sum(log["tokens_estimation"] for log in self.logs if log["context"])
-        total_received_tokens = sum(log["tokens_estimation"] for log in self.logs if not log["context"])
+        total_sent_tokens = sum(log["tokens_estimation"] for log in self.logs
+                                if log["context"])
+        total_received_tokens = sum(log["tokens_estimation"]
+                                    for log in self.logs if not log["context"])
 
         # Add a system log for the overall sent and received tokens
-        self.add_log(f"Total sent tokens: {total_sent_tokens}, Total received tokens: {total_received_tokens}")
+        self.add_log(
+            f"Total sent tokens: {total_sent_tokens}, Total received tokens: {total_received_tokens}"
+        )
 
         with open(self.snapshot_file, "w") as file:
             json.dump(self.logs, file, indent=4)
@@ -77,6 +103,7 @@ class Logger:
 
     def _start_periodic_snapshot(self):
         """Start a thread for periodic snapshot caching."""
+
         def snapshot_loop():
             while True:
                 self._cache_snapshot()

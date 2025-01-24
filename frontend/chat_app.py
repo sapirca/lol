@@ -8,10 +8,10 @@ import re
 import subprocess
 import platform
 from constants import ANIMATION_OUT_TEMP_DIR
+import threading
 
 # Constants
 LOGS_FOLDER_PATH = "logs"  # Folder where system snapshots are stored
-# UNTITLED_CHAT_FILE = "untitled.json"  # Default chat file for initialization
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -100,8 +100,10 @@ def append_message_to_window(timestamp, sender, message):
 
 
 def send_message(event=None):
+    """Handles sending a message by the user and calling the backend in a separate thread."""
     global controller
     user_message = user_input.get("1.0", tk.END).strip()
+    user_input.delete("1.0", tk.END)
     if user_message:
         # Check if the user wants to exit
         if user_message.lower() == "exit":
@@ -110,7 +112,7 @@ def send_message(event=None):
                 )  # Ensure the controller finalizes and saves state
             root.destroy()  # Close the application
             return
-    user_message = user_input.get("1.0", tk.END).strip()
+
     if user_message:
         chat_window.config(state=tk.NORMAL)
 
@@ -120,30 +122,32 @@ def send_message(event=None):
         # Add user message
         append_message_to_window(current_time, "You", user_message)
 
-        # Save user message to the chat history
-        # Chat saving now handled internally by MainController
+        # Run the backend communication in a separate thread
+        threading.Thread(target=communicate_with_backend,
+                         args=(user_message, current_time),
+                         daemon=True).start()
 
-        # Call the MainController for the system reply
-        # Call the MainController for the system reply
-        replies = controller.communicate(user_message)
 
-        # Add system reply
-        for tag, system_reply in replies.items():
-            if tag == 'assistant':
-                append_message_to_window(current_time, 'Assistant',
-                                         system_reply)
-            elif tag == 'system':
-                append_message_to_window(current_time, 'System', system_reply)
-            else:
-                append_message_to_window(current_time, tag.capitalize(),
-                                         system_reply)
+def communicate_with_backend(user_message, current_time):
+    """Handles communication with the backend without freezing the UI."""
+    global controller
+    replies = controller.communicate(user_message)
+
+    for tag, system_reply in replies.items():
+        if tag == 'assistant':
+            append_message_to_window(current_time, 'Assistant', system_reply)
+        elif tag == 'system':
+            append_message_to_window(current_time, 'System', system_reply)
+        else:
+            append_message_to_window(current_time, tag.capitalize(),
+                                     system_reply)
 
         # # Save system reply to the chat history
         # save_chat_to_file(UNTITLED_CHAT_FILE, {"timestamp": current_time, "sender": "System", "message": system_reply})
 
-        chat_window.config(state=tk.DISABLED)
-        chat_window.see(tk.END)
-        user_input.delete("1.0", tk.END)
+    chat_window.config(state=tk.DISABLED)
+    chat_window.see(tk.END)
+    user_input.delete("1.0", tk.END)
 
 
 def close_current_chat():
@@ -329,13 +333,6 @@ def handle_keypress(event):
     """Handles the Enter key press to send messages."""
     if event.keysym == "Return" and not event.state & 1:  # Enter without Shift
         send_message()
-        try:
-            if user_input.winfo_exists():  # Check if the widget still exists
-                user_input.delete("1.0", tk.END)  # Clear the input field
-            else:
-                print("user_input widget does not exist!")
-        except Exception as e:
-            print(f"Error: {e}")
         return "break"  # Prevent default newline behavior
 
 

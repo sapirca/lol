@@ -189,8 +189,7 @@ class MainController:
 
         backend = self.select_backend()
 
-        latest_sequence = self.sequence_manager.get_latest_sequence()
-
+        latest_sequence = None
         if not self.initial_prompt_added:
             initial_prompt = get_full_prompt(self.house_config)
             # Ensure the main instructions are always sent to the LLM for proper context.
@@ -199,6 +198,7 @@ class MainController:
                                     visible=False,
                                     context=True)
             # Always send the original animation structure to the LLM for reference.
+            latest_sequence = self.sequence_manager.get_latest_sequence()
             self.logger.add_message("initial_animation",
                                     latest_sequence,
                                     visible=False,
@@ -212,7 +212,6 @@ class MainController:
 
         # Build the messages array for the LLM
         messages = []
-        messages.append({"role": "system", "content": initial_prompt})
 
         # Add all logged context to the messages
         for log in self.logger.logs:
@@ -229,12 +228,15 @@ class MainController:
                         f"Unexpected log tag: {log['tag']} context: True")
                 messages.append({"role": role, "content": log['content']})
 
-        messages.append({
-            "role":
-            "system",
-            "content":
-            f"Latest Animation Sequence ({XSEQUENCE_TAG}):\n{latest_sequence}"
-        })
+        # Latest animation is always empty, besides the first run it's initialized in the
+        if not latest_sequence:
+            latest_sequence = self.sequence_manager.get_latest_sequence()
+            messages.append({
+                "role":
+                "system",
+                "content":
+                f"Latest Animation Sequence ({XSEQUENCE_TAG}):\n{latest_sequence}"
+            })
 
         response = backend.generate_response(messages)
 
