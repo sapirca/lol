@@ -9,7 +9,7 @@ This project implements an AI agent that communicates with users using multiple 
 ## Setting up the Project
 
 ### Prerequisites
-1. Install [Conda](https://docs.conda.io/en/latest/miniconda.html).
+1. Install [Miniconda](https://docs.anaconda.com/miniconda/install/).
 2. Ensure you have **Python 3.8+** installed.
 3. Install **Visual Studio Code** (recommended) and the Python extension.
 
@@ -65,7 +65,7 @@ This project implements an AI agent that communicates with users using multiple 
    - Search for **Python** and click **Install**.
 
 3. **Select the Python Interpreter**:
-   - Open the Command Palette (Ctrl+Shift+P).
+   - Open the Command Palette (Command+Shift+P on macOS or Ctrl+Shift+P on Windows/Linux).
    - Type and select **Python: Select Interpreter**.
    - Choose the Conda environment `lol_agent` created earlier.
 
@@ -175,3 +175,4 @@ This project implements an AI agent that communicates with users using multiple 
    - Stores the API keys for the backends in a secure and centralized location.
 
 ---
+
