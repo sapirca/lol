@@ -28,8 +28,15 @@ This project implements an AI agent that communicates with users using multiple 
    ```
 
 3. **Install Required Libraries**:
+
    ```bash
    pip install openai requests
+   pip install anthropic
+   ```
+
+   Using Python 3.9+, install the google-generativeai package using the following pip command:
+   ```bash
+   pip install -q -U google-generativeai
    ```
 
 4. **Download or Clone the Repository**:
