@@ -1,6 +1,0 @@
-# API Keys for LLM Backends
-
-OPENAI_API_KEY = "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"
-CLAUDE_API_KEY = "your_claude_api_key"
-# GEMINI_API_KEY = "AIzaSyCZKxpKAvgcGB9pAPbBo4I8dCS9wx6AVXc" # personal
-GEMINI_API_KEY = "AIzaSyA3HuQnX7z6UsVKNM4CAHb7FYl-ynTD5QE"  # corp
