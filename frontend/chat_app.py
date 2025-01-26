@@ -370,6 +370,22 @@ chat_window = scrolledtext.ScrolledText(chat_frame,
                                         bg="#2c2c2c",
                                         fg="#ffffff",
                                         insertbackground="#ffffff")
+
+# Create a context menu for right-click
+context_menu = tk.Menu(chat_window, tearoff=0)
+context_menu.add_command(
+    label="Copy", command=lambda: chat_window.event_generate("<<Copy>>"))
+
+
+def show_context_menu(event):
+    """Show the context menu at the cursor position."""
+    print("Right-click event detected")  # Debug: Check if the event triggers
+    context_menu.tk_popup(event.x_root, event.y_root)
+
+
+# Bind right-click to show the context menu
+chat_window.bind("<Button-2>", show_context_menu)
+
 chat_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the input

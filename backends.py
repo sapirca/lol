@@ -103,44 +103,53 @@ class ClaudeBackend(LLMBackend):  # Assuming LLMBackend is defined elsewhere
         Communicates with the Claude backend.
 
         Args:
-            messages (list): The array of messages to send to Claude.  Should follow
-                             the Anthropic messages format.
+            messages (list): A list of Message objects to send to Claude. Each Message object
+                            should have 'role' and 'content' attributes.
 
         Returns:
             str: The response from Claude, or an error message.
         """
+        # Separate system messages and chat messages
+        system_messages = []
+        chat_messages = []
+        for message in messages:
+            if message['role'] == 'system':
+                system_messages.append(message['content'])
+            else:
+                chat_messages.append({
+                    'role': message['role'],
+                    'content': message['content']
+                })
+
         try:
+            # Send the request to Claude's backend
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=1000,
                 temperature=0,
-                system=
-                "You are a world-class poet. Respond only with short poems.",
-                messages=messages)
+                system=" ".join(system_messages).strip(
+                ),  # Concatenate with space for clarity
+                messages=chat_messages)
 
-            # Correct way to extract text content (handling content blocks):
+            # Parse and clean up response text
             response_text = ""
-            for content_block in response.content:
+            for content_block in response.content:  # Assuming response.content is iterable
                 if content_block.type == "text":
                     response_text += content_block.text
             response_text = response_text.strip()  # Clean up whitespace
 
-            self.log_tokens(messages,
-                            response_text)  # Assuming this function exists
+            # Log tokens (if the log_tokens method is defined)
+            if hasattr(self, 'log_tokens'):
+                self.log_tokens(messages, response_text)
+
             return response_text
 
-        except anthropic.APIConnectionError as e:
-            error_msg = f"Error connecting to Claude: {e}"
-            self.logger.add_log(error_msg)  # Use the logger
-            return f"Error: {error_msg}"  # Return the error message
-        except anthropic.APIStatusError as e:
-            error_msg = f"Claude API Error: {e}"
-            self.logger.add_log(error_msg)
-            return f"Error: {error_msg}"
-        except Exception as e:  # Catch general exceptions
-            error_msg = f"An unexpected error occurred: {e}"
-            self.logger.add_log(error_msg)
-            return f"Error: {error_msg}"
+        except Exception as e:
+            # Handle and log errors
+            error_message = f"Error communicating with Claude backend: {str(e)}"
+            if hasattr(self, 'log_tokens'):
+                self.log_tokens(messages, error_message)
+            return error_message
 
 
 class GeminiBackend(LLMBackend):

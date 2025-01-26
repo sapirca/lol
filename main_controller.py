@@ -206,7 +206,7 @@ class MainController:
             self.initial_prompt_added = True
 
         self.logger.add_message("user_input",
-                                "User: " + user_input,
+                                user_input,
                                 visible=True,
                                 context=True)
 
@@ -253,7 +253,7 @@ class MainController:
         # Add this trimmed short response to the context
         # for better understanding.
         self.logger.add_message("assistant",
-                                "Assistant: " + assistant_response +
+                                assistant_response +
                                 " The animation was trimmed out",
                                 visible=True,
                                 context=True)
