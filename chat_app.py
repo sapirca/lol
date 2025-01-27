@@ -124,6 +124,8 @@ def send_message(event=None):
     if user_message:
         chat_window.config(state=tk.NORMAL)
         send_button.config(state=tk.DISABLED)  # Disable send button
+        user_input.unbind("<Return>")  # Disable Enter key
+        # user_input.unbind("<Shift-Return>")  # Disable Shift+Enter key
         append_message_to_window("You", user_message)
 
         # Run the backend communication in a separate thread
@@ -147,8 +149,9 @@ def communicate_with_backend(user_message):
 
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
-    # user_input.delete("1.0", tk.END)
-    send_button.config(state=tk.NORMAL)  # Re-enable send button(user_message):
+    send_button.config(state=tk.NORMAL)
+    user_input.bind("<Return>", handle_keypress)
+
 
 def close_current_chat():
     """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
