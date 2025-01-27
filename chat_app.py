@@ -117,14 +117,13 @@ def send_message(event=None):
         # Check if the user wants to exit
         if user_message.lower() == "exit":
             if controller:
-                controller.shutdown(
-                )  # Ensure the controller finalizes and saves state
+                controller.shutdown()  # Ensure the controller finalizes and saves state
             root.destroy()  # Close the application
             return
 
     if user_message:
         chat_window.config(state=tk.NORMAL)
-
+        send_button.config(state=tk.DISABLED)  # Disable send button
         append_message_to_window("You", user_message)
 
         # Run the backend communication in a separate thread
@@ -148,7 +147,8 @@ def communicate_with_backend(user_message):
 
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
-    user_input.delete("1.0", tk.END)
+    # user_input.delete("1.0", tk.END)
+    send_button.config(state=tk.NORMAL)  # Re-enable send button(user_message):
 
 def close_current_chat():
     """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
