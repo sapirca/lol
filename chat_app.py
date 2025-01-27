@@ -100,6 +100,9 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
                                   justify=USER_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
 
+    # Automatically scroll to the bottom
+    chat_window.see(tk.END)
+
 def update_active_chat_label(snapshot_name):
     """Update the active chat label to reflect the currently active chat."""
     active_chat_label.config(text=f"Active Chat: {snapshot_name}")
