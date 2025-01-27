@@ -1,7 +1,8 @@
 import openai
-import requests
+import tiktoken
 import anthropic
-# import google.generativeai as genai
+import google.generativeai as genai
+
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
 GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
@@ -23,14 +24,17 @@ class LLMBackend:
 
     def log_tokens(self, messages, response):
         """Log the number of tokens sent and received."""
-        prompt_tokens = sum(
-            len(message["content"].split()) for message in messages)
-        response_tokens = len(response.split())
+        prompt_tokens = self.token_count(messages)
+        response_tokens = self.token_count([{"content": response}])
         log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
         self.logger.add_message(tag=f"system_log {self.name} - Tokens",
                                 content=log_message,
                                 visible=False,
                                 context=False)
+
+    def token_count(self, messages):
+        """Default token counting method using word splits."""
+        return sum(len(message["content"].split()) for message in messages)
 
 
 class GPTBackend(LLMBackend):
@@ -45,11 +49,15 @@ class GPTBackend(LLMBackend):
     def __init__(self, logger, model="gpt-4o-mini"):
         super().__init__("GPT", logger)
         self.api_key = OPENAI_API_KEY
-        self.api_url = GPT_4O_MINI_API_URL
         self.model = model
         self.logger.add_log(f"Using GPT model: {self.model}")
 
         self.client = openai.OpenAI(api_key=self.api_key)
+
+    def token_count(self, messages):
+        encoding = tiktoken.encoding_for_model(self.model)
+        return sum(
+            len(encoding.encode(message["content"])) for message in messages)
 
     def generate_response(self, messages):
         headers = {
@@ -64,18 +72,17 @@ class GPTBackend(LLMBackend):
             completion = self.client.chat.completions.create(model=self.model,
                                                              messages=messages)
 
-            print("Assistant: " + completion.choices[0].message.content)
+            # print("Assistant: " + completion.choices[0].message.content)
 
             response_text = completion.choices[0].message.content.strip()
             self.log_tokens(messages, response_text)
             return response_text
         except Exception as e:
             self.logger.error(f"Error communicating with GPT API: {e}")
-            print(f"Error communicating with GPT: {e}")
+            return (f"Error communicating with GPT: {e}")
 
 
-class ClaudeBackend(LLMBackend):  # Assuming LLMBackend is defined elsewhere
-
+class ClaudeBackend(LLMBackend):
     CLAUDE_MODELS = {
         "claude-2": 0.05,
         "claude-instant": 0.025,
@@ -83,13 +90,12 @@ class ClaudeBackend(LLMBackend):  # Assuming LLMBackend is defined elsewhere
         "claude-lite": 0.015,
         "claude-ultra": 0.045,
         "claude-supernova": 0.055,
-        "claude-3-5-sonnet-20241022":
-        0.055  # Example price - add others as needed.
+        "claude-3-5-sonnet-20241022": 0.055
     }
 
     def __init__(self, logger, model="claude-3-5-sonnet-20241022"):
         super().__init__("Claude", logger)
-        self.api_key = CLAUDE_API_KEY  # No longer needs to be an argument
+        self.api_key = CLAUDE_API_KEY
         self.model = model
         self.client = anthropic.Anthropic(api_key=self.api_key)
         self.logger.add_log(f"Using Claude model: {self.model}")
@@ -163,33 +169,22 @@ class GeminiBackend(LLMBackend):
         super().__init__("Gemini", logger)
         self.api_key = GEMINI_API_KEY
         self.model = model
+        genai.configure(api_key=self.api_key)
+        self.gemini_model = genai.GenerativeModel(self.model)
         self.logger.add_log(f"Using Gemini model: {self.model}")
 
-        # genai.configure(api_key=self.api_key)
-        # self.gemini_model = genai.GenerativeModel(self.model)
-
-        self.gemini_model = None
-
     def generate_response(self, messages):
-        """
-        Communicates with the Gemini backend.
-
-        Args:
-            messages (list): The array of messages to send to Gemini.
-
-        Returns:
-            str: The response from Gemini.
-        """
         try:
             prompt = "\n".join(
-                [message["role"] + message["content"] for message in messages])
+                [f'{msg["role"]}: {msg["content"]}' for msg in messages])
+            # Replace with actual Gemini API call
             response = self.gemini_model.generate_content(prompt)
             response_text = response.text.strip()
             self.log_tokens(messages, response_text)
             return response_text
         except Exception as e:
-            print(f"Error communicating with Gemini: {e}")
-            return "Error: Unable to connect to Gemini backend."
+            self.logger.error(f"Error communicating with Gemini backend: {e}")
+            return f"Error communicating with Gemini backend {e}"
 
 
 class StubBackend(LLMBackend):
@@ -212,7 +207,7 @@ class StubBackend(LLMBackend):
         response_text = "This is a stubbed response."
 
         # Randomly include an animation sequence in the response
-        if random.choice([True, False]):
+        if False: # TODO Uncomment this when done debugging - random.choice([True, False]):
             sequence = (
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<xsequence BaseChannel=\"0\" ChanCtrlBasic=\"0\" ChanCtrlColor=\"0\" FixedPointTiming=\"1\" ModelBlending=\"true\">"

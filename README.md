@@ -32,6 +32,7 @@ This project implements an AI agent that communicates with users using multiple 
    ```bash
    pip install openai requests
    pip install anthropic
+   pip install tiktoken
    ```
 
    Using Python 3.9+, install the google-generativeai package using the following pip command:

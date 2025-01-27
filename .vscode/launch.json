@@ -5,7 +5,7 @@
             "name": "Run Chat App",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/frontend/chat_app.py",
+            "program": "${workspaceFolder}/chat_app.py",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
