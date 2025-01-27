@@ -29,8 +29,11 @@ def initialize_main_controller(snapshot_folder):
         os.path.join(LOGS_FOLDER_PATH, snapshot_folder))
     controller = MainController(snapshot_path)
 
+def append_message_to_window(sender, message):    
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    append_message_to_window_w_timestamp(timestamp, sender, message)
 
-def append_message_to_window(timestamp, sender, message):
+def append_message_to_window_w_timestamp(timestamp, sender, message):
     """Adds a message to the chat window with proper formatting and clickable links."""
     label_tag = f"{sender.lower()}_label"
     message_tag = f"{sender.lower()}_message"
@@ -116,30 +119,26 @@ def send_message(event=None):
     if user_message:
         chat_window.config(state=tk.NORMAL)
 
-        # Get the current time
-        current_time = datetime.now().strftime("%H:%M:%S")
-
-        # Add user message
-        append_message_to_window(current_time, "You", user_message)
+        append_message_to_window("You", user_message)
 
         # Run the backend communication in a separate thread
         threading.Thread(target=communicate_with_backend,
-                         args=(user_message, current_time),
+                         args=(user_message),
                          daemon=True).start()
 
 
-def communicate_with_backend(user_message, current_time):
+def communicate_with_backend(user_message):
     """Handles communication with the backend without freezing the UI."""
     global controller
     replies = controller.communicate(user_message)
 
     for tag, system_reply in replies.items():
         if tag == 'assistant':
-            append_message_to_window(current_time, 'Assistant', system_reply)
+            append_message_to_window('Assistant', system_reply)
         elif tag == 'system':
-            append_message_to_window(current_time, 'System', system_reply)
+            append_message_to_window('System', system_reply)
         else:
-            append_message_to_window(current_time, tag.capitalize(),
+            append_message_to_window(tag.capitalize(),
                                      system_reply)
 
         # # Save system reply to the chat history
@@ -175,8 +174,9 @@ def save_chat():
                                      fg="red")
 
 
+
 def load_chat_content(snapshot_folder):
-    """Load chat content and alert if the current chat is unsaved."""
+    """Load chat content and display the backend name."""
     if controller and controller.logger.logs:
         unsaved_warning = tk.Toplevel(root)
         unsaved_warning.title("Unsaved Changes")
@@ -208,42 +208,40 @@ def load_chat_content(snapshot_folder):
     else:
         _load_chat(snapshot_folder)
 
-
 def _load_chat(snapshot_folder):
     """Load chat content and alert if the current chat is unsaved."""
     if controller:
         # Alert user if current chat is not saved
         if not controller.logger.logs:  # Assuming the logger's logs indicate changes
             print("Warning: Current chat session is not saved!")
-    """Load chat content without saving the current chat session."""
-    """Loads chat history into the chat window using the selected snapshot folder."""
+    
     global active_chat_snapshot
     active_chat_snapshot = snapshot_folder
 
-    # Initialize the MainController with the selected snapshot
     initialize_main_controller(snapshot_folder)
 
-    # Retrieve visible chat from the controller
     chat_history = controller.get_visible_chat()
-
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
-    if not chat_history:
-        # Initialize with a welcome message if history is empty
-        current_time = datetime.now().strftime("%H:%M:%S")
-        append_message_to_window(
-            current_time, "System",
-            "Welcome to LOL - the Light Animations Orchestrator Dialog Agent!")
-    else:
-        for timestamp, message, tag in chat_history:
-            if tag == 'user_input':
-                sender = 'You'
-            elif tag == 'assistant':
-                sender = 'Assistant'
-            else:
-                sender = 'System'
-            append_message_to_window(timestamp, sender, message)
+
+    for timestamp, message, tag in chat_history:
+        if tag == 'user_input':
+            sender = 'You'
+        elif tag == 'assistant':
+            sender = 'Assistant'
+        else:
+            sender = 'System'
+        append_message_to_window_w_timestamp(timestamp, sender, message)
+
+    print_system_info()
     chat_window.config(state=tk.DISABLED)
+
+def print_system_info():
+    current_time = datetime.now().strftime("%H:%M:%S")
+    backend_name = controller.selected_backend or "Unknown Backend"
+    message = f"Active Backend is: {backend_name}"
+    controller.logger.add_message("system_output", message, visible=True, context=False)  
+    append_message_to_window("System", message)
 
 
 def create_or_ensure_untitled_chat():
@@ -251,53 +249,22 @@ def create_or_ensure_untitled_chat():
     global controller, active_chat_snapshot
     if controller is None or active_chat_snapshot != "untitled":
         # Initialize untitled session only if it doesn't exist
+        close_current_chat()  # Ensure the previous chat is closed
         controller = MainController()
         active_chat_snapshot = "untitled"
 
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
+
+    print_system_info()
+
     current_time = datetime.now().strftime("%H:%M:%S")
-    append_message_to_window(current_time, "System",
-                             "Welcome to the untitled chat session!")
+    append_message_to_window("System",
+                             "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)
 
     print(f"Untitled chat session ensured")
     active_chat_snapshot = "untitled"
-
-    chat_window.config(state=tk.NORMAL)
-    chat_window.delete("1.0", tk.END)
-    current_time = datetime.now().strftime("%H:%M:%S")
-    append_message_to_window(current_time, "System",
-                             "Welcome to the untitled chat session!")
-    chat_window.config(state=tk.DISABLED)
-
-    print(f"Untitled chat session initialized in")
-
-
-def create_new_chat():
-    """Creates a new empty chat session."""
-    global controller, active_chat_snapshot
-    close_current_chat()  # Ensure the previous chat is closed
-
-    # Create a unique folder for the new chat
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_chat_folder = os.path.abspath(
-        os.path.join(LOGS_FOLDER_PATH, f"snapshot_{timestamp}"))
-    os.makedirs(new_chat_folder, exist_ok=True)
-
-    # Initialize a new controller for the new chat
-    controller = MainController(new_chat_folder)
-    active_chat_snapshot = f"snapshot_{timestamp}"
-
-    # Display a welcome message in the new chat
-    chat_window.config(state=tk.NORMAL)
-    chat_window.delete("1.0", tk.END)
-    current_time = datetime.now().strftime("%H:%M:%S")
-    append_message_to_window(current_time, "System",
-                             "Welcome to a new chat session!")
-    chat_window.config(state=tk.DISABLED)
-
-    print(f"New chat session created: {new_chat_folder}")
 
 
 def populate_snapshot_list():

@@ -29,6 +29,7 @@ class Logger:
         """Add a message to the log with specific tags and flags."""
         words = count_words(content)
         tokens_estimation = estimate_tokens(words)
+        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
         self.logs.append({
             "tag": tag,
             "content": content,
@@ -36,7 +37,7 @@ class Logger:
             "context": context,
             "words": words,
             "tokens_estimation": tokens_estimation,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": timestamp
         })
 
     def add_log(self, content):

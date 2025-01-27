@@ -194,7 +194,7 @@ class MainController:
             initial_prompt = get_full_prompt(self.house_config)
             # Ensure the main instructions are always sent to the LLM for proper context.
             self.logger.add_message("initial_prompt_context",
-                                    "System: " + initial_prompt,
+                                    initial_prompt,
                                     visible=False,
                                     context=True)
             # Always send the original animation structure to the LLM for reference.
