@@ -269,44 +269,38 @@ def create_or_ensure_untitled_chat():
     active_chat_snapshot = "untitled"
 
 def populate_snapshot_list():
-    """Populates the snapshot list on the left UI bar with a scrollbar."""
+    """Populates the snapshot list with a scrollbar and highlights the active chat."""
     for widget in chat_list_frame.winfo_children():
-        widget.destroy()  # Clear existing buttons
+        widget.destroy()
 
     snapshot_folders = [
         f for f in os.listdir(LOGS_FOLDER_PATH)
         if os.path.isdir(os.path.join(LOGS_FOLDER_PATH, f))
     ]
 
-    # Create a canvas to hold the buttons
     canvas = tk.Canvas(chat_list_frame)
     scrollbar_y = tk.Scrollbar(chat_list_frame, orient="vertical", command=canvas.yview)
     scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
     canvas.config(yscrollcommand=scrollbar_y.set)
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-
-    # Create a frame inside the canvas to hold the buttons
     buttons_frame = tk.Frame(canvas)
     canvas.create_window((0, 0), window=buttons_frame, anchor=tk.NW)
 
     for snapshot_folder in snapshot_folders:
         snapshot_button = tk.Button(
-            buttons_frame,  # Place buttons in the buttons_frame
+            buttons_frame,
             text=snapshot_folder,
-            command=lambda folder=snapshot_folder: load_chat_content(folder))
+            command=lambda folder=snapshot_folder: load_chat_content(folder)) 
         snapshot_button.pack(fill=tk.X, pady=2)
 
-    # Always add a button for the untitled chat at the top
-    untitled_button = tk.Button(buttons_frame,  # Place in buttons_frame
+    untitled_button = tk.Button(buttons_frame,
                                 text="untitled",
                                 command=create_or_ensure_untitled_chat)
     untitled_button.pack(fill=tk.X, pady=2)
 
-    # Make the buttons_frame scrollable
     buttons_frame.bind("<Configure>", lambda e: canvas.config(scrollregion=canvas.bbox("all")))
 
-    # Click on the last button to load its chat (if any buttons exist)
     buttons = buttons_frame.winfo_children()
     if buttons:
        buttons[-1].invoke()
