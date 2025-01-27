@@ -162,14 +162,18 @@ def save_chat():
     global controller, active_chat_snapshot
     if controller:
         try:
+            # Construct the snapshot file name
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            snapshot_file_name = f"logs/snapshot_{timestamp}"
             controller.shutdown()  # Save the current session state
-            save_status_label.config(text=f"Saved changes to snapshot",
-                                     fg="light gray")
+            save_status_label.config(text=f"Snapshot saved: {snapshot_file_name}", fg="light gray")
         except Exception as e:
-            save_status_label.config(text=f"Failed to save chat: {str(e)}",
-                                     fg="red")
+            save_status_label.config(text=f"Failed to save chat: {str(e)}", fg="red")
+    else:
+        save_status_label.config(text="No active chat to save", fg="red")
 
 def load_chat_content(snapshot_folder):
+    save_status_label.config(text="", fg="light gray")  # Clear the status label
     """Load chat content and display the backend name."""
     close_current_chat()  # Ensure the previous chat is closed before switching
 
@@ -206,6 +210,7 @@ def load_chat_content(snapshot_folder):
         update_active_chat_label(snapshot_folder)  # Update label here
 
 def _load_chat(snapshot_folder):
+    save_status_label.config(text="", fg="light gray")  # Ensure the status label is cleared when switching chats
     """Load chat content and alert if the current chat is unsaved."""
     if controller:
         # Alert user if current chat is not saved
@@ -320,26 +325,30 @@ chat_list_frame.pack(side=tk.LEFT, fill=tk.Y)
 chat_frame = tk.Frame(root)
 chat_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-# Add a save button to the top of the chat window
-save_button = tk.Button(chat_frame, text="Snapshot", command=save_chat)
-save_button.pack(side=tk.TOP, padx=5, pady=5, anchor="ne")
-
-# Add a status label for saving feedback
-save_status_label = tk.Label(chat_frame,
-                             text="",
-                             fg="light gray",
-                             anchor="w",
-                             bg="#2c2c2c")
-save_status_label.pack(side=tk.TOP, fill=tk.X, padx=5)
+# Create a frame for the top bar
+top_bar = tk.Frame(chat_frame, bg="#2c2c2c")
+top_bar.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
 # Add a label to display the active chat name
-active_chat_label = tk.Label(chat_frame,
+active_chat_label = tk.Label(top_bar,
                              text="Active Chat: None",
                              fg="#ffffff",
                              bg="#2c2c2c",
                              anchor="w",
                              font=("Helvetica", 12, "bold"))
-active_chat_label.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+active_chat_label.pack(side=tk.LEFT, padx=5)
+
+# Add a status label for saving feedback
+save_status_label = tk.Label(top_bar,
+                             text="",
+                             fg="light gray",
+                             bg="#2c2c2c",
+                             font=("Helvetica", 10))
+save_status_label.pack(side=tk.LEFT, padx=10)
+
+# Add a save button for snapshots
+save_button = tk.Button(top_bar, text="Snapshot", command=save_chat)
+save_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(chat_frame,
