@@ -8,7 +8,7 @@ import re
 import subprocess
 import platform
 from constants import ANIMATION_OUT_TEMP_DIR
-import threading
+from constants import TIME_FORMAT
 
 # Constants
 LOGS_FOLDER_PATH = "logs"  # Folder where system snapshots are stored
@@ -30,7 +30,7 @@ def initialize_main_controller(snapshot_folder):
     controller = MainController(snapshot_path)
 
 def append_message_to_window(sender, message):    
-    timestamp = datetime.now().strftime("%H:%M:%S")
+    timestamp = datetime.now().strftime(TIME_FORMAT)
     append_message_to_window_w_timestamp(timestamp, sender, message)
 
 def append_message_to_window_w_timestamp(timestamp, sender, message):
@@ -150,12 +150,12 @@ def communicate_with_backend(user_message):
 
 
 def close_current_chat():
-    """Gracefully close the current chat controller, saving changes if necessary."""
+    """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
     global controller, active_chat_snapshot
     if controller:
         controller.shutdown()  # Ensure controller finalizes and saves state
         print(f"Saved changes to snapshot: {active_chat_snapshot}")
-
+            
     # Clear global references to free resources
     controller = None
     active_chat_snapshot = None  # TODO(sapir) remove the snapshots
@@ -176,6 +176,7 @@ def save_chat():
 
 
 def load_chat_content(snapshot_folder):
+    close_current_chat()  # Ensure the previous chat is closed before switching
     """Load chat content and display the backend name."""
     if controller and controller.logger.logs:
         unsaved_warning = tk.Toplevel(root)
@@ -237,7 +238,8 @@ def _load_chat(snapshot_folder):
     chat_window.config(state=tk.DISABLED)
 
 def print_system_info():
-    current_time = datetime.now().strftime("%H:%M:%S")
+    # current_time = datetime.now().strftime("%H:%M:%S")
+    current_time = datetime.now().strftime(TIME_FORMAT)
     backend_name = controller.selected_backend or "Unknown Backend"
     message = f"Active Backend is: {backend_name}"
     controller.logger.add_message("system_output", message, visible=True, context=False)  
@@ -258,7 +260,7 @@ def create_or_ensure_untitled_chat():
 
     print_system_info()
 
-    current_time = datetime.now().strftime("%H:%M:%S")
+    current_time = datetime.now().strftime(TIME_FORMAT)
     append_message_to_window("System",
                              "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)

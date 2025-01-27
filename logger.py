@@ -2,7 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta
 import threading
-
+from constants import TIME_FORMAT
 
 def count_words(text):
     """Utility function to count words in a given text."""
@@ -29,7 +29,7 @@ class Logger:
         """Add a message to the log with specific tags and flags."""
         words = count_words(content)
         tokens_estimation = estimate_tokens(words)
-        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+        timestamp = datetime.now().strftime(TIME_FORMAT)
         self.logs.append({
             "tag": tag,
             "content": content,

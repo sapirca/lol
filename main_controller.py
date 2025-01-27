@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 import json
 from config import config as basic_config
-
+from constants import TIME_FORMAT
 
 class MainController:
 
@@ -44,8 +44,7 @@ class MainController:
         self.response_manager = ResponseManager(self.sequence_manager)
 
     def shutdown(self):
-        # Create a dedicated snapshot folder with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%YY%m%d_%H%M%S") # File Name Format
         snapshot_dir = os.path.join(self.logger.log_dir,
                                     f"snapshot_{timestamp}")
         os.makedirs(snapshot_dir, exist_ok=True)

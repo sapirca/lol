@@ -14,3 +14,5 @@ API_TIMEOUT = 10
 
 # XML sequence tag
 XSEQUENCE_TAG = "xsequence"
+
+TIME_FORMAT = "%d-%m-%Y %H:%M:%S"
