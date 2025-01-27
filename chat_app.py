@@ -21,7 +21,6 @@ SYSTEM_ALIGNMENT = "left"
 active_chat_snapshot = None
 controller = None  # Will be initialized dynamically based on selected snapshot
 
-
 def initialize_main_controller(snapshot_folder):
     """Initialize the MainController with the selected snapshot folder."""
     global controller
@@ -29,7 +28,7 @@ def initialize_main_controller(snapshot_folder):
         os.path.join(LOGS_FOLDER_PATH, snapshot_folder))
     controller = MainController(snapshot_path)
 
-def append_message_to_window(sender, message):    
+def append_message_to_window(sender, message):
     timestamp = datetime.now().strftime(TIME_FORMAT)
     append_message_to_window_w_timestamp(timestamp, sender, message)
 
@@ -101,6 +100,9 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
                                   justify=USER_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
 
+def update_active_chat_label(snapshot_name):
+    """Update the active chat label to reflect the currently active chat."""
+    active_chat_label.config(text=f"Active Chat: {snapshot_name}")
 
 def send_message(event=None):
     """Handles sending a message by the user and calling the backend in a separate thread."""
@@ -126,7 +128,6 @@ def send_message(event=None):
                          args=(user_message),
                          daemon=True).start()
 
-
 def communicate_with_backend(user_message):
     """Handles communication with the backend without freezing the UI."""
     global controller
@@ -141,13 +142,9 @@ def communicate_with_backend(user_message):
             append_message_to_window(tag.capitalize(),
                                      system_reply)
 
-        # # Save system reply to the chat history
-        # save_chat_to_file(UNTITLED_CHAT_FILE, {"timestamp": current_time, "sender": "System", "message": system_reply})
-
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
     user_input.delete("1.0", tk.END)
-
 
 def close_current_chat():
     """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
@@ -158,8 +155,7 @@ def close_current_chat():
             
     # Clear global references to free resources
     controller = None
-    active_chat_snapshot = None  # TODO(sapir) remove the snapshots
-
+    active_chat_snapshot = None
 
 def save_chat():
     """Saves the current chat session explicitly."""
@@ -173,11 +169,11 @@ def save_chat():
             save_status_label.config(text=f"Failed to save chat: {str(e)}",
                                      fg="red")
 
-
-
 def load_chat_content(snapshot_folder):
-    close_current_chat()  # Ensure the previous chat is closed before switching
     """Load chat content and display the backend name."""
+    close_current_chat()  # Ensure the previous chat is closed before switching
+
+    # Check for unsaved changes
     if controller and controller.logger.logs:
         unsaved_warning = tk.Toplevel(root)
         unsaved_warning.title("Unsaved Changes")
@@ -185,14 +181,14 @@ def load_chat_content(snapshot_folder):
 
         label = tk.Label(
             unsaved_warning,
-            text=
-            "System doesn't save automatically. Use Save button. Agree to exit?",
+            text="System doesn't save automatically. Use Save button. Agree to exit?",
             wraplength=250)
         label.pack(pady=10)
 
         def proceed():
             unsaved_warning.destroy()
             _load_chat(snapshot_folder)
+            update_active_chat_label(snapshot_folder)  # Update label here
 
         def cancel():
             unsaved_warning.destroy()
@@ -205,9 +201,9 @@ def load_chat_content(snapshot_folder):
 
         no_button = tk.Button(button_frame, text="No", command=cancel)
         no_button.pack(side=tk.RIGHT, padx=5)
-
     else:
         _load_chat(snapshot_folder)
+        update_active_chat_label(snapshot_folder)  # Update label here
 
 def _load_chat(snapshot_folder):
     """Load chat content and alert if the current chat is unsaved."""
@@ -238,13 +234,11 @@ def _load_chat(snapshot_folder):
     chat_window.config(state=tk.DISABLED)
 
 def print_system_info():
-    # current_time = datetime.now().strftime("%H:%M:%S")
     current_time = datetime.now().strftime(TIME_FORMAT)
     backend_name = controller.selected_backend or "Unknown Backend"
     message = f"Active Backend is: {backend_name}"
     controller.logger.add_message("system_output", message, visible=True, context=False)  
     append_message_to_window("System", message)
-
 
 def create_or_ensure_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
@@ -264,6 +258,8 @@ def create_or_ensure_untitled_chat():
     append_message_to_window("System",
                              "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)
+
+    update_active_chat_label("untitled")  # Update label here
 
     print(f"Untitled chat session ensured")
     active_chat_snapshot = "untitled"
@@ -305,13 +301,11 @@ def populate_snapshot_list():
     if buttons:
        buttons[-1].invoke()
 
-
 def handle_keypress(event):
     """Handles the Enter key press to send messages."""
     if event.keysym == "Return" and not event.state & 1:  # Enter without Shift
         send_message()
         return "break"  # Prevent default newline behavior
-
 
 # Create the main window
 root = tk.Tk()
@@ -338,6 +332,15 @@ save_status_label = tk.Label(chat_frame,
                              bg="#2c2c2c")
 save_status_label.pack(side=tk.TOP, fill=tk.X, padx=5)
 
+# Add a label to display the active chat name
+active_chat_label = tk.Label(chat_frame,
+                             text="Active Chat: None",
+                             fg="#ffffff",
+                             bg="#2c2c2c",
+                             anchor="w",
+                             font=("Helvetica", 12, "bold"))
+active_chat_label.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(chat_frame,
                                         wrap=tk.WORD,
@@ -353,12 +356,10 @@ context_menu = tk.Menu(chat_window, tearoff=0)
 context_menu.add_command(
     label="Copy", command=lambda: chat_window.event_generate("<<Copy>>"))
 
-
 def show_context_menu(event):
     """Show the context menu at the cursor position."""
     print("Right-click event detected")  # Debug: Check if the event triggers
     context_menu.tk_popup(event.x_root, event.y_root)
-
 
 # Bind right-click to show the context menu
 chat_window.bind("<Button-2>", show_context_menu)
