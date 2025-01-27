@@ -9,6 +9,7 @@ import subprocess
 import platform
 from constants import ANIMATION_OUT_TEMP_DIR
 from constants import TIME_FORMAT
+import threading
 
 # Constants
 LOGS_FOLDER_PATH = "logs"  # Folder where system snapshots are stored
@@ -128,7 +129,7 @@ def send_message(event=None):
 
         # Run the backend communication in a separate thread
         threading.Thread(target=communicate_with_backend,
-                         args=(user_message),
+                         args=(user_message,),
                          daemon=True).start()
 
 def communicate_with_backend(user_message):
