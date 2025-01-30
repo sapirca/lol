@@ -3,7 +3,7 @@ from tkinter import scrolledtext
 from datetime import datetime
 import os
 import json
-from controller.logic_plus_plus import LogicPlusPlus  # Updated import
+from controller.logic_controller import LogicPlusPlus  # Updated import
 import re
 import subprocess
 import platform
