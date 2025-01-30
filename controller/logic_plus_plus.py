@@ -1,17 +1,17 @@
 import random
-from backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend
+from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend
 from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
 from interpreter import Interpreter
 from formatter import Formatter
-from constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_HOUSE_PATH, XLIGHTS_SEQUENCE_PATH
+from controller.constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_HOUSE_PATH, XLIGHTS_SEQUENCE_PATH
 from animation.sequence_manager import SequenceManager
 from logger import Logger
 import os
 from datetime import datetime
 import json
 from config import config as basic_config
-from constants import TIME_FORMAT
+from controller.constants import TIME_FORMAT
 
 class LogicPlusPlus:
 

@@ -5,17 +5,7 @@
             "name": "Run Chat App",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/chat_app.py",
-            "console": "integratedTerminal",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "Test MainController",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/test_main_controller.py",
+            "program": "${workspaceFolder}/controller/chat_app.py",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
@@ -26,16 +16,6 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
-            }
-        },
-        {
-            "name": "Run Console",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/console.py",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"

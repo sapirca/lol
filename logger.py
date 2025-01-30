@@ -2,7 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta
 import threading
-from constants import TIME_FORMAT, LOG_DIR, LOG_INTERVAL_IN_SECONDS
+from controller.constants import TIME_FORMAT, LOG_DIR, LOG_INTERVAL_IN_SECONDS
 
 def count_words(text):
     """Utility function to count words in a given text."""

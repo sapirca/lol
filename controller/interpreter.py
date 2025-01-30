@@ -1,4 +1,4 @@
-from constants import XSEQUENCE_TAG
+from controller.constants import XSEQUENCE_TAG
 import re
 
 class Interpreter:

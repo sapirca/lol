@@ -1,6 +1,6 @@
 from animation.sequence_manager import SequenceManager
 from logger import Logger
-from constants import XSEQUENCE_TAG
+from controller.constants import XSEQUENCE_TAG
 
 class Formatter:
     def __init__(self, logger : Logger, sequence_manager: SequenceManager):

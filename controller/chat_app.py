@@ -3,13 +3,13 @@ from tkinter import scrolledtext
 from datetime import datetime
 import os
 import json
-from logic_plus_plus import LogicPlusPlus  # Updated import
+from controller.logic_plus_plus import LogicPlusPlus  # Updated import
 import re
 import subprocess
 import platform
-from constants import ANIMATION_OUT_TEMP_DIR
-from constants import TIME_FORMAT
-from constants import LOG_DIR
+from controller.constants import ANIMATION_OUT_TEMP_DIR
+from controller.constants import TIME_FORMAT
+from controller.constants import LOG_DIR
 import threading
 
 # Alignment flags

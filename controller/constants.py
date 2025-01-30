@@ -2,9 +2,9 @@
 MAX_TOKENS = 2048
 
 # Log directory
-LOG_DIR = "output/logs"
+LOG_DIR = "outputs/logs"
 
-ANIMATION_OUT_TEMP_DIR = "output/animation_output"
+ANIMATION_OUT_TEMP_DIR = "outputs/animation_output"
 
 # Default backend configuration
 DEFAULT_BACKEND = "GPT"
