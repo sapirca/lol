@@ -1,11 +1,11 @@
-# main_controller.py
 import random
 from backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend
 from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
+from interpreter import Interpreter
+from formatter import Formatter
+from constants import ANIMATION_OUT_TEMP_DIR
 from sequence_manager import SequenceManager
-from response_manager import ResponseManager
-from constants import XSEQUENCE_TAG, ANIMATION_OUT_TEMP_DIR
 from logger import Logger
 import os
 from datetime import datetime
@@ -13,10 +13,10 @@ import json
 from config import config as basic_config
 from constants import TIME_FORMAT
 
-class MainController:
+class LogicPlusPlus:
 
     def __init__(self, snapshot_dir=None):
-        """Initialize the MainController, optionally loading from a snapshot."""
+        """Initialize the LogicPlusPlus, optionally loading from a snapshot."""
         self.logger = Logger()
         self.backends = {}
         self.house_config = self._load_house_config()
@@ -25,6 +25,7 @@ class MainController:
         self._initialize_backends()
         self.sequence_manager = SequenceManager("sequence_skeleton.xml",
                                                 self.logger)
+        self.formatter = Formatter(self.logger, self.sequence_manager)
 
         if snapshot_dir is not None:
             try:
@@ -41,7 +42,7 @@ class MainController:
         # Shared initialization logic
         self.use_stub = self.config.get("use_stub", False)
         self.selected_backend = self.config.get("selected_backend", None)
-        self.response_manager = ResponseManager(self.sequence_manager)
+        self.response_manager = Interpreter(self.sequence_manager)
 
     def shutdown(self):
         timestamp = datetime.now().strftime("%YY%m%d_%H%M%S") # File Name Format
@@ -210,32 +211,7 @@ class MainController:
                                 context=True)
 
         # Build the messages array for the LLM
-        messages = []
-
-        # Add all logged context to the messages
-        for log in self.logger.logs:
-            if log['context']:
-                if log['tag'] == 'initial_prompt_context' or log[
-                        'tag'] == 'initial_animation':
-                    role = "system"
-                elif log['tag'] == 'user_input':
-                    role = "user"
-                elif log['tag'] == 'assistant':
-                    role = "assistant"
-                else:
-                    raise Exception(
-                        f"Unexpected log tag: {log['tag']} context: True")
-                messages.append({"role": role, "content": log['content']})
-
-        # Latest animation is always empty, besides the first run it's initialized in the
-        if not latest_sequence:
-            latest_sequence = self.sequence_manager.get_latest_sequence()
-            messages.append({
-                "role":
-                "system",
-                "content":
-                f"Latest Animation Sequence ({XSEQUENCE_TAG}):\n{latest_sequence}"
-            })
+        messages = self.formatter.build_messages()
 
         response = backend.generate_response(messages)
 

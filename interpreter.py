@@ -1,9 +1,7 @@
-# /Users/sapir/repos/lol/response_manager.py
 from constants import XSEQUENCE_TAG
 import re
 
-
-class ResponseManager:
+class Interpreter:
 
     def __init__(self, sequence_manager):
         self.sequence_manager = sequence_manager

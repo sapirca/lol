@@ -3,7 +3,7 @@ from tkinter import scrolledtext
 from datetime import datetime
 import os
 import json
-from main_controller import MainController
+from logic_plus_plus import LogicPlusPlus  # Updated import
 import re
 import subprocess
 import platform
@@ -22,12 +22,12 @@ SYSTEM_ALIGNMENT = "left"
 active_chat_snapshot = None
 controller = None  # Will be initialized dynamically based on selected snapshot
 
-def initialize_main_controller(snapshot_folder):
-    """Initialize the MainController with the selected snapshot folder."""
+def initialize_logic_controller(snapshot_folder):  # Updated function name
+    """Initialize the LogicPlusPlus with the selected snapshot folder."""
     global controller
     snapshot_path = os.path.abspath(
         os.path.join(LOGS_FOLDER_PATH, snapshot_folder))
-    controller = MainController(snapshot_path)
+    controller = LogicPlusPlus(snapshot_path)
 
 def append_message_to_window(sender, message):
     timestamp = datetime.now().strftime(TIME_FORMAT)
@@ -227,7 +227,7 @@ def _load_chat(snapshot_folder):
     global active_chat_snapshot
     active_chat_snapshot = snapshot_folder
 
-    initialize_main_controller(snapshot_folder)
+    initialize_logic_controller(snapshot_folder)  # Updated function call
 
     chat_history = controller.get_visible_chat()
     chat_window.config(state=tk.NORMAL)
@@ -258,7 +258,7 @@ def create_or_ensure_untitled_chat():
     if controller is None or active_chat_snapshot != "untitled":
         # Initialize untitled session only if it doesn't exist
         close_current_chat()  # Ensure the previous chat is closed
-        controller = MainController()
+        controller = LogicPlusPlus()
         active_chat_snapshot = "untitled"
 
     chat_window.config(state=tk.NORMAL)
