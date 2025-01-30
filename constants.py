@@ -2,9 +2,9 @@
 MAX_TOKENS = 2048
 
 # Log directory
-LOG_DIR = "logs"
+LOG_DIR = "output/logs"
 
-ANIMATION_OUT_TEMP_DIR = "animation_output"
+ANIMATION_OUT_TEMP_DIR = "output/animation_output"
 
 # Default backend configuration
 DEFAULT_BACKEND = "GPT"
@@ -16,3 +16,9 @@ API_TIMEOUT = 10
 XSEQUENCE_TAG = "xsequence"
 
 TIME_FORMAT = "%d-%m-%Y %H:%M:%S"
+
+XLIGHTS_HOUSE_PATH = "animation/house_config.xml"
+XLIGHTS_SEQUENCE_PATH = "animation/sequence_skeleton.xml"
+
+
+LOG_INTERVAL_IN_SECONDS = 60

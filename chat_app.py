@@ -9,10 +9,8 @@ import subprocess
 import platform
 from constants import ANIMATION_OUT_TEMP_DIR
 from constants import TIME_FORMAT
+from constants import LOG_DIR
 import threading
-
-# Constants
-LOGS_FOLDER_PATH = "logs"  # Folder where system snapshots are stored
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -26,7 +24,7 @@ def initialize_logic_controller(snapshot_folder):  # Updated function name
     """Initialize the LogicPlusPlus with the selected snapshot folder."""
     global controller
     snapshot_path = os.path.abspath(
-        os.path.join(LOGS_FOLDER_PATH, snapshot_folder))
+        os.path.join(LOG_DIR, snapshot_folder))
     controller = LogicPlusPlus(snapshot_path)
 
 def append_message_to_window(sender, message):
@@ -282,8 +280,8 @@ def populate_snapshot_list():
         widget.destroy()
 
     snapshot_folders = [
-        f for f in os.listdir(LOGS_FOLDER_PATH)
-        if os.path.isdir(os.path.join(LOGS_FOLDER_PATH, f))
+        f for f in os.listdir(LOG_DIR)
+        if os.path.isdir(os.path.join(LOG_DIR, f))
     ]
 
     canvas = tk.Canvas(chat_list_frame)

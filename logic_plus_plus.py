@@ -4,8 +4,8 @@ from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
 from interpreter import Interpreter
 from formatter import Formatter
-from constants import ANIMATION_OUT_TEMP_DIR
-from sequence_manager import SequenceManager
+from constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_HOUSE_PATH, XLIGHTS_SEQUENCE_PATH
+from animation.sequence_manager import SequenceManager
 from logger import Logger
 import os
 from datetime import datetime
@@ -23,7 +23,7 @@ class LogicPlusPlus:
         self.wait_for_response = False
         self.temp_animation_path = None
         self._initialize_backends()
-        self.sequence_manager = SequenceManager("sequence_skeleton.xml",
+        self.sequence_manager = SequenceManager(XLIGHTS_SEQUENCE_PATH,
                                                 self.logger)
         self.formatter = Formatter(self.logger, self.sequence_manager)
 
@@ -45,7 +45,7 @@ class LogicPlusPlus:
         self.response_manager = Interpreter(self.sequence_manager)
 
     def shutdown(self):
-        timestamp = datetime.now().strftime("%YY%m%d_%H%M%S") # File Name Format
+        timestamp = datetime.now().strftime("%YY%m%d_%H%M%S")
         snapshot_dir = os.path.join(self.logger.log_dir,
                                     f"snapshot_{timestamp}")
         os.makedirs(snapshot_dir, exist_ok=True)
@@ -165,7 +165,7 @@ class LogicPlusPlus:
 
     def _load_house_config(self):
         try:
-            tree = ET.parse('house_config.xml')
+            tree = ET.parse(XLIGHTS_HOUSE_PATH)
             root = tree.getroot()
             return ET.tostring(root, encoding='unicode')
         except Exception as e:

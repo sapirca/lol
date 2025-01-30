@@ -1,4 +1,4 @@
-from sequence_manager import SequenceManager
+from animation.sequence_manager import SequenceManager
 from logger import Logger
 from constants import XSEQUENCE_TAG
 

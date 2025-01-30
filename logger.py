@@ -2,7 +2,7 @@ import os
 import json
 from datetime import datetime, timedelta
 import threading
-from constants import TIME_FORMAT
+from constants import TIME_FORMAT, LOG_DIR, LOG_INTERVAL_IN_SECONDS
 
 def count_words(text):
     """Utility function to count words in a given text."""
@@ -16,7 +16,7 @@ def estimate_tokens(words):
 
 class Logger:
 
-    def __init__(self, log_dir="logs", snapshot_interval=30):
+    def __init__(self, log_dir=LOG_DIR, snapshot_interval=LOG_INTERVAL_IN_SECONDS):
         """Initialize the logger with optional periodic snapshot caching."""
         self.log_dir = log_dir
         self.logs = []  # Unified log storage for all messages
