@@ -6,9 +6,7 @@ secrets.py
 *.py[cod]
 *$py.class
 
-# Logs
-logs/
-*.log
+outputs/
 
 # Environment variables
 .env

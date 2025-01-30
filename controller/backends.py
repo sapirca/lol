@@ -3,6 +3,7 @@ import tiktoken
 import anthropic
 import google.generativeai as genai
 
+#TODO sapir rename this file 
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
 GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
@@ -171,7 +172,6 @@ class GeminiBackend(LLMBackend):
         self.model = model
         genai.configure(api_key=self.api_key)
         self.gemini_model = genai.GenerativeModel(self.model)
-        self.logger.add_log(f"Using Gemini model: {self.model}")
 
     def generate_response(self, messages):
         try:

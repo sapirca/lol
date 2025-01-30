@@ -2,8 +2,8 @@ import os
 import json
 from datetime import datetime, timedelta
 import threading
-from controller.constants import TIME_FORMAT, LOG_DIR, LOG_INTERVAL_IN_SECONDS
-
+from controller.constants import TIME_FORMAT, LOG_INTERVAL_IN_SECONDS, MESSAGE_SNAPSHOT_FILE
+from controller.constants import SNAPSHOTS_DIR
 def count_words(text):
     """Utility function to count words in a given text."""
     return len(text.split())
@@ -14,14 +14,18 @@ def estimate_tokens(words):
     return int(words * 1.33 + 0.5)  # Round up to nearest integer
 
 
-class Logger:
+class MessageStreamer:  # Updated class name
 
-    def __init__(self, log_dir=LOG_DIR, snapshot_interval=LOG_INTERVAL_IN_SECONDS):
-        """Initialize the logger with optional periodic snapshot caching."""
-        self.log_dir = log_dir
-        self.logs = []  # Unified log storage for all messages
-        self.snapshot_file = os.path.join(log_dir, "snapshot.json")
-        os.makedirs(log_dir, exist_ok=True)
+    def __init__(self, snapshots_dir=SNAPSHOTS_DIR, snapshot_interval=LOG_INTERVAL_IN_SECONDS):
+        """Initialize the MessageStreamer with optional periodic snapshot caching."""
+        
+        self.snapshots_dir = snapshots_dir
+        os.makedirs(self.snapshots_dir, exist_ok=True)
+
+        self.messages = []  # Unified log storage for all messages
+        # self.msgs_full_path = os.path.join(self.snapshots_dir, MESSAGE_SNAPSHOT_FILE)
+        
+        self.periodic_snapshot = os.path.join(self.snapshots_dir,"preiodic_snapshot.json")
         self.snapshot_interval = snapshot_interval
         self._start_periodic_snapshot()
 
@@ -30,7 +34,7 @@ class Logger:
         words = count_words(content)
         tokens_estimation = estimate_tokens(words)
         timestamp = datetime.now().strftime(TIME_FORMAT)
-        self.logs.append({
+        self.messages.append({
             "tag": tag,
             "content": content,
             "visible": visible,
@@ -44,7 +48,7 @@ class Logger:
         """Add a system log with predefined tags and flags."""
         words = count_words(content)
         tokens_estimation = estimate_tokens(words)
-        self.logs.append({
+        self.messages.append({
             "tag": "info_log",
             "content": content,
             "visible": False,
@@ -58,7 +62,7 @@ class Logger:
         """Log an error message."""
         words = count_words(content)
         tokens_estimation = estimate_tokens(words)
-        self.logs.append({
+        self.messages.append({
             "tag": "error_log",
             "content": content,
             "visible": True,
@@ -70,36 +74,38 @@ class Logger:
 
     def finalize(self):
         """Save all logs to a file and add a summary log."""
-        total_sent_tokens = sum(log["tokens_estimation"] for log in self.logs
-                                if log["context"])
-        total_received_tokens = sum(log["tokens_estimation"]
-                                    for log in self.logs if not log["context"])
+        total_sent_tokens = sum(message["tokens_estimation"] for message in self.messages
+                                if message["context"])
+        total_received_tokens = sum(message["tokens_estimation"]
+                                    for message in self.messages if not message["context"])
 
         # Add a system log for the overall sent and received tokens
         self.add_log(
             f"Total sent tokens: {total_sent_tokens}, Total received tokens: {total_received_tokens}"
         )
 
-        with open(self.snapshot_file, "w") as file:
-            json.dump(self.logs, file, indent=4)
+        # TODO remove this method?
+
+        # with open(self.msgs_full_path, "w") as file:
+        #     json.dump(self.messages, file, indent=4)
 
     def load(self, file_name):
         """Load logs from a specified file."""
         if os.path.exists(file_name):
             with open(file_name, "r") as file:
-                self.logs = json.load(file)
+                self.messages = json.load(file)
         else:
             raise FileNotFoundError(f"Log file '{file_name}' does not exist.")
 
     def get_context_to_llm(self):
         """Retrieve the full context for LLM, including logs marked as context."""
-        return "\n".join(log["content"] for log in self.logs if log["context"])
+        return "\n".join(message["content"] for message in self.messages if message["context"])
 
     def get_visible_chat(self):
         """Retrieve all visible messages as a dictionary."""
         return {
-            log["tag"]: log["content"]
-            for log in self.logs if log["visible"]
+            message["tag"]: message["content"]
+            for message in self.messages if message["visible"]
         }
 
     def _start_periodic_snapshot(self):
@@ -114,10 +120,12 @@ class Logger:
         thread.start()
 
     def _cache_snapshot(self):
-        """Periodically cache the snapshot to disk."""
+        """Periodically cache the snapshot to disk.
+        We write this only for backups incase the main file is lost or corrupted.
+        Read manually if system crashes."""
+
         try:
-            with open(self.snapshot_file, "w") as file:
-                json.dump(self.logs, file, indent=4)
-            self.add_log("Periodic snapshot cached successfully.")
+            with open(self.periodic_snapshot, "w") as file:
+                json.dump(self.messages, file, indent=4)
         except Exception as e:
             self.add_log(f"Error during periodic snapshot: {e}")

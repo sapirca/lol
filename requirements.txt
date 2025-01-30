@@ -3,3 +3,4 @@ openai
 tiktoken
 anthropic
 google-generativeai
+python>=3.9

@@ -3,13 +3,12 @@ from tkinter import scrolledtext
 from datetime import datetime
 import os
 import json
-from controller.logic_controller import LogicPlusPlus  # Updated import
+from controller.logic_controller import LogicPlusPlus
 import re
 import subprocess
 import platform
-from controller.constants import ANIMATION_OUT_TEMP_DIR
+from controller.constants import ANIMATION_OUT_TEMP_DIR, SNAPSHOTS_DIR
 from controller.constants import TIME_FORMAT
-from controller.constants import LOG_DIR
 import threading
 
 # Alignment flags
@@ -20,11 +19,11 @@ SYSTEM_ALIGNMENT = "left"
 active_chat_snapshot = None
 controller = None  # Will be initialized dynamically based on selected snapshot
 
-def initialize_logic_controller(snapshot_folder):  # Updated function name
+def initialize_logic_controller(a_snapshot):  # Updated function name
     """Initialize the LogicPlusPlus with the selected snapshot folder."""
     global controller
     snapshot_path = os.path.abspath(
-        os.path.join(LOG_DIR, snapshot_folder))
+        os.path.join(SNAPSHOTS_DIR, a_snapshot))
     controller = LogicPlusPlus(snapshot_path)
 
 def append_message_to_window(sender, message):
@@ -155,8 +154,8 @@ def close_current_chat():
     """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
     global controller, active_chat_snapshot
     if controller:
-        controller.shutdown()  # Ensure controller finalizes and saves state
-        print(f"Saved changes to snapshot: {active_chat_snapshot}")
+        shutdown_msg = controller.shutdown()
+        print(shutdown_msg)
             
     # Clear global references to free resources
     controller = None
@@ -167,23 +166,22 @@ def save_chat():
     global controller, active_chat_snapshot
     if controller:
         try:
-            # Construct the snapshot file name
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            snapshot_file_name = f"logs/snapshot_{timestamp}"
-            controller.shutdown()  # Save the current session state
-            save_status_label.config(text=f"Snapshot saved: {snapshot_file_name}", fg="light gray")
+            # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            # snapshot_file_name = f"{SNAPSHOTS_DIR}/snapshot_{timestamp}" # Dump to an existing
+            save_message = controller.shutdown()
+            save_status_label.config(text=save_message, fg="light gray")
         except Exception as e:
             save_status_label.config(text=f"Failed to save chat: {str(e)}", fg="red")
     else:
         save_status_label.config(text="No active chat to save", fg="red")
 
-def load_chat_content(snapshot_folder):
+def load_chat_content(a_snapshot):
     save_status_label.config(text="", fg="light gray")  # Clear the status label
     """Load chat content and display the backend name."""
     close_current_chat()  # Ensure the previous chat is closed before switching
 
     # Check for unsaved changes
-    if controller and controller.logger.logs:
+    if controller and controller.message_streamer.messages:
         unsaved_warning = tk.Toplevel(root)
         unsaved_warning.title("Unsaved Changes")
         unsaved_warning.geometry("300x150")
@@ -196,8 +194,8 @@ def load_chat_content(snapshot_folder):
 
         def proceed():
             unsaved_warning.destroy()
-            _load_chat(snapshot_folder)
-            update_active_chat_label(snapshot_folder)  # Update label here
+            _load_chat(a_snapshot)
+            update_active_chat_label(a_snapshot)  # Update label here
 
         def cancel():
             unsaved_warning.destroy()
@@ -211,21 +209,21 @@ def load_chat_content(snapshot_folder):
         no_button = tk.Button(button_frame, text="No", command=cancel)
         no_button.pack(side=tk.RIGHT, padx=5)
     else:
-        _load_chat(snapshot_folder)
-        update_active_chat_label(snapshot_folder)  # Update label here
+        _load_chat(a_snapshot)
+        update_active_chat_label(a_snapshot)  # Update label here
 
-def _load_chat(snapshot_folder):
+def _load_chat(a_snapshot):
     save_status_label.config(text="", fg="light gray")  # Ensure the status label is cleared when switching chats
     """Load chat content and alert if the current chat is unsaved."""
     if controller:
         # Alert user if current chat is not saved
-        if not controller.logger.logs:  # Assuming the logger's logs indicate changes
+        if not controller.message_streamer.messages:  # Assuming the message_streamer's messages indicate changes
             print("Warning: Current chat session is not saved!")
     
     global active_chat_snapshot
-    active_chat_snapshot = snapshot_folder
+    active_chat_snapshot = a_snapshot
 
-    initialize_logic_controller(snapshot_folder)  # Updated function call
+    initialize_logic_controller(a_snapshot)  # Updated function call
 
     chat_history = controller.get_visible_chat()
     chat_window.config(state=tk.NORMAL)
@@ -247,7 +245,7 @@ def print_system_info():
     current_time = datetime.now().strftime(TIME_FORMAT)
     backend_name = controller.selected_backend or "Unknown Backend"
     message = f"Active Backend is: {backend_name}"
-    controller.logger.add_message("system_output", message, visible=True, context=False)  
+    controller.message_streamer.add_message("system_output", message, visible=True, context=False)  
     append_message_to_window("System", message)
 
 def create_or_ensure_untitled_chat():
@@ -279,10 +277,12 @@ def populate_snapshot_list():
     for widget in chat_list_frame.winfo_children():
         widget.destroy()
 
-    snapshot_folders = [
-        f for f in os.listdir(LOG_DIR)
-        if os.path.isdir(os.path.join(LOG_DIR, f))
-    ]
+    snapshot_folders = []
+    if os.path.exists(SNAPSHOTS_DIR):
+        snapshot_folders = [
+            f for f in os.listdir(SNAPSHOTS_DIR)
+            if os.path.isdir(os.path.join(SNAPSHOTS_DIR, f))
+        ]
 
     canvas = tk.Canvas(chat_list_frame)
     scrollbar_y = tk.Scrollbar(chat_list_frame, orient="vertical", command=canvas.yview)

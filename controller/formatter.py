@@ -1,30 +1,30 @@
 from animation.sequence_manager import SequenceManager
-from logger import Logger
+from controller.message_streamer import MessageStreamer
 from controller.constants import XSEQUENCE_TAG
 
 class Formatter:
-    def __init__(self, logger : Logger, sequence_manager: SequenceManager):
+    def __init__(self, message_streamer: MessageStreamer, sequence_manager: SequenceManager):
         """
         Initializes the Formatter class.
 
-        :param logger: Logger instance for logging events.
+        :param message_streamer: MessageStreamer instance of the messages stream.
         :param sequence_manager: SequenceManager instance to manage animation sequences.
         """
-        self.logger = logger
+        self.message_streamer = message_streamer
         self.sequence_manager = sequence_manager
 
     def build_messages(self):
         """
-        Constructs a list of messages for the LLM context based on the logs.
+        Constructs a list of messages for the LLM context based on the messages.
 
         :return: List of formatted message dictionaries for the LLM.
         """
         messages = []
         
-        for log in self.logger.logs:
-            if log['context']:
-                role = self._determine_role(log['tag'])
-                messages.append({"role": role, "content": log['content']})
+        for message in self.message_streamer.messages:
+            if message['context']:
+                role = self._determine_role(message['tag'])
+                messages.append({"role": role, "content": message['content']})
         
         latest_sequence = self.sequence_manager.get_latest_sequence()
         if latest_sequence:
@@ -39,7 +39,7 @@ class Formatter:
         """
         Determines the role of a message based on its tag.
 
-        :param tag: The tag associated with the log message.
+        :param tag: The tag associated with the message.
         :return: Corresponding role for the message.
         """
         role_mapping = {
