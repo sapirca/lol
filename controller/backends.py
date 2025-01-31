@@ -2,7 +2,7 @@ import openai
 import tiktoken
 import anthropic
 import google.generativeai as genai
-
+import logging
 #TODO sapir rename this file 
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
@@ -15,9 +15,9 @@ class LLMBackend:
     Each backend should inherit from this class and implement the generate_response method.
     """
 
-    def __init__(self, name, logger):
+    def __init__(self, name):
         self.name = name
-        self.logger = logger
+        self.logger = logging.getLogger(name)
 
     def generate_response(self, messages):
         """Generate a response based on the provided messages array."""
@@ -28,10 +28,11 @@ class LLMBackend:
         prompt_tokens = self.token_count(messages)
         response_tokens = self.token_count([{"content": response}])
         log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
-        self.logger.add_message(tag=f"system_log {self.name} - Tokens",
-                                content=log_message,
-                                visible=False,
-                                context=False)
+        self.logger.info(log_message)
+    #     self.logger.add_message(tag=f"system_log {self.name} - Tokens",
+    #                             content=log_message,
+    #                             visible=False,
+    #                             context=False)
 
     def token_count(self, messages):
         """Default token counting method using word splits."""
@@ -47,11 +48,11 @@ class GPTBackend(LLMBackend):
         "gpt-o1-mini": 0.015
     }
 
-    def __init__(self, logger, model="gpt-4o-mini"):
-        super().__init__("GPT", logger)
+    def __init__(self, name, model="gpt-4o-mini"):
+        super().__init__(name)
         self.api_key = OPENAI_API_KEY
         self.model = model
-        self.logger.add_log(f"Using GPT model: {self.model}")
+        self.logger.info(f"Using GPT model: {self.model}")
 
         self.client = openai.OpenAI(api_key=self.api_key)
 
@@ -73,9 +74,8 @@ class GPTBackend(LLMBackend):
             completion = self.client.chat.completions.create(model=self.model,
                                                              messages=messages)
 
-            # print("Assistant: " + completion.choices[0].message.content)
-
             response_text = completion.choices[0].message.content.strip()
+
             self.log_tokens(messages, response_text)
             return response_text
         except Exception as e:
@@ -94,16 +94,16 @@ class ClaudeBackend(LLMBackend):
         "claude-3-5-sonnet-20241022": 0.055
     }
 
-    def __init__(self, logger, model="claude-3-5-sonnet-20241022"):
-        super().__init__("Claude", logger)
+    def __init__(self, name, model="claude-3-5-sonnet-20241022"):
+        super().__init__(name)
         self.api_key = CLAUDE_API_KEY
         self.model = model
         self.client = anthropic.Anthropic(api_key=self.api_key)
-        self.logger.add_log(f"Using Claude model: {self.model}")
+        self.logger.info(f"Using Claude model: {self.model}")
 
         if self.model not in self.CLAUDE_MODELS:
-            self.logger.add_log(
-                f"Warning: Model {self.model} not found in CLAUDE_MODELS.")
+            self.logger.warning(
+                f"Model {self.model} not found in CLAUDE_MODELS.")
 
     def generate_response(self, messages):
         """
@@ -145,7 +145,6 @@ class ClaudeBackend(LLMBackend):
                     response_text += content_block.text
             response_text = response_text.strip()  # Clean up whitespace
 
-            # Log tokens (if the log_tokens method is defined)
             if hasattr(self, 'log_tokens'):
                 self.log_tokens(messages, response_text)
 
@@ -166,8 +165,8 @@ class GeminiBackend(LLMBackend):
         "gemini-1.5-pro": 1.25
     }
 
-    def __init__(self, logger, model="gemini-1.5-flash"):
-        super().__init__("Gemini", logger)
+    def __init__(self, name, model="gemini-1.5-flash"):
+        super().__init__(name)
         self.api_key = GEMINI_API_KEY
         self.model = model
         genai.configure(api_key=self.api_key)
@@ -186,11 +185,39 @@ class GeminiBackend(LLMBackend):
             self.logger.error(f"Error communicating with Gemini backend: {e}")
             return f"Error communicating with Gemini backend {e}"
 
+class DeepSeekBackend(LLMBackend):
+    DEEPSEEK_MODELS = {
+        "deepseek-chat": 0.04,
+        "deepseek-chat-pro": 0.08,
+        "deepseek-reasoner": 0.06,
+    }
+
+def __init__(self, name, model="deepseek-chat"):
+    super().__init__(name)
+    self.api_key = "<DeepSeek API Key>"
+    self.model = model
+    self.client = openai.OpenAI(api_key=self.api_key, base_url="https://api.deepseek.com/v1")
+    self.logger.info(f"Using DeepSeek model: {self.model}")
+
+def generate_response(self, messages):
+    try:
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            stream=False
+        )
+        response_text = response.choices[0].message.content.strip()
+        self.log_tokens(messages, response_text)
+        return response_text
+    except Exception as e:
+        self.logger.error(f"Error communicating with DeepSeek backend: {e}")
+        return f"Error communicating with DeepSeek backend: {e}"
+
 
 class StubBackend(LLMBackend):
 
-    def __init__(self, logger):
-        super().__init__("Stub", logger)
+    def __init__(self, name):
+        super().__init__(name)
 
     def generate_response(self, messages):
         """
@@ -207,7 +234,9 @@ class StubBackend(LLMBackend):
         response_text = "This is a stubbed response."
 
         # Randomly include an animation sequence in the response
-        if False: # TODO Uncomment this when done debugging - random.choice([True, False]):
+        # if False:
+        # if True:
+        if random.choice([True, False]):
             sequence = (
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<xsequence BaseChannel=\"0\" ChanCtrlBasic=\"0\" ChanCtrlColor=\"0\" FixedPointTiming=\"1\" ModelBlending=\"true\">"

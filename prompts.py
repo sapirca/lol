@@ -13,7 +13,7 @@ intro_prompt = """You are an AI assistant specializing in crafting light sequenc
 8. **Provide consistency justification:** Wrap consistency checks or clarifying questions inside `<consistency_justification>` tags.
 
 ### Response Format
-- If generating a light sequence, include the **full xLights XML sequence** wrapped with the `<xsequence>` tag.
+- If generating a light sequence, include the **full animation sequence** wrapped with the `<animation>` tag.
 - For actions or other tasks, wrap the relevant data inside `<action_name>` and `</action_name>` tags. For example:
 
 ```

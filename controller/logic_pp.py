@@ -1,48 +1,47 @@
 import random
-from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend
+from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend, DeepSeekBackend
 from prompts import get_full_prompt
 import xml.etree.ElementTree as ET
 from interpreter import Interpreter
 from formatter import Formatter
-from controller.constants import ANIMATION_OUT_TEMP_DIR, TEMP_ANIMATION_FILE, XLIGHTS_HOUSE_PATH, XLIGHTS_SEQUENCE_PATH, MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
-from animation.sequence_manager import SequenceManager
+from controller.constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
 from controller.message_streamer import MessageStreamer
+import logging
 import os
 from datetime import datetime
 import json
 from config import config as basic_config
-from controller.constants import TIME_FORMAT
+from animation.animation_manager import AnimationManager
 
 class LogicPlusPlus:
 
     def __init__(self, snapshot_dir=None):
         """Initialize the LogicPlusPlus, optionally loading from a snapshot."""
-        self.message_streamer = MessageStreamer()
-        self.backends = {}
-        self.house_config = self._load_house_config()
+        self.logger = logging.getLogger("LogicPlusPlusLogger")
         self.wait_for_response = False
         self.temp_animation_path = None
+        self.message_streamer = MessageStreamer()
+        self.backends = {}
         self._initialize_backends()
-        self.sequence_manager = SequenceManager(XLIGHTS_SEQUENCE_PATH,
-                                                self.message_streamer)
-        self.formatter = Formatter(self.message_streamer, self.sequence_manager)
-
+        
         if snapshot_dir is not None:
             try:
                 self._load_from_snapshot(snapshot_dir)
                 self.initial_prompt_added = True
             except Exception as e:
-                raise RuntimeError(
-                    f"Failed to load snapshot from {snapshot_dir}: {e}")
+                self.logger.error(f"Failed to load snapshot from {snapshot_dir}: {e}")
+                raise RuntimeError(f"Failed to load snapshot from {snapshot_dir}: {e}")
         else:
             # Default initialization if no snapshot is provided
             self.initial_prompt_added = False
             self.config = basic_config
+            self.selected_framework = self.config.get("framework", None)
+            self.animation_manager = AnimationManager(self.selected_framework, self.message_streamer)
 
         # Shared initialization logic
-        self.use_stub = self.config.get("use_stub", False)
         self.selected_backend = self.config.get("selected_backend", None)
-        self.response_manager = Interpreter(self.sequence_manager)
+        self.response_manager = Interpreter(self.animation_manager)
+        self.formatter = Formatter(self.message_streamer, self.animation_manager)
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
@@ -57,7 +56,7 @@ class LogicPlusPlus:
             json.dump(self.config, file, indent=4)
 
         # Save all animations
-        all_animations = self.sequence_manager.get_all_sequences()
+        all_animations = self.animation_manager.get_all_sequences()
         animations_dir = os.path.join(shutdown_snapshot_dir, "animations")
         os.makedirs(animations_dir, exist_ok=True)
         for i, animation in enumerate(all_animations, start=1):
@@ -105,6 +104,7 @@ class LogicPlusPlus:
         try:
             self.message_streamer.load(messages_snapshot_file)
         except Exception as e:
+            self.logger.error(f"Error loading messages: {e}")
             raise ValueError(f"Error loading messages: {e}")
 
         # Load configuration
@@ -113,31 +113,35 @@ class LogicPlusPlus:
             with open(snapshot_config_file, "r") as file:
                 self.config = json.load(file)
         except Exception as e:
+            self.logger.error(f"Error loading configuration: {e}")
             raise ValueError(f"Error loading configuration: {e}")
 
         # Load animations
+        self.selected_framework = self.config.get("framework", None)
+        self.animation_manager = AnimationManager(self.selected_framework, self.message_streamer)
         try:
             animations = []
             for animation_file in sorted(os.listdir(animations_dir)):
                 animation_path = os.path.join(animations_dir, animation_file)
                 with open(animation_path, "r") as file:
                     animations.append(file.read())
-            self.sequence_manager.load_sequences(animations)
+            self.animation_manager.load_sequences(animations)
         except Exception as e:
+            self.logger.error(f"Error loading animations: {e}")
             raise ValueError(f"Error loading animations: {e}")
 
-        self.message_streamer.add_log(
-            f"Snapshot loaded successfully from {snapshot_dir}.")
+        self.logger.info(f"Snapshot loaded successfully from {snapshot_dir}.")
 
     def _initialize_backends(self):
         backend_mapping = {
             "GPT": GPTBackend,
             "Claude": ClaudeBackend,
             "Gemini": GeminiBackend,
+            "DeepSeek": DeepSeekBackend,
             "Stub": StubBackend
         }
         for backend_name, backend_class in backend_mapping.items():
-            self.register_backend(backend_class(self.message_streamer))
+            self.register_backend(backend_class(name=backend_name))
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):
@@ -148,30 +152,16 @@ class LogicPlusPlus:
         if not self.backends:
             raise ValueError("No backends available.")
 
-        if self.use_stub:
-            stub_backend = self.backends.get("Stub")
-            if not stub_backend:
-                raise ValueError("Stub backend is not registered.")
-            return stub_backend
-
         if self.selected_backend:
             selected_backend = self.backends.get(self.selected_backend)
             if selected_backend:
                 return selected_backend
 
-            print(
+            self.logger.warning(
                 f"Warning: Selected backend '{self.selected_backend}' not found, choosing randomly."
             )
 
         return random.choice(list(self.backends.values()))
-
-    def _load_house_config(self):
-        try:
-            tree = ET.parse(XLIGHTS_HOUSE_PATH)
-            root = tree.getroot()
-            return ET.tostring(root, encoding='unicode')
-        except Exception as e:
-            return f"Error loading house configuration: {e}"
 
     def communicate(self, user_input):
         if self.wait_for_response:
@@ -193,14 +183,18 @@ class LogicPlusPlus:
 
         latest_sequence = None
         if not self.initial_prompt_added:
-            initial_prompt = get_full_prompt(self.house_config)
+            # TODO: Fix prompts / songs / knowledge etc... 
+            self.world_structure = self.animation_manager.get_world_structure()
+            general_knowledge = self.animation_manager.get_general_knowledge()
+            animation_knowledge = self.animation_manager.get_domain_knowledge()
+            initial_prompt = get_full_prompt(self.world_structure)
             # Ensure the main instructions are always sent to the LLM for proper context.
             self.message_streamer.add_message("initial_prompt_context",
                                     initial_prompt,
                                     visible=False,
                                     context=True)
             # Always send the original animation structure to the LLM for reference.
-            latest_sequence = self.sequence_manager.get_latest_sequence()
+            latest_sequence = self.animation_manager.get_latest_sequence()
             self.message_streamer.add_message("initial_animation",
                                     latest_sequence,
                                     visible=False,
@@ -214,7 +208,6 @@ class LogicPlusPlus:
 
         # Build the messages array for the LLM
         messages = self.formatter.build_messages()
-
         response = backend.generate_response(messages)
 
         # The raw response contains a WIP animation which does not need to be added to the context.
@@ -252,17 +245,9 @@ class LogicPlusPlus:
         output = ""
 
         if animation_sequence:
-            output_dir = ANIMATION_OUT_TEMP_DIR
-            os.makedirs(output_dir, exist_ok=True)
-            
-            temp_file_path = os.path.join(output_dir, TEMP_ANIMATION_FILE)
-            self.temp_animation_path = os.path.abspath(temp_file_path)
-
-            with open(self.temp_animation_path, "w") as temp_file:
-                temp_file.write(animation_sequence)
-
-            self.message_streamer.add_log(
-                "Generated temp_animation.xml for the user's observation.")
+            self.temp_animation_path = self.animation_manager.store_temp_animation(animation_sequence)
+            self.logger.info(
+                f"Generated {self.temp_animation_path} for the user's observation.")
             self.wait_for_response = True
 
             output += f"An animation sequence was generated and saved in {self.temp_animation_path}\n"
@@ -279,27 +264,27 @@ class LogicPlusPlus:
 
     def handle_user_approval(self, user_input):
         if user_input.lower() in ["y", "yes"]:
-            step_number = len(self.sequence_manager.steps) + 1
+            step_number = len(self.animation_manager.sequence_manager.steps) + 1
             with open(self.temp_animation_path, "r") as temp_file:
                 animation_sequence = temp_file.read()
             self.message_streamer.add_message("animation_update",
                                     animation_sequence,
                                     visible=False,
                                     context=False)  # save every sequence update to streamer
-            self.sequence_manager.add_sequence(step_number, animation_sequence)
-            self.delete_temp_file(self.temp_animation_path)
+            seq_message = self.animation_manager.add_sequence(step_number, animation_sequence)
+            self.message_streamer.add_message("animation_update", seq_message, visible=False, context=False)
+            self.animation_manager.delete_temp_file(self.temp_animation_path)
             self.wait_for_response = False
-            self.message_streamer.add_log("Animation approved and saved.")
+            self.logger.info("Animation approved and saved.")
             return f"Animation saved successfully as step {step_number}.\n"
 
         elif user_input.lower() in ["n", "no"]:
-            self.delete_temp_file(self.temp_animation_path)
+            self.animation_manager.delete_temp_file(self.temp_animation_path)
             self.wait_for_response = False
-            self.message_streamer.add_log("Animation discarded by user.")
+            self.logger.info("Animation discarded by user.")
             return "Animation discarded.\n"
 
-        self.message_streamer.add_log(
-            "Invalid response received during approval process.")
+        self.logger.warning("Invalid response received during approval process.")
         return "Invalid response. Please reply with 'y' or 'n'.\n"
 
     def delete_temp_file(self, file_path):
@@ -308,15 +293,15 @@ class LogicPlusPlus:
             if os.path.exists(absolute_path):
                 os.remove(absolute_path)
                 if not os.path.exists(absolute_path):
-                    self.message_streamer.add_log(
+                    self.logger.info(
                         f"Temp file {absolute_path} was successfully deleted.")
                 else:
-                    self.message_streamer.add_log(
+                    self.logger.error(
                         f"Error: Temp file {absolute_path} still exists after deletion attempt."
                     )
             else:
-                self.message_streamer.add_log(
+                self.logger.warning(
                     f"Temp file {absolute_path} does not exist.")
         except Exception as e:
-            self.message_streamer.add_log(
+            self.logger.error(
                 f"An error occurred while deleting {absolute_path}: {e}")

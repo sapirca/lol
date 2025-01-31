@@ -1,10 +1,11 @@
 from controller.constants import XSEQUENCE_TAG
 import re
+from animation.animation_manager import AnimationManager
 
 class Interpreter:
 
-    def __init__(self, sequence_manager):
-        self.sequence_manager = sequence_manager
+    def __init__(self, animation_manager):
+        self.animation_manager = animation_manager
 
     def parse_response(self, response):
         result = {
@@ -15,41 +16,15 @@ class Interpreter:
             "animation_sequence": None,
         }
 
-        # Fix for identifying the animation sequence
-        # Look for the beginning "<?xml"
-        # If not found, look for "<XSEQUENCE_TAG>"
-        if "<?xml" in response:
-            sequence_start = response.find("<?xml")
-            sequence_end = response.find(f"</{XSEQUENCE_TAG}>") + len(
-                f"</{XSEQUENCE_TAG}>")
-            if sequence_end > sequence_start:
-                sequence_xml = response[sequence_start:sequence_end]
-                result["animation_sequence"] = sequence_xml
-
-                # Save the response without the animation
-                result[
-                    "response_wo_animation"] = response[:
-                                                        sequence_start] + response[
-                                                            sequence_end:]
-                response = result["response_wo_animation"]
-        elif f"<{XSEQUENCE_TAG}" in response:
-            sequence_start = response.find(f"<{XSEQUENCE_TAG}")
-            sequence_end = response.find(f"</{XSEQUENCE_TAG}>") + len(
-                f"</{XSEQUENCE_TAG}>")
-            if sequence_end > sequence_start:
-                sequence_xml = response[sequence_start:sequence_end]
-                result["animation_sequence"] = sequence_xml
-
-                # Save the response without the animation
-                result[
-                    "response_wo_animation"] = response[:
-                                                        sequence_start] + response[
-                                                            sequence_end:]
-                response = result["response_wo_animation"]
+        if "<animation>" in response and "</animation>" in response:
+            animation_start = response.find("<animation>") + len("<animation>")
+            animation_end = response.find("</animation>")
+            result["animation_sequence"] = response[animation_start:animation_end]
+            result["response_wo_animation"] = response[:animation_start - len("<animation>")] + response[animation_end + len("</animation>"):]
         else:
             result["response_wo_animation"] = response
 
-        tags = re.findall(r"<([a-zA-Z0-9_]+)>(.*?)</\1>", response, re.DOTALL)
+        tags = re.findall(r"<([a-zA-Z0-9_]+)>(.*?)</\1>", result["response_wo_animation"], re.DOTALL)
         for tag, content in tags:
             if tag == "reasoning":
                 result["reasoning"] = content.strip()
@@ -60,5 +35,8 @@ class Interpreter:
                     "action": tag,
                     "content": content.strip()
                 })
+
+        if result["animation_sequence"]:
+            self.animation_manager.process_animation(result["animation_sequence"])
 
         return result

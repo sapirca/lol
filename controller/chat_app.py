@@ -3,7 +3,7 @@ from tkinter import scrolledtext
 from datetime import datetime
 import os
 import json
-from controller.logic_controller import LogicPlusPlus
+from controller.logic_pp import LogicPlusPlus
 import re
 import subprocess
 import platform
@@ -149,7 +149,6 @@ def communicate_with_backend(user_message):
     send_button.config(state=tk.NORMAL)
     user_input.bind("<Return>", handle_keypress)
 
-
 def close_current_chat():
     """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
     global controller, active_chat_snapshot
@@ -178,39 +177,12 @@ def save_chat():
 def load_chat_content(a_snapshot):
     save_status_label.config(text="", fg="light gray")  # Clear the status label
     """Load chat content and display the backend name."""
-    close_current_chat()  # Ensure the previous chat is closed before switching
-
-    # Check for unsaved changes
-    if controller and controller.message_streamer.messages:
-        unsaved_warning = tk.Toplevel(root)
-        unsaved_warning.title("Unsaved Changes")
-        unsaved_warning.geometry("300x150")
-
-        label = tk.Label(
-            unsaved_warning,
-            text="System doesn't save automatically. Use Save button. Agree to exit?",
-            wraplength=250)
-        label.pack(pady=10)
-
-        def proceed():
-            unsaved_warning.destroy()
-            _load_chat(a_snapshot)
-            update_active_chat_label(a_snapshot)  # Update label here
-
-        def cancel():
-            unsaved_warning.destroy()
-
-        button_frame = tk.Frame(unsaved_warning)
-        button_frame.pack(pady=10)
-
-        yes_button = tk.Button(button_frame, text="Yes", command=proceed)
-        yes_button.pack(side=tk.LEFT, padx=5)
-
-        no_button = tk.Button(button_frame, text="No", command=cancel)
-        no_button.pack(side=tk.RIGHT, padx=5)
+    global active_chat_snapshot
+    if controller and controller.message_streamer.messages and active_chat_snapshot != a_snapshot:
+        show_save_popup(lambda: (close_current_chat(), _load_chat(a_snapshot), update_active_chat_label(a_snapshot)), lambda: _load_chat(a_snapshot), update_active_chat_label(a_snapshot))
     else:
         _load_chat(a_snapshot)
-        update_active_chat_label(a_snapshot)  # Update label here
+        update_active_chat_label(a_snapshot)
 
 def _load_chat(a_snapshot):
     save_status_label.config(text="", fg="light gray")  # Ensure the status label is cleared when switching chats
@@ -251,9 +223,16 @@ def print_system_info():
 def create_or_ensure_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
     global controller, active_chat_snapshot
+    if controller and active_chat_snapshot != "untitled":
+        show_save_popup(lambda: (close_current_chat(), _create_untitled_chat()), lambda: _create_untitled_chat())
+    else:
+        _create_untitled_chat()
+
+
+def _create_untitled_chat():
+    """Helper function to create or ensure an untitled chat session."""
+    global controller, active_chat_snapshot
     if controller is None or active_chat_snapshot != "untitled":
-        # Initialize untitled session only if it doesn't exist
-        close_current_chat()  # Ensure the previous chat is closed
         controller = LogicPlusPlus()
         active_chat_snapshot = "untitled"
 
@@ -263,8 +242,7 @@ def create_or_ensure_untitled_chat():
     print_system_info()
 
     current_time = datetime.now().strftime(TIME_FORMAT)
-    append_message_to_window("System",
-                             "Welcome to a new chat session!")
+    append_message_to_window("System", "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)
 
     update_active_chat_label("untitled")  # Update label here
@@ -316,6 +294,27 @@ def handle_keypress(event):
     if event.keysym == "Return" and not event.state & 1:  # Enter without Shift
         send_message()
         return "break"  # Prevent default newline behavior
+
+def show_save_popup(proceed_callback, cancel_callback):
+    """Show a warning dialog for unsaved changes."""
+    unsaved_warning = tk.Toplevel(root)
+    unsaved_warning.title("Unsaved Changes")
+    unsaved_warning.geometry("300x150")
+
+    label = tk.Label(
+        unsaved_warning,
+        text="The system doesn't save automatically. Click Yes to take a snapshot or No to discard and exit.",
+        wraplength=250)
+    label.pack(pady=10)
+
+    button_frame = tk.Frame(unsaved_warning)
+    button_frame.pack(pady=10)
+
+    yes_button = tk.Button(button_frame, text="Yes", command=lambda: [proceed_callback(), (cancel_callback(), unsaved_warning.destroy())])
+    yes_button.pack(side=tk.LEFT, padx=5)
+
+    no_button = tk.Button(button_frame, text="No", command=unsaved_warning.destroy)
+    no_button.pack(side=tk.RIGHT, padx=5)
 
 # Create the main window
 root = tk.Tk()

@@ -1,9 +1,10 @@
+from animation.frameworks.sequence import Sequence
+
 import xml.etree.ElementTree as ET
 
-class SequenceManager:
-    def __init__(self, skeleton_file, logger):
+class XlightsSequence(Sequence):
+    def __init__(self, skeleton_file):
         self.skeleton_file = skeleton_file
-        self.logger = logger
         self.sequence_data = None
         self.steps = []
         self._load_sequence_skeleton()
@@ -22,7 +23,7 @@ class SequenceManager:
         """Add a new sequence to the manager and log the update."""
         step = {"step": step_number, "sequence": sequence_xml}
         self.steps.append(step)
-        self.logger.add_message("animation_update", f"Animation updated for step {step_number}", visible=False, context=False)
+        return f"Animation updated for step {step_number}"
 
     def get_latest_sequence(self):
         """Return the latest sequence available."""
