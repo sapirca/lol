@@ -165,8 +165,6 @@ def save_chat():
     global controller, active_chat_snapshot
     if controller:
         try:
-            # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            # snapshot_file_name = f"{SNAPSHOTS_DIR}/snapshot_{timestamp}" # Dump to an existing
             save_message = controller.shutdown()
             save_status_label.config(text=save_message, fg="light gray")
         except Exception as e:
@@ -174,15 +172,17 @@ def save_chat():
     else:
         save_status_label.config(text="No active chat to save", fg="red")
 
-def load_chat_content(a_snapshot):
-    save_status_label.config(text="", fg="light gray")  # Clear the status label
+def save_and_load_chat_content(a_snapshot):
     """Load chat content and display the backend name."""
-    global active_chat_snapshot
-    if controller and controller.message_streamer.messages and active_chat_snapshot != a_snapshot:
-        show_save_popup(lambda: (close_current_chat(), _load_chat(a_snapshot), update_active_chat_label(a_snapshot)), lambda: _load_chat(a_snapshot), update_active_chat_label(a_snapshot))
-    else:
-        _load_chat(a_snapshot)
-        update_active_chat_label(a_snapshot)
+    save_status_label.config(text="", fg="light gray")  # Clear the status label
+    
+    # Check for unsaved changes
+    if controller and controller.message_streamer.messages:
+        show_save_popup(lambda: [close_current_chat(), _load_chat(a_snapshot)], lambda: None)
+        root.update()  # Ensure the main loop is updated
+    
+    _load_chat(a_snapshot)
+    update_active_chat_label(a_snapshot)  # Update label here
 
 def _load_chat(a_snapshot):
     save_status_label.config(text="", fg="light gray")  # Ensure the status label is cleared when switching chats
@@ -220,18 +220,13 @@ def print_system_info():
     controller.message_streamer.add_message("system_output", message, visible=True, context=False)  
     append_message_to_window("System", message)
 
-def create_or_ensure_untitled_chat():
+def save_and_load_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
     global controller, active_chat_snapshot
-    if controller and active_chat_snapshot != "untitled":
-        show_save_popup(lambda: (close_current_chat(), _create_untitled_chat()), lambda: _create_untitled_chat())
-    else:
-        _create_untitled_chat()
-
-
-def _create_untitled_chat():
-    """Helper function to create or ensure an untitled chat session."""
-    global controller, active_chat_snapshot
+    if controller:
+        show_save_popup(close_current_chat, lambda: None)
+        root.update()  # Ensure the main loop is updated
+    
     if controller is None or active_chat_snapshot != "untitled":
         controller = LogicPlusPlus()
         active_chat_snapshot = "untitled"
@@ -242,7 +237,8 @@ def _create_untitled_chat():
     print_system_info()
 
     current_time = datetime.now().strftime(TIME_FORMAT)
-    append_message_to_window("System", "Welcome to a new chat session!")
+    append_message_to_window("System",
+                             "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)
 
     update_active_chat_label("untitled")  # Update label here
@@ -275,12 +271,12 @@ def populate_snapshot_list():
         snapshot_button = tk.Button(
             buttons_frame,
             text=snapshot_folder,
-            command=lambda folder=snapshot_folder: load_chat_content(folder)) 
+            command=lambda folder=snapshot_folder: save_and_load_chat_content(folder)) 
         snapshot_button.pack(fill=tk.X, pady=2)
 
     untitled_button = tk.Button(buttons_frame,
                                 text="untitled",
-                                command=create_or_ensure_untitled_chat)
+                                command=save_and_load_untitled_chat)
     untitled_button.pack(fill=tk.X, pady=2)
 
     buttons_frame.bind("<Configure>", lambda e: canvas.config(scrollregion=canvas.bbox("all")))
@@ -310,11 +306,21 @@ def show_save_popup(proceed_callback, cancel_callback):
     button_frame = tk.Frame(unsaved_warning)
     button_frame.pack(pady=10)
 
-    yes_button = tk.Button(button_frame, text="Yes", command=lambda: [proceed_callback(), (cancel_callback(), unsaved_warning.destroy())])
+    def on_yes():
+        proceed_callback()
+        unsaved_warning.destroy()
+
+    def on_no():
+        cancel_callback()
+        unsaved_warning.destroy()
+
+    yes_button = tk.Button(button_frame, text="Yes", command=on_yes)
     yes_button.pack(side=tk.LEFT, padx=5)
 
-    no_button = tk.Button(button_frame, text="No", command=unsaved_warning.destroy)
+    no_button = tk.Button(button_frame, text="No", command=on_no)
     no_button.pack(side=tk.RIGHT, padx=5)
+
+    root.wait_window(unsaved_warning)  # Wait for the popup to be closed
 
 # Create the main window
 root = tk.Tk()
