@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, ttk
 from datetime import datetime
 import os
 import json
@@ -18,17 +18,49 @@ SYSTEM_ALIGNMENT = "left"
 # Global variables
 active_chat_snapshot = None
 controller = None  # Will be initialized dynamically based on selected snapshot
+active_chat_button = None  # Store the currently active chat button
+button_mapping = {}  # Dictionary to store button references
+
+
+# Function to detect macOS appearance (light or dark)
+def get_macos_appearance():
+    try:
+        result = subprocess.run(
+            ["defaults", "read", "-g", "AppleInterfaceStyle"],
+            capture_output=True,
+            text=True)
+        return result.stdout.strip().lower()
+    except Exception:
+        return "light"  # Default to light if detection fails
+
+
+# Set colors based on the detected theme
+appearance = get_macos_appearance()
+if appearance == "dark":
+    normal_color = "gray"
+    active_color = "lightblue"
+else:
+    normal_color = "lightgray"
+    active_color = "lightblue"
+
+# Create a style for active and normal buttons
+style = ttk.Style()
+style.configure("TButton", padding=6, relief="flat", background=normal_color)
+style.map("TButton",
+          background=[("active", active_color), ("!active", normal_color)])
+
 
 def initialize_logic_controller(a_snapshot):  # Updated function name
     """Initialize the LogicPlusPlus with the selected snapshot folder."""
     global controller
-    snapshot_path = os.path.abspath(
-        os.path.join(SNAPSHOTS_DIR, a_snapshot))
+    snapshot_path = os.path.abspath(os.path.join(SNAPSHOTS_DIR, a_snapshot))
     controller = LogicPlusPlus(snapshot_path)
+
 
 def append_message_to_window(sender, message):
     timestamp = datetime.now().strftime(TIME_FORMAT)
     append_message_to_window_w_timestamp(timestamp, sender, message)
+
 
 def append_message_to_window_w_timestamp(timestamp, sender, message):
     """Adds a message to the chat window with proper formatting and clickable links."""
@@ -101,9 +133,15 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
     # Automatically scroll to the bottom
     chat_window.see(tk.END)
 
-def update_active_chat_label(snapshot_name):
+
+def update_active_chat_label(button_name):
     """Update the active chat label to reflect the currently active chat."""
-    active_chat_label.config(text=f"Active Chat: {snapshot_name}")
+    button = button_mapping[button_name]
+    active_chat_label.config(
+        text=
+        f"Active Chat: {button_name}. Backend: {controller.selected_backend}")
+    set_active_chat_button(button)
+
 
 def send_message(event=None):
     """Handles sending a message by the user and calling the backend in a separate thread."""
@@ -114,7 +152,7 @@ def send_message(event=None):
         # Check if the user wants to exit
         if user_message.lower() == "exit":
             if controller:
-                controller.shutdown()  # Ensure the controller finalizes and saves state
+                controller.shutdown()
             root.destroy()  # Close the application
             return
 
@@ -122,13 +160,13 @@ def send_message(event=None):
         chat_window.config(state=tk.NORMAL)
         send_button.config(state=tk.DISABLED)  # Disable send button
         user_input.unbind("<Return>")  # Disable Enter key
-        # user_input.unbind("<Shift-Return>")  # Disable Shift+Enter key
         append_message_to_window("You", user_message)
 
         # Run the backend communication in a separate thread
         threading.Thread(target=communicate_with_backend,
-                         args=(user_message,),
+                         args=(user_message, ),
                          daemon=True).start()
+
 
 def communicate_with_backend(user_message):
     """Handles communication with the backend without freezing the UI."""
@@ -141,13 +179,13 @@ def communicate_with_backend(user_message):
         elif tag == 'system':
             append_message_to_window('System', system_reply)
         else:
-            append_message_to_window(tag.capitalize(),
-                                     system_reply)
+            append_message_to_window(tag.capitalize(), system_reply)
 
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
     send_button.config(state=tk.NORMAL)
     user_input.bind("<Return>", handle_keypress)
+
 
 def close_current_chat():
     """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
@@ -155,10 +193,11 @@ def close_current_chat():
     if controller:
         shutdown_msg = controller.shutdown()
         print(shutdown_msg)
-            
+
     # Clear global references to free resources
     controller = None
     active_chat_snapshot = None
+
 
 def save_chat():
     """Saves the current chat session explicitly."""
@@ -168,30 +207,37 @@ def save_chat():
             save_message = controller.shutdown()
             save_status_label.config(text=save_message, fg="light gray")
         except Exception as e:
-            save_status_label.config(text=f"Failed to save chat: {str(e)}", fg="red")
+            save_status_label.config(text=f"Failed to save chat: {str(e)}",
+                                     fg="red")
     else:
         save_status_label.config(text="No active chat to save", fg="red")
 
+
 def save_and_load_chat_content(a_snapshot):
     """Load chat content and display the backend name."""
-    save_status_label.config(text="", fg="light gray")  # Clear the status label
-    
+    save_status_label.config(text="",
+                             fg="light gray")  # Clear the status label
+
     # Check for unsaved changes
     if controller and controller.message_streamer.messages:
-        show_save_popup(lambda: [close_current_chat(), _load_chat(a_snapshot)], lambda: None)
+        show_save_popup(lambda: [close_current_chat(),
+                                 _load_chat(a_snapshot)], lambda: None)
         root.update()  # Ensure the main loop is updated
-    
+
     _load_chat(a_snapshot)
-    update_active_chat_label(a_snapshot)  # Update label here
+    update_active_chat_label(a_snapshot)
+
 
 def _load_chat(a_snapshot):
-    save_status_label.config(text="", fg="light gray")  # Ensure the status label is cleared when switching chats
+    save_status_label.config(
+        text="", fg="light gray"
+    )  # Ensure the status label is cleared when switching chats
     """Load chat content and alert if the current chat is unsaved."""
     if controller:
         # Alert user if current chat is not saved
         if not controller.message_streamer.messages:  # Assuming the message_streamer's messages indicate changes
             print("Warning: Current chat session is not saved!")
-    
+
     global active_chat_snapshot
     active_chat_snapshot = a_snapshot
 
@@ -213,12 +259,17 @@ def _load_chat(a_snapshot):
     print_system_info()
     chat_window.config(state=tk.DISABLED)
 
+
 def print_system_info():
     current_time = datetime.now().strftime(TIME_FORMAT)
     backend_name = controller.selected_backend or "Unknown Backend"
     message = f"Active Backend is: {backend_name}"
-    controller.message_streamer.add_message("system_output", message, visible=True, context=False)  
+    controller.message_streamer.add_message("system_output",
+                                            message,
+                                            visible=True,
+                                            context=False)
     append_message_to_window("System", message)
+
 
 def save_and_load_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
@@ -226,7 +277,7 @@ def save_and_load_untitled_chat():
     if controller:
         show_save_popup(close_current_chat, lambda: None)
         root.update()  # Ensure the main loop is updated
-    
+
     if controller is None or active_chat_snapshot != "untitled":
         controller = LogicPlusPlus()
         active_chat_snapshot = "untitled"
@@ -237,14 +288,12 @@ def save_and_load_untitled_chat():
     print_system_info()
 
     current_time = datetime.now().strftime(TIME_FORMAT)
-    append_message_to_window("System",
-                             "Welcome to a new chat session!")
+    append_message_to_window("System", "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)
-
-    update_active_chat_label("untitled")  # Update label here
-
     print(f"Untitled chat session ensured")
     active_chat_snapshot = "untitled"
+    update_active_chat_label("untitled")
+
 
 def populate_snapshot_list():
     """Populates the snapshot list with a scrollbar and highlights the active chat."""
@@ -259,7 +308,9 @@ def populate_snapshot_list():
         ]
 
     canvas = tk.Canvas(chat_list_frame)
-    scrollbar_y = tk.Scrollbar(chat_list_frame, orient="vertical", command=canvas.yview)
+    scrollbar_y = tk.Scrollbar(chat_list_frame,
+                               orient="vertical",
+                               command=canvas.yview)
     scrollbar_y.pack(side=tk.RIGHT, fill=tk.Y)
     canvas.config(yscrollcommand=scrollbar_y.set)
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -267,29 +318,38 @@ def populate_snapshot_list():
     buttons_frame = tk.Frame(canvas)
     canvas.create_window((0, 0), window=buttons_frame, anchor=tk.NW)
 
+    global button_mapping
+    button_mapping = {}
+
     for snapshot_folder in snapshot_folders:
-        snapshot_button = tk.Button(
-            buttons_frame,
-            text=snapshot_folder,
-            command=lambda folder=snapshot_folder: save_and_load_chat_content(folder)) 
+        snapshot_button = ttk.Button(buttons_frame,
+                                     text=snapshot_folder,
+                                     command=lambda folder=snapshot_folder:
+                                     save_and_load_chat_content(folder))
         snapshot_button.pack(fill=tk.X, pady=2)
+        button_mapping[snapshot_folder] = snapshot_button
 
-    untitled_button = tk.Button(buttons_frame,
-                                text="untitled",
-                                command=save_and_load_untitled_chat)
+    untitled_button = ttk.Button(buttons_frame,
+                                 text="untitled",
+                                 command=save_and_load_untitled_chat)
     untitled_button.pack(fill=tk.X, pady=2)
+    button_mapping["untitled"] = untitled_button
 
-    buttons_frame.bind("<Configure>", lambda e: canvas.config(scrollregion=canvas.bbox("all")))
+    buttons_frame.bind(
+        "<Configure>",
+        lambda e: canvas.config(scrollregion=canvas.bbox("all")))
 
     buttons = buttons_frame.winfo_children()
     if buttons:
-       buttons[-1].invoke()
+        buttons[-1].invoke()
+
 
 def handle_keypress(event):
     """Handles the Enter key press to send messages."""
     if event.keysym == "Return" and not event.state & 1:  # Enter without Shift
         send_message()
         return "break"  # Prevent default newline behavior
+
 
 def show_save_popup(proceed_callback, cancel_callback):
     """Show a warning dialog for unsaved changes."""
@@ -321,6 +381,16 @@ def show_save_popup(proceed_callback, cancel_callback):
     no_button.pack(side=tk.RIGHT, padx=5)
 
     root.wait_window(unsaved_warning)  # Wait for the popup to be closed
+
+
+# TODO(sapir): Mac is running over this theme, fix the bug!!!
+def set_active_chat_button(button):
+    global active_chat_button
+    if active_chat_button:
+        active_chat_button.config(state=tk.NORMAL, bg=normal_color)
+    button.config(state=tk.ACTIVE, bg=active_color)
+    active_chat_button = button
+
 
 # Create the main window
 root = tk.Tk()
@@ -375,10 +445,12 @@ context_menu = tk.Menu(chat_window, tearoff=0)
 context_menu.add_command(
     label="Copy", command=lambda: chat_window.event_generate("<<Copy>>"))
 
+
 def show_context_menu(event):
     """Show the context menu at the cursor position."""
     print("Right-click event detected")  # Debug: Check if the event triggers
     context_menu.tk_popup(event.x_root, event.y_root)
+
 
 # Bind right-click to show the context menu
 chat_window.bind("<Button-2>", show_context_menu)
