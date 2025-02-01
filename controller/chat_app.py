@@ -43,12 +43,6 @@ else:
     normal_color = "lightgray"
     active_color = "lightblue"
 
-# Create a style for active and normal buttons
-style = ttk.Style()
-style.configure("TButton", padding=6, relief="flat", background=normal_color)
-style.map("TButton",
-          background=[("active", active_color), ("!active", normal_color)])
-
 
 def initialize_logic_controller(a_snapshot):  # Updated function name
     """Initialize the LogicPlusPlus with the selected snapshot folder."""
@@ -138,8 +132,7 @@ def update_active_chat_label(button_name):
     """Update the active chat label to reflect the currently active chat."""
     button = button_mapping[button_name]
     active_chat_label.config(
-        text=
-        f"Active Chat: {button_name}. Backend: {controller.selected_backend}")
+        text=f"{controller.selected_backend} | {button_name}")
     set_active_chat_button(button)
 
 
@@ -206,6 +199,9 @@ def save_chat():
         try:
             save_message = controller.shutdown()
             save_status_label.config(text=save_message, fg="light gray")
+            controller = None
+            active_chat_snapshot = None
+            populate_snapshot_list()  # Refresh the snapshot list
         except Exception as e:
             save_status_label.config(text=f"Failed to save chat: {str(e)}",
                                      fg="red")
@@ -220,8 +216,8 @@ def save_and_load_chat_content(a_snapshot):
 
     # Check for unsaved changes
     if controller and controller.message_streamer.messages:
-        show_save_popup(lambda: [close_current_chat(),
-                                 _load_chat(a_snapshot)], lambda: None)
+        show_save_popup(
+            lambda: [save_chat(), _load_chat(a_snapshot)], lambda: None)
         root.update()  # Ensure the main loop is updated
 
     _load_chat(a_snapshot)
@@ -275,7 +271,7 @@ def save_and_load_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
     global controller, active_chat_snapshot
     if controller:
-        show_save_popup(close_current_chat, lambda: None)
+        show_save_popup(save_chat(), lambda: None)
         root.update()  # Ensure the main loop is updated
 
     if controller is None or active_chat_snapshot != "untitled":
@@ -322,16 +318,16 @@ def populate_snapshot_list():
     button_mapping = {}
 
     for snapshot_folder in snapshot_folders:
-        snapshot_button = ttk.Button(buttons_frame,
-                                     text=snapshot_folder,
-                                     command=lambda folder=snapshot_folder:
-                                     save_and_load_chat_content(folder))
+        snapshot_button = tk.Button(buttons_frame,
+                                    text=snapshot_folder,
+                                    command=lambda folder=snapshot_folder:
+                                    save_and_load_chat_content(folder))
         snapshot_button.pack(fill=tk.X, pady=2)
         button_mapping[snapshot_folder] = snapshot_button
 
-    untitled_button = ttk.Button(buttons_frame,
-                                 text="untitled",
-                                 command=save_and_load_untitled_chat)
+    untitled_button = tk.Button(buttons_frame,
+                                text="untitled",
+                                command=save_and_load_untitled_chat)
     untitled_button.pack(fill=tk.X, pady=2)
     button_mapping["untitled"] = untitled_button
 
@@ -383,12 +379,12 @@ def show_save_popup(proceed_callback, cancel_callback):
     root.wait_window(unsaved_warning)  # Wait for the popup to be closed
 
 
-# TODO(sapir): Mac is running over this theme, fix the bug!!!
 def set_active_chat_button(button):
     global active_chat_button
     if active_chat_button:
-        active_chat_button.config(state=tk.NORMAL, bg=normal_color)
-    button.config(state=tk.ACTIVE, bg=active_color)
+        active_chat_button.config(
+            bg=normal_color)  # Reset color of previous active button
+    button.config(bg=active_color)  # Set color of new active button
     active_chat_button = button
 
 
@@ -398,7 +394,7 @@ root.title("Chat App")
 root.geometry("1000x500")
 
 # Create a frame for the left chat list
-chat_list_frame = tk.Frame(root, width=200, bg="#2c2c2c")
+chat_list_frame = tk.Frame(root, bg="#2c2c2c")
 chat_list_frame.pack(side=tk.LEFT, fill=tk.Y)
 
 # Create a frame for the chat window
@@ -415,7 +411,7 @@ active_chat_label = tk.Label(top_bar,
                              fg="#ffffff",
                              bg="#2c2c2c",
                              anchor="w",
-                             font=("Helvetica", 12, "bold"))
+                             font=("Helvetica", 12))
 active_chat_label.pack(side=tk.LEFT, padx=5)
 
 # Add a status label for saving feedback
