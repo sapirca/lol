@@ -299,7 +299,7 @@ def show_save_popup(proceed_callback, cancel_callback):
 
     label = tk.Label(
         unsaved_warning,
-        text="The system doesn't save automatically. Click Yes to take a snapshot or No to discard and exit.",
+        text="Do you want to save a NEW Snapshot before discarding this chat?",
         wraplength=250)
     label.pack(pady=10)
 
