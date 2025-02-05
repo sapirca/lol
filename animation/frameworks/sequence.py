@@ -1,35 +1,26 @@
 from abc import ABC, abstractmethod
 
+
 class Sequence(ABC):
 
-    @abstractmethod
-    def add_sequence(self, step_number, animation_sequence):
-        pass
+    def add_sequence(self, step_number, sequence_xml):
+        """Add a new sequence to the manager and log the update."""
+        step = {"step": step_number, "sequence": sequence_xml}
+        self.steps.append(step)
+        return f"Animation updated for step {step_number}"
 
-    @abstractmethod
     def get_latest_sequence(self):
-        pass
+        """Return the latest sequence available."""
+        if not self.steps:
+            return None
+        return self.steps[-1]["sequence"]
 
-    @abstractmethod
     def get_all_sequences(self):
-        pass
+        """Return all sequences as a list."""
+        return [step["sequence"] for step in self.steps]
 
-    @abstractmethod
     def load_sequences(self, sequences):
-        pass
-
-    # Removed methods
-    # def get_sequence(self):
-    #     pass
-
-    # def list_sequences(self):
-    #     pass
-
-    # def play_sequence(self):
-    #     pass
-
-    # def remove_sequence(self):
-    #     pass
-
-    # def stop_sequence(self):
-    #     pass
+        """Load sequences from a list."""
+        self.steps = []
+        for i, sequence in enumerate(sequences):
+            self.steps.append({"step": i, "sequence": sequence})

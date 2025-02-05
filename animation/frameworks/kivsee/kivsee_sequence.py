@@ -1,21 +1,21 @@
 from animation.frameworks.sequence import Sequence
+import os
+
 
 class KivseeSequence(Sequence):
+
     def __init__(self, sequence_path):
         self.sequence_path = sequence_path
+        self.sequence_data = None
+        self.steps = []
+        self._load_sequence_skeleton()
 
-    def get_latest_sequence(self):
-        # Stub implementation
-        return "Latest Kivsee sequence"
-
-    def get_all_sequences(self):
-        # Stub implementation
-        return ["Kivsee sequence 1", "Kivsee sequence 2"]
-
-    def load_sequences(self, animations):
-        # Stub implementation
-        pass
-
-    def add_sequence(self, step_number, animation_sequence):
-        # Stub implementation
-        return f"Added Kivsee sequence at step {step_number}"
+    def _load_sequence_skeleton(self):
+        """Load the initial sequence skeleton."""
+        try:
+            with open(self.sequence_path, 'r') as file:
+                self.sequence_data = file.read()
+            # Ensure the first step is the skeleton sequence
+            self.steps.append({"step": 0, "sequence": self.sequence_data})
+        except Exception as e:
+            raise RuntimeError(f"Error loading sequence skeleton: {e}")

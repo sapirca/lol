@@ -1,0 +1,13 @@
+// In this house there are 12 rings hanged on the wall. 
+// Here are groups of rings, representing their spatial placement.
+// It's copied from a typed script file:
+
+//  /Users/sapir/repos/led-rings/src/objects/ring-elements.ts
+
+export const all = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+export const odd = [1, 3, 5, 7, 9, 11];
+export const even = [2, 4, 6, 8, 10, 12];
+export const left = [1, 2, 3, 4, 5, 6];
+export const right = [7, 8, 9, 10, 11, 12];
+export const center = [4, 5, 6, 7, 8, 9];
+export const outer = [1, 2, 3, 10, 11, 12];

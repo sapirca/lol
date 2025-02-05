@@ -1,4 +1,3 @@
-
 # Main prompt for light show generation
 intro_prompt = """You are an AI assistant specializing in crafting light sequences that suit the played music. Your task is to generate a visually engaging light show for the provided song using the xLights software. You will analyze the provided EDM music and create an XSQ sequence file based on the given template.
 
@@ -47,29 +46,3 @@ Based on your previous input, I have used a similar animation style to maintain 
 
 Ensure all outputs adhere to the above structure.
 """
-
-# Sub-prompts for specific tasks
-song_information_prompt = """
-Generate a light show for this song:
-Song: "Nikki" by Worakls
-
-BPM: 126
-
-Song structure:
-8 Bars: Intro
-16 Bars: Verse 1
-16 Bars: Verse 2
-16 Bars: Bridge
-16 Bars: Build up
-16 Bars: Drop (chorus)
-16 Bars: Verse
-16 Bars: Bridge
-16 Bars: Build up
-16 Bars: Outro
-"""
-
-prompts_list = [song_information_prompt]
-
-def get_full_prompt(house_config):
-    return intro_prompt + "\n" + "\n".join(prompts_list) + f"\n\nHouse Configuration:\n{house_config}"
-

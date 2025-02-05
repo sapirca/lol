@@ -18,14 +18,15 @@ CONFIG_FILE = "config.json"
 # Animations
 ANIMATION_OUT_TEMP_DIR = "outputs/animation_output"
 
+# Kivsee
+KIVSEE_HOUSE_PATH = "animation/frameworks/kivsee/world_structure.ts"
+KIVSEE_TEMP_ANIMATION_FILE = "temp_animation.ts"
+KIVSEE_SEQUENCE_PATH = "animation/frameworks/kivsee/sequence_skeleton.ts"
+KIVSEE_KNOWLEDGE_PATH = "animation/frameworks/kivsee/knowledge.ts"
 
 # Xlights
-XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/house_config.xml"
+XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/world_structure.xml"
 XLIGHTS_SEQUENCE_PATH = "animation/frameworks/xlights/sequence_skeleton.xml"
-XSEQUENCE_TAG = "xsequence"
+XLIGHTS_KNOWLEDGE_PATH = "animation/frameworks/xlights/knowledge.py"
 XLIGHTS_TEMP_ANIMATION_FILE = "temp_animation.xsq"
-
-# Kivsee
-KIVSEE_HOUSE_PATH = "animation/frameworks/kivsee/house_config.xml"
-KIVSEE_TEMP_ANIMATION_FILE = "temp_animation.py"
-KIVSEE_SEQUENCE_PATH = "animation/frameworks/kivsee/sequence_skeleton.py"
+XSEQUENCE_TAG = "xsequence"

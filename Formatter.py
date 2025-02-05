@@ -1,9 +1,11 @@
-from animation.frameworks.xlights.xlights_sequence import XlightsSequence
+from animation.frameworks.sequence import Sequence
 from controller.message_streamer import MessageStreamer
 from controller.constants import XSEQUENCE_TAG
 
+
 class Formatter:
-    def __init__(self, logger : MessageStreamer, sequence_manager: XlightsSequence):
+
+    def __init__(self, logger: MessageStreamer, sequence_manager: Sequence):
         """
         Initializes the Formatter class.
 
@@ -20,19 +22,21 @@ class Formatter:
         :return: List of formatted message dictionaries for the LLM.
         """
         messages = []
-        
+
         for log in self.logger.logs:
             if log['context']:
                 role = self._determine_role(log['tag'])
                 messages.append({"role": role, "content": log['content']})
-        
+
         latest_sequence = self.sequence_manager.get_latest_sequence()
         if latest_sequence:
             messages.append({
-                "role": "system",
-                "content": f"Latest Animation Sequence ({XSEQUENCE_TAG}):\n{latest_sequence}"
+                "role":
+                "system",
+                "content":
+                f"Latest Animation Sequence ({XSEQUENCE_TAG}):\n{latest_sequence}"
             })
-        
+
         return messages
 
     def _determine_role(self, tag):
@@ -48,5 +52,5 @@ class Formatter:
             "user_input": "user",
             "assistant": "assistant"
         }
-        
+
         return role_mapping.get(tag, "system")

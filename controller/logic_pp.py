@@ -1,6 +1,7 @@
 import random
 from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend, DeepSeekBackend
-from prompts import get_full_prompt
+from prompts import intro_prompt
+from animation.songs.song_provider import SongProvider
 import xml.etree.ElementTree as ET
 from interpreter import Interpreter
 from formatter import Formatter
@@ -13,6 +14,7 @@ import json
 from config import config as basic_config
 from animation.animation_manager import AnimationManager
 
+
 class LogicPlusPlus:
 
     def __init__(self, snapshot_dir=None):
@@ -21,51 +23,51 @@ class LogicPlusPlus:
         self.wait_for_response = False
         self.temp_animation_path = None
         self.message_streamer = MessageStreamer()
+        self.song_provider = SongProvider()
         self.backends = {}
         self._initialize_backends()
-        
+
         if snapshot_dir is not None:
             try:
                 self._load_from_snapshot(snapshot_dir)
                 self.initial_prompt_added = True
             except Exception as e:
-                self.logger.error(f"Failed to load snapshot from {snapshot_dir}: {e}")
-                raise RuntimeError(f"Failed to load snapshot from {snapshot_dir}: {e}")
+                self.logger.error(
+                    f"Failed to load snapshot from {snapshot_dir}: {e}")
+                raise RuntimeError(
+                    f"Failed to load snapshot from {snapshot_dir}: {e}")
         else:
             # Default initialization if no snapshot is provided
             self.initial_prompt_added = False
             self.config = basic_config
             self.selected_framework = self.config.get("framework", None)
-            self.animation_manager = AnimationManager(self.selected_framework, self.message_streamer)
+            self.animation_manager = AnimationManager(self.selected_framework,
+                                                      self.message_streamer)
 
         # Shared initialization logic
         self.selected_backend = self.config.get("selected_backend", None)
         self.response_manager = Interpreter(self.animation_manager)
-        self.formatter = Formatter(self.message_streamer, self.animation_manager)
+        self.formatter = Formatter(self.message_streamer,
+                                   self.animation_manager)
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            shutdown_snapshot_dir = os.path.join(self.message_streamer.snapshots_dir,
-                                        f"snapshot_{timestamp}")
+            shutdown_snapshot_dir = os.path.join(
+                self.message_streamer.snapshots_dir, f"snapshot_{timestamp}")
             os.makedirs(shutdown_snapshot_dir, exist_ok=True)
-            
+
         # Save configuration
         snapshot_config_file = os.path.join(shutdown_snapshot_dir, CONFIG_FILE)
         with open(snapshot_config_file, "w") as file:
             json.dump(self.config, file, indent=4)
 
-        # Save all animations
-        all_animations = self.animation_manager.get_all_sequences()
-        animations_dir = os.path.join(shutdown_snapshot_dir, "animations")
-        os.makedirs(animations_dir, exist_ok=True)
-        for i, animation in enumerate(all_animations, start=1):
-            animation_file = os.path.join(animations_dir, f"animation_{i}.xml")
-            with open(animation_file, "w") as file:
-                file.write(animation)
+        # Save all animations using the new method
+        self.animation_manager.save_all_animations(shutdown_snapshot_dir)
 
         # Save messages to messages.json
-        messages_json_file = os.path.join(shutdown_snapshot_dir, MESSAGE_SNAPSHOT_FILE)
+        messages_json_file = os.path.join(shutdown_snapshot_dir,
+                                          MESSAGE_SNAPSHOT_FILE)
         with open(messages_json_file, "w") as file:
             json.dump(self.message_streamer.messages, file,
                       indent=4)  # Save only the messages data
@@ -73,8 +75,7 @@ class LogicPlusPlus:
         # Finalize the message_streamer
         self.message_streamer.finalize()
 
-        return(f"Snapshot saved: {shutdown_snapshot_dir}.")
-        
+        return (f"Snapshot saved: {shutdown_snapshot_dir}.")
 
     def get_visible_chat(self):
         """Retrieve all visible chat messages from the message_streamer, including their tags/labels."""
@@ -100,7 +101,8 @@ class LogicPlusPlus:
                 "Animations directory is missing in the snapshot directory.")
 
         # Load messages
-        messages_snapshot_file = os.path.join(snapshot_dir, MESSAGE_SNAPSHOT_FILE)
+        messages_snapshot_file = os.path.join(snapshot_dir,
+                                              MESSAGE_SNAPSHOT_FILE)
         try:
             self.message_streamer.load(messages_snapshot_file)
         except Exception as e:
@@ -118,7 +120,8 @@ class LogicPlusPlus:
 
         # Load animations
         self.selected_framework = self.config.get("framework", None)
-        self.animation_manager = AnimationManager(self.selected_framework, self.message_streamer)
+        self.animation_manager = AnimationManager(self.selected_framework,
+                                                  self.message_streamer)
         try:
             animations = []
             for animation_file in sorted(os.listdir(animations_dir)):
@@ -163,7 +166,32 @@ class LogicPlusPlus:
 
         return random.choice(list(self.backends.values()))
 
+    def build_prompt(self, intro_prompt, general_knowledge,
+                     animation_knowledge, song_structure, world_structure):
+        """
+        Build the initial prompt by combining the intro prompt, general knowledge, animation knowledge,
+        song structure, and world structure.
+
+        Args:
+            intro_prompt (str): The introductory prompt.
+            general_knowledge (str): General knowledge about the system.
+            animation_knowledge (str): Knowledge specific to animations.
+            song_structure (str): The structure of the song.
+            world_structure (str): The structure of the world.
+
+        Returns:
+            str: The combined initial prompt.
+        """
+        prompt_parts = [
+            intro_prompt, "\n### General Knowledge\n", general_knowledge,
+            "\n### Animation Knowledge\n", animation_knowledge,
+            "\n### Song Structure\n", song_structure,
+            "\n### World Structure\n", world_structure
+        ]
+        return "\n".join(prompt_parts)
+
     def communicate(self, user_input):
+        system_responses = []
         if self.wait_for_response:
             # User response for agent action (e.g., store to memory, update animation)
             # This does not need to be added to the LLM context.
@@ -177,34 +205,57 @@ class LogicPlusPlus:
                 visible=True,
                 context=False
             )  # Need to add info that this is internal_actions communication
-            return {"system": visible_system_message}
+            system_responses.append(("system", visible_system_message))
+            return system_responses
 
         backend = self.select_backend()
 
         latest_sequence = None
         if not self.initial_prompt_added:
-            # TODO: Fix prompts / songs / knowledge etc... 
-            self.world_structure = self.animation_manager.get_world_structure()
+            # TODO: Fix prompts / songs / knowledge etc...
+            song_name = "Nikki"
+            world_structure = self.animation_manager.get_world_structure()
             general_knowledge = self.animation_manager.get_general_knowledge()
             animation_knowledge = self.animation_manager.get_domain_knowledge()
-            initial_prompt = get_full_prompt(self.world_structure)
+            song_structure = self.song_provider.get_song_structure(song_name)
+
+            # Get the song from the song provider
+            initial_prompt = self.build_prompt(intro_prompt, general_knowledge,
+                                               animation_knowledge,
+                                               song_structure, world_structure)
+
             # Ensure the main instructions are always sent to the LLM for proper context.
             self.message_streamer.add_message("initial_prompt_context",
-                                    initial_prompt,
-                                    visible=False,
-                                    context=True)
+                                              initial_prompt,
+                                              visible=False,
+                                              context=True)
+
             # Always send the original animation structure to the LLM for reference.
             latest_sequence = self.animation_manager.get_latest_sequence()
             self.message_streamer.add_message("initial_animation",
-                                    latest_sequence,
-                                    visible=False,
-                                    context=True)
+                                              latest_sequence,
+                                              visible=False,
+                                              context=True)
             self.initial_prompt_added = True
 
+            initial_prompt_report = (
+                f"Request sent to {self.selected_backend} with the following information"
+                f"\nsong name: {song_name}"
+                f"\nFramework: {self.selected_framework}")
+
+            self.message_streamer.add_message("system",
+                                              initial_prompt_report,
+                                              visible=True,
+                                              context=False)
+
+            system_responses.append(("system", initial_prompt_report))
+
         self.message_streamer.add_message("user_input",
-                                user_input,
-                                visible=True,
-                                context=True)
+                                          user_input,
+                                          visible=True,
+                                          context=True)
+
+        # Update the UI with the prompt that was sent
 
         # Build the messages array for the LLM
         messages = self.formatter.build_messages()
@@ -212,9 +263,9 @@ class LogicPlusPlus:
 
         # The raw response contains a WIP animation which does not need to be added to the context.
         self.message_streamer.add_message("llm_raw_response",
-                                response,
-                                visible=False,
-                                context=False)
+                                          response,
+                                          visible=False,
+                                          context=False)
 
         parsed_response = self.response_manager.parse_response(response)
 
@@ -223,18 +274,21 @@ class LogicPlusPlus:
         # Add this trimmed short response to the context
         # for better understanding.
         self.message_streamer.add_message("assistant",
-                                assistant_response +
-                                " The animation was trimmed out",
-                                visible=True,
-                                context=True)
+                                          assistant_response +
+                                          " The animation was trimmed out",
+                                          visible=True,
+                                          context=True)
 
-        system_response = self.act_on_response(parsed_response)
+        act_on_response_msg = self.act_on_response(parsed_response)
         self.message_streamer.add_message(
-            "system_output", system_response, visible=True,
+            "system_output", act_on_response_msg, visible=True,
             context=False)  # Information about agent actions shared
         # with the user.
 
-        return {"assistant": assistant_response, "system": system_response}
+        system_responses.append(("assistant", assistant_response))
+        if act_on_response_msg:
+            system_responses.append(("system", act_on_response_msg))
+        return system_responses
 
     def act_on_response(self, processed_response):
         reasoning = processed_response.get("reasoning")
@@ -245,17 +299,16 @@ class LogicPlusPlus:
         output = ""
 
         if animation_sequence:
-            self.temp_animation_path = self.animation_manager.store_temp_animation(animation_sequence)
+            self.temp_animation_path = self.animation_manager.store_temp_animation(
+                animation_sequence)
             self.logger.info(
-                f"Generated {self.temp_animation_path} for the user's observation.")
+                f"Generated {self.temp_animation_path} for the user's observation."
+            )
             self.wait_for_response = True
 
-            output += f"An animation sequence was generated and saved in {self.temp_animation_path}\n"
-            output += "Simulate or edit the file using xLights. Edit the animation file if needed.\n"
-            output += "Approve to save this animation to the sequence manager once done. Approve? (y/n): "
-
-        else:
-            output += "No animation sequence provided in the LLM response.\n"
+            output += f"Animation sequence generated and saved to {self.temp_animation_path}\n"
+            output += "Preview and edit the animation as needed.\n"
+            output += "Save this temporary animation file to the sequence manager? (y/n): "
 
         for action in processed_response.get("requested_actions", []):
             output += f"Unhandled action: {action['action']}\n"
@@ -264,15 +317,21 @@ class LogicPlusPlus:
 
     def handle_user_approval(self, user_input):
         if user_input.lower() in ["y", "yes"]:
-            step_number = len(self.animation_manager.sequence_manager.steps) + 1
+            step_number = len(
+                self.animation_manager.sequence_manager.steps) + 1
             with open(self.temp_animation_path, "r") as temp_file:
                 animation_sequence = temp_file.read()
+            self.message_streamer.add_message(
+                "animation_update",
+                animation_sequence,
+                visible=False,
+                context=False)  # save every sequence update to streamer
+            seq_message = self.animation_manager.add_sequence(
+                step_number, animation_sequence)
             self.message_streamer.add_message("animation_update",
-                                    animation_sequence,
-                                    visible=False,
-                                    context=False)  # save every sequence update to streamer
-            seq_message = self.animation_manager.add_sequence(step_number, animation_sequence)
-            self.message_streamer.add_message("animation_update", seq_message, visible=False, context=False)
+                                              seq_message,
+                                              visible=False,
+                                              context=False)
             self.animation_manager.delete_temp_file(self.temp_animation_path)
             self.wait_for_response = False
             self.logger.info("Animation approved and saved.")
@@ -284,7 +343,8 @@ class LogicPlusPlus:
             self.logger.info("Animation discarded by user.")
             return "Animation discarded.\n"
 
-        self.logger.warning("Invalid response received during approval process.")
+        self.logger.warning(
+            "Invalid response received during approval process.")
         return "Invalid response. Please reply with 'y' or 'n'.\n"
 
     def delete_temp_file(self, file_path):

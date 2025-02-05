@@ -3,7 +3,7 @@ import tiktoken
 import anthropic
 import google.generativeai as genai
 import logging
-#TODO sapir rename this file 
+#TODO sapir rename this file
 from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
 GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
@@ -29,6 +29,7 @@ class LLMBackend:
         response_tokens = self.token_count([{"content": response}])
         log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
         self.logger.info(log_message)
+
     #     self.logger.add_message(tag=f"system_log {self.name} - Tokens",
     #                             content=log_message,
     #                             visible=False,
@@ -185,6 +186,7 @@ class GeminiBackend(LLMBackend):
             self.logger.error(f"Error communicating with Gemini backend: {e}")
             return f"Error communicating with Gemini backend {e}"
 
+
 class DeepSeekBackend(LLMBackend):
     DEEPSEEK_MODELS = {
         "deepseek-chat": 0.04,
@@ -192,20 +194,21 @@ class DeepSeekBackend(LLMBackend):
         "deepseek-reasoner": 0.06,
     }
 
+
 def __init__(self, name, model="deepseek-chat"):
     super().__init__(name)
     self.api_key = "<DeepSeek API Key>"
     self.model = model
-    self.client = openai.OpenAI(api_key=self.api_key, base_url="https://api.deepseek.com/v1")
+    self.client = openai.OpenAI(api_key=self.api_key,
+                                base_url="https://api.deepseek.com/v1")
     self.logger.info(f"Using DeepSeek model: {self.model}")
+
 
 def generate_response(self, messages):
     try:
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            stream=False
-        )
+        response = self.client.chat.completions.create(model=self.model,
+                                                       messages=messages,
+                                                       stream=False)
         response_text = response.choices[0].message.content.strip()
         self.log_tokens(messages, response_text)
         return response_text
@@ -238,6 +241,7 @@ class StubBackend(LLMBackend):
         # if True:
         if random.choice([True, False]):
             sequence = (
+                "<animation>"
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                 "<xsequence BaseChannel=\"0\" ChanCtrlBasic=\"0\" ChanCtrlColor=\"0\" FixedPointTiming=\"1\" ModelBlending=\"true\">"
                 "<head>"
@@ -246,10 +250,10 @@ class StubBackend(LLMBackend):
                 "<steps>"
                 "<step>"
                 "<number>1</number>"
-                "<animation>Simple Animation</animation>"
                 "</step>"
                 "</steps>"
-                "</xsequence>")
+                "</xsequence>"
+                "</animation>")
             response_text += f"\n{sequence}"
 
         self.log_tokens(messages, response_text)

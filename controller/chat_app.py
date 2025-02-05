@@ -166,7 +166,7 @@ def communicate_with_backend(user_message):
     global controller
     replies = controller.communicate(user_message)
 
-    for tag, system_reply in replies.items():
+    for tag, system_reply in replies:
         if tag == 'assistant':
             append_message_to_window('Assistant', system_reply)
         elif tag == 'system':

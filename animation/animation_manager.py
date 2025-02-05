@@ -8,7 +8,9 @@ from animation.frameworks.sequence import Sequence
 from animation.knowledge import knowledge_prompts
 import os
 
+
 class AnimationManager:
+
     def __init__(self, framework_name, message_streamer):
         self.framework_name = framework_name
         self.framework: Framework = None
@@ -29,14 +31,12 @@ class AnimationManager:
     def get_prompt(self):
         return self.framework.get_prompt()
 
-    def process_animation(self, animation_sequence):
-        self.framework.process_animation(animation_sequence)
-
     def store_temp_animation(self, animation_sequence):
         output_dir = ANIMATION_OUT_TEMP_DIR
         os.makedirs(output_dir, exist_ok=True)
-        
-        temp_file_path = self.framework.build_temp_animation_file_path(output_dir)
+
+        temp_file_path = self.framework.build_temp_animation_file_path(
+            output_dir)
         abs_temp_file_path = os.path.abspath(temp_file_path)
 
         with open(abs_temp_file_path, "w") as temp_file:
@@ -50,20 +50,26 @@ class AnimationManager:
             if os.path.exists(absolute_path):
                 os.remove(absolute_path)
                 if not os.path.exists(absolute_path):
-                    print(f"Logger: Temp file {absolute_path} was successfully deleted.")
+                    print(
+                        f"Logger: Temp file {absolute_path} was successfully deleted."
+                    )
                 else:
-                    print(f"Logger: Error: Temp file {absolute_path} still exists after deletion attempt.")
+                    print(
+                        f"Logger: Error: Temp file {absolute_path} still exists after deletion attempt."
+                    )
             else:
                 print(f"Logger: Temp file {absolute_path} does not exist.")
         except Exception as e:
-            print(f"Logger: An error occurred while deleting {absolute_path}: {e}")
+            print(
+                f"Logger: An error occurred while deleting {absolute_path}: {e}"
+            )
 
     def get_world_structure(self):
         return self.framework.get_world_structure()
 
     def get_general_knowledge(self):
         return "".join(knowledge_prompts)
-    
+
     def get_domain_knowledge(self):
         return self.framework.get_domain_knowledge()
 
@@ -77,4 +83,15 @@ class AnimationManager:
         self.sequence_manager.load_sequences(animations)
 
     def add_sequence(self, step_number, animation_sequence):
-        return self.sequence_manager.add_sequence(step_number, animation_sequence)
+        return self.sequence_manager.add_sequence(step_number,
+                                                  animation_sequence)
+
+    def save_all_animations(self, snapshot_dir):
+        """Save all animations to the specified directory."""
+        all_animations = self.get_all_sequences()
+        animations_dir = os.path.join(snapshot_dir, "animations")
+        os.makedirs(animations_dir, exist_ok=True)
+        for i, animation in enumerate(all_animations, start=1):
+            animation_file = os.path.join(animations_dir, f"animation_{i}.txt")
+            with open(animation_file, "w") as file:
+                file.write(animation)

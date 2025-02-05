@@ -49,7 +49,5 @@ Use colors and their combinations to evoke desired emotions and match the musicâ
 """
 
 knowledge_prompts = [
-    song_structure_prompt,
-    timing_knowledge_prompt,
-    color_knowledge_prompt
+    song_structure_prompt, timing_knowledge_prompt, color_knowledge_prompt
 ]
