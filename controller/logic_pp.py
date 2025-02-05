@@ -52,9 +52,11 @@ class LogicPlusPlus:
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
             shutdown_snapshot_dir = os.path.join(
-                self.message_streamer.snapshots_dir, f"snapshot_{timestamp}")
+                self.message_streamer.snapshots_dir,
+                f"{timestamp}_{self.selected_framework}_{self.selected_backend}"
+            )
             os.makedirs(shutdown_snapshot_dir, exist_ok=True)
 
         # Save configuration

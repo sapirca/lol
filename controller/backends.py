@@ -4,7 +4,7 @@ import anthropic
 import google.generativeai as genai
 import logging
 #TODO sapir rename this file
-from secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
+from secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
 GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
 
@@ -194,27 +194,26 @@ class DeepSeekBackend(LLMBackend):
         "deepseek-reasoner": 0.06,
     }
 
+    def __init__(self, name, model="deepseek-chat"):
+        super().__init__(name)
+        self.api_key = DEEP_SEEK_API_KEY
+        self.model = model
+        self.client = openai.OpenAI(api_key=self.api_key,
+                                    base_url="https://api.deepseek.com/v1")
+        self.logger.info(f"Using DeepSeek model: {self.model}")
 
-def __init__(self, name, model="deepseek-chat"):
-    super().__init__(name)
-    self.api_key = "<DeepSeek API Key>"
-    self.model = model
-    self.client = openai.OpenAI(api_key=self.api_key,
-                                base_url="https://api.deepseek.com/v1")
-    self.logger.info(f"Using DeepSeek model: {self.model}")
-
-
-def generate_response(self, messages):
-    try:
-        response = self.client.chat.completions.create(model=self.model,
-                                                       messages=messages,
-                                                       stream=False)
-        response_text = response.choices[0].message.content.strip()
-        self.log_tokens(messages, response_text)
-        return response_text
-    except Exception as e:
-        self.logger.error(f"Error communicating with DeepSeek backend: {e}")
-        return f"Error communicating with DeepSeek backend: {e}"
+    def generate_response(self, messages):
+        try:
+            response = self.client.chat.completions.create(model=self.model,
+                                                           messages=messages,
+                                                           stream=False)
+            response_text = response.choices[0].message.content.strip()
+            self.log_tokens(messages, response_text)
+            return response_text
+        except Exception as e:
+            self.logger.error(
+                f"Error communicating with DeepSeek backend: {e}")
+            return f"Error communicating with DeepSeek backend: {e}"
 
 
 class StubBackend(LLMBackend):
