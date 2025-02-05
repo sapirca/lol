@@ -1,6 +1,8 @@
 from animation.frameworks.sequence import Sequence
 import os
 
+from controller.constants import KIVSEE_ANIMATION_SUFFIX, KIVSEE_TEMP_ANIMATION_FILE
+
 
 class KivseeSequence(Sequence):
 
@@ -9,6 +11,10 @@ class KivseeSequence(Sequence):
         self.sequence_data = None
         self.steps = []
         self._load_sequence_skeleton()
+
+    def build_temp_animation_file_path(self, output_dir):
+        temp_file_path = os.path.join(output_dir, KIVSEE_TEMP_ANIMATION_FILE)
+        return os.path.abspath(temp_file_path)
 
     def _load_sequence_skeleton(self):
         """Load the initial sequence skeleton."""
@@ -19,3 +25,6 @@ class KivseeSequence(Sequence):
             self.steps.append({"step": 0, "sequence": self.sequence_data})
         except Exception as e:
             raise RuntimeError(f"Error loading sequence skeleton: {e}")
+
+    def get_suffix(self):
+        return KIVSEE_ANIMATION_SUFFIX

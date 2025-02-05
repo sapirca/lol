@@ -62,8 +62,11 @@ class LogicPlusPlus:
         with open(snapshot_config_file, "w") as file:
             json.dump(self.config, file, indent=4)
 
+        animation_suffix = self.animation_manager.get_suffix()
+
         # Save all animations using the new method
-        self.animation_manager.save_all_animations(shutdown_snapshot_dir)
+        self.animation_manager.save_all_animations(shutdown_snapshot_dir,
+                                                   animation_suffix)
 
         # Save messages to messages.json
         messages_json_file = os.path.join(shutdown_snapshot_dir,
@@ -168,20 +171,6 @@ class LogicPlusPlus:
 
     def build_prompt(self, intro_prompt, general_knowledge,
                      animation_knowledge, song_structure, world_structure):
-        """
-        Build the initial prompt by combining the intro prompt, general knowledge, animation knowledge,
-        song structure, and world structure.
-
-        Args:
-            intro_prompt (str): The introductory prompt.
-            general_knowledge (str): General knowledge about the system.
-            animation_knowledge (str): Knowledge specific to animations.
-            song_structure (str): The structure of the song.
-            world_structure (str): The structure of the world.
-
-        Returns:
-            str: The combined initial prompt.
-        """
         prompt_parts = [
             intro_prompt, "\n### General Knowledge\n", general_knowledge,
             "\n### Animation Knowledge\n", animation_knowledge,
@@ -240,8 +229,10 @@ class LogicPlusPlus:
 
             initial_prompt_report = (
                 f"Request sent to {self.selected_backend} with the following information"
-                f"\nsong name: {song_name}"
-                f"\nFramework: {self.selected_framework}")
+                f"\n  * General prompt and knowledge files"
+                f"\n  * {self.selected_framework}'s World structure file"
+                f"\n  * {self.selected_framework}'s Animation sequence file"
+                f"\n  * Song name: {song_name}")
 
             self.message_streamer.add_message("system",
                                               initial_prompt_report,

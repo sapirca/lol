@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 
 class Sequence(ABC):
 
-    def add_sequence(self, step_number, sequence_xml):
+    def add_sequence(self, step_number, sequence):
         """Add a new sequence to the manager and log the update."""
-        step = {"step": step_number, "sequence": sequence_xml}
+        step = {"step": step_number, "sequence": sequence}
         self.steps.append(step)
         return f"Animation updated for step {step_number}"
 
@@ -24,3 +24,13 @@ class Sequence(ABC):
         self.steps = []
         for i, sequence in enumerate(sequences):
             self.steps.append({"step": i, "sequence": sequence})
+
+    @abstractmethod
+    def get_suffix(self):
+        """Return the animation suffix for the sequence."""
+        pass
+
+    @abstractmethod
+    def build_temp_animation_file_path(self, output_dir):
+        # Default implementation for building temp animation file path
+        pass

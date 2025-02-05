@@ -10,6 +10,7 @@ import platform
 from controller.constants import ANIMATION_OUT_TEMP_DIR, SNAPSHOTS_DIR
 from controller.constants import TIME_FORMAT
 import threading
+import _tkinter
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -382,10 +383,13 @@ def show_save_popup(proceed_callback, cancel_callback):
 def set_active_chat_button(button):
     global active_chat_button
     if active_chat_button:
-        active_chat_button.config(
-            bg=normal_color)  # Reset color of previous active button
-    button.config(bg=active_color)  # Set color of new active button
+        try:
+            active_chat_button.config(relief="raised")
+        except _tkinter.TclError:
+            pass  # Handle the case where the widget no longer exists
     active_chat_button = button
+    if active_chat_button:
+        active_chat_button.config(relief="sunken")
 
 
 # Create the main window

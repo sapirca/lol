@@ -20,11 +20,11 @@ class AnimationManager:
 
     def _load_animation_framework(self):
         if self.framework_name == 'kivsee':
-            self.framework = KivseeFramework()
             self.sequence_manager = KivseeSequence(KIVSEE_SEQUENCE_PATH)
+            self.framework = KivseeFramework()
         elif self.framework_name == 'xlights':
-            self.framework = XLightsFramework()
             self.sequence_manager = XlightsSequence(XLIGHTS_SEQUENCE_PATH)
+            self.framework = XLightsFramework()
         else:
             raise ValueError(f"Unsupported framework: {self.framework_name}")
 
@@ -35,7 +35,7 @@ class AnimationManager:
         output_dir = ANIMATION_OUT_TEMP_DIR
         os.makedirs(output_dir, exist_ok=True)
 
-        temp_file_path = self.framework.build_temp_animation_file_path(
+        temp_file_path = self.sequence_manager.build_temp_animation_file_path(
             output_dir)
         abs_temp_file_path = os.path.abspath(temp_file_path)
 
@@ -86,12 +86,16 @@ class AnimationManager:
         return self.sequence_manager.add_sequence(step_number,
                                                   animation_sequence)
 
-    def save_all_animations(self, snapshot_dir):
+    def save_all_animations(self, snapshot_dir, animation_suffix):
         """Save all animations to the specified directory."""
         all_animations = self.get_all_sequences()
         animations_dir = os.path.join(snapshot_dir, "animations")
         os.makedirs(animations_dir, exist_ok=True)
         for i, animation in enumerate(all_animations, start=1):
-            animation_file = os.path.join(animations_dir, f"animation_{i}.txt")
+            animation_file = os.path.join(animations_dir,
+                                          f"animation_{i}.{animation_suffix}")
             with open(animation_file, "w") as file:
                 file.write(animation)
+
+    def get_suffix(self):
+        return self.sequence_manager.get_suffix()
