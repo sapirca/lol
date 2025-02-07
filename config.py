@@ -1,3 +1,5 @@
-# config = {"selected_backend": "DeepSeek", "framework": "kivsee"}
-config = {"selected_backend": "GPT", "framework": "kivsee"}
-# config = {"selected_backend": "Gemini", "framework": "kivsee"}
+config = {
+    "selected_backend": "GPT",
+    "framework": "xlights",  #kivsee, xlights
+    'song': 'Jingle Bells',  #  "nikki", "sandstorm", "req", "overthinker"
+}
