@@ -23,6 +23,7 @@ KIVSEE_HOUSE_PATH = "animation/frameworks/kivsee/world_structure.ts"
 KIVSEE_TEMP_ANIMATION_FILE = "temp_animation.ts"
 KIVSEE_SEQUENCE_PATH = "animation/frameworks/kivsee/sequence_skeleton.ts"
 KIVSEE_KNOWLEDGE_PATH = "animation/frameworks/kivsee/knowledge.ts"
+KIVSEE_ADD_ONS_PATH = "animation/frameworks/kivsee/knowledge_add_ons.txt"
 KIVSEE_ANIMATION_SUFFIX = 'ts'
 
 # Xlights

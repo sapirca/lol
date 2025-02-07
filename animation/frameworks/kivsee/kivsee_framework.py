@@ -2,7 +2,7 @@ from animation.frameworks.framework import Framework
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 import os
 import xml.etree.ElementTree as ET
-from controller.constants import KIVSEE_HOUSE_PATH, KIVSEE_KNOWLEDGE_PATH, KIVSEE_TEMP_ANIMATION_FILE, KIVSEE_SEQUENCE_PATH
+from controller.constants import KIVSEE_ADD_ONS_PATH, KIVSEE_HOUSE_PATH, KIVSEE_KNOWLEDGE_PATH, KIVSEE_TEMP_ANIMATION_FILE, KIVSEE_SEQUENCE_PATH
 
 
 class KivseeFramework(Framework):
@@ -24,6 +24,8 @@ class KivseeFramework(Framework):
         try:
             with open(KIVSEE_KNOWLEDGE_PATH, 'r') as file:
                 content = file.read()
+            with open(KIVSEE_ADD_ONS_PATH, 'r') as file:
+                content += file.read()
             return content
         except Exception as e:
             print(f"Logger: Error reading domain knowledge: {e}")

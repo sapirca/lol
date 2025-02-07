@@ -21,10 +21,12 @@ sandstorm_song_prompt = """
 Song: "Sandstorm (Extended Mix)" by Freejak
 
 BPM: 128
+Duration: 5:04 in minutes
+Duration: 304 in seconds
 
 Song structure:
 16 Bars: Intro
-8 Bars: Bridge
+8 Bars: Build up - Minor
 16 Bars: Verse 1
 16 Bars: Build Up 1 (Mello)
 16 Bars: Build Up 2
