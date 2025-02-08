@@ -4,7 +4,7 @@ import animation.songs.structures as song_structures
 class SongProvider:
 
     def __init__(self):
-        pass
+        self.song_names = ["nikki", "sandstorm", "req", "overthinker"]
 
     def get_song_structure(self, song_name):
         match song_name.lower():

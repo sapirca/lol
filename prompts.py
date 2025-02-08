@@ -12,7 +12,7 @@ Objectives:
 8. Provide consistency justification in <consistency_justification> tags.
 
 Response Format:
-Full animation sequence in <animation> tags.
+Full animation sequence in <animation> put here the generated animation, same format as in the exmaple prodvided </animation> tags.
 Actions/tasks in <action_name> tags (e.g., <store_to_memory>User prefers warm colors.</store_to_memory>, <query_user>Color preference?</query_user>).
 Reasoning in <reasoning> tags.
 Consistency justification in <consistency_justification> tags.

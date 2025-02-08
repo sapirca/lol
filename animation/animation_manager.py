@@ -74,7 +74,7 @@ class AnimationManager:
         return self.framework.get_domain_knowledge()
 
     def get_latest_sequence(self):
-        return self.sequence_manager.get_latest_sequence()
+        return f"Latest Animation: <animation> {self.sequence_manager.get_latest_sequence()} </animation>"
 
     def get_all_sequences(self):
         return self.sequence_manager.get_all_sequences()

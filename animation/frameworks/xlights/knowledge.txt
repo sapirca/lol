@@ -69,3 +69,9 @@ Structure of the animation file (.xsq):
         - "Sparkle": Creates a sparkling effect.
         - "Rainbow": Displays a rainbow effect.
         - "Wave": Creates a wave-like motion.
+
+
+
+# Restriction #1:
+do not use duration, use startTime and endTime
+

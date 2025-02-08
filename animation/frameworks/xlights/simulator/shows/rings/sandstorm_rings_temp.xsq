@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xsequence BaseChannel="0" ChanCtrlBasic="0" ChanCtrlColor="0" FixedPointTiming="1"
-  ModelBlending="true">
-  <head>
+ModelBlending="true">
+<head>
     <version>2025.02.1</version>
     <author></author>
     <author-email></author-email>
@@ -16,131 +15,94 @@
     <mediaFile>/Users/sapir/repos/lol/animation/songs/audio/sandstorm.wav</mediaFile>
     <sequenceDuration>304.229</sequenceDuration>
     <imageDir />
-  </head>
-  <nextid>1</nextid>
-  <Jukebox />
-  <ColorPalettes>
-    <ColorPalette>
-      C_BUTTON_Palette1=#FFFFFF,C_BUTTON_Palette2=#FF0000,C_BUTTON_Palette3=#00FF00,C_BUTTON_Palette4=#0000FF,C_BUTTON_Palette5=#FFFF00,C_BUTTON_Palette6=#000000,C_BUTTON_Palette7=#00FFFF,C_BUTTON_Palette8=#FF00FF,C_CHECKBOX_Palette1=1,C_CHECKBOX_Palette2=1</ColorPalette>
-  </ColorPalettes>
-  <EffectDB>
-    <Effect>
-      E_CHOICE_Butterfly_Colors=Rainbow,E_CHOICE_Butterfly_Direction=Normal,E_SLIDER_Butterfly_Chunks=1,E_SLIDER_Butterfly_Skip=2,E_SLIDER_Butterfly_Speed=10,E_SLIDER_Butterfly_Style=1</Effect>
-    <Effect>
-      E_CHECKBOX_Bars_3D=0,E_CHECKBOX_Bars_Gradient=0,E_CHECKBOX_Bars_Highlight=0,E_CHECKBOX_Bars_UseFirstColorForHighlight=0,E_CHOICE_Bars_Direction=up,E_SLIDER_Bars_BarCount=1,E_TEXTCTRL_Bars_Cycles=1.0</Effect>
-    <Effect>
-      E_CHECKBOX_PerNode=0,E_TEXTCTRL_Candle_FlameAgility=2,E_TEXTCTRL_Candle_WindBaseline=30,E_TEXTCTRL_Candle_WindCalmness=2,E_TEXTCTRL_Candle_WindVariability=5</Effect>
-  </EffectDB>
-  <DataLayers>
-    <DataLayer lor_params="0" channel_offset="0" num_channels="0" num_frames="0"
-      data="&lt;rendered: erase-mode&gt;" source="&lt;auto-generated&gt;" name="Nutcracker" />
-  </DataLayers>
-  <DisplayElements>
-    <Element collapsed="0" type="timing" name="New Timing" visible="1" views="Master View"
-      active="1" />
-    <Element collapsed="0" type="model" name="ALL" visible="1" />
-    <Element collapsed="0" type="model" name="odd" visible="1" />
-    <Element collapsed="0" type="model" name="even" visible="1" />
-    <Element collapsed="0" type="model" name="left" visible="1" />
-    <Element collapsed="0" type="model" name="right" visible="1" />
-    <Element collapsed="0" type="model" name="center" visible="1" />
-    <Element collapsed="0" type="model" name="outer" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-5" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-4" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-3" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-7" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-2" visible="1" />
-    <Element collapsed="0" type="model" name="Circle" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-12" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-11" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-10" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-9" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-8" visible="1" />
-    <Element collapsed="0" type="model" name="Circle-6" visible="1" />
-  </DisplayElements>
-  <ElementEffects>
-    <Element type="timing" name="New Timing">
-      <EffectLayer />
-    </Element>
+</head>
+<nextid>1</nextid>
+
+<!-- Intro 16 Bars -->
+<ElementEffects>
     <Element type="model" name="ALL">
-      <EffectLayer>
-        <Effect ref="0" name="Butterfly" startTime="0" endTime="950" palette="0" />
-      </EffectLayer>
+    <EffectLayer>
+        <Effect startTime="0" name="Fade" color="#FFFFFF" duration="1875" />
+        <Effect startTime="1875" name="Fade" color="#FF0000" duration="1875" />
+        <Effect startTime="3750" name="Fade" color="#00FF00" duration="1875" />
+        <Effect startTime="5625" name="Fade" color="#0000FF" duration="1875" />
+        <Effect startTime="7500" name="Fade" color="#FFFF00" duration="1875" />
+        <Effect startTime="9375" name="Fade" color="#00FFFF" duration="1875" />
+        <Effect startTime="11250" name="Fade" color="#FF00FF" duration="1875" />
+        <Effect startTime="13125" name="Fade" color="#FFFFFF" duration="1875" />
+    </EffectLayer>
     </Element>
-    <Element type="model" name="odd">
-      <EffectLayer>
-        <Effect ref="1" name="Bars" startTime="1900" endTime="2900" palette="0" />
-      </EffectLayer>
+</ElementEffects>
+
+<!-- Build Up 1 (8 Bars) -->
+<ElementEffects>
+    <Element type="model" name="ALL">
+    <EffectLayer>
+        <Effect startTime="15000" name="Chase" color="#FF0000" duration="1875" />
+        <Effect startTime="16875" name="Chase" color="#00FF00" duration="1875" />
+        <Effect startTime="18750" name="Chase" color="#0000FF" duration="1875" />
+        <Effect startTime="20625" name="Chase" color="#FFFF00" duration="1875" />
+    </EffectLayer>
     </Element>
-    <Element type="model" name="even">
-      <EffectLayer>
-        <Effect ref="1" name="Bars" startTime="950" endTime="1900" palette="0" />
-      </EffectLayer>
+</ElementEffects>
+
+<!-- Verse 1 (16 Bars) -->
+<ElementEffects>
+    <Element type="model" name="ALL">
+    <EffectLayer>
+        <Effect startTime="22500" name="Twinkle" color="#00FFFF" duration="1875" />
+        <Effect startTime="24375" name="Twinkle" color="#FF00FF" duration="1875" />
+        <Effect startTime="26250" name="Twinkle" color="#FFFFFF" duration="1875" />
+        <Effect startTime="28125" name="Twinkle" color="#FF0000" duration="1875" />
+        <Effect startTime="30000" name="Twinkle" color="#00FF00" duration="1875" />
+        <Effect startTime="31875" name="Twinkle" color="#0000FF" duration="1875" />
+        <Effect startTime="33750" name="Twinkle" color="#FFFF00" duration="1875" />
+        <Effect startTime="35625" name="Twinkle" color="#00FFFF" duration="1875" />
+    </EffectLayer>
     </Element>
-    <Element type="model" name="left">
-      <EffectLayer>
-        <Effect ref="2" name="Candle" startTime="3025" endTime="4000" palette="0" />
-      </EffectLayer>
+</ElementEffects>
+
+<!-- Build Up 2 (16 Bars) -->
+<ElementEffects>
+    <Element type="model" name="ALL">
+    <EffectLayer>
+        <Effect startTime="37500" name="Butterfly" color="#FF0000" duration="1875" />
+        <Effect startTime="39375" name="Butterfly" color="#00FF00" duration="1875" />
+        <Effect startTime="41250" name="Butterfly" color="#0000FF" duration="1875" />
+        <Effect startTime="43125" name="Butterfly" color="#FFFF00" duration="1875" />
+        <Effect startTime="45000" name="Butterfly" color="#00FFFF" duration="1875" />
+        <Effect startTime="46875" name="Butterfly" color="#FF00FF" duration="1875" />
+        <Effect startTime="48750" name="Butterfly" color="#FFFFFF" duration="1875" />
+        <Effect startTime="50625" name="Butterfly" color="#FF0000" duration="1875" />
+    </EffectLayer>
     </Element>
-    <Element type="model" name="right">
-      <EffectLayer>
-        <Effect ref="2" name="Candle" startTime="4000" endTime="4925" palette="0" />
-      </EffectLayer>
+</ElementEffects>
+
+<!-- Drop (24 Bars) -->
+<ElementEffects>
+    <Element type="model" name="ALL">
+    <EffectLayer>
+        <Effect startTime="52500" name="Fireworks" color="#00FF00" duration="1875" />
+        <Effect startTime="54375" name="Fireworks" color="#0000FF" duration="1875" />
+        <Effect startTime="56250" name="Fireworks" color="#FFFF00" duration="1875" />
+        <Effect startTime="58125" name="Fireworks" color="#00FFFF" duration="1875" />
+        <Effect startTime="60000" name="Fireworks" color="#FF00FF" duration="1875" />
+        <Effect startTime="61875" name="Fireworks" color="#FFFFFF" duration="1875" />
+        <Effect startTime="63750" name="Fireworks" color="#FF0000" duration="1875" />
+        <Effect startTime="65625" name="Fireworks" color="#00FF00" duration="1875" />
+    </EffectLayer>
     </Element>
-    <Element type="model" name="center">
-      <EffectLayer />
+</ElementEffects>
+
+<!-- Outro (8 Bars) -->
+<ElementEffects>
+    <Element type="model" name="ALL">
+    <EffectLayer>
+        <Effect startTime="67500" name="Fade" color="#FFFFFF" duration="1875" />
+        <Effect startTime="69375" name="Fade" color="#FF0000" duration="1875" />
+        <Effect startTime="71250" name="Fade" color="#00FF00" duration="1875" />
+        <Effect startTime="73125" name="Fade" color="#0000FF" duration="1875" />
+    </EffectLayer>
     </Element>
-    <Element type="model" name="outer">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-5">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-4">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-3">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-7">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-2">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-12">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-11">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-10">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-9">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-8">
-      <EffectLayer />
-    </Element>
-    <Element type="model" name="Circle-6">
-      <EffectLayer />
-    </Element>
-  </ElementEffects>
-  <lastView>0</lastView>
-  <TimingTags>
-    <Tag number="0" position="-1" />
-    <Tag number="1" position="-1" />
-    <Tag number="2" position="-1" />
-    <Tag number="3" position="-1" />
-    <Tag number="4" position="-1" />
-    <Tag number="5" position="-1" />
-    <Tag number="6" position="-1" />
-    <Tag number="7" position="-1" />
-    <Tag number="8" position="-1" />
-    <Tag number="9" position="-1" />
-  </TimingTags>
+</ElementEffects>
 </xsequence>
