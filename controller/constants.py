@@ -25,7 +25,7 @@ KIVSEE_SEQUENCE_PATH = "animation/frameworks/kivsee/sequence_skeleton.ts"
 KIVSEE_KNOWLEDGE_PATH = "animation/frameworks/kivsee/knowledge.ts"
 KIVSEE_ADD_ONS_PATH = "animation/frameworks/kivsee/knowledge_add_ons.txt"
 KIVSEE_ANIMATION_SUFFIX = 'ts'
-
+KIVSEE_ANIMATION_EXAMPLE = "animation/frameworks/kivsee/knowledge_example"
 # Xlights
 # XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/world_structure.xml"
 XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/simulator/shows/rings/sandstorm_rings.fseq"
