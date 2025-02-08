@@ -16,11 +16,11 @@ MESSAGE_SNAPSHOT_FILE = "messages.json"
 CONFIG_FILE = "config.json"
 
 # Animations
-ANIMATION_OUT_TEMP_DIR = "outputs/animation_output"
+ANIMATION_OUT_TEMP_DIR = "outputs/tmp"
 
 # Kivsee
 KIVSEE_HOUSE_PATH = "animation/frameworks/kivsee/world_structure.ts"
-KIVSEE_TEMP_ANIMATION_FILE = "temp_animation.ts"
+KIVSEE_TEMP_ANIMATION_FILE = "kivsee_tmp.ts"
 KIVSEE_SEQUENCE_PATH = "animation/frameworks/kivsee/sequence_skeleton.ts"
 KIVSEE_KNOWLEDGE_PATH = "animation/frameworks/kivsee/knowledge.ts"
 KIVSEE_ADD_ONS_PATH = "animation/frameworks/kivsee/knowledge_add_ons.txt"
@@ -32,6 +32,6 @@ XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/simulator/shows/rings/sandsto
 # XLIGHTS_SEQUENCE_PATH = "animation/frameworks/xlights/sequence_skeleton.xsq"
 XLIGHTS_SEQUENCE_PATH = "animation/frameworks/xlights/simulator/shows/rings/sandstorm_rings.xsq"
 XLIGHTS_KNOWLEDGE_PATH = "animation/frameworks/xlights/knowledge.txt"
-XLIGHTS_TEMP_ANIMATION_FILE = "temp_animation.xsq"
+XLIGHTS_TEMP_ANIMATION_FILE = "xlights_tmp.xsq"
 XSEQUENCE_TAG = "xsequence"
 XLIGHTS_ANIMATION_SUFFIX = 'xsq'

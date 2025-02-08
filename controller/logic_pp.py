@@ -204,7 +204,8 @@ class LogicPlusPlus:
         latest_sequence = None
         if not self.initial_prompt_added:
             # TODO: Fix prompts / songs / knowledge etc...
-            song_name = "Nikki"
+            song_name = self.config.get("song_name", None)
+            print(f" >>> Song name: {song_name}")
             world_structure = self.animation_manager.get_world_structure()
             general_knowledge = self.animation_manager.get_general_knowledge()
             animation_knowledge = self.animation_manager.get_domain_knowledge()

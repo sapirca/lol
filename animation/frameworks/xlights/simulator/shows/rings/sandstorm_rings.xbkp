@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsequence BaseChannel="0" ChanCtrlBasic="0" ChanCtrlColor="0" FixedPointTiming="1" ModelBlending="true">
+  <head>
+    <version>2025.02.1</version>
+    <author></author>
+    <author-email></author-email>
+    <author-website></author-website>
+    <song></song>
+    <artist></artist>
+    <album></album>
+    <MusicURL></MusicURL>
+    <comment></comment>
+    <sequenceTiming>50 ms</sequenceTiming>
+    <sequenceType>Animation</sequenceType>
+    <mediaFile>/Users/sapir/repos/lol/animation/songs/audio/sandstorm.wav</mediaFile>
+    <sequenceDuration>304.229</sequenceDuration>
+    <imageDir></imageDir>
+  </head>
+  <nextid>1</nextid>
+  <ColorPalettes/>
+  <EffectDB/>
+  <DataLayers>
+    <DataLayer lor_params="0" channel_offset="0" num_channels="0" num_frames="0" data="&lt;rendered: erase-mode&gt;" source="&lt;auto-generated&gt;" name="Nutcracker"/>
+  </DataLayers>
+  <DisplayElements>
+    <Element collapsed="0" type="timing" name="New Timing" visible="1" views="Master View" active="1"/>
+    <Element collapsed="0" type="model" name="ALL" visible="1"/>
+    <Element collapsed="0" type="model" name="odd" visible="1"/>
+    <Element collapsed="0" type="model" name="even" visible="1"/>
+    <Element collapsed="0" type="model" name="left" visible="1"/>
+    <Element collapsed="0" type="model" name="right" visible="1"/>
+    <Element collapsed="0" type="model" name="center" visible="1"/>
+    <Element collapsed="0" type="model" name="outer" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-5" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-4" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-3" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-7" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-2" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-12" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-11" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-10" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-9" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-8" visible="1"/>
+    <Element collapsed="0" type="model" name="Circle-6" visible="1"/>
+  </DisplayElements>
+  <ElementEffects>
+    <Element type="timing" name="New Timing">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="ALL">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="odd">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="even">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="left">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="right">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="center">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="outer">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-5">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-4">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-3">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-7">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-2">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-12">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-11">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-10">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-9">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-8">
+      <EffectLayer/>
+    </Element>
+    <Element type="model" name="Circle-6">
+      <EffectLayer/>
+    </Element>
+  </ElementEffects>
+  <lastView>0</lastView>
+  <TimingTags>
+    <Tag number="0" position="-1"/>
+    <Tag number="1" position="-1"/>
+    <Tag number="2" position="-1"/>
+    <Tag number="3" position="-1"/>
+    <Tag number="4" position="-1"/>
+    <Tag number="5" position="-1"/>
+    <Tag number="6" position="-1"/>
+    <Tag number="7" position="-1"/>
+    <Tag number="8" position="-1"/>
+    <Tag number="9" position="-1"/>
+  </TimingTags>
+</xsequence>
