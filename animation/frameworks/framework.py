@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class Framework(ABC):
 
     def __init__(self):
-        self.prompts = self.load_prompts()
+        pass
 
     @abstractmethod
     def get_world_structure(self):

@@ -27,9 +27,11 @@ KIVSEE_ADD_ONS_PATH = "animation/frameworks/kivsee/knowledge_add_ons.txt"
 KIVSEE_ANIMATION_SUFFIX = 'ts'
 
 # Xlights
-XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/world_structure.xml"
-XLIGHTS_SEQUENCE_PATH = "animation/frameworks/xlights/sequence_skeleton.xsq"
-XLIGHTS_KNOWLEDGE_PATH = "animation/frameworks/xlights/knowledge.py"
+# XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/world_structure.xml"
+XLIGHTS_HOUSE_PATH = "animation/frameworks/xlights/simulator/shows/rings/sandstorm_rings.fseq"
+# XLIGHTS_SEQUENCE_PATH = "animation/frameworks/xlights/sequence_skeleton.xsq"
+XLIGHTS_SEQUENCE_PATH = "animation/frameworks/xlights/simulator/shows/rings/sandstorm_rings.xsq"
+XLIGHTS_KNOWLEDGE_PATH = "animation/frameworks/xlights/knowledge.txt"
 XLIGHTS_TEMP_ANIMATION_FILE = "temp_animation.xsq"
 XSEQUENCE_TAG = "xsequence"
 XLIGHTS_ANIMATION_SUFFIX = 'xsq'
