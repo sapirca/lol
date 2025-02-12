@@ -26,8 +26,19 @@ export class Animation {
     als.run({ animation: this, effectConfig: emptyEffectConfig }, cb);
   }
 
-  public addEffect(effect: Effect) {
+  public addEffect(effect: Effect | Function) {
     const store = als.getStore();
+    if (typeof effect === "function") {
+      for (let i = 0; i < store.elements.length; i++) {
+        const phase = i / store.elements.length * store.phase;
+        const e = effect(phase);
+        this.effects.push({
+          effect: e,
+          elements: [store.elements[i]],
+        });
+      }
+      return;
+    }
     this.effects.push({
       effect,
       elements: store.elements,
@@ -61,33 +72,46 @@ import { Effect } from "./types";
 export const constColor = (hue: number, sat: number, val: number) => {
   const store = als.getStore();
 
-  const constColorEffect: Effect = {
-    effect_config: store.effectConfig,
-    const_color: {
-      color: {
-        hue: hue,
-        sat: sat,
-        val: val
-      }
-    }
-  };
-
-  const { animation } = store;
-  animation.addEffect(constColorEffect);
-}
-// /Users/sapir/repos/led-rings/src/effects/brightness.ts
-import { als } from "../async-local-storage";
-import { Effect } from "./types";
-
-const addEffect = (specificEffectConfig: any) => {
-  const store = als.getStore();
-  const { animation } = store;
-  const effect = {
-    effect_config: store.effectConfig,
-    ...specificEffectConfig,
-  };
-  animation.addEffect(effect);
+  store.animation.addEffect((phase: number) => {
+    const constColorEffect: Effect = {
+      effect_config: store.effectConfig,
+      const_color: {
+        color: {
+          hue: hue + phase,
+          sat: sat,
+          val: val,
+        },
+      },
+    };
+    return constColorEffect;
+  });
 };
+
+export const rainbow = () => {
+  const store = als.getStore();
+
+  store.animation.addEffect((phase: number) => {
+    const rainbowEffect: Effect = {
+      effect_config: store.effectConfig,
+      rainbow: {
+        hue_start: {
+          const_value: {
+            value: 0.0 + phase,
+          },
+        },
+        hue_end: {
+          const_value: {
+            value: 1.0 + phase,
+          },
+        },
+      },
+    };
+    return rainbowEffect;
+  });
+};
+
+// /Users/sapir/repos/led-rings/src/effects/brightness.ts
+import { addEffect } from "./effect";
 
 export const fadeIn = (opt?: { start: number; end: number }) => {
   addEffect({
@@ -186,6 +210,53 @@ export const blink = (opts?: { low: number; high: number }) => {
   });
 };
 
+// /Users/sapir/repos/led-rings/src/effects/motion.ts
+import { phase } from "../phase/phase";
+import { addEffect } from "./effect";
+
+export const snake = () => {
+  addEffect((phase: number) => {
+    return {
+      snake: {
+        head: {
+          linear: {
+            start: phase,
+            end: phase + 1,
+          },
+        },
+        tailLength: {
+          constValue: {
+            value: 1.5,
+          },
+        },
+        cyclic: true,
+      },
+    };
+  });
+};
+
+export const snakeInOut = (opt?: { start: number; end: number }) => {
+  addEffect((phase: number) => {
+    return {
+      snake: {
+        head: {
+          sin: {
+            min: 0,
+            max: 1.5,
+            phase: phase,
+            repeats: 1.0,
+          },
+        },
+        tailLength: {
+          constValue: {
+            value: 1.5,
+          },
+        },
+      },
+    };
+  });
+};
+
 // /Users/sapir/repos/led-rings/src/effects/types.ts
 import { SegmentName } from "../objects/types";
 import { FloatFunction } from "./functions";
@@ -276,8 +347,8 @@ const beatToMs = (beat: number, bpm: number) => {
 export const beats = (startBeat: number, endBeat: number, cb: Function) => {
   const store = als.getStore();
   const { bpm } = store.animation;
-  const startTime = beatToMs(startBeat, bpm);
-  const endTime = beatToMs(endBeat, bpm);
+  const startTime = Math.round(beatToMs(startBeat, bpm));
+  const endTime = Math.round(beatToMs(endBeat, bpm));
   const newStore = {
     ...store,
     effectConfig: {
@@ -306,3 +377,4 @@ export const cycleBeats = (beatsInCycle: number, startBeat: number, endBeat: num
   }
   als.run(newStore, cb);
 }
+

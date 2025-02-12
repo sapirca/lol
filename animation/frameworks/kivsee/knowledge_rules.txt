@@ -9,6 +9,7 @@ prompt = """Create a TypeScript light show animation using the Kivsee Animation 
 Effects follow a structured pipeline: **Beats → Elements → Coloring → Optional Relative Effects** (e.g., brightness, motion).  
 - **Relative effects** (e.g., brightness from `brightness.ts`) modify the existing brightness defined in `coloring.ts`.  
   - Example: `fadeIn({ start: 0.1, end: 0.7 })` scales the current brightness by 0.7.
+  
 - Effects accumulate over the same beat range:
   - If you define:
     ```typescript
@@ -20,9 +21,12 @@ Effects follow a structured pipeline: **Beats → Elements → Coloring → Opti
     The **GREEN** color will override the previous RED, making GREEN the final visible color.
 
 #### 3. Brightness Restrictions
+The LED elements are connected to a power supply, so you must not use a brightness level higher than BRIGHTNESS_MAX at the final brightness. 
+Exceeding this limit will cause the LED controller to crash. 
 - **Coloring effect brightness** (e.g., `constColor` in `coloring.ts`) must be **≤ 0.5** (preferably 0.3) to prevent controller crashes.
 - **Brightness effects** (e.g., `fadeIn`, `fadeOut` in `brightness.ts`) can go up to **1.0**, since they modify the coloring effect's brightness.
-- Use predefined brightness constants:
+  - If coloring effect brightness is 0.7 and the relative brighness end is 0.9 then the final brightness is will result in 0.7*0.9=0.56
+- For readibility you can defined brightness constants and use them, e.g.:
   ```typescript
   OFF = 0.0;
   LOW_BRIGHTNESS = 0.1;
@@ -33,6 +37,7 @@ Effects follow a structured pipeline: **Beats → Elements → Coloring → Opti
 #### 4. Saturation Restrictions
 - Saturation should generally be **≥ 0.8** (`SATURATION_MIN = 0.8`), up to `SATURATION_MAX = 1.0`, to maintain vibrant colors.
 - Use `SATURATION_WHITE = 0.0` for white light.
+- Saturation below 0.8 might appear dull and less appealing.
 
 #### 5. Color Constants
 Define hue constants at the top of your TypeScript file:
@@ -102,43 +107,7 @@ const testSequence = async () => {
 """
 
 
-__________________________________
-
-Knowledge #4: 
-The relative effects are relative to the coloring values, 
-e.g. if coloring effect brightness is 0.7 and the relative brighness end is 0.9 then the final brightness is will result in 0.7*0.9=0.56
-fadeIn({ start: 0.1, end: 0.7 }); // Brightness increase multiplying the current brighness in 0.7
-
-
-Restriction #1 - Brightness range
-The LED elements are connected to a power supply, so you must not use a brightness level higher than BRIGHTNESS_MAX. Exceeding this limit will cause the LED controller to crash. The permissible brightness levels are:
-
-const OFF = 0.0
-const LOW_BRIGHTNESS = 0.1
-const MEDIUM_BRIGHTNESS = 0.3
-const HIGH_BRIGHTNESS = 0.5
-const BRIGHTNESS_MAX = 0.5
-
-
-In the brigthness effects (brighness.ts file)
-use brightness high: 1.0 
-
-To summarize: 
-in coloring effect brightness must be at the most 0.5, most preferbly brightness: 0.3, in brightness effects it can reach 1.0
-So constColor
-import { constColor } from "./effects/coloring";
-from the coloring file, must receive at the most 0.5 in the val (brightness value)
-In the fadein for example, from the brightness file
-import { fadeIn, fadeOut } from "./effects/brightness";
-You can use brighness of 1.0
-
-Restriction #2 - Saturation range
-
-If the saturation is below 0.7-0.8, the colors will appear dull and less vibrant. Use low saturation sparingly, mainly for creating moody or subdued animations. It is generally recommended to avoid using low saturation. 
-const SATURATION_MAX = 1.0
-const SATURATION_MIN = 0.8
-const SATURATION_WHITE = 0.0
-
+__________________________________________________________________________________________________________________________________________________________________________
 
 
 Restriction #4
