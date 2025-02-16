@@ -1,6 +1,6 @@
 import random
 from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend, DeepSeekBackend
-from prompts import intro_prompt
+from prompt import intro_prompt
 from animation.songs.song_provider import SongProvider
 import xml.etree.ElementTree as ET
 from interpreter import Interpreter
@@ -173,12 +173,21 @@ class LogicPlusPlus:
 
     def build_prompt(self, intro_prompt, general_knowledge,
                      animation_knowledge, song_structure, world_structure):
-        prompt_parts = [
-            intro_prompt, "\n### General Knowledge\n", general_knowledge,
-            "\n### Animation Knowledge\n", animation_knowledge,
-            "\n### Song Structure\n", song_structure,
-            "\n### World Structure\n", world_structure
-        ]
+        prompt_parts = []
+        if intro_prompt:
+            prompt_parts.append(intro_prompt)
+        if general_knowledge:
+            prompt_parts.append("\n### General Knowledge\n")
+            prompt_parts.append(general_knowledge)
+        if animation_knowledge:
+            prompt_parts.append("\n### Animation Knowledge\n")
+            prompt_parts.append(animation_knowledge)
+        if song_structure:
+            prompt_parts.append("\n### Song Structure\n")
+            prompt_parts.append(song_structure)
+        if world_structure:
+            prompt_parts.append("\n### World Structure\n")
+            prompt_parts.append(world_structure)
         return "\n".join(prompt_parts)
 
     def communicate(self, user_input):
@@ -203,7 +212,6 @@ class LogicPlusPlus:
 
         latest_sequence = None
         if not self.initial_prompt_added:
-            # TODO: Fix prompts / songs / knowledge etc...
             song_name = self.config.get("song_name", None)
             if (song_name is None) or (song_name
                                        not in self.song_provider.song_names):
@@ -218,8 +226,9 @@ class LogicPlusPlus:
             song_structure = self.song_provider.get_song_structure(song_name)
 
             # Get the song from the song provider
-            initial_prompt = self.build_prompt(intro_prompt, general_knowledge,
+            initial_prompt = self.build_prompt(intro_prompt,
                                                animation_knowledge,
+                                               general_knowledge,
                                                song_structure, world_structure)
 
             # Ensure the main instructions are always sent to the LLM for proper context.

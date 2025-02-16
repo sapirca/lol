@@ -16,6 +16,9 @@ import _tkinter
 USER_ALIGNMENT = "left"
 SYSTEM_ALIGNMENT = "left"
 
+# CHAT_FONT = "Helvetica"
+CHAT_FONT = "Verdana"
+
 # Global variables
 active_chat_snapshot = None
 controller = None  # Will be initialized dynamically based on selected snapshot
@@ -152,7 +155,12 @@ def send_message(event=None):
 
     if user_message:
         chat_window.config(state=tk.NORMAL)
-        send_button.config(state=tk.DISABLED)  # Disable send button
+        send_button.config(
+            state=tk.DISABLED,
+            text="Waiting...",
+            foreground="black",
+            background="grey"
+        )  # Disable send button and change text color to black
         user_input.unbind("<Return>")  # Disable Enter key
         append_message_to_window("You", user_message)
 
@@ -177,7 +185,7 @@ def communicate_with_backend(user_message):
 
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
-    send_button.config(state=tk.NORMAL)
+    send_button.config(state=tk.NORMAL, text="Send")
     user_input.bind("<Return>", handle_keypress)
 
 
@@ -415,7 +423,7 @@ active_chat_label = tk.Label(top_bar,
                              fg="#ffffff",
                              bg="#2c2c2c",
                              anchor="w",
-                             font=("Helvetica", 12))
+                             font=(CHAT_FONT, 12))
 active_chat_label.pack(side=tk.LEFT, padx=5)
 
 # Add a status label for saving feedback
@@ -423,7 +431,7 @@ save_status_label = tk.Label(top_bar,
                              text="",
                              fg="light gray",
                              bg="#2c2c2c",
-                             font=("Helvetica", 10))
+                             font=(CHAT_FONT, 10))
 save_status_label.pack(side=tk.LEFT, padx=10)
 
 # Add a save button for snapshots
@@ -438,7 +446,23 @@ chat_window = scrolledtext.ScrolledText(chat_frame,
                                         width=50,
                                         bg="#2c2c2c",
                                         fg="#ffffff",
-                                        insertbackground="#ffffff")
+                                        insertbackground="#ffffff",
+                                        font=(CHAT_FONT, 16))
+# chat_window.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+
+def zoom(event, widget):
+    current_font_size = widget.cget("font").split()[-1]
+    new_font_size = int(current_font_size) + (1 if event.delta > 0 else -1)
+    new_font_size = max(8, new_font_size)  # Set a minimum font size
+    widget.config(font=(CHAT_FONT, new_font_size))
+
+
+chat_window.bind("<Control-MouseWheel>", lambda e: zoom(e, chat_window))
+chat_window.bind("<Control-Button-4>",
+                 lambda e: zoom(e, chat_window))  # For Linux
+chat_window.bind("<Control-Button-5>",
+                 lambda e: zoom(e, chat_window))  # For Linux
 
 # Create a context menu for right-click
 context_menu = tk.Menu(chat_window, tearoff=0)
@@ -458,19 +482,31 @@ chat_window.bind("<Button-2>", show_context_menu)
 chat_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the input
-input_frame = tk.Frame(chat_frame)
-input_frame.pack(padx=10, pady=10, fill=tk.X)
+# input_frame = tk.Frame(chat_frame)
+input_frame = tk.Frame(chat_frame,
+                       height=10)  # Adjusted height to allow more space
+input_frame.pack(padx=10, pady=10, fill=tk.BOTH)
+
+send_button = tk.Button(input_frame, text="Send", command=send_message)
+send_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
 # Create a text widget for user input
-user_input = tk.Text(input_frame, height=3, wrap=tk.WORD)
+user_input = tk.Text(input_frame, height=5, wrap=tk.WORD,
+                     font=(CHAT_FONT,
+                           16))  # Adjusted height to allow 2-3 lines of text
 user_input.pack(side=tk.LEFT, padx=5, pady=5, fill=tk.X, expand=True)
 user_input.bind("<Return>", handle_keypress)
 user_input.bind("<Shift-Return>",
                 lambda event: None)  # Allow new line on Shift+Enter
 
-# Create a send button
-send_button = tk.Button(input_frame, text="Send", command=send_message)
-send_button.pack(side=tk.RIGHT, padx=5, pady=5)
+# Ensure the input_frame size is not being squeezed by other elements
+# input_frame.pack_propagate(False)
+
+user_input.bind("<Control-MouseWheel>", lambda e: zoom(e, user_input))
+user_input.bind("<Control-Button-4>",
+                lambda e: zoom(e, user_input))  # For Linux
+user_input.bind("<Control-Button-5>",
+                lambda e: zoom(e, user_input))  # For Linux
 
 # Populate the snapshot list
 populate_snapshot_list()

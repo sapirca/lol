@@ -1,0 +1,135 @@
+kivsee_framework_with_examples = """
+### Kivsee Framework Instructions
+
+#### **Overview**
+
+- Animations are written in TypeScript.
+- Create an animation using the following structure:
+  - An `Animation` class that accepts the **song name**, **BPM**, and **duration** as arguments.
+  - Call the `sync` method and pass an animation sequence callback function.
+
+#### **Example:**
+
+```typescript
+const testSequence = async () => {
+    const testAnimation = new Animation("req", 126, 50);
+    testAnimation.sync(() => {
+        // Define the animation sequence here.
+        // Place your animation code within this block.
+    });
+};
+```
+
+#### **Beats (Time Frames)**
+
+Define time frames within the animation using beats:
+
+- `start_beat`: The beginning of the frame, in beats.
+- `end_beat`: The end of the frame, in beats.
+- `elements_callback`: A function that defines effects for elements within the frame.
+
+```typescript
+beats(start_beat, end_beat, () => {
+     // Define element effects that occur between start_beat and end_beat.
+});
+```
+
+#### **Controlling Elements**
+
+Apply effects to elements using the following format:
+
+```typescript
+    elements([element_list], () => {
+        // Define the effects here.
+    });
+```
+
+- `element_list`: An array of elements to affect.
+- The callback function defines the effects to apply.
+
+#### **Segment-Specific Effects**
+
+Optionally, apply effects to specific segments of elements:
+
+```typescript
+elements([element_list], () => {
+    segment(segment_id, () => {
+        // Define the effects for segment_id here.
+    });
+});
+```
+
+- Targets a specific segment within the specified elements.
+
+#### **Repeating Animations (Cycle Beats)**
+
+Optionally, create looping animations:
+
+```typescript
+cycleBeats(beatsInCycle, startBeat, endBeat, () => {
+    // Define the effect for the cycle here.
+});
+```
+
+- `beatsInCycle`: The total number of beats in one cycle.
+- `startBeat` & `endBeat`: Define the effect's timing within the cycle.
+- The callback function defines the effect.
+
+#### **Example:**
+
+```typescript
+cycleBeats(8, 0, 4, () => constColor(0, 100, 100)); // Red for the first half
+cycleBeats(8, 4, 8, () => constColor(240, 100, 100)); // Blue for the second half
+```
+
+#### **Available Effects**
+
+##### **Coloring**
+
+```typescript
+constColor(hue, sat, val);
+rainbow();
+```
+
+##### **Brightness**
+
+```typescript
+fadeIn({ start, end });
+fadeOut({ start, end });
+fadeInOut({ min, max });
+fadeOutIn({ min, max });
+blink({ low, high });
+```
+
+##### **Motion**
+
+```typescript
+snake();
+snakeInOut({ start, end });
+```
+
+#### **Animation Example:**
+
+```typescript
+const testSequence = async () => {
+  const testAnimation = new Animation("req", 126, 50);
+  testAnimation.sync(() => {
+    beats(0, 120, () => {
+      elements(all, () => {
+          rainbow();
+          segment(segment_b1, () => {
+            cycleBeats(4, 0, 4, () => {
+                fadeOutIn({ min: 0.5 });
+            });
+          });
+          segment(segment_b2, () => {
+          cycleBeats(8, 0, 8, () => {
+              constColor(0.3, 1.0, 0.3);
+              fadeInOut({ min: 0.5, max: 0.9 });
+            });
+        });
+      });
+    });
+  });
+};
+"""
