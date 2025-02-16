@@ -25,6 +25,9 @@ controller = None  # Will be initialized dynamically based on selected snapshot
 active_chat_button = None  # Store the currently active chat button
 button_mapping = {}  # Dictionary to store button references
 
+# Maximum length for button text before breaking into two lines
+MAX_BUTTON_TEXT_LENGTH = 10
+
 
 # Function to detect macOS appearance (light or dark)
 def get_macos_appearance():
@@ -300,6 +303,13 @@ def save_and_load_untitled_chat():
     update_active_chat_label("untitled")
 
 
+def format_button_text(text, max_width):
+    """Format the button text to break into two lines after max_width characters."""
+    if len(text) > max_width:
+        return text[:max_width] + "\n" + text[max_width:]
+    return text
+
+
 def populate_snapshot_list():
     """Populates the snapshot list with a scrollbar and highlights the active chat."""
     for widget in chat_list_frame.winfo_children():
@@ -326,13 +336,19 @@ def populate_snapshot_list():
     global button_mapping
     button_mapping = {}
 
+    max_width = 30  # Default value, will be updated after the first button is created
+
     for snapshot_folder in snapshot_folders:
+        formatted_text = format_button_text(snapshot_folder, max_width)
         snapshot_button = tk.Button(buttons_frame,
-                                    text=snapshot_folder,
+                                    text=formatted_text,
                                     command=lambda folder=snapshot_folder:
                                     save_and_load_chat_content(folder))
         snapshot_button.pack(fill=tk.X, pady=2)
         button_mapping[snapshot_folder] = snapshot_button
+
+        # Update max_width based on the actual button width
+        max_width = max(max_width, snapshot_button.winfo_reqwidth() // 10)
 
     untitled_button = tk.Button(buttons_frame,
                                 text="untitled",
