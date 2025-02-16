@@ -25,9 +25,6 @@ controller = None  # Will be initialized dynamically based on selected snapshot
 active_chat_button = None  # Store the currently active chat button
 button_mapping = {}  # Dictionary to store button references
 
-# Maximum length for button text before breaking into two lines
-MAX_BUTTON_TEXT_LENGTH = 10
-
 
 # Function to detect macOS appearance (light or dark)
 def get_macos_appearance():
@@ -229,11 +226,11 @@ def save_and_load_chat_content(a_snapshot):
     # Check for unsaved changes
     if controller and controller.message_streamer.messages:
         show_save_popup(
-            lambda: [save_chat(), _load_chat(a_snapshot)], lambda: None)
+            lambda: [save_chat(), _load_chat(a_snapshot)],
+            lambda: _load_chat(a_snapshot))
         root.update()  # Ensure the main loop is updated
 
-    _load_chat(a_snapshot)
-    update_active_chat_label(a_snapshot)
+        update_active_chat_label(a_snapshot)
 
 
 def _load_chat(a_snapshot):
@@ -282,13 +279,19 @@ def print_system_info():
 def save_and_load_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
     global controller, active_chat_snapshot
-    if controller:
-        show_save_popup(save_chat(), lambda: None)
+    if controller and controller.message_streamer.messages:
+        show_save_popup(
+            lambda: [save_chat(), _load_untitled_chat()],
+            lambda: _load_untitled_chat())
         root.update()  # Ensure the main loop is updated
+    else:
+        _load_untitled_chat()
 
-    if controller is None or active_chat_snapshot != "untitled":
-        controller = LogicPlusPlus()
-        active_chat_snapshot = "untitled"
+
+def _load_untitled_chat():
+    global controller, active_chat_snapshot
+    controller = LogicPlusPlus()
+    active_chat_snapshot = "untitled"
 
     chat_window.config(state=tk.NORMAL)
     chat_window.delete("1.0", tk.END)
@@ -388,12 +391,17 @@ def show_save_popup(proceed_callback, cancel_callback):
     button_frame.pack(pady=10)
 
     def on_yes():
-        proceed_callback()
         unsaved_warning.destroy()
+        proceed_callback()
 
     def on_no():
-        cancel_callback()
         unsaved_warning.destroy()
+        cancel_callback()
+
+    def on_close():
+        unsaved_warning.destroy()
+
+        unsaved_warning.protocol("WM_DELETE_WINDOW", on_close)
 
     yes_button = tk.Button(button_frame, text="Yes", command=on_yes)
     yes_button.pack(side=tk.LEFT, padx=5)
@@ -421,13 +429,16 @@ root = tk.Tk()
 root.title("Chat App")
 root.geometry("1000x500")
 
-# Create a frame for the left chat list
-chat_list_frame = tk.Frame(root, bg="#2c2c2c")
-chat_list_frame.pack(side=tk.LEFT, fill=tk.Y)
+# Create a PanedWindow to make the divider adjustable
+paned_window = tk.PanedWindow(root, orient=tk.HORIZONTAL)
+paned_window.pack(fill=tk.BOTH, expand=True)
 
-# Create a frame for the chat window
-chat_frame = tk.Frame(root)
-chat_frame.pack(side=tk.RIGHT, padx=10, pady=10, fill=tk.BOTH, expand=True)
+# Create a frame for the left chat list
+chat_list_frame = tk.Frame(paned_window, bg="#2c2c2c")
+paned_window.add(chat_list_frame, minsize=200, width=210)
+
+chat_frame = tk.Frame(paned_window)
+paned_window.add(chat_frame, minsize=400)
 
 # Create a frame for the top bar
 top_bar = tk.Frame(chat_frame, bg="#2c2c2c")
