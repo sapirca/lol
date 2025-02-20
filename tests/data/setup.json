@@ -1,0 +1,13 @@
+{
+    "prompt": "Design a synchronized light sequence for an EDM track, tailored for a physical art installation composed of interactive elements. Art Installation: A \"World\" consists of multiple physical objects called Elements. Each Element has an LED controller. You will receive the Elements' names and spatial arrangement. Music: An EDM track breakdown will be provided, including musical phrases (e.g., Intro, Breakdown, Build, Drop, Outro) and their duration in bars. Musical Intent: Each phrase conveys a specific emotional intent: Intro: Evoke intrigue. Breakdown: Build tension. Build: Increase anticipation. Drop: Release explosive energy and excitement. Outro: Provide a sense of closure. Synchronization: The light sequence must visually reflect the emotional intent of each phrase. LED Control: Each Element can be lit with a specific color and brightness. You can control entire Elements or specific LED segments within the strip.",
+    "song": {
+        "name": "{song_name}",
+        "duration": "{song_duration}",
+        "structure": [
+            {
+                "phase_name": "{phase_name}",
+                "phase_length_bars": "{phase_length_bars}"
+            }
+        ]
+    }
+}

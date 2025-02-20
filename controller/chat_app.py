@@ -475,7 +475,6 @@ chat_window = scrolledtext.ScrolledText(chat_frame,
                                         fg="#ffffff",
                                         insertbackground="#ffffff",
                                         font=(CHAT_FONT, 16))
-# chat_window.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
 
 def zoom(event, widget):

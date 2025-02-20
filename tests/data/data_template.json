@@ -1,0 +1,290 @@
+{
+  "tests": [
+    {
+      "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK",
+      "difficulty": "Simple",
+      "expected_output": {
+        "animation": {
+          "name": "ANY",
+          "duration": "ANY",
+          "beats": [
+            {
+              "beat_start": "0",
+              "beat_end": "4",
+              "elements": {
+                "ring1": {
+                  "coloring": {
+                    "color": "HUE_PINK"
+                  },
+                  // "brightness": {
+                  //   "type": "const",
+                  //   "value": 1.0
+                  // },
+                  // "motion": {
+                  //   "type": "none"
+                  // } ---> Or ANY? 
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK, song name is pink_const_color_ring1, duration 100 secs",
+      "difficulty": "Simple",
+      "expected_output": {
+        "animation": {
+          "name": "pink_const_color_ring1",
+          "duration": 100,
+          "beats": [
+            {
+              "beat_start": "0",
+              "beat_end": "4",
+              "elements": {
+                "ring1": {
+                  "coloring": {
+                    "color": "HUE_PINK"
+                  },
+                  // "brightness": {
+                  //   "type": "const",
+                  //   "value": 1.0
+                  // },
+                  // "motion": {
+                  //   "type": "none"
+                  // }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "instruction": "Generate animation for beats 5-8 that turns off ring6",
+      "difficulty": "Simple",
+      "expected_output": {
+        "animation": {
+          "name": "ANY",
+          "duration": "ANY",
+          "beats": [
+            {
+              "beat_start": "5",
+              "beat_end": "8",
+              "elements": {
+                "ring6": {
+                  // "coloring": {
+                  //   "type": "solid",
+                  //   "color": "#000000"
+                  // },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 0.0
+                  },
+                  // "motion": {
+                  //   "type": "none"
+                  // }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "instruction": "Generate animation that lit ALL elements in constcolor {color} for the entire duration of the song, which is 10 beats",
+      "difficulty": "Simple",
+      "expected_output": {
+        "animation": {
+          "name": "Test Animation",
+          "duration": 10,
+          "beats": [
+            {
+              "beat_start": "0",
+              "beat_end": "10",
+              "element_groups": {
+                "all": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "{color}"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "instruction": "Create an animation where ring12's color cycles through 8 hues, synchronized to a beat, starting with HUE_PINK, during the first 8 bars.",
+      "difficulty": "Moderate",
+      "expected_output": {
+        "animation": {
+          "name": "Test Animation",
+          "duration": 8,
+          "beats": [
+            {
+              "beat_start": "0",
+              "beat_end": "1",
+              "elements": {
+                "odd": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_PINK"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            },
+            {
+              "beat_start": "1",
+              "beat_end": "2",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_RED"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            },
+            {
+              "beat_start": "2",
+              "beat_end": "3",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_ORANGE"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            },
+            {
+              "beat_start": "3",
+              "beat_end": "4",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_YELLOW"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            },
+            {
+              "beat_start": "4",
+              "beat_end": "5",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_GREEN"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            },
+            {
+              "beat_start": "5",
+              "beat_end": "6",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_AQUA"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            },
+            {
+              "beat_start": "6",
+              "beat_end": "7",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_BLUE"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            },
+            {
+              "beat_start": "7",
+              "beat_end": "8",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "type": "solid",
+                    "color": "HUE_PURPLE"
+                  },
+                  "brightness": {
+                    "type": "constant",
+                    "value": 1.0
+                  },
+                  "motion": {
+                    "type": "none"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

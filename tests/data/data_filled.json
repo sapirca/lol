@@ -1,0 +1,279 @@
+{
+    "tests": [
+        {
+            "instruction": "Generate animation for bars 3-4 that lit odd in constcolor HUE_ORANGE",
+            "difficulty": "Simple",
+            "expected_output": {
+                "animation": {
+                    "name": "Test Animation",
+                    "duration": 4,
+                    "beats": [
+                        {
+                            "beat_start": 12,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "prompt": "Design a synchronized light sequence for an EDM track, tailored for a physical art installation composed of interactive elements. Art Installation: A \"World\" consists of multiple physical objects called Elements. Each Element has an LED controller. You will receive the Elements' names and spatial arrangement. Music: An EDM track breakdown will be provided, including musical phrases (e.g., Intro, Breakdown, Build, Drop, Outro) and their duration in bars. Musical Intent: Each phrase conveys a specific emotional intent: Intro: Evoke intrigue. Breakdown: Build tension. Build: Increase anticipation. Drop: Release explosive energy and excitement. Outro: Provide a sense of closure. Synchronization: The light sequence must visually reflect the emotional intent of each phrase. LED Control: Each Element can be lit with a specific color and brightness. You can control entire Elements or specific LED segments within the strip.\n\nSong: Song C\nDuration: 300\nStructure: [{'phase_name': 'Intro', 'phase_length_bars': 8}, {'phase_name': 'Verse', 'phase_length_bars': 16}, {'phase_name': 'Chorus', 'phase_length_bars': 8}, {'phase_name': 'Solo', 'phase_length_bars': 16}, {'phase_name': 'Outro', 'phase_length_bars': 8}]\n\nYou Task: Generate animation for bars 3-4 that lit odd in constcolor HUE_ORANGE"
+        },
+        {
+            "instruction": "Generate animation for beats 4-8 that turns off odd",
+            "difficulty": "Simple",
+            "expected_output": {
+                "animation": {
+                    "name": "Test Animation",
+                    "duration": 4,
+                    "beats": [
+                        {
+                            "beat_start": 4,
+                            "beat_end": 8,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "#000000"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 0.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "prompt": "Design a synchronized light sequence for an EDM track, tailored for a physical art installation composed of interactive elements. Art Installation: A \"World\" consists of multiple physical objects called Elements. Each Element has an LED controller. You will receive the Elements' names and spatial arrangement. Music: An EDM track breakdown will be provided, including musical phrases (e.g., Intro, Breakdown, Build, Drop, Outro) and their duration in bars. Musical Intent: Each phrase conveys a specific emotional intent: Intro: Evoke intrigue. Breakdown: Build tension. Build: Increase anticipation. Drop: Release explosive energy and excitement. Outro: Provide a sense of closure. Synchronization: The light sequence must visually reflect the emotional intent of each phrase. LED Control: Each Element can be lit with a specific color and brightness. You can control entire Elements or specific LED segments within the strip.\n\nSong: Song C\nDuration: 300\nStructure: [{'phase_name': 'Intro', 'phase_length_bars': 8}, {'phase_name': 'Verse', 'phase_length_bars': 16}, {'phase_name': 'Chorus', 'phase_length_bars': 8}, {'phase_name': 'Solo', 'phase_length_bars': 16}, {'phase_name': 'Outro', 'phase_length_bars': 8}]\n\nYou Task: Generate animation for beats 4-8 that turns off odd"
+        },
+        {
+            "instruction": "Generate animation that lit ALL elements in constcolor HUE_ORANGE for the entire duration of the song, which is {duration} beats",
+            "difficulty": "Simple",
+            "expected_output": {
+                "animation": {
+                    "name": "Test Animation",
+                    "duration": 10,
+                    "beats": [
+                        {
+                            "beat_start": 0,
+                            "beat_end": 4,
+                            "element_groups": {
+                                "all": {
+                                    "elements": [
+                                        "ring1",
+                                        "ring2",
+                                        "ring3",
+                                        "ring4",
+                                        "ring5",
+                                        "ring6",
+                                        "ring7",
+                                        "ring8",
+                                        "ring9",
+                                        "ring10",
+                                        "ring11",
+                                        "ring12"
+                                    ],
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "prompt": "Design a synchronized light sequence for an EDM track, tailored for a physical art installation composed of interactive elements. Art Installation: A \"World\" consists of multiple physical objects called Elements. Each Element has an LED controller. You will receive the Elements' names and spatial arrangement. Music: An EDM track breakdown will be provided, including musical phrases (e.g., Intro, Breakdown, Build, Drop, Outro) and their duration in bars. Musical Intent: Each phrase conveys a specific emotional intent: Intro: Evoke intrigue. Breakdown: Build tension. Build: Increase anticipation. Drop: Release explosive energy and excitement. Outro: Provide a sense of closure. Synchronization: The light sequence must visually reflect the emotional intent of each phrase. LED Control: Each Element can be lit with a specific color and brightness. You can control entire Elements or specific LED segments within the strip.\n\nSong: Song C\nDuration: 300\nStructure: [{'phase_name': 'Intro', 'phase_length_bars': 8}, {'phase_name': 'Verse', 'phase_length_bars': 16}, {'phase_name': 'Chorus', 'phase_length_bars': 8}, {'phase_name': 'Solo', 'phase_length_bars': 16}, {'phase_name': 'Outro', 'phase_length_bars': 8}]\n\nYou Task: Generate animation that lit ALL elements in constcolor HUE_ORANGE for the entire duration of the song, which is {duration} beats"
+        },
+        {
+            "instruction": "Create an animation where odd's color cycles through 8 hues, synchronized to a beat, starting with HUE_ORANGE, during the first 8 bars.",
+            "difficulty": "Moderate",
+            "expected_output": {
+                "animation": {
+                    "name": "Test Animation",
+                    "duration": 8,
+                    "beats": [
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "beat_start": 8,
+                            "beat_end": 16,
+                            "elements": {
+                                "{element_or_group_name}": {
+                                    "coloring": {
+                                        "type": "solid",
+                                        "color": "HUE_ORANGE"
+                                    },
+                                    "brightness": {
+                                        "type": "constant",
+                                        "value": 1.0
+                                    },
+                                    "motion": {
+                                        "type": "none"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "prompt": "Design a synchronized light sequence for an EDM track, tailored for a physical art installation composed of interactive elements. Art Installation: A \"World\" consists of multiple physical objects called Elements. Each Element has an LED controller. You will receive the Elements' names and spatial arrangement. Music: An EDM track breakdown will be provided, including musical phrases (e.g., Intro, Breakdown, Build, Drop, Outro) and their duration in bars. Musical Intent: Each phrase conveys a specific emotional intent: Intro: Evoke intrigue. Breakdown: Build tension. Build: Increase anticipation. Drop: Release explosive energy and excitement. Outro: Provide a sense of closure. Synchronization: The light sequence must visually reflect the emotional intent of each phrase. LED Control: Each Element can be lit with a specific color and brightness. You can control entire Elements or specific LED segments within the strip.\n\nSong: Song C\nDuration: 300\nStructure: [{'phase_name': 'Intro', 'phase_length_bars': 8}, {'phase_name': 'Verse', 'phase_length_bars': 16}, {'phase_name': 'Chorus', 'phase_length_bars': 8}, {'phase_name': 'Solo', 'phase_length_bars': 16}, {'phase_name': 'Outro', 'phase_length_bars': 8}]\n\nYou Task: Create an animation where odd's color cycles through 8 hues, synchronized to a beat, starting with HUE_ORANGE, during the first 8 bars."
+        }
+    ]
+}
