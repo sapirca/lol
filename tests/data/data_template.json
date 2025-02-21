@@ -16,13 +16,98 @@
                   "coloring": {
                     "color": "HUE_PINK"
                   },
-                  // "brightness": {
-                  //   "type": "const",
-                  //   "value": 1.0
-                  // },
-                  // "motion": {
-                  //   "type": "none"
-                  // } ---> Or ANY? 
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    // Ambiguity questions
+    // {
+    //   "instruction": "Generate animation for 1-5 seconds that lit ring12 in const color HUE_RED.",
+    //   "difficulty": "Simple",
+    //   "expected_output": {
+    //     "query_user": "Missing information.... What is the BPM? "
+    //   }
+    // },
+    {
+      "instruction": "Generate animation for bars 1-5 that lit ring12 in const color RED",
+      "difficulty": "Simple",
+      "expected_output": {
+        "animation": {
+          "name": "ANY",
+          "duration": "ANY",
+          "beats": [
+            {
+              "beat_start": "4",
+              "beat_end": "20",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "color": "HUE_RED"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "instruction": "Generate animation for bars 1-5 that lit ring12 in const color RED",
+      "difficulty": "Simple",
+      "expected_output": {
+        "animation": {
+          "name": "ANY",
+          "duration": "ANY",
+          "beats": [
+            {
+              "beat_start": "4",
+              "beat_end": "20",
+              "elements": {
+                "ring12": {
+                  "coloring": {
+                    "color": "HUE_RED"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "instruction": "Generate animation for bars 1-5 that lit all rings from ring9 until ring12 in const color HUE_RED.",
+      "difficulty": "Simple",
+      "expected_output": {
+        "animation": {
+          "name": "ANY",
+          "duration": "ANY",
+          "beats": [
+            {
+              "beat_start": "4",
+              "beat_end": "20",
+              "elements": {
+                "ring9": {
+                  "coloring": {
+                    "color": "HUE_RED"
+                  }
+                },
+                "ring10": {
+                  "coloring": {
+                    "color": "HUE_RED"
+                  }
+                },
+                "ring11": {
+                  "coloring": {
+                    "color": "HUE_RED"
+                  }
+                },
+                "ring12": {
+                  "coloring": {
+                    "color": "HUE_RED"
+                  }
                 }
               }
             }
@@ -32,7 +117,7 @@
     },
     {
       "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK, song name is pink_const_color_ring1, duration 100 secs",
-      "difficulty": "Simple",
+      "difficulty": "Moderate",
       "expected_output": {
         "animation": {
           "name": "pink_const_color_ring1",
@@ -73,10 +158,6 @@
               "beat_end": "8",
               "elements": {
                 "ring6": {
-                  // "coloring": {
-                  //   "type": "solid",
-                  //   "color": "#000000"
-                  // },
                   "brightness": {
                     "type": "constant",
                     "value": 0.0
@@ -92,7 +173,7 @@
       }
     },
     {
-      "instruction": "Generate animation that lit ALL elements in constcolor {color} for the entire duration of the song, which is 10 beats",
+      "instruction": "Generate animation that lit ALL elements in const color BLUE for the entire duration of the song, which is 10 seconds, BPM 120",
       "difficulty": "Simple",
       "expected_output": {
         "animation": {
@@ -101,12 +182,12 @@
           "beats": [
             {
               "beat_start": "0",
-              "beat_end": "10",
+              "beat_end": "20",
               "element_groups": {
                 "all": {
                   "coloring": {
                     "type": "solid",
-                    "color": "{color}"
+                    "color": "HUE_BLUE"
                   },
                   "brightness": {
                     "type": "constant",
