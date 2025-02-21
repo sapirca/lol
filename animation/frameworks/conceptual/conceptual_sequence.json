@@ -1,0 +1,81 @@
+{
+  "animation": {
+    "name": "<song_name_provided_by_user>",
+    "duration": "<total_duration_of_song_in_seconds>",
+    "beats": [
+      {
+        "time_start": "<start_beat_value>",
+        "time_end": "<end_beat_value>",
+        "elements": [
+          {
+            "element_group": "<group_name>",
+            "coloring": {
+              "type": "<coloring_effect_type: constColor or rainbow>",
+              "hue": "<hue_value_if_constColor>"
+            },
+            "brightness": {
+              "type": "<brightness_effect_type: fadeIn, fadeOut, fadeInOut, fadeOutIn, blink>",
+              "start": "<start_value_if_fadeIn/fadeOut>",
+              "end": "<end_value_if_fadeIn/fadeOut>",
+              "min": "<min_value_if_fadeInOut/fadeOutIn/blink>",
+              "max": "<max_value_if_fadeInOut/fadeOutIn>",
+              "low": "<low_value_if_blink>",
+              "high": "<high_value_if_blink>"
+            },
+            "motion": {
+              "type": "<motion_effect_type: snake, snakeInOut>",
+              "start": "<start_value_if_snakeInOut>",
+              "end": "<end_value_if_snakeInOut>"
+            }
+          },
+          {
+            "element": "<element_name_2>",
+            "coloring": {
+              "type": "<coloring_effect_type: constColor or rainbow>",
+              "hue": "<hue_value_if_constColor>",
+              "saturation": "<saturation_value_if_constColor>",
+              "value": "<value_if_constColor>"
+            },
+            "brightness": {
+              "type": "<brightness_effect_type: fadeIn, fadeOut, fadeInOut, fadeOutIn, blink>",
+              "start": "<start_value_if_fadeIn/fadeOut>",
+              "end": "<end_value_if_fadeIn/fadeOut>",
+              "min": "<min_value_if_fadeInOut/fadeOutIn/blink>",
+              "max": "<max_value_if_fadeInOut/fadeOutIn>",
+              "low": "<low_value_if_blink>",
+              "high": "<high_value_if_blink>"
+            },
+            "motion": {
+              "type": "<motion_effect_type: snake, snakeInOut>",
+              "start": "<start_value_if_snakeInOut>",
+              "end": "<end_value_if_snakeInOut>"
+            }
+          },
+          {
+            "element_group": ["<element_name_1>", "<element_name_2>", "<element_name_3>"],
+            "coloring": {
+              "type": "<coloring_effect_type: constColor or rainbow>",
+              "hue": "<hue_value_if_constColor>",
+              "saturation": "<saturation_value_if_constColor>",
+              "value": "<value_if_constColor>"
+            },
+            "brightness": {
+              "type": "<brightness_effect_type: fadeIn, fadeOut, fadeInOut, fadeOutIn, blink>",
+              "start": "<start_value_if_fadeIn/fadeOut>",
+              "end": "<end_value_if_fadeIn/fadeOut>",
+              "min": "<min_value_if_fadeInOut/fadeOutIn/blink>",
+              "max": "<max_value_if_fadeInOut/fadeOutIn>",
+              "low": "<low_value_if_blink>",
+              "high": "<high_value_if_blink>"
+            },
+            "motion": {
+              "type": "<motion_effect_type: snake, snakeInOut>",
+              "start": "<start_value_if_snakeInOut>",
+              "end": "<end_value_if_snakeInOut>"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

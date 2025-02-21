@@ -212,18 +212,16 @@ class LogicPlusPlus:
 
         latest_sequence = None
         if not self.initial_prompt_added:
-            song_name = self.config.get("song_name", None)
-            if (song_name is None) or (song_name
-                                       not in self.song_provider.song_names):
-                raise ValueError(
-                    f"Invalid song name '{song_name}'. Available songs: {self.song_provider.song_names}"
-                )
+            song_name = self.config.get("song_name")
+            song_structure = self.song_provider.get_song_structure(
+                song_name) if song_name else ""
+
+            #TODO(sapir): Handle song name from the
             print(f" >>> Song name: {song_name}")
 
             world_structure = self.animation_manager.get_world_structure()
             general_knowledge = self.animation_manager.get_general_knowledge()
             animation_knowledge = self.animation_manager.get_domain_knowledge()
-            song_structure = self.song_provider.get_song_structure(song_name)
 
             # Get the song from the song provider
             initial_prompt = self.build_prompt(intro_prompt,

@@ -4,9 +4,10 @@ import animation.songs.structures as song_structures
 class SongProvider:
 
     def __init__(self):
-        self.song_names = ["nikki", "sandstorm", "req", "overthinker"]
+        pass
 
     def get_song_structure(self, song_name):
+        song_names = ["nikki", "sandstorm", "req", "overthinker"]
         match song_name.lower():
             case "nikki":
                 return song_structures.nikki_song_prompt
@@ -17,6 +18,6 @@ class SongProvider:
             case "overthinker":
                 return song_structures.overthinker_song_prompt
             case _:
-                return "Song not found"
-
-        # Implement the logic to retrieve other song structures
+                raise ValueError(
+                    f"Invalid song name '{song_name}'. Available songs: {song_names}"
+                )

@@ -1,9 +1,11 @@
-from controller.constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, KIVSEE_SEQUENCE_PATH
+from controller.constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, KIVSEE_SEQUENCE_PATH, CONCEPTUAL_SEQUENCE_PATH
 from animation.frameworks.kivsee.kivsee_framework import KivseeFramework
 from animation.frameworks.framework import Framework
 from animation.frameworks.xlights.xlights_framework import XLightsFramework
 from animation.frameworks.xlights.xlights_sequence import XlightsSequence
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
+from animation.frameworks.conceptual.conceptual_framework import ConceptualFramework
+from animation.frameworks.conceptual.conceptual_sequence import ConceptualSequence
 from animation.frameworks.sequence import Sequence
 from animation.knowledge import knowledge_prompts
 import os
@@ -25,6 +27,10 @@ class AnimationManager:
         elif self.framework_name == 'xlights':
             self.sequence_manager = XlightsSequence(XLIGHTS_SEQUENCE_PATH)
             self.framework = XLightsFramework()
+        elif self.framework_name == 'conceptual':
+            self.sequence_manager = ConceptualSequence(
+                CONCEPTUAL_SEQUENCE_PATH)
+            self.framework = ConceptualFramework()
         else:
             raise ValueError(f"Unsupported framework: {self.framework_name}")
 
@@ -74,7 +80,7 @@ class AnimationManager:
         return self.framework.get_domain_knowledge()
 
     def get_latest_sequence(self):
-        return f"Latest Animation: <animation> {self.sequence_manager.get_latest_sequence()} </animation>"
+        return f"<animation> {self.sequence_manager.get_latest_sequence()} </animation>"
 
     def get_all_sequences(self):
         return self.sequence_manager.get_all_sequences()

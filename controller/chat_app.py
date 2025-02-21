@@ -95,7 +95,7 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
     full_path = os.path.join(working_dir, ANIMATION_OUT_TEMP_DIR)
     absolute_path = os.path.abspath(full_path)
     # Match file paths that start with ANIMATION_OUT_TEMP_DIR
-    file_links = re.finditer(rf"({re.escape(absolute_path)}[^\s]+)",
+    file_links = re.finditer(rf"({re.escape(absolute_path)}[^\s\n]+)",
                              message)  # Match full file path
     last_end = 0
 
@@ -136,7 +136,9 @@ def update_active_chat_label(button_name):
     """Update the active chat label to reflect the currently active chat."""
     button = button_mapping[button_name]
     active_chat_label.config(
-        text=f"{controller.selected_backend} | {button_name}")
+        text=
+        f"{controller.selected_backend} | {controller.selected_framework} | {button_name}"
+    )
     set_active_chat_button(button)
 
 

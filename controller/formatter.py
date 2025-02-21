@@ -1,6 +1,5 @@
 from animation.frameworks.xlights.xlights_sequence import XlightsSequence
 from controller.message_streamer import MessageStreamer
-from controller.constants import XSEQUENCE_TAG
 from animation.animation_manager import AnimationManager
 
 
@@ -30,14 +29,15 @@ class Formatter:
                 role = self._determine_role(message['tag'])
                 messages.append({"role": role, "content": message['content']})
 
-        latest_sequence = self.animation_manager.get_latest_sequence()
-        if latest_sequence:
-            messages.append({
-                "role":
-                "system",
-                "content":
-                f"Latest Animation Sequence ({XSEQUENCE_TAG}):\n{latest_sequence}"
-            })
+        # TODO : Do not add the latest animation? Reconsider later
+        # latest_sequence = self.animation_manager.get_latest_sequence()
+        # if latest_sequence:
+        #     messages.append({
+        #         "role":
+        #         "system",
+        #         "content":
+        #         f"Animation Sequence: \n{latest_sequence}"
+        #     })
 
         return messages
 

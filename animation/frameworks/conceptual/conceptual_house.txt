@@ -1,0 +1,15 @@
+all_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+odd_list = [1, 3, 5, 7, 9, 11]
+even_list = [2, 4, 6, 8, 10, 12]
+left_list = [1, 2, 3, 4, 5, 6]
+right_list = [7, 8, 9, 10, 11, 12]
+center_list = [4, 5, 6, 7, 8, 9]
+outer_list = [1, 2, 3, 10, 11, 12]
+
+segment_all = "all"
+segment_centric = "centric"
+segment_updown = "updown"
+segment_arc = "arc"
+segment_ind = "ind"
+segment_b1 = "b1"
+segment_b2 = "b2"

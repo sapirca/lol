@@ -277,3 +277,153 @@ const blueConstColorAnimation = async () => {
 (async () => {
     await blueConstColorAnimation();
 })();
+
+// generate one color for each element
+{
+    "animation": {
+        "name": "Sandstorm (Extended Mix)",
+            "duration": 304,
+                "beats": [
+                    {
+                        "time_start": 0,
+                        "time_end": 64,
+                        "elements": [
+                            {
+                                "element_group": "all",
+                                "coloring": {
+                                    "type": "constColor",
+                                    "hue": "blue"
+                                },
+                                "brightness": {
+                                    "type": "fadeIn",
+                                    "start": 0,
+                                    "end": 100
+                                },
+                                "motion": {
+                                    "type": "snake",
+                                    "start": 0,
+                                    "end": 5
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "time_start": 64,
+                        "time_end": 128,
+                        "elements": [
+                            {
+                                "element_group": "all",
+                                "coloring": {
+                                    "type": "constColor",
+                                    "hue": "green"
+                                },
+                                "brightness": {
+                                    "type": "fadeIn",
+                                    "start": 0,
+                                    "end": 100
+                                },
+                                "motion": {
+                                    "type": "snake",
+                                    "start": 0,
+                                    "end": 5
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "time_start": 128,
+                        "time_end": 192,
+                        "elements": [
+                            {
+                                "element_group": "all",
+                                "coloring": {
+                                    "type": "constColor",
+                                    "hue": "yellow"
+                                },
+                                "brightness": {
+                                    "type": "fadeInOut",
+                                    "start": 100,
+                                    "end": 0,
+                                    "min": 10,
+                                    "max": 100
+                                },
+                                "motion": {
+                                    "type": "snake",
+                                    "start": 0,
+                                    "end": 5
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "time_start": 192,
+                        "time_end": 256,
+                        "elements": [
+                            {
+                                "element_group": "all",
+                                "coloring": {
+                                    "type": "constColor",
+                                    "hue": "orange"
+                                },
+                                "brightness": {
+                                    "type": "fadeIn",
+                                    "start": 0,
+                                    "end": 100
+                                },
+                                "motion": {
+                                    "type": "snake",
+                                    "start": 0,
+                                    "end": 5
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "time_start": 256,
+                        "time_end": 272,
+                        "elements": [
+                            {
+                                "element_group": "all",
+                                "coloring": {
+                                    "type": "constColor",
+                                    "hue": "purple"
+                                },
+                                "brightness": {
+                                    "type": "blink",
+                                    "low": 0,
+                                    "high": 100
+                                },
+                                "motion": {
+                                    "type": "snakeInOut",
+                                    "start": 0,
+                                    "end": 5
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "time_start": 272,
+                        "time_end": 304,
+                        "elements": [
+                            {
+                                "element_group": "all",
+                                "coloring": {
+                                    "type": "constColor",
+                                    "hue": "red"
+                                },
+                                "brightness": {
+                                    "type": "fadeOut",
+                                    "start": 100,
+                                    "end": 0
+                                },
+                                "motion": {
+                                    "type": "snake",
+                                    "start": 0,
+                                    "end": 5
+                                }
+                            }
+                        ]
+                    }
+                ]
+    }
+}

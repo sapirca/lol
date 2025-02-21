@@ -1,4 +1,3 @@
-from controller.constants import XSEQUENCE_TAG
 import re
 from animation.animation_manager import AnimationManager
 
@@ -25,6 +24,16 @@ class Interpreter:
             result["response_wo_animation"] = response[:animation_start - len(
                 "<animation>")] + response[animation_end +
                                            len("</animation>"):]
+        # TODO try all possible tags for different models
+        if "```json" in response and "```" in response:
+            json_start = response.find("```json")
+            json_end = response.find("```", json_start + len("```json"))
+            if json_start != -1 and json_end != -1:
+                result["animation_sequence"] = response[
+                    json_start + len("```json"):json_end].strip()
+                result[
+                    "response_wo_animation"] = response[:json_start] + response[
+                        json_end + len("```"):]
         else:
             result["response_wo_animation"] = response
 
