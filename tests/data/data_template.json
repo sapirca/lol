@@ -9,8 +9,8 @@
           "duration": "ANY",
           "beats": [
             {
-              "beat_start": "0",
-              "beat_end": "4",
+              "beat_start": 0,
+              "beat_end": 4,
               "elements": [
                 "ring1"
               ],
@@ -33,8 +33,8 @@
           "duration": "ANY",
           "beats": [
             {
-              "beat_start": "4",
-              "beat_end": "8",
+              "beat_start": 4,
+              "beat_end": 8,
               "elements": [
                 "ring6"
               ],
@@ -61,8 +61,8 @@
           "duration": "ANY",
           "beats": [
             {
-              "beat_start": "4",
-              "beat_end": "20",
+              "beat_start": 4,
+              "beat_end": 20,
               "elements": [
                 "ring9",
                 "ring10",
@@ -136,8 +136,8 @@
           "duration": "ANY",
           "beats": [
             {
-              "beat_start": "0", // Any even number
-              "beat_end": "1",
+              "beat_start": 0,
+              "beat_end": 1,
               "elements": [
                 "element_group_1"
               ],
@@ -151,8 +151,8 @@
               }
             },
             {
-              "beat_start": "1",
-              "beat_end": "2",
+              "beat_start": 1,
+              "beat_end": 2,
               "elements": [
                 "element_group_1"
               ],
@@ -166,8 +166,8 @@
               }
             },
             {
-              "beat_start": "0",
-              "beat_end": "1",
+              "beat_start": 0,
+              "beat_end": 1,
               "elements": [
                 "element_group_2"
               ],
@@ -181,8 +181,8 @@
               }
             },
             {
-              "beat_start": "1",
-              "beat_end": "2",
+              "beat_start": 1,
+              "beat_end": 2,
               "elements": [
                 "element_group_2"
               ],
@@ -208,8 +208,8 @@
           "duration": "100",
           "beats": [
             {
-              "beat_start": "0",
-              "beat_end": "24",
+              "beat_start": 0,
+              "beat_end": 24,
               "elements": [
                 "ring3",
                 "ring5"
@@ -228,8 +228,8 @@
           "duration": "100",
           "beats": [
             {
-              "beat_start": "0",
-              "beat_end": "24",
+              "beat_start": 0,
+              "beat_end": 24,
               "elements": [
                 "ring3",
                 "ring5",
@@ -253,8 +253,8 @@
           "duration": "100",
           "beats": [
             {
-              "beat_start": "0",
-              "beat_end": "24",
+              "beat_start": 0,
+              "beat_end": 24,
               "elements": [
                 "ring3",
                 "ring5",
@@ -274,8 +274,8 @@
           "duration": "100",
           "beats": [
             {
-              "beat_start": "0",
-              "beat_end": "24",
+              "beat_start": 0,
+              "beat_end": 24,
               "elements": [
                 "ring3",
                 "ring5",
@@ -287,8 +287,8 @@
               }
             },
             {
-              "beat_start": "4",
-              "beat_end": "12",
+              "beat_start": 4,
+              "beat_end": 12,
               "elements": [
                 "ring3",
                 "ring5",
@@ -312,8 +312,8 @@
           "duration": "100",
           "beats": [
             {
-              "beat_start": "0",
-              "beat_end": "24",
+              "beat_start": 0,
+              "beat_end": 24,
               "elements": [
                 "ring3",
                 "ring5"
@@ -332,8 +332,8 @@
           "duration": "100",
           "beats": [
             {
-              "beat_start": "0",
-              "beat_end": "1",
+              "beat_start": 0,
+              "beat_end": 1,
               "elements": [
                 "ring3",
                 "ring5"
@@ -348,8 +348,8 @@
               }
             },
             {
-              "beat_start": "1",
-              "beat_end": "24",
+              "beat_start": 1,
+              "beat_end": 24,
               "elements": [
                 "ring3",
                 "ring5"
