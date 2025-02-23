@@ -1,6 +1,6 @@
-{
+{  
   "tests": [
-    {
+    { 
       "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK",
       "difficulty": "Simple",
       "expected_output": {
@@ -17,12 +17,13 @@
                     "color": "HUE_PINK"
                   },
                 }
-              }
+              },
+              // "repeat": 16 
             }
           ]
         }
       }
-    },
+    }, 
     // Ambiguity questions
     // {
     //   "instruction": "Generate animation for 1-5 seconds that lit ring12 in const color HUE_RED.",

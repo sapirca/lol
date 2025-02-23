@@ -3,10 +3,12 @@ import tiktoken
 import anthropic
 import google.generativeai as genai
 import logging
+import json
 #TODO sapir rename this file
 from secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
 GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
+from config import config as basic_config
 
 
 class LLMBackend:
@@ -18,6 +20,7 @@ class LLMBackend:
     def __init__(self, name):
         self.name = name
         self.logger = logging.getLogger(name)
+        self.w_structured_output = basic_config["with_structured_output"]
 
     def generate_response(self, messages):
         """Generate a response based on the provided messages array."""
@@ -46,7 +49,12 @@ class GPTBackend(LLMBackend):
         "gpt-4": 0.06,
         "gpt-4o": 0.035,
         "gpt-o1": 0.02,
-        "gpt-o1-mini": 0.015
+        "gpt-o1-mini": 0.015,
+        # Json Scheme
+        "o3-mini-2025-1-31": 0.02,  # and later
+        "o1-2024-12-17": 0.02,  # and later
+        "gpt-4o-mini-2024-07-18": 0.02,  # and later
+        "gpt-4o-2024-08-06": 0.02,  # and later
     }
 
     def __init__(self, name, model="gpt-4o-mini"):
@@ -56,6 +64,13 @@ class GPTBackend(LLMBackend):
         self.logger.info(f"Using GPT model: {self.model}")
 
         self.client = openai.OpenAI(api_key=self.api_key)
+
+        # TODO sapir: add the schema to the backend
+        if self.w_structured_output:
+            with open(
+                    '/Users/sapir/repos/lol/schemas/gpt_response_scheme.json',
+                    'r') as schema_file:
+                self.schema = json.load(schema_file)
 
     def token_count(self, messages):
         encoding = tiktoken.encoding_for_model(self.model)
@@ -71,11 +86,22 @@ class GPTBackend(LLMBackend):
         data = {
             "messages": messages,
         }
+
+        if self.w_structured_output:
+            data["response_format"] = {
+                "type": "json_schema",
+                "json_schema": self.schema
+            }
+
         try:
             completion = self.client.chat.completions.create(model=self.model,
-                                                             messages=messages)
+                                                             messages=messages,
+                                                             **data)
 
-            response_text = completion.choices[0].message.content.strip()
+            if "refusal" in completion:
+                response_text = f"Request refused: {completion['refusal']}"
+            else:
+                response_text = completion.choices[0].message.content.strip()
 
             self.log_tokens(messages, response_text)
             return response_text
@@ -106,6 +132,13 @@ class ClaudeBackend(LLMBackend):
             self.logger.warning(
                 f"Model {self.model} not found in CLAUDE_MODELS.")
 
+        # Load schema from file
+        if self.w_structured_output:
+            with open(
+                    '/Users/sapir/repos/lol/schemas/claude_response_schema.json',
+                    'r') as schema_file:
+                self.schema = json.load(schema_file)
+
     def generate_response(self, messages):
         """
         Communicates with the Claude backend.
@@ -129,15 +162,23 @@ class ClaudeBackend(LLMBackend):
                     'content': message['content']
                 })
 
+        data = {
+            "model": self.model,
+            "max_tokens": 1000,
+            "temperature": 0,
+            "system": " ".join(system_messages).strip(),
+            "messages": chat_messages
+        }
+
+        if self.w_structured_output:
+            data["response_format"] = {
+                "type": "json_schema",
+                "json_schema": self.schema
+            }
+
         try:
             # Send the request to Claude's backend
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=1000,
-                temperature=0,
-                system=" ".join(system_messages).strip(
-                ),  # Concatenate with space for clarity
-                messages=chat_messages)
+            response = self.client.messages.create(**data)
 
             # Parse and clean up response text
             response_text = ""
@@ -173,12 +214,30 @@ class GeminiBackend(LLMBackend):
         genai.configure(api_key=self.api_key)
         self.gemini_model = genai.GenerativeModel(self.model)
 
+        # Load schema from file
+        if self.w_structured_output:
+            with open(
+                    '/Users/sapir/repos/lol/schemas/gemini_response_schema.json',
+                    'r') as schema_file:
+                self.schema = json.load(schema_file)
+
     def generate_response(self, messages):
         try:
             prompt = "\n".join(
                 [f'{msg["role"]}: {msg["content"]}' for msg in messages])
+
+            data = {
+                "prompt": prompt,
+            }
+
+            if self.w_structured_output:
+                data["response_format"] = {
+                    "type": "json_schema",
+                    "json_schema": self.schema
+                }
+
             # Replace with actual Gemini API call
-            response = self.gemini_model.generate_content(prompt)
+            response = self.gemini_model.generate_content(**data)
             response_text = response.text.strip()
             self.log_tokens(messages, response_text)
             return response_text
