@@ -20,7 +20,8 @@ class LLMBackend:
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
-        self.w_structured_output = config.get("with_structured_output", False)
+        self.w_structured_output = self.config.get("with_structured_output",
+                                                   False)
 
     def generate_response(self, messages):
         """Generate a response based on the provided messages array."""
