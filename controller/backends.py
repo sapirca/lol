@@ -8,7 +8,6 @@ import json
 from secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
 GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
-from config import config as basic_config
 
 
 class LLMBackend:
@@ -17,10 +16,11 @@ class LLMBackend:
     Each backend should inherit from this class and implement the generate_response method.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, config=None):
         self.name = name
         self.logger = logging.getLogger(name)
-        self.w_structured_output = basic_config["with_structured_output"]
+        self.config = config or {}
+        self.w_structured_output = config.get("with_structured_output", False)
 
     def generate_response(self, messages):
         """Generate a response based on the provided messages array."""
@@ -57,8 +57,8 @@ class GPTBackend(LLMBackend):
         "gpt-4o-2024-08-06": 0.02,  # and later
     }
 
-    def __init__(self, name, model="gpt-4o-mini"):
-        super().__init__(name)
+    def __init__(self, name, model="gpt-4o-mini", config=None):
+        super().__init__(name, config=config)
         self.api_key = OPENAI_API_KEY
         self.model = model
         self.logger.info(f"Using GPT model: {self.model}")
@@ -90,12 +90,14 @@ class GPTBackend(LLMBackend):
         if self.w_structured_output:
             data["response_format"] = {
                 "type": "json_schema",
-                "json_schema": self.schema
+                "json_schema": {
+                    "name": "gpt_response",
+                    "schema": self.schema
+                }
             }
 
         try:
             completion = self.client.chat.completions.create(model=self.model,
-                                                             messages=messages,
                                                              **data)
 
             if "refusal" in completion:
@@ -107,7 +109,7 @@ class GPTBackend(LLMBackend):
             return response_text
         except Exception as e:
             self.logger.error(f"Error communicating with GPT API: {e}")
-            return (f"Error communicating with GPT: {e}")
+            return f"Error communicating with GPT: {e}"
 
 
 class ClaudeBackend(LLMBackend):
@@ -121,8 +123,8 @@ class ClaudeBackend(LLMBackend):
         "claude-3-5-sonnet-20241022": 0.055
     }
 
-    def __init__(self, name, model="claude-3-5-sonnet-20241022"):
-        super().__init__(name)
+    def __init__(self, name, model="claude-3-5-sonnet-20241022", config=None):
+        super().__init__(name, config=config)
         self.api_key = CLAUDE_API_KEY
         self.model = model
         self.client = anthropic.Anthropic(api_key=self.api_key)
@@ -207,8 +209,8 @@ class GeminiBackend(LLMBackend):
         "gemini-1.5-pro": 1.25
     }
 
-    def __init__(self, name, model="gemini-1.5-flash"):
-        super().__init__(name)
+    def __init__(self, name, model="gemini-1.5-flash", config=None):
+        super().__init__(name, config=config)
         self.api_key = GEMINI_API_KEY
         self.model = model
         genai.configure(api_key=self.api_key)
@@ -225,13 +227,13 @@ class GeminiBackend(LLMBackend):
         try:
             prompt = "\n".join(
                 [f'{msg["role"]}: {msg["content"]}' for msg in messages])
-
             data = {
-                "prompt": prompt,
+                "text": prompt,
             }
 
             if self.w_structured_output:
                 data["response_format"] = {
+                    "text": prompt,
                     "type": "json_schema",
                     "json_schema": self.schema
                 }
@@ -253,8 +255,8 @@ class DeepSeekBackend(LLMBackend):
         "deepseek-reasoner": 0.06,
     }
 
-    def __init__(self, name, model="deepseek-chat"):
-        super().__init__(name)
+    def __init__(self, name, model="deepseek-chat", config=None):
+        super().__init__(name, config=config)
         self.api_key = DEEP_SEEK_API_KEY
         self.model = model
         self.client = openai.OpenAI(api_key=self.api_key,
@@ -277,8 +279,8 @@ class DeepSeekBackend(LLMBackend):
 
 class StubBackend(LLMBackend):
 
-    def __init__(self, name):
-        super().__init__(name)
+    def __init__(self, name, config=None):
+        super().__init__(name, config=config)
 
     def generate_response(self, messages):
         """

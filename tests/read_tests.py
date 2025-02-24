@@ -2,7 +2,7 @@ import json
 import os
 
 
-def read_and_print_tests(filename="tests/data/data_template.json"):
+def read_and_print_tests(filename="tests/data/test_data.json"):
     """
     Reads animation test data from a JSON file, prints the setup prompt once,
     and then prints the instructions, difficulty, and JSON representation of 

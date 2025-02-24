@@ -15,23 +15,14 @@
                 "ring1": {
                   "coloring": {
                     "color": "HUE_PINK"
-                  },
+                  }
                 }
-              },
-              // "repeat": 16 
+              }
             }
           ]
         }
       }
     }, 
-    // Ambiguity questions
-    // {
-    //   "instruction": "Generate animation for 1-5 seconds that lit ring12 in const color HUE_RED.",
-    //   "difficulty": "Simple",
-    //   "expected_output": {
-    //     "query_user": "Missing information.... What is the BPM? "
-    //   }
-    // },
     {
       "instruction": "Generate animation for bars 1-5 that lit ring12 in const color RED",
       "difficulty": "Simple",
@@ -131,14 +122,7 @@
                 "ring1": {
                   "coloring": {
                     "color": "HUE_PINK"
-                  },
-                  // "brightness": {
-                  //   "type": "const",
-                  //   "value": 1.0
-                  // },
-                  // "motion": {
-                  //   "type": "none"
-                  // }
+                  }
                 }
               }
             }
@@ -162,10 +146,7 @@
                   "brightness": {
                     "type": "constant",
                     "value": 0.0
-                  },
-                  // "motion": {
-                  //   "type": "none"
-                  // }
+                  }
                 }
               }
             }

@@ -1,105 +1,156 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "LED Animation Schema",
-    "description": "Schema for defining LED animations synchronized with music, including beat timing, element control, colors, brightness, and motion effects",
-    "type": "object",
-    "properties": {
-      "animation": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "The song title"
-          },
-          "duration": {
-            "type": "number",
-            "description": "Total length in seconds",
-            "minimum": 0
-          },
-          "beats": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "beat_start": {
-                  "type": "number",
-                  "description": "Starting beat"
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LED Animation Schema",
+  "description": "Schema for defining LED animations synchronized with music, including beat timing, element control, colors, brightness, and motion effects",
+  "type": "object",
+  "properties": {
+    "reasoning": {
+      "type": "string",
+      "description": "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
+    },
+    "animation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The song title"
+        },
+        "duration": {
+          "type": "number",
+          "description": "Total length in seconds",
+          "minimum": 0
+        },
+        "beats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "beat_start": {
+                "type": "number",
+                "description": "Starting beat"
+              },
+              "beat_end": {
+                "type": "number",
+                "description": "Ending beat"
+              },
+              "elements": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 12
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "all",
+                        "odd",
+                        "even",
+                        "left",
+                        "right",
+                        "center",
+                        "outer"
+                      ]
+                    }
+                  ]
                 },
-                "beat_end": {
-                  "type": "number",
-                  "description": "Ending beat"
-                },
-                "elements": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "type": "number",
-                        "minimum": 1,
-                        "maximum": 12
-                      },
-                      {
-                        "type": "string",
-                        "enum": ["all", "odd", "even", "left", "right", "center", "outer"]
-                      }
+                "description": "List of elements (numbers 1-12) or group names affected during this period",
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "mapping": {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "centric",
+                  "updown",
+                  "arc",
+                  "ind",
+                  "b1",
+                  "b2",
+                  "top",
+                  "mid",
+                  "bot"
+                ],
+                "description": "The mapping type for the elements"
+              },
+              "coloring": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "constant",
+                      "rainbow"
                     ]
                   },
-                  "description": "List of elements (numbers 1-12) or group names affected during this period",
-                  "minItems": 1,
-                  "uniqueItems": true
+                  "hue": {
+                    "type": "number",
+                    "description": "Required for constant type, not needed for rainbow"
+                  }
                 },
-                "mapping": {
-                  "type": "string",
-                  "enum": ["all", "centric", "updown", "arc", "ind", "b1", "b2", "top", "mid", "bot"],
-                  "description": "The mapping type for the elements"
-                },
-                "coloring": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "enum": ["constant", "rainbow"]
-                    },
-                    "hue": {
-                      "type": "number",
-                      "description": "Required for constant type, not needed for rainbow"
-                    }
-                  },
-                  "required": ["type"]
-                },
-                "brightness": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "enum": ["fadeIn", "fadeOut", "constant"]
-                    },
-                    "value": {
-                      "type": "number",
-                      "description": "Required if type is constant",
-                      "minimum": 0,
-                      "maximum": 1
-                    }
-                  },
-                  "required": ["type"]
-                },
-                "motion": {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "type": "string",
-                      "enum": ["snake", "snakeInOut"]
-                    }
-                  },
-                  "required": ["type"]
-                }
+                "required": [
+                  "type"
+                ]
               },
-              "required": ["beat_start", "beat_end", "elements", "mapping", "coloring"]
-            }
+              "brightness": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "fadeIn",
+                      "fadeOut",
+                      "constant"
+                    ]
+                  },
+                  "value": {
+                    "type": "number",
+                    "description": "Required if type is constant",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "motion": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "snake",
+                      "snakeInOut"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            },
+            "required": [
+              "beat_start",
+              "beat_end",
+              "elements",
+              "mapping",
+              "coloring"
+            ]
           }
-        },
-        "required": ["name", "duration", "beats"]
-      }
-    },
-    "required": ["animation"]
-  }
+        }
+      },
+      "required": [
+        "name",
+        "duration",
+        "beats"
+      ]
+    }
+  },
+  "required": [
+    "animation"
+  ]
+}

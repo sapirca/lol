@@ -1,11 +1,13 @@
+import json
 import re
 from animation.animation_manager import AnimationManager
 
 
 class Interpreter:
 
-    def __init__(self, animation_manager):
+    def __init__(self, animation_manager, config=None):
         self.animation_manager = animation_manager
+        self.config = config or {}
 
     def parse_response(self, response):
         result = {
@@ -15,8 +17,16 @@ class Interpreter:
             "requested_actions": [],
             "animation_sequence": None,
         }
-
-        if "<animation>" in response and "</animation>" in response:
+        structured = self.config.get('with_structured_output', False)
+        if structured:
+            response_json = json.loads(response)
+            reasoning = response_json['reasoning']
+            animation = json.dumps(response_json['animation'])
+            result["animation_sequence"] = animation
+            result["response_wo_animation"] = reasoning
+            # result["reasoning"] =
+            # response_text = f"{reasoning}\n<animation> {animation} </animation>"
+        elif "<animation>" in response and "</animation>" in response:
             animation_start = response.find("<animation>") + len("<animation>")
             animation_end = response.find("</animation>")
             result["animation_sequence"] = response[
@@ -25,7 +35,7 @@ class Interpreter:
                 "<animation>")] + response[animation_end +
                                            len("</animation>"):]
         # TODO try all possible tags for different models
-        if "```json" in response and "```" in response:
+        elif "```json" in response and "```" in response:
             json_start = response.find("```json")
             json_end = response.find("```", json_start + len("```json"))
             if json_start != -1 and json_end != -1:
@@ -37,17 +47,17 @@ class Interpreter:
         else:
             result["response_wo_animation"] = response
 
-        tags = re.findall(r"<([a-zA-Z0-9_]+)>(.*?)</\1>",
-                          result["response_wo_animation"], re.DOTALL)
-        for tag, content in tags:
-            if tag == "reasoning":
-                result["reasoning"] = content.strip()
-            elif tag == "consistency_justification":
-                result["consistency_justification"] = content.strip()
-            else:
-                result["requested_actions"].append({
-                    "action": tag,
-                    "content": content.strip()
-                })
+        # tags = re.findall(r"<([a-zA-Z0-9_]+)>(.*?)</\1>",
+        #                   result["response_wo_animation"], re.DOTALL)
+        # for tag, content in tags:
+        #     if tag == "reasoning":
+        #         result["reasoning"] = content.strip()
+        #     elif tag == "consistency_justification":
+        #         result["consistency_justification"] = content.strip()
+        #     else:
+        #         result["requested_actions"].append({
+        #             "action": tag,
+        #             "content": content.strip()
+        #         })
 
         return result
