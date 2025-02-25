@@ -1,0 +1,128 @@
+backend,difficulty,instruction,expected_animation,animation_sequence,reasoning,additionals
+GPT,Simple,Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK,"""{
+  ""name"": ""EDM Track Intro"",
+  ""duration"": 4,
+  ""beats"": [
+    {
+      ""time_start"": 0,
+      ""time_end"": 1,
+      ""elements"": {
+        ""ring1"": {
+          ""coloring"": {
+            ""type"": ""constant"",
+            ""hue"": 330
+          },
+          ""brightness"": {
+            ""type"": ""constant"",
+            ""value"": 255
+          },
+          ""motion"": {
+            ""type"": ""snake""
+          }
+        }
+      }
+    },
+    {
+      ""time_start"": 1,
+      ""time_end"": 2,
+      ""elements"": {
+        ""ring1"": {
+          ""coloring"": {
+            ""type"": ""constant"",
+            ""hue"": 330
+          },
+          ""brightness"": {
+            ""type"": ""constant"",
+            ""value"": 255
+          },
+          ""motion"": {
+            ""type"": ""snake""
+          }
+        }
+      }
+    },
+    {
+      ""time_start"": 2,
+      ""time_end"": 3,
+      ""elements"": {
+        ""ring1"": {
+          ""coloring"": {
+            ""type"": ""constant"",
+            ""hue"": 330
+          },
+          ""brightness"": {
+            ""type"": ""constant"",
+            ""value"": 255
+          },
+          ""motion"": {
+            ""type"": ""snake""
+          }
+        }
+      }
+    },
+    {
+      ""time_start"": 3,
+      ""time_end"": 4,
+      ""elements"": {
+        ""ring1"": {
+          ""coloring"": {
+            ""type"": ""constant"",
+            ""hue"": 330
+          },
+          ""brightness"": {
+            ""type"": ""constant"",
+            ""value"": 255
+          },
+          ""motion"": {
+            ""type"": ""snake""
+          }
+        }
+      }
+    }
+  ]
+}""",,"The animation sequence reflects the intriguing tone of the 'Intro' phase, using a consistent hue of pink to evoke curiosity and set the stage for the upcoming energy. The lighting is static, providing a stable yet engaging visual that aligns with the gentle introduction of the music.",""""""
+Claude,Simple,Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK,"""{
+  ""name"": ""Single Ring Pink Animation"",
+  ""duration"": 4,
+  ""beats"": [
+    {
+      ""beat_start"": 0,
+      ""beat_end"": 4,
+      ""elements"": [
+        1
+      ],
+      ""mapping"": ""all"",
+      ""coloring"": {
+        ""type"": ""constant"",
+        ""hue"": 300
+      },
+      ""brightness"": {
+        ""type"": ""constant"",
+        ""value"": 1.0
+      }
+    }
+  ]
+}""",,Creating a simple animation that lights up ring 1 with a constant pink color for 4 beats. Using constant brightness for clarity and simplicity.,"""I'll help you create an animation for beats 0-4 that lights up ring 1 with a constant pink color. I'll provide both the reasoning and the JSON animation description.\n\n\n\nThis animation:\n1. Targets only element 1 (ring 1)\n2. Uses \""all\"" mapping to light the entire ring\n3. Sets a constant pink color (hue 300)\n4. Maintains full brightness throughout\n5. Runs from beat 0 to beat 4\n\nThe hue value 300 represents pink in the HSV color space. The animation maintains consistent lighting throughout the specified time period with no variations in brightness or motion effects."""
+Gemini,Simple,Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK,"""{
+  ""name"": ""EDM Track 1"",
+  ""duration"": 60,
+  ""beats"": [
+    {
+      ""beat_start"": 0,
+      ""beat_end"": 4,
+      ""elements"": 1,
+      ""mapping"": ""ind"",
+      ""coloring"": {
+        ""type"": ""constant"",
+        ""hue"": 330
+      },
+      ""brightness"": {
+        ""type"": ""constant"",
+        ""value"": 1
+      },
+      ""motion"": {
+        ""type"": ""null""
+      }
+    }
+  ]
+}""",,"This animation focuses on a simple, consistent effect for the first four beats to establish a baseline and demonstrate the JSON structure.  It uses a constant pink color for `ring1` (assuming 'ring1' maps to Element 1).  More complex animations and element interactions can be added for later beats.",""""""

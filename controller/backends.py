@@ -1,7 +1,8 @@
 import openai
 import tiktoken
 import anthropic
-import google.generativeai as genai
+# import google.generativeai as genai
+from google import genai
 import logging
 import json
 #TODO sapir rename this file
@@ -121,7 +122,8 @@ class ClaudeBackend(LLMBackend):
         "claude-lite": 0.015,
         "claude-ultra": 0.045,
         "claude-supernova": 0.055,
-        "claude-3-5-sonnet-20241022": 0.055
+        "claude-3-5-sonnet-20241022": 0.055,
+        "claude-3-haiku-20240307": 0.055
     }
 
     def __init__(self, name, model="claude-3-5-sonnet-20241022", config=None):
@@ -156,6 +158,7 @@ class ClaudeBackend(LLMBackend):
         # Separate system messages and chat messages
         system_messages = []
         chat_messages = []
+
         for message in messages:
             if message['role'] == 'system':
                 system_messages.append(message['content'])
@@ -165,19 +168,34 @@ class ClaudeBackend(LLMBackend):
                     'content': message['content']
                 })
 
+        claude_messages = [{
+            "role": chat_message["role"],
+            "content": chat_message["content"]
+        } for chat_message in chat_messages]
+
+        # claude_messages += [
+        #     {
+        #         "role": "user",  # ????
+        #         "content": msg
+        #     } for msg in system_messages
+        # ]
+
+        # Set system prompt separately
+        system_prompt = "\n".join(system_messages) if system_messages else ""
+
+        # Append schema if structured output is required
+        if self.w_structured_output:
+            system_prompt += "\n" + json.dumps(self.schema)
+        else:
+            system_prompt = ""
+
         data = {
             "model": self.model,
-            "max_tokens": 1000,
+            "max_tokens": 2048,
             "temperature": 0,
-            "system": " ".join(system_messages).strip(),
-            "messages": chat_messages
+            "system": system_prompt,  # Correct usage of system instructions
+            "messages": claude_messages
         }
-
-        if self.w_structured_output:
-            data["response_format"] = {
-                "type": "json_schema",
-                "json_schema": self.schema
-            }
 
         try:
             # Send the request to Claude's backend
@@ -197,7 +215,7 @@ class ClaudeBackend(LLMBackend):
 
         except Exception as e:
             # Handle and log errors
-            error_message = f"Error communicating with Claude backend: {str(e)}"
+            error_message = f"Error, Claude backend: {str(e)}"
             if hasattr(self, 'log_tokens'):
                 self.log_tokens(messages, error_message)
             return error_message
@@ -214,8 +232,9 @@ class GeminiBackend(LLMBackend):
         super().__init__(name, config=config)
         self.api_key = GEMINI_API_KEY
         self.model = model
-        genai.configure(api_key=self.api_key)
-        self.gemini_model = genai.GenerativeModel(self.model)
+        # genai.configure(api_key=self.api_key)
+        # self.gemini_model = genai.GenerativeModel(self.model)
+        self.client = genai.Client(api_key=self.api_key)
 
         # Load schema from file
         if self.w_structured_output:
@@ -228,19 +247,12 @@ class GeminiBackend(LLMBackend):
         try:
             prompt = "\n".join(
                 [f'{msg["role"]}: {msg["content"]}' for msg in messages])
-            data = {
-                "text": prompt,
-            }
 
             if self.w_structured_output:
-                data["response_format"] = {
-                    "text": prompt,
-                    "type": "json_schema",
-                    "json_schema": self.schema
-                }
+                prompt += "\nUse this JSON schema:" + json.dumps(self.schema)
 
-            # Replace with actual Gemini API call
-            response = self.gemini_model.generate_content(**data)
+            response = self.client.models.generate_content(model=self.model,
+                                                           contents=prompt)
             response_text = response.text.strip()
             self.log_tokens(messages, response_text)
             return response_text

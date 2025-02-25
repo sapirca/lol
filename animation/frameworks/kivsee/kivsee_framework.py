@@ -24,8 +24,8 @@ class KivseeFramework(Framework):
         try:
             with open(KIVSEE_PROMPT, 'r') as file:
                 content = file.read()
-            with open(KIVSEE_KNOWLEDGE_PATH, 'r') as file:
-                content = file.read()
+            # with open(KIVSEE_KNOWLEDGE_PATH, 'r') as file:
+            #     content = file.read()
             # with open(KIVSEE_ADD_ONS_PATH, 'r') as file:
             #     content += file.read()
             # for i in range(1, 2):

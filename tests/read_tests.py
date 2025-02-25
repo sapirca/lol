@@ -27,11 +27,6 @@ def read_and_print_tests(filename="tests/data/test_data.json"):
             test_data = json.load(f)
         print("-" * 20)  # Separator
 
-        prompt = test_data.get("setup", {}).get("prompt", "")  # Get the prompt
-        print("Setup Prompt:")
-        print(prompt)
-        print("-" * 20)  # Separator
-
         if "tests" in test_data and isinstance(test_data["tests"], list):
             for test in test_data["tests"]:
                 instruction = test.get("instruction")
