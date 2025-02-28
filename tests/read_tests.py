@@ -2,7 +2,7 @@ import json
 import os
 
 
-def read_and_print_tests(filename="tests/data/data_template.json"):
+def read_and_print_tests(filename="tests/data/test_data.json"):
     """
     Reads animation test data from a JSON file, prints the setup prompt once,
     and then prints the instructions, difficulty, and JSON representation of 
@@ -25,11 +25,6 @@ def read_and_print_tests(filename="tests/data/data_template.json"):
 
         with open(full_path, "r") as f:
             test_data = json.load(f)
-        print("-" * 20)  # Separator
-
-        prompt = test_data.get("setup", {}).get("prompt", "")  # Get the prompt
-        print("Setup Prompt:")
-        print(prompt)
         print("-" * 20)  # Separator
 
         if "tests" in test_data and isinstance(test_data["tests"], list):

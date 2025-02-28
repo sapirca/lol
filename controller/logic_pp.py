@@ -25,7 +25,6 @@ class LogicPlusPlus:
         self.message_streamer = MessageStreamer()
         self.song_provider = SongProvider()
         self.backends = {}
-        self._initialize_backends()
 
         if snapshot_dir is not None:
             try:
@@ -44,9 +43,11 @@ class LogicPlusPlus:
             self.animation_manager = AnimationManager(self.selected_framework,
                                                       self.message_streamer)
 
+        self._initialize_backends()
         # Shared initialization logic
         self.selected_backend = self.config.get("selected_backend", None)
-        self.response_manager = Interpreter(self.animation_manager)
+        self.response_manager = Interpreter(self.animation_manager,
+                                            config=self.config)
         self.formatter = Formatter(self.message_streamer,
                                    self.animation_manager)
 
@@ -149,7 +150,8 @@ class LogicPlusPlus:
             "Stub": StubBackend
         }
         for backend_name, backend_class in backend_mapping.items():
-            self.register_backend(backend_class(name=backend_name))
+            self.register_backend(
+                backend_class(name=backend_name, config=self.config))
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):

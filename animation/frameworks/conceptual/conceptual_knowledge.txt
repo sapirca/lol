@@ -1,28 +1,32 @@
 You are to generate a **JSON animation description** based on user-provided song information. Follow these strict guidelines to ensure consistency and accuracy:  
-Define the animation:
 
+### **1. Root Object (\"animation\")**  
+The top-level JSON object must be named `"animation"` and must include the following properties:  
 
-Set "name" to the song title.
-Set "duration" to the total length in seconds.
-Create the beats array:
+- **`"name"`** (string): The song title, as provided by the user.  
+- **`"duration"`** (number): The total duration of the song, in seconds.  
 
+---
 
-Each beat section must have:
-"beat_start": The starting beat.
-"beat_end": The ending beat.
-"elements": A list of elements affected during this period.
-Define coloring:
+### **2. Timeframes (\"beats\" Array)**  
+- Within the `"animation"` object, create an array named `"beats"`.  
+- Each element in the `"beats"` array represents a specific timeframe and must include:  
 
+  - **`"time_start"`** (number): The start time of the timeframe, in beats.  
+  - **`"time_end"`** (number): The end time of the timeframe, in beats.  
+  - **`"elements"`** (object): Describes all animated elements during that timeframe.  
 
-"type" can be "constant" or "rainbow".
-"hue" (mandatory for "constant", not needed for "rainbow").
-Set brightness (optional):
+---
 
+### **3. Elements Structure**  
+The `"elements"` list can contain:  
+1. **Individual elements**  
+2. **Groups of elements**, defined in one of the following ways:  
+   - A **single group name**  
+   - An **array of individual element names**  
 
-"type" can be "fadeIn", "fadeOut", or "constant".
-"value" is required if "type" is "constant".
-Set motion (optional):
+- Each **named element** inside `"elements"` will contain animation properties:  
+  - **`"coloring"`** (object): Defines the color effect applied to this element.  
+  - **`"brightness"`** (object): Defines the brightness effect applied to this element.  
+  - **`"motion"`** (object): Defines the motion effect applied to this element.  
 
-
-"type" can be "snake" or "snakeInOut".
-Omit optional fields if not needed.

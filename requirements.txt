@@ -2,5 +2,6 @@ requests
 openai
 tiktoken
 anthropic
-google-generativeai
+# google-generativeai
+google-genai
 python>=3.9
