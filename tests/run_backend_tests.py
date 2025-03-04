@@ -5,6 +5,7 @@ from animation.animation_manager import AnimationManager
 from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, DeepSeekBackend, StubBackend
 import csv
 # from config import config as basic_config
+
 from configs.config_conceptual import config as basic_config
 # from configs.config_kivsee import config as basic_config
 
@@ -37,6 +38,8 @@ def run_tests(test_data, backends):
     for backend_name, backend in backends.items():
         results[backend_name] = []
 
+    # Switch Order
+    for backend_name, backend in backends.items():
         for test in test_data["tests"]:
             instruction = test["instruction"]
 
@@ -49,13 +52,14 @@ def run_tests(test_data, backends):
             }]
             response = backend.generate_response(messages)
 
-            if (basic_config.get("with_structured_output", False)):
-                parsed_response = response_manager.parse_structured(
-                    response, backend_name)
-            else:
-                parsed_response = response_manager.parse_response(response)
+            try:
+                if (basic_config.get("with_structured_output", False)):
+                    parsed_response = response_manager.parse_structured(
+                        response, backend_name)
 
-            if basic_config["with_structured_output"]:
+                else:
+                    parsed_response = response_manager.parse_response(response)
+
                 results[backend_name].append({
                     "instruction":
                     instruction,
@@ -72,20 +76,23 @@ def run_tests(test_data, backends):
                     json.dumps(parsed_response.get('additionals', ""),
                                indent=2),
                 })
-            else:
+            except Exception as e:
                 results[backend_name].append({
                     "instruction":
                     instruction,
                     "difficulty":
                     test.get('difficulty', ""),
                     "reasoning":
-                    parsed_response['response_wo_animation'],
+                    response,
                     "animation_sequence":
-                    json.dumps(parsed_response['animation_sequence'],
-                               indent=2),
+                    " ",
                     "expected_animation":
-                    json.dumps(test.get('expected_output', ""), indent=2)
+                    " ",
+                    "additionals":
+                    " ",
                 })
+                print(f"Error parsing structured response for {backend}: {e}")
+
     return results
 
 
@@ -122,88 +129,106 @@ def prepare_full_prompt(animation_manager):
     return full_prompt
 
 
+def write_csv(backend, results):
+    try:
+        # Write results to a CSV file
+        csv_filename = f"tests/output/all_test_results_{basic_config['framework']}_{backend}.csv"
+        with open(csv_filename, mode='w+', newline='',
+                  encoding="utf-8") as csvfile:
+            if basic_config["with_structured_output"]:
+                fieldnames = [
+                    'backend', 'difficulty', 'instruction',
+                    'expected_animation', 'animation_sequence', 'reasoning',
+                    'additionals'
+                ]
+            else:
+                fieldnames = [
+                    'backend',
+                    'difficulty',
+                    'instruction',
+                    'expected_animation',
+                    'animation_sequence',
+                    'reasoning',
+                ]
+
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            for backend_name, backend_results in results.items():
+                for result in backend_results:
+                    if basic_config["with_structured_output"]:
+                        writer.writerow({
+                            'backend':
+                            backend_name,
+                            "difficulty":
+                            result['difficulty'],
+                            'instruction':
+                            result['instruction'],
+                            'expected_animation':
+                            "\"" + result['expected_animation'] + "\"",
+                            'animation_sequence':
+                            "\"" + result['animation_sequence'] + "\"",
+                            'reasoning':
+                            result['reasoning'],
+                            "additionals":
+                            result['additionals']
+                        })
+                    else:
+                        writer.writerow({
+                            'backend':
+                            backend_name,
+                            'difficulty':
+                            result['difficulty'],
+                            'instruction':
+                            result['instruction'],
+                            'expected_animation':
+                            "\"" + result['expected_animation'] + "\"",
+                            'reasoning':
+                            result['reasoning'],
+                            'animation_sequence':
+                            "\"" + result['animation_sequence'] + "\"",
+                        })
+    except Exception as e:
+        print(f"Error writing results to CSV: {e}")
+        # dump the results to a text file
+        with open(
+                f"tests/output/all_test_results_{basic_config['framework']}.txt",
+                "w") as text_file:
+            # write the entire file as is
+            text_file.write(json.dumps(results, indent=2))
+
+
+# backend = 'claude'
+# backend = 'GPT'
+# backend = 'gemini'
+backend = 'all_three'
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
     # test_data = load_test_data(MINI_TEST_FILENAME)
     test_data = load_test_data(TEST_FILENAME)
-
     backends = {
         "GPT": GPTBackend(name="GPT", config=basic_config),
         "Claude": ClaudeBackend(name="Claude", config=basic_config),
         "Gemini": GeminiBackend(name="Gemini", config=basic_config),
         # "DeepSeek": DeepSeekBackend(name="DeepSeek", config=basic_config),
     }
-
     results = run_tests(test_data, backends)
+    write_csv(backend, results)
 
-    # Print results
-    for backend_name, backend_results in results.items():
-        print(f"Results for {backend_name}:")
-        for result in backend_results:
-            print(f"Instruction: {result['instruction']}")
-            # if basic_config["with_structured_output"]:
-            print(f"Reasoning: {result['reasoning']}")
-            # print(f"Animation Sequence: {result['pretty_animation']}")
-            # else:
-            #     print(f"Response: {result['response']}\n")
 
-    # Write results to a CSV file
-    csv_filename = f"tests/output/all_test_results_{basic_config['framework']}.csv"
-    with open(csv_filename, mode='w+', newline='',
-              encoding="utf-8") as csvfile:
-        if basic_config["with_structured_output"]:
-            fieldnames = [
-                'backend', 'difficulty', 'instruction', 'expected_animation',
-                'animation_sequence', 'reasoning', 'additionals'
-            ]
-        else:
-            fieldnames = [
-                'backend',
-                'difficulty',
-                'instruction',
-                'expected_animation',
-                # 'animation_sequence',
-                'reasoning',
-            ]
+def load_file(backend, write_csv):
+    with open(f"tests/output/all_test_results_{basic_config['framework']}.txt",
+              "r") as text_file:
+        # read the entire file as is
+        results = json.load(text_file)
+        # print(results)
 
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-        writer.writeheader()
-        for backend_name, backend_results in results.items():
-            for result in backend_results:
-                if basic_config["with_structured_output"]:
-                    writer.writerow({
-                        'backend':
-                        backend_name,
-                        "difficulty":
-                        result['difficulty'],
-                        'instruction':
-                        result['instruction'],
-                        'expected_animation':
-                        "\"" + result['expected_animation'] + "\"",
-                        'expected_animation':
-                        "\"" + result['animation_sequence'] + "\"",
-                        'reasoning':
-                        result['reasoning'],
-                        "additionals":
-                        result['additionals']
-                    })
-                else:
-                    writer.writerow({
-                        'backend':
-                        backend_name,
-                        'difficulty':
-                        result['difficulty'],
-                        'instruction':
-                        result['instruction'],
-                        'expected_animation':
-                        "\"" + result['expected_animation'] + "\"",
-                        'reasoning':
-                        result['reasoning'],
-                        # 'animation_sequence':
-                        # "\"" + result['animation_sequence'] + "\"",
-                    })
+        write_csv(backend, results)
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+
+    load_file(backend, write_csv)

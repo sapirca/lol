@@ -278,8 +278,7 @@ class LogicPlusPlus:
 
         parsed_response = self.response_manager.parse_response(response)
 
-        assistant_response = parsed_response.get("response_wo_animation",
-                                                 "") or ""
+        assistant_response = parsed_response.get("reasoning", "") or ""
         # Add this trimmed short response to the context
         # for better understanding.
         self.message_streamer.add_message("assistant",

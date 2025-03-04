@@ -1,6 +1,6 @@
-{  
+{
   "tests": [
-    { 
+    {
       "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK",
       "difficulty": "Simple",
       "expected_output": {
@@ -15,29 +15,6 @@
                 "ring1": {
                   "coloring": {
                     "color": "HUE_PINK"
-                  }
-                }
-              }
-            }
-          ]
-        }
-      }
-    }, 
-    {
-      "instruction": "Generate animation for bars 1-5 that lit ring12 in const color RED",
-      "difficulty": "Simple",
-      "expected_output": {
-        "animation": {
-          "name": "ANY",
-          "duration": "ANY",
-          "beats": [
-            {
-              "beat_start": "4",
-              "beat_end": "20",
-              "elements": {
-                "ring12": {
-                  "coloring": {
-                    "color": "HUE_RED"
                   }
                 }
               }
