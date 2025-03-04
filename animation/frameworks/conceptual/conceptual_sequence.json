@@ -1,81 +1,44 @@
 {
   "animation": {
-    "name": "<song_name_provided_by_user>",
-    "duration": "<total_duration_of_song_in_seconds>",
+    "name": "<song_name>",
+    "duration": <duration_in_seconds>,
     "beats": [
       {
-        "time_start": "<start_beat_value>",
-        "time_end": "<end_beat_value>",
+        "beat_start": <start_beat>,
+        "beat_end": <end_beat>,
         "elements": [
-          {
-            "element_group": "<group_name>",
-            "coloring": {
-              "type": "<coloring_effect_type: constColor or rainbow>",
-              "hue": "<hue_value_if_constColor>"
-            },
-            "brightness": {
-              "type": "<brightness_effect_type: fadeIn, fadeOut, fadeInOut, fadeOutIn, blink>",
-              "start": "<start_value_if_fadeIn/fadeOut>",
-              "end": "<end_value_if_fadeIn/fadeOut>",
-              "min": "<min_value_if_fadeInOut/fadeOutIn/blink>",
-              "max": "<max_value_if_fadeInOut/fadeOutIn>",
-              "low": "<low_value_if_blink>",
-              "high": "<high_value_if_blink>"
-            },
-            "motion": {
-              "type": "<motion_effect_type: snake, snakeInOut>",
-              "start": "<start_value_if_snakeInOut>",
-              "end": "<end_value_if_snakeInOut>"
-            }
-          },
-          {
-            "element": "<element_name_2>",
-            "coloring": {
-              "type": "<coloring_effect_type: constColor or rainbow>",
-              "hue": "<hue_value_if_constColor>",
-              "saturation": "<saturation_value_if_constColor>",
-              "value": "<value_if_constColor>"
-            },
-            "brightness": {
-              "type": "<brightness_effect_type: fadeIn, fadeOut, fadeInOut, fadeOutIn, blink>",
-              "start": "<start_value_if_fadeIn/fadeOut>",
-              "end": "<end_value_if_fadeIn/fadeOut>",
-              "min": "<min_value_if_fadeInOut/fadeOutIn/blink>",
-              "max": "<max_value_if_fadeInOut/fadeOutIn>",
-              "low": "<low_value_if_blink>",
-              "high": "<high_value_if_blink>"
-            },
-            "motion": {
-              "type": "<motion_effect_type: snake, snakeInOut>",
-              "start": "<start_value_if_snakeInOut>",
-              "end": "<end_value_if_snakeInOut>"
-            }
-          },
-          {
-            "element_group": ["<element_name_1>", "<element_name_2>", "<element_name_3>"],
-            "coloring": {
-              "type": "<coloring_effect_type: constColor or rainbow>",
-              "hue": "<hue_value_if_constColor>",
-              "saturation": "<saturation_value_if_constColor>",
-              "value": "<value_if_constColor>"
-            },
-            "brightness": {
-              "type": "<brightness_effect_type: fadeIn, fadeOut, fadeInOut, fadeOutIn, blink>",
-              "start": "<start_value_if_fadeIn/fadeOut>",
-              "end": "<end_value_if_fadeIn/fadeOut>",
-              "min": "<min_value_if_fadeInOut/fadeOutIn/blink>",
-              "max": "<max_value_if_fadeInOut/fadeOutIn>",
-              "low": "<low_value_if_blink>",
-              "high": "<high_value_if_blink>"
-            },
-            "motion": {
-              "type": "<motion_effect_type: snake, snakeInOut>",
-              "start": "<start_value_if_snakeInOut>",
-              "end": "<end_value_if_snakeInOut>"
-            }
-          }
-        ]
+          "<element1>",
+          "<element2>",
+          "..."
+        ],
+        "segment": “segment_all | segment_centric | segment_updown | segment_arc | segment_ind | segment_b1 | segment_b2”
+        "coloring": {
+          "type": "<constant | rainbow>",
+          "hue": <hue_value_if_applicable> // Mandatory for "constant", unnecessary for "rainbow"
+        },
+        "brightness": { // Optional: Can be dropped if not needed
+          "type": "<fadeIn | fadeOut | constant>",
+          "value": <brightness_value> // Mandatory if "constant"
+        },
+        "motion": { // Optional: Can be dropped if not needed
+          "type": "<snake | snakeInOut>"
+        }
+      },
+      {
+        "beat_start": <start_beat>,
+        "beat_end": <end_beat>,
+        "elements": [
+          "<element1>",
+          "<element2>",
+          "..."
+        ],
+        "coloring": {
+          "type": "<constant | rainbow>",
+          "hue": <hue_value_if_applicable> // Mandatory for "constant", unnecessary for "rainbow"
+        }
+        // Brightness and motion can be omitted if not needed
       }
+      // Add more beat sections as needed
     ]
   }
 }
