@@ -45,37 +45,5 @@ For a 120 BPM song:
 # Part 3: JSON Animation Description
 
 You are to generate a JSON animation description based on user-provided song information.
-
-Follow these strict guidelines in the JSON output:
-
-## Define the Animation:
-
--   Set `"name"` to the song title.
--   Set `"duration"` to the total length in seconds.
-
-## Create the Beats Array:
-
--   Each beat section must include:
-    -   `"beat_start"`: The starting beat where the effects begin to render.
-    -   `"beat_end"`: The ending beat where the effects finish rendering.
-    -   `"elements"`: A list of elements affected during this period.
-    -   Optional: `"segment"` (a subgroup of LEDs in a full element). This can be added for decoration. The specific outcome of each segment is not relevant as much as it is another instrument for variety. The segment names are given as part of the world description.
-
-## Define Coloring:
-
--   `"type"` can be `"constant"` or `"rainbow"`.
--   `"hue"` (mandatory for `"constant"`, not needed for `"rainbow"`).
-
-## Set Brightness (Optional):
-
--   `"type"` can be `"fadeIn"`, `"fadeOut"`, or `"constant"`.
--   `"value"` is required if `"type"` is `"constant"`.
-
-## Set Motion (Optional):
-
--   `"type"` can be `"snake"` or `"snakeInOut"`.
-
-Omit optional fields if not needed.
-
 A json scheme is attached to the prompt.
 ```

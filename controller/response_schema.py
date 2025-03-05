@@ -34,7 +34,7 @@ class Motion(BaseModel):
 class Beat(BaseModel):
     beat_start: float = Field(description="Starting beat")
     beat_end: float = Field(description="Ending beat")
-    elements: Set[Union[str]] = Field(
+    elements: List[str] = Field(
         description=
         "Name of individual Elements (ring1-ring12) or groups of elements (all, odd, even, left, right, center, outer) affected during this time period. Groups select all element in the group (e.g., 'odd' selects odd-numbered rings, 'left' selects left-side rings).",
         enum=[
@@ -46,14 +46,14 @@ class Beat(BaseModel):
     brightness: Brightness = None
     motion: Motion = None
 
-    @model_validator(mode='before')
-    def check_coloring_dependency(cls, values):
-        motion = values.get('motion')
-        coloring = values.get('coloring')
-        if motion and not coloring:
-            raise ValueError(
-                'If motion is provided, coloring must also be provided.')
-        return values
+    # @model_validator(mode='before')
+    # def check_coloring_dependency(cls, values):
+    #     motion = values.get('motion')
+    #     coloring = values.get('coloring')
+    #     if motion and not coloring:
+    #         raise ValueError(
+    #             'If motion is provided, coloring must also be provided.')
+    #     return values
 
 
 class Animation(BaseModel):
@@ -64,6 +64,10 @@ class Animation(BaseModel):
 
 class ResponseSchema(BaseModel):
     name: str
+    instruction: str = Field(
+        description=
+        "The instruction that was given to the model to generate this response."
+    )
     reasoning: str = Field(
         description=
         "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
