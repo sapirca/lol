@@ -39,6 +39,7 @@ XLIGHTS_ANIMATION_SUFFIX = 'xsq'
 # ConceptualFramework
 CONCEPTUAL_HOUSE_PATH = "animation/frameworks/conceptual/conceptual_house.txt"
 CONCEPTUAL_KNOWLEDGE_PATH = "animation/frameworks/conceptual/conceptual_knowledge.txt"
+CONCEPTUAL_PROMPT = "animation/frameworks/conceptual/prompt.txt"
 CONCEPTUAL_SEQUENCE_PATH = "animation/frameworks/conceptual/conceptual_sequence.json"
 CONCEPTUAL_TEMP_ANIMATION_FILE = "conceptual_tmp.json"
 CONCEPTUAL_ANIMATION_SUFFIX = "json"

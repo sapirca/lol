@@ -1,0 +1,81 @@
+```markdown
+# Part 2: The Animation Framework - High-Level Structure
+
+## Animation Rendering Process for LED Light Shows:
+
+An animation consists of a sequence of time frames, where each time frame defines which Elements should be lit and the effects applied to them. The animation structure follows this pattern:
+
+```
+Time frame 1 → List of elements → Effects applied
+Time frame 2 → List of elements → Effects applied
+Time frame 3 → List of elements → Effects applied
+```
+
+## Effect Types:
+
+-   **Coloring Effects (Mandatory):** Define the base color and visibility of an element (e.g., `rainbow()`).
+-   **Brightness Effects (Optional):** Modify intensity over time (e.g., `blink()`, `fade()`).
+-   **Motion Effects (Optional):** Apply movement transformations (e.g., `snake()`).
+
+## Effect Layering & Rendering Process:
+
+-   Each element’s controller receives the animation containing sequences of (time frame → effects).
+-   Each controller maintains the state of the LED strip connected to it. It holds a virtual representation of the LED pixels. Each pixel has HSV - Hue, Saturation and Value (brightness).
+-   During the light show, the controller continuously samples the current time in the song and renders all the relevant effects for that moment.
+-   Effects are applied sequentially, modifying a virtual LED representation before transmitting the final HSV values to the physical LEDs.
+
+## Effect Application Rules:
+
+-   Some effects modify existing values (e.g., `fade-in` adjusts brightness). Some relative (e.g., `hue shift` modifies the current color phase, if there’s no color, the hue shift will not do anything).
+-   Some effects override values (e.g., color changes replace the current color).
+
+## Example Calculation:
+
+For a 120 BPM song:
+
+-   Each beat lasts 500ms.
+-   Suppose an animation applies `rainbow()` (Coloring) and `blink()` (Brightness).
+-   Between 0 - 2000ms (4 beats), the controller will:
+    -   Check active effects at each time frame (e.g., at 1649ms).
+    -   Render rainbow coloring first.
+    -   Apply the blinking effect over it.
+    -   Transmit the final HSV values to the physical LED strip.
+-   At 100 pixels, if the last effect in sequence is BLUE, the strip will display blue across all pixels.
+
+# Part 3: JSON Animation Description
+
+You are to generate a JSON animation description based on user-provided song information.
+
+Follow these strict guidelines in the JSON output:
+
+## Define the Animation:
+
+-   Set `"name"` to the song title.
+-   Set `"duration"` to the total length in seconds.
+
+## Create the Beats Array:
+
+-   Each beat section must include:
+    -   `"beat_start"`: The starting beat where the effects begin to render.
+    -   `"beat_end"`: The ending beat where the effects finish rendering.
+    -   `"elements"`: A list of elements affected during this period.
+    -   Optional: `"segment"` (a subgroup of LEDs in a full element). This can be added for decoration. The specific outcome of each segment is not relevant as much as it is another instrument for variety. The segment names are given as part of the world description.
+
+## Define Coloring:
+
+-   `"type"` can be `"constant"` or `"rainbow"`.
+-   `"hue"` (mandatory for `"constant"`, not needed for `"rainbow"`).
+
+## Set Brightness (Optional):
+
+-   `"type"` can be `"fadeIn"`, `"fadeOut"`, or `"constant"`.
+-   `"value"` is required if `"type"` is `"constant"`.
+
+## Set Motion (Optional):
+
+-   `"type"` can be `"snake"` or `"snakeInOut"`.
+
+Omit optional fields if not needed.
+
+A json scheme is attached to the prompt.
+```

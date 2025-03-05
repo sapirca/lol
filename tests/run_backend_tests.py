@@ -13,9 +13,9 @@ from controller.interpreter import Interpreter
 from prompt import intro_prompt
 
 RELATIVE_DATA_PATH = "tests/data/"
-TEST_FILENAME = "test_data.json"
 
-# MINI_TEST_FILENAME = "mini_test_data.json"
+# TEST_FILENAME = "test_data.json"
+TEST_FILENAME = "mini_test_data.json"
 
 
 def load_test_data(filename):

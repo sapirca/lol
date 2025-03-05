@@ -7,6 +7,8 @@ import logging
 import json
 #TODO sapir rename this file
 from secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
+from pydantic import BaseModel
+from controller.response_schema import ResponseSchema
 
 GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
 
@@ -67,12 +69,8 @@ class GPTBackend(LLMBackend):
 
         self.client = openai.OpenAI(api_key=self.api_key)
 
-        # TODO sapir: add the schema to the backend
         if self.w_structured_output:
-            with open(
-                    '/Users/sapir/repos/lol/schemas/gpt_response_scheme.json',
-                    'r') as schema_file:
-                self.schema = json.load(schema_file)
+            self.schema = ResponseSchema(name="gpt_response")
 
     def token_count(self, messages):
         encoding = tiktoken.encoding_for_model(self.model)
@@ -137,12 +135,8 @@ class ClaudeBackend(LLMBackend):
             self.logger.warning(
                 f"Model {self.model} not found in CLAUDE_MODELS.")
 
-        # Load schema from file
         if self.w_structured_output:
-            with open(
-                    '/Users/sapir/repos/lol/schemas/claude_response_schema.json',
-                    'r') as schema_file:
-                self.schema = json.load(schema_file)
+            self.schema = ResponseSchema(name="claude_response")
 
     def generate_response(self, messages):
         """
@@ -236,12 +230,8 @@ class GeminiBackend(LLMBackend):
         # self.gemini_model = genai.GenerativeModel(self.model)
         self.client = genai.Client(api_key=self.api_key)
 
-        # Load schema from file
         if self.w_structured_output:
-            with open(
-                    '/Users/sapir/repos/lol/schemas/gemini_response_schema.json',
-                    'r') as schema_file:
-                self.schema = json.load(schema_file)
+            self.schema = ResponseSchema(name="gemini_response")
 
     def generate_response(self, messages):
         try:

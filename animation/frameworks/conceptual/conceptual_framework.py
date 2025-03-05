@@ -2,7 +2,7 @@ from animation.frameworks.framework import Framework
 from animation.frameworks.conceptual.conceptual_sequence import ConceptualSequence
 import os
 import json
-from controller.constants import CONCEPTUAL_HOUSE_PATH, CONCEPTUAL_KNOWLEDGE_PATH, CONCEPTUAL_SEQUENCE_PATH
+from controller.constants import CONCEPTUAL_HOUSE_PATH, CONCEPTUAL_KNOWLEDGE_PATH, CONCEPTUAL_PROMPT, CONCEPTUAL_SEQUENCE_PATH
 
 
 class ConceptualFramework(Framework):
@@ -22,7 +22,8 @@ class ConceptualFramework(Framework):
 
     def get_domain_knowledge(self):
         try:
-            with open(CONCEPTUAL_KNOWLEDGE_PATH, 'r') as file:
+            # with open(CONCEPTUAL_KNOWLEDGE_PATH, 'r') as file:
+            with open(CONCEPTUAL_PROMPT, 'r') as file:
                 content = file.read()
             return content
         except Exception as e:
