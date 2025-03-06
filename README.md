@@ -6,7 +6,7 @@ This project integrates multiple LLM backends including OpenAI's GPT, Anthropic'
 
 1. **Python**:
    - Ensure Python 3.9 or higher is installed on your system.
-   - Install [Anaconda](https://www.anaconda.com/products/distribution) for managing environments.
+   - Install [MiniConda](https://docs.anaconda.com/miniconda/install/) for managing environments.
 
 2. **VSCode**:
    - Install [Visual Studio Code](https://code.visualstudio.com/).
@@ -16,13 +16,13 @@ This project integrates multiple LLM backends including OpenAI's GPT, Anthropic'
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/llm-backend-integration.git
-   cd llm-backend-integration
+   git clone https://github.com/sapirca/lol.git
+   cd lol
    ```
 
 2. **Create a Conda Environment**:
    ```bash
-   conda create --name lol_agent python=3.8
+   conda create --name lol_agent python=3.9
    conda activate lol_agent
    ```
 

@@ -23,9 +23,6 @@ Thumbs.db
 .idea/
 *.swp
 
-# lol specific
-animation_output/temp_animation.xml
-
 # Exclude specific directories in animation/frameworks/xlights/simulator/
 animation/frameworks/xlights/simulator/*/
 !animation/frameworks/xlights/simulator/shows/
