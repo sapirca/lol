@@ -15,8 +15,8 @@ from prompt import intro_prompt
 
 RELATIVE_DATA_PATH = "tests/data/"
 
-TEST_FILENAME = "test_data.json"
-# TEST_FILENAME = "mini_test_data.json"
+# TEST_FILENAME = "test_data.json"
+TEST_FILENAME = "mini_test_data.json"
 
 
 def prepare_full_prompt(animation_manager):
@@ -95,8 +95,11 @@ def run_tests(test_data, backends):
 
             if isinstance(response, ResponseSchema):
                 test_results[backend_name] = response.model_dump_json(indent=4)
+            elif isinstance(response, str):
+                data = json.loads(response)
+                formatted_json = json.dumps(data, indent=2)
+                test_results[backend_name] = formatted_json
             else:
-                assert isinstance(response, str)
                 test_results[backend_name] = response
 
         results.setdefault("tests", []).append(test_results)
@@ -128,10 +131,10 @@ def main():
     logging.basicConfig(level=logging.INFO)
     test_data = load_test_data(TEST_FILENAME)
     backends = {
-        "GPT": GPTBackend(name="GPT", config=basic_config),
+        # "GPT": GPTBackend(name="GPT", config=basic_config),
         # "Claude": ClaudeBackend(name="Claude", config=basic_config),
         # "Gemini": GeminiBackend(name="Gemini", config=basic_config),
-        # "DeepSeek": DeepSeekBackend(name="DeepSeek", config=basic_config),
+        "DeepSeek": DeepSeekBackend(name="DeepSeek", config=basic_config),
     }
     results = run_tests(test_data, backends)
     write_csv(results)

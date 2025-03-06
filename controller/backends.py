@@ -2,7 +2,8 @@ import instructor
 import openai
 import tiktoken
 import anthropic
-import google.generativeai as genai
+# import google.generativeai as genai
+from google import genai
 import logging
 import json
 from lol_secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
@@ -22,6 +23,8 @@ class LLMBackend:
         self.config = config or {}
         self.model = model
         self.logger.info(f"Using {name} model: {self.model}")
+        self.intstructor_response = self.config.get("instructor_response",
+                                                    False)
         self.w_structured_output = self.config.get("with_structured_output",
                                                    False)
 
@@ -47,15 +50,6 @@ class StubBackend(LLMBackend):
         super().__init__(name, "stub", config=config)
 
     def generate_response(self, messages):
-        """
-        Stub backend that returns a fixed response for testing purposes.
-
-        Args:
-            messages (list): The array of messages to process.
-
-        Returns:
-            str: A fixed response for testing, occasionally including an animation sequence.
-        """
         response_schema = ResponseSchema(
             name="stub_response",
             reasoning="This is a stubbed reasoning.",
@@ -78,16 +72,31 @@ class GPTBackend(LLMBackend):
 
     def __init__(self, name, model="gpt-4o-mini-2024-07-18", config=None):
         super().__init__(name, model, config=config)
-        self.client = instructor.from_openai(
-            openai.OpenAI(api_key=OPENAI_API_KEY))
+        self.client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
     def generate_response(self, messages):
         data = {"messages": messages}
-        data["response_model"] = ResponseSchema
+
+        schema = ResponseSchema.model_json_schema()
+        data["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": "ResponseSchema",
+                "schema": schema
+            }
+        }
 
         try:
-            response = self.client.chat.completions.create(model=self.model,
-                                                           **data)
+            if self.intstructor_response:
+                response = self.client.beta.chat.completions.parse(
+                    model=self.model,
+                    messages=messages,
+                    response_format=ResponseSchema)
+            else:
+                response = self.client.chat.completions.create(
+                    model=self.model, **data)
+
+            response = response.choices[0].message.content.strip()
             return response
         except Exception as e:
             self.logger.error(f"Error communicating with GPT API: {e}")
@@ -107,6 +116,8 @@ class ClaudeBackend(LLMBackend):
             client=anthropic.Anthropic(api_key=CLAUDE_API_KEY),
             model=self.model,
         )
+
+        # self.client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
 
     def generate_response(self, messages):
         system_messages = []
@@ -140,7 +151,37 @@ class ClaudeBackend(LLMBackend):
                 "response_model": ResponseSchema,
             }
 
+            # schema = ResponseSchema.model_json_schema()
+            # data = {
+            #     "model": self.model,
+            #     "max_tokens": 2048,
+            #     "temperature": 0,
+            #     "system":
+            #     system_prompt,  # Correct usage of system instructions
+            #     "messages": claude_messages,
+            #     "response_format": {
+            #         "type": "json_schema",
+            #         "json_schema": {
+            #             "name": "ResponseSchema",
+            #             "schema": schema
+            #         }
+            #     }
+            # }
+
             response = self.client.messages.create(**data)
+
+            # # Parse and clean up response text
+            # response_text = ""
+            # for content_block in response.content:  # Assuming response.content is iterable
+            #     if content_block.type == "text":
+            #         response_text += content_block.text
+            # response_text = response_text.strip()  # Clean up whitespace
+
+            # if hasattr(self, 'log_tokens'):
+            #     self.log_tokens(messages, response_text)
+
+            # return response_text
+
             return response
 
         except Exception as e:
@@ -155,22 +196,37 @@ class GeminiBackend(LLMBackend):
 
     def __init__(self, name, model="gemini-1.5-flash-latest", config=None):
         super().__init__(name, model, config=config)
-        genai.configure(api_key=GEMINI_API_KEY)
-        self.client = instructor.from_gemini(
-            client=genai.GenerativeModel(model_name=self.model),
-            mode=instructor.Mode.GEMINI_JSON,
-        )
+        # genai.configure(api_key=GEMINI_API_KEY)
+        # self.client = genai.GenerativeModel(model_name=self.model)
+        self.api_key = GEMINI_API_KEY
+        self.client = genai.Client(api_key=self.api_key)
 
     def generate_response(self, messages):
         try:
-            # prompt = "\n".join(
-            #     [f'{msg["role"]}: {msg["content"]}' for msg in messages])
-
-            response = self.client.messages.create(
-                messages=messages,
-                response_model=ResponseSchema,
-            )
-            return response
+            # data = {
+            #     "messages": messages,
+            #     "response_format": {
+            #         "type": "json_schema",
+            #         "json_schema": {
+            #             "name": "ResponseSchema",
+            #             "schema": schema
+            #         }
+            #     }
+            # }
+            prompt = "\n".join(
+                [f'{msg["role"]}: {msg["content"]}' for msg in messages])
+            schema = ResponseSchema.model_json_schema()
+            prompt += "\nUse this JSON schema:" + json.dumps(schema)
+            response = self.client.models.generate_content(model=self.model,
+                                                           contents=prompt)
+            response_text = response.text.strip()
+            response_text = response_text.replace("```json",
+                                                  "").replace("```",
+                                                              "").strip()
+            # data = json.loads(response)
+            # response = self.client.messages.create(**data)
+            # response = response.choices[0].message.content.strip()
+            return response_text
         except Exception as e:
             self.logger.error(f"Error communicating with Gemini backend: {e}")
             raise e
@@ -185,19 +241,27 @@ class DeepSeekBackend(LLMBackend):
 
     def __init__(self, name, model="deepseek-chat", config=None):
         super().__init__(name, model, config=config)
-
-        # TODO use self.model
         self.client = openai.OpenAI(api_key=DEEP_SEEK_API_KEY,
                                     base_url="https://api.deepseek.com/v1")
 
     def generate_response(self, messages):
         try:
+            schema = ResponseSchema.model_json_schema()
+            data = {
+                "messages": messages,
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "ResponseSchema",
+                        "schema": schema
+                    }
+                }
+            }
+
             response = self.client.chat.completions.create(model=self.model,
-                                                           messages=messages,
-                                                           stream=False)
-            response_text = response.choices[0].message.content.strip()
-            self.log_tokens(messages, response_text)
-            return response_text
+                                                           **data)
+            response = response.choices[0].message.content.strip()
+            return response
         except Exception as e:
             self.logger.error(
                 f"Error communicating with DeepSeek backend: {e}")
