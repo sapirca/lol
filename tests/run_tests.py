@@ -72,10 +72,15 @@ def run_tests(test_data, backends):
     for backend_name, backend in backends.items():
         results[backend_name] = []
 
-    for backend_name, backend in backends.items():
-        for test in test_data["tests"]:
-            instruction = test["instruction"]
+    for test in test_data["tests"]:
+        instruction = test["instruction"]
+        test_results = {
+            "instruction": instruction,
+            "difficulty": test.get('difficulty', ""),
+            "expected_output": test.get("expected_output", "")
+        }
 
+        for backend_name, backend in backends.items():
             messages = [{
                 "role": "system",
                 "content": full_prompt
@@ -88,69 +93,47 @@ def run_tests(test_data, backends):
             except Exception as e:
                 response = f"Error: {str(e)}"
 
-            dict_response = {
-                "instruction": instruction,
-                "difficulty": test.get('difficulty', "")
-            }
-
             if isinstance(response, ResponseSchema):
-                dict_response["response"] = response.model_dump_json(indent=4)
+                test_results[backend_name] = response.model_dump_json(indent=4)
             else:
                 assert isinstance(response, str)
-                dict_response["response"] = response
+                test_results[backend_name] = response
 
-            results[backend_name].append(dict_response)
+        results.setdefault("tests", []).append(test_results)
     return results
 
 
 def write_csv(results):
-    # for backend_name in backends:
-    #     for backend_name, backend_result in results.items():
-    #         write_csv_for_backend(backend_name, backend_result)
-
-    # def write_csv_for_backend(backend_name, backend_result):
     try:
-        backend_name = "_".join([backend for backend in results.keys()])
-        csv_filename = f"tests/output/csv_{basic_config['framework']}_{backend_name}.csv"
+        tested_backends = "_".join([backend for backend in results.keys()])
+        csv_filename = f"tests/output/csv_{basic_config['framework']}_{tested_backends}.csv"
         with open(csv_filename, mode='w+', newline='',
                   encoding="utf-8") as csvfile:
-            fieldnames = [
-                'backend',
-                'difficulty',
-                'instruction',
-                'response',
-            ]
+            fieldnames = ['instruction', 'difficulty', 'expected_output'
+                          ] + list(results["tests"][0].keys())[2:]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
-            for backend_name, backend_result in results.items():
-                for result in backend_result:
-                    writer.writerow({
-                        'backend': backend_name,
-                        "difficulty": result['difficulty'],
-                        'instruction': result['instruction'],
-                        'response': result['response'],
-                    })
+            for test_result in results["tests"]:
+                writer.writerow(test_result)
     except Exception as e:
         print(f"Error writing results to CSV: {e}")
-        full_name = f"tests/output/dump_{basic_config['framework']}_{backend_name}.txt"
+        full_name = f"tests/output/dump_{basic_config['framework']}_results.txt"
         with open(full_name, "w+") as text_file:
-            text_file.write("\n".join(str(item) for item in backend_result))
+            text_file.write(json.dumps(results, indent=2))
         print(f"Results dumped to {full_name}")
 
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    # test_data = load_test_data(MINI_TEST_FILENAME)
     test_data = load_test_data(TEST_FILENAME)
     backends = {
         "GPT": GPTBackend(name="GPT", config=basic_config),
-        "Claude": ClaudeBackend(name="Claude", config=basic_config),
+        # "Claude": ClaudeBackend(name="Claude", config=basic_config),
         # "Gemini": GeminiBackend(name="Gemini", config=basic_config),
         # "DeepSeek": DeepSeekBackend(name="DeepSeek", config=basic_config),
     }
     results = run_tests(test_data, backends)
-    # backend_names = "".join([backend for backend in backends.keys()])
     write_csv(results)
 
 

@@ -9,6 +9,7 @@ from lol_secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMIN
 from pydantic import BaseModel
 from controller.response_schema import ResponseSchema
 
+
 class LLMBackend:
     """
     Base class for LLM backends.
@@ -66,12 +67,15 @@ class StubBackend(LLMBackend):
 
         self.log_tokens(messages, response_schema.dict())
         return response_schema
-    
+
+
 # *************************************** #
 # ***************** GPT ***************** #
 # *************************************** #
 
+
 class GPTBackend(LLMBackend):
+
     def __init__(self, name, model="gpt-4o-mini-2024-07-18", config=None):
         super().__init__(name, model, config=config)
         self.client = instructor.from_openai(
@@ -89,9 +93,11 @@ class GPTBackend(LLMBackend):
             self.logger.error(f"Error communicating with GPT API: {e}")
             raise e
 
+
 # *************************************** #
 # **************** Claude *************** #
 # *************************************** #
+
 
 class ClaudeBackend(LLMBackend):
 
@@ -141,6 +147,7 @@ class ClaudeBackend(LLMBackend):
             error_message = f"Error, Claude backend: {str(e)}"
             raise e
 
+
 # *************************************** #
 # **************** Gemini *************** #
 # *************************************** #
@@ -173,7 +180,9 @@ class GeminiBackend(LLMBackend):
 # ************** Deep Seek **************** #
 # ***************************************** #
 
+
 class DeepSeekBackend(LLMBackend):
+
     def __init__(self, name, model="deepseek-chat", config=None):
         super().__init__(name, model, config=config)
 
@@ -193,4 +202,3 @@ class DeepSeekBackend(LLMBackend):
             self.logger.error(
                 f"Error communicating with DeepSeek backend: {e}")
             raise e
-

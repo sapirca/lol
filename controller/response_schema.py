@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Set, Union, List
+from typing import List, Union, Optional
 
 
 class Coloring(BaseModel):
@@ -7,7 +7,7 @@ class Coloring(BaseModel):
         description=
         "Coloring effects define the base color of an element. If no coloring effect is applied, the element will not be visible.",
         enum=["constant", "rainbow"])
-    hue: Union[float, None] = Field(
+    hue: Optional[float] = Field(
         description="Required for constant type, not needed for rainbow",
         default=None)
 
@@ -17,11 +17,10 @@ class Brightness(BaseModel):
         description=
         "Brightness effects modify the intensity of the light over time. If no brightness effect is set, brightness remains constant. No need to put this field if no brightness effect is needed.",
         enum=["fadeIn", "fadeOut", "blink", "fadeInOut", "fadeOutIn"])
-    value: Union[float,
-                 None] = Field(description="Required if type is constant",
-                               default=None,
-                               ge=0,
-                               le=1)
+    value: Optional[float] = Field(description="Required if type is constant",
+                                   default=None,
+                                   ge=0,
+                                   le=1)
 
 
 class Motion(BaseModel):
@@ -43,8 +42,8 @@ class Beat(BaseModel):
             "even", "left", "right", "center", "outer"
         ])
     coloring: Coloring
-    brightness: Brightness = None
-    motion: Motion = None
+    brightness: Optional[Brightness] = None
+    motion: Optional[Motion] = None
 
     # @model_validator(mode='before')
     # def check_coloring_dependency(cls, values):

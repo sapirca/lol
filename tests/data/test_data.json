@@ -14,7 +14,6 @@
               "elements": [
                 "ring1"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_PINK"
@@ -38,7 +37,6 @@
               "elements": [
                 "ring6"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 0
@@ -69,7 +67,6 @@
                 "ring11",
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_RED"
@@ -93,7 +90,6 @@
               "elements": [
                 "ring1"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_PINK"
@@ -117,7 +113,6 @@
               "elements": [
                 "all"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_BLUE"
@@ -141,7 +136,6 @@
               "elements": [
                 "element_group_1"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_RED"
@@ -156,7 +150,6 @@
               "elements": [
                 "element_group_1"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_RED"
@@ -171,7 +164,6 @@
               "elements": [
                 "element_group_2"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_GREEN"
@@ -186,7 +178,6 @@
               "elements": [
                 "element_group_2"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": "HUE_GREEN"
@@ -214,7 +205,6 @@
                 "ring3",
                 "ring5"
               ],
-              "mapping": "centeric",
               "coloring": {
                 "type": "rainbow"
               }
@@ -235,7 +225,6 @@
                 "ring5",
                 "even"
               ],
-              "mapping": "centeric",
               "coloring": {
                 "type": "rainbow"
               }
@@ -260,7 +249,6 @@
                 "ring5",
                 "even"
               ],
-              "mapping": "centeric",
               "coloring": {
                 "type": "rainbow"
               }
@@ -281,7 +269,6 @@
                 "ring5",
                 "even"
               ],
-              "mapping": "centeric",
               "coloring": {
                 "type": "rainbow"
               }
@@ -294,7 +281,6 @@
                 "ring5",
                 "even"
               ],
-              "mapping": "centeric",
               "brightness": {
                 "type": "fadeIn"
               }
@@ -318,7 +304,6 @@
                 "ring3",
                 "ring5"
               ],
-              "mapping": "centeric",
               "coloring": {
                 "type": "rainbow"
               }
@@ -338,7 +323,6 @@
                 "ring3",
                 "ring5"
               ],
-              "mapping": "centeric",
               "coloring": {
                 "type": "rainbow"
               },
@@ -354,7 +338,6 @@
                 "ring3",
                 "ring5"
               ],
-              "mapping": "centeric",
               "coloring": {
                 "type": "rainbow"
               }
@@ -377,7 +360,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 330
@@ -389,7 +371,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 15
@@ -401,7 +382,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 60
@@ -413,7 +393,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 105
@@ -425,7 +404,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 150
@@ -437,7 +415,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 195
@@ -449,7 +426,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 240
@@ -461,7 +437,6 @@
               "elements": [
                 "ring12"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "constant",
                 "hue": 285
@@ -486,7 +461,6 @@
                 "ring1",
                 "ring2"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "rainbow"
               }
@@ -506,7 +480,6 @@
                 "ring1",
                 "ring2"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "rainbow"
               },
@@ -521,7 +494,6 @@
                 "ring1",
                 "ring2"
               ],
-              "mapping": "all",
               "coloring": {
                 "type": "rainbow"
               },
