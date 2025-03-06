@@ -241,26 +241,20 @@ class DeepSeekBackend(LLMBackend):
 
     def __init__(self, name, model="deepseek-chat", config=None):
         super().__init__(name, model, config=config)
-        self.client = openai.OpenAI(api_key=DEEP_SEEK_API_KEY,
-                                    base_url="https://api.deepseek.com/v1")
+        self.client = instructor.from_openai(
+            openai.OpenAI(api_key=DEEP_SEEK_API_KEY,
+                          base_url="https://api.deepseek.com"))
 
     def generate_response(self, messages):
         try:
             schema = ResponseSchema.model_json_schema()
             data = {
+                "model": self.model,
                 "messages": messages,
-                "response_format": {
-                    "type": "json_schema",
-                    "json_schema": {
-                        "name": "ResponseSchema",
-                        "schema": schema
-                    }
-                }
+                "response_model": ResponseSchema,
             }
 
-            response = self.client.chat.completions.create(model=self.model,
-                                                           **data)
-            response = response.choices[0].message.content.strip()
+            response = self.client.chat.completions.create(**data)
             return response
         except Exception as e:
             self.logger.error(
