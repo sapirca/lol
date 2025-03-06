@@ -85,8 +85,8 @@ def run_tests(test_data, backends):
 
         input_animation = test.get("input_animation", None)
         if input_animation:
-            test_results["input_animation"] = json.dump(input_animation,
-                                                        indent=2)
+            test_results["input_animation"] = json.dumps(input_animation,
+                                                         indent=2)
         else:
             test_results["input_animation"] = ""
 
@@ -101,8 +101,10 @@ def run_tests(test_data, backends):
 
             if input_animation:
                 messages.append({
-                    "role": "user",
-                    "content": json.dump(input_animation, indent=2)
+                    "role":
+                    "user",
+                    "content":
+                    json.dumps(input_animation, indent=2)
                 })
 
             try:
@@ -141,8 +143,14 @@ def write_csv(results):
         csv_filename = f"tests/output/_{TEST_FILENAME}_{basic_config['framework']}_{tested_backends}.csv"
         with open(csv_filename, mode='w+', newline='',
                   encoding="utf-8") as csvfile:
-            fieldnames = ['instruction', 'difficulty', 'expected_output'
-                          ] + list(results["tests"][0].keys())[2:]
+            predefined_fieldnames = [
+                'instruction', 'difficulty', 'expected_output'
+            ]
+            additional_fieldnames = list(results["tests"][0].keys())[3:]
+            fieldnames = predefined_fieldnames + [
+                field for field in additional_fieldnames
+                if field not in predefined_fieldnames
+            ]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
