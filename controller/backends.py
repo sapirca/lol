@@ -9,9 +9,6 @@ from lol_secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMIN
 from pydantic import BaseModel
 from controller.response_schema import ResponseSchema
 
-GPT_4O_MINI_API_URL = "https://api.example.com/gpt-4o-mini"
-
-
 class LLMBackend:
     """
     Base class for LLM backends.
@@ -43,20 +40,38 @@ class LLMBackend:
         return sum(len(message["content"].split()) for message in messages)
 
 
-class GPTBackend(LLMBackend):
-    GPT_MODELS = [
-        "gpt-4o-mini",
-        "gpt-4",
-        "gpt-4o",
-        "gpt-o1",
-        "gpt-o1-mini",
-        # Json Scheme
-        "o3-mini-2025-1-31",  # and later
-        "o1-2024-12-17",  # and later
-        "gpt-4o-mini-2024-07-18",  # and later
-        "gpt-4o-2024-08-06",  # and later
-    ]
+class StubBackend(LLMBackend):
 
+    def __init__(self, name, config=None):
+        super().__init__(name, "stub", config=config)
+
+    def generate_response(self, messages):
+        """
+        Stub backend that returns a fixed response for testing purposes.
+
+        Args:
+            messages (list): The array of messages to process.
+
+        Returns:
+            str: A fixed response for testing, occasionally including an animation sequence.
+        """
+        response_schema = ResponseSchema(
+            name="stub_response",
+            reasoning="This is a stubbed reasoning.",
+            animation={
+                "name": "stub_animation",
+                "duration": 0,
+                "beats": []
+            })
+
+        self.log_tokens(messages, response_schema.dict())
+        return response_schema
+    
+# *************************************** #
+# ***************** GPT ***************** #
+# *************************************** #
+
+class GPTBackend(LLMBackend):
     def __init__(self, name, model="gpt-4o-mini-2024-07-18", config=None):
         super().__init__(name, model, config=config)
         self.client = instructor.from_openai(
@@ -69,29 +84,16 @@ class GPTBackend(LLMBackend):
         try:
             response = self.client.chat.completions.create(model=self.model,
                                                            **data)
-            # self.log_tokens(messages, response.dict())
             return response
         except Exception as e:
             self.logger.error(f"Error communicating with GPT API: {e}")
             raise e
 
-    # def token_count(self, messages):
-    #     encoding = tiktoken.encoding_for_model(self.model)
-    #     return sum(
-    #         len(encoding.encode(message["content"])) for message in messages)
-
+# *************************************** #
+# **************** Claude *************** #
+# *************************************** #
 
 class ClaudeBackend(LLMBackend):
-    CLAUDE_MODELS = [
-        "claude-2",
-        "claude-instant",
-        "claude-next-gen",
-        "claude-lite",
-        "claude-ultra",
-        "claude-supernova",
-        "claude-3-5-sonnet-20241022",
-        "claude-3-haiku-20240307",
-    ]
 
     def __init__(self, name, model="claude-3-5-sonnet-20241022", config=None):
         super().__init__(name, model, config=config)
@@ -139,13 +141,10 @@ class ClaudeBackend(LLMBackend):
             error_message = f"Error, Claude backend: {str(e)}"
             raise e
 
-
+# *************************************** #
+# **************** Gemini *************** #
+# *************************************** #
 class GeminiBackend(LLMBackend):
-    GEMINI_MODELS = {
-        "gemini-1.5-flash-8b": 0.0375,
-        "gemini-1.5-flash": 0.075,
-        "gemini-1.5-pro": 1.25
-    }
 
     def __init__(self, name, model="gemini-1.5-flash-latest", config=None):
         super().__init__(name, model, config=config)
@@ -170,13 +169,11 @@ class GeminiBackend(LLMBackend):
             raise e
 
 
-class DeepSeekBackend(LLMBackend):
-    DEEPSEEK_MODELS = {
-        "deepseek-chat": 0.04,
-        "deepseek-chat-pro": 0.08,
-        "deepseek-reasoner": 0.06,
-    }
+# ***************************************** #
+# ************** Deep Seek **************** #
+# ***************************************** #
 
+class DeepSeekBackend(LLMBackend):
     def __init__(self, name, model="deepseek-chat", config=None):
         super().__init__(name, model, config=config)
 
@@ -197,30 +194,3 @@ class DeepSeekBackend(LLMBackend):
                 f"Error communicating with DeepSeek backend: {e}")
             raise e
 
-
-class StubBackend(LLMBackend):
-
-    def __init__(self, name, config=None):
-        super().__init__(name, "stub", config=config)
-
-    def generate_response(self, messages):
-        """
-        Stub backend that returns a fixed response for testing purposes.
-
-        Args:
-            messages (list): The array of messages to process.
-
-        Returns:
-            str: A fixed response for testing, occasionally including an animation sequence.
-        """
-        response_schema = ResponseSchema(
-            name="stub_response",
-            reasoning="This is a stubbed reasoning.",
-            animation={
-                "name": "stub_animation",
-                "duration": 0,
-                "beats": []
-            })
-
-        self.log_tokens(messages, response_schema.dict())
-        return response_schema
