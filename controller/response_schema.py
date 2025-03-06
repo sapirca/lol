@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import List, Union, Optional
+from typing import List, Literal, Union, Optional
 
 
 class Coloring(BaseModel):
@@ -7,9 +7,30 @@ class Coloring(BaseModel):
         description=
         "Coloring effects define the base color of an element. If no coloring effect is applied, the element will not be visible.",
         enum=["constant", "rainbow"])
-    hue: Optional[float] = Field(
-        description="Required for constant type, not needed for rainbow",
-        default=None)
+    hue: Optional[Union[float, Literal[
+        "RED", "ORANGE", "YELLOW", "GREEN", "AQUA", "BLUE", "PURPLE",
+        "PINK"]]] = Field(
+            description=
+            "The hue value in HSV describes the base color. When represented as a float from 0.0 to 1.0, 0.0 and 1.0 both represent red, as they are the start and end of the color wheel. The values in between transition through the other colors of the spectrum. Required for constant type, not needed for rainbow. Can be a float from 0.0 to 1.0, or one of the predefined color names: RED, ORANGE, YELLOW, GREEN, AQUA, BLUE, PURPLE, PINK.",
+            default=None)
+    # RED = 0.0, ORANGE = 0.125, YELLOW = 0.250, GREEN = 0.376, AQUA = 0.502, BLUE = 0.627, PURPLE = 0.752, PINK = 0.878, RED = 1.0
+
+    @model_validator(mode='after')
+    def check_hue(self):
+        if self.type == "constant" and self.hue is None:
+            raise ValueError("Hue is required for 'constant' coloring type.")
+        if self.type == "rainbow" and self.hue is not None:
+            raise ValueError(
+                "Hue should not be provided for 'rainbow' coloring type.")
+        return self
+
+        # Optional[int] = Field(
+        #     description="Hue is measured in degrees from 0 to 360. Required for constant type, not needed for rainbow",
+        #     default=None)
+        # Optional[str] = Field(
+        #     description="predefined hue values. Set hue for constant type, not needed for rainbow",
+        #           enum=["HUE_RED", "HUE_ORANGE", "HUE_YELLOW", "HUE_GREEN", "HUE_AQUA", "HUE_BLUE", "HUE_PURPLE", "HUE_PINK"],
+        #             default=None)
 
 
 class Brightness(BaseModel):
@@ -19,8 +40,8 @@ class Brightness(BaseModel):
         enum=["fadeIn", "fadeOut", "blink", "fadeInOut", "fadeOutIn"])
     value: Optional[float] = Field(description="Required if type is constant",
                                    default=None,
-                                   ge=0,
-                                   le=1)
+                                   ge=0.3,
+                                   le=0.8)
 
 
 class Motion(BaseModel):
@@ -31,8 +52,14 @@ class Motion(BaseModel):
 
 
 class Beat(BaseModel):
-    beat_start: float = Field(description="Starting beat")
-    beat_end: float = Field(description="Ending beat")
+    beat_start: int = Field(
+        description=
+        "The beat at which the effect starts. Song is 4/4 time signature. 1 beat = 1/4 note. 1 bar = 4 beats. XYZ BPM = 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds."
+    )
+    beat_end: int = Field(
+        description=
+        "The beat at which the effect ends. Song is 4/4 time signature. 1 beat = 1/4 note. 1 bar = 4 beats. XYZ BPM = 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds."
+    )
     elements: List[str] = Field(
         description=
         "Name of individual Elements (ring1-ring12) or groups of elements (all, odd, even, left, right, center, outer) affected during this time period. Groups select all element in the group (e.g., 'odd' selects odd-numbered rings, 'left' selects left-side rings).",
@@ -62,13 +89,13 @@ class Animation(BaseModel):
 
 
 class ResponseSchema(BaseModel):
-    name: str
     instruction: str = Field(
         description=
         "The instruction that was given to the model to generate this response."
     )
+    name: str
+    animation: Animation
     reasoning: str = Field(
         description=
         "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
     )
-    animation: Animation

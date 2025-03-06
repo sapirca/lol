@@ -22,6 +22,62 @@
           ]
         }
       }
+    },
+    {
+      "instruction": "Add brightness effect fadeIn on all active elements - during the second and third bars",
+      "difficulty": "Moderate",
+      "input_animation": {
+        "animation": {
+          "name": "I Got You",
+          "duration": "100",
+          "beats": [
+            {
+              "beat_start": 0,
+              "beat_end": 24,
+              "elements": [
+                "ring3",
+                "ring5",
+                "even"
+              ],
+              "coloring": {
+                "type": "rainbow"
+              }
+            }
+          ]
+        }
+      },
+      "expected_output": {
+        "animation": {
+          "name": "I Got You",
+          "duration": "100",
+          "beats": [
+            {
+              "beat_start": 0,
+              "beat_end": 24,
+              "elements": [
+                "ring3",
+                "ring5",
+                "even"
+              ],
+              "coloring": {
+                "type": "rainbow"
+              }
+            },
+            {
+              "beat_start": 4,
+              "beat_end": 12,
+              "elements": [
+                "ring3",
+                "ring5",
+                "even"
+              ],
+              "brightness": {
+                "type": "fadeIn"
+              }
+            }
+          ]
+        }
+      }
     }
   ]
 }

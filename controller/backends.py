@@ -2,13 +2,13 @@ import instructor
 import openai
 import tiktoken
 import anthropic
-# import google.generativeai as genai
 from google import genai
 import logging
 import json
-from lol_secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
+from lol_secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY, LLAMA_API_KEY
 from pydantic import BaseModel
 from controller.response_schema import ResponseSchema
+# from llama import LlamaClient  # Assuming there's a LlamaClient to import
 
 
 class LLMBackend:
@@ -114,7 +114,7 @@ class ClaudeBackend(LLMBackend):
         super().__init__(name, model, config=config)
         self.client = instructor.from_anthropic(
             client=anthropic.Anthropic(api_key=CLAUDE_API_KEY),
-            model=self.model,
+            # model=self.model,
         )
 
         # self.client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
@@ -150,38 +150,7 @@ class ClaudeBackend(LLMBackend):
                 "messages": claude_messages,
                 "response_model": ResponseSchema,
             }
-
-            # schema = ResponseSchema.model_json_schema()
-            # data = {
-            #     "model": self.model,
-            #     "max_tokens": 2048,
-            #     "temperature": 0,
-            #     "system":
-            #     system_prompt,  # Correct usage of system instructions
-            #     "messages": claude_messages,
-            #     "response_format": {
-            #         "type": "json_schema",
-            #         "json_schema": {
-            #             "name": "ResponseSchema",
-            #             "schema": schema
-            #         }
-            #     }
-            # }
-
             response = self.client.messages.create(**data)
-
-            # # Parse and clean up response text
-            # response_text = ""
-            # for content_block in response.content:  # Assuming response.content is iterable
-            #     if content_block.type == "text":
-            #         response_text += content_block.text
-            # response_text = response_text.strip()  # Clean up whitespace
-
-            # if hasattr(self, 'log_tokens'):
-            #     self.log_tokens(messages, response_text)
-
-            # return response_text
-
             return response
 
         except Exception as e:
@@ -203,16 +172,6 @@ class GeminiBackend(LLMBackend):
 
     def generate_response(self, messages):
         try:
-            # data = {
-            #     "messages": messages,
-            #     "response_format": {
-            #         "type": "json_schema",
-            #         "json_schema": {
-            #             "name": "ResponseSchema",
-            #             "schema": schema
-            #         }
-            #     }
-            # }
             prompt = "\n".join(
                 [f'{msg["role"]}: {msg["content"]}' for msg in messages])
             schema = ResponseSchema.model_json_schema()
@@ -223,9 +182,6 @@ class GeminiBackend(LLMBackend):
             response_text = response_text.replace("```json",
                                                   "").replace("```",
                                                               "").strip()
-            # data = json.loads(response)
-            # response = self.client.messages.create(**data)
-            # response = response.choices[0].message.content.strip()
             return response_text
         except Exception as e:
             self.logger.error(f"Error communicating with Gemini backend: {e}")
@@ -255,8 +211,38 @@ class DeepSeekBackend(LLMBackend):
             }
 
             response = self.client.chat.completions.create(**data)
+
+            # TODO Sapir RTokens
+            # response, completion = self.client.chat.completions.create_with_completion(
+            # print(completion.usage)
             return response
         except Exception as e:
             self.logger.error(
                 f"Error communicating with DeepSeek backend: {e}")
             raise e
+
+
+# ***************************************** #
+# **************** Llama ****************** #
+# ***************************************** #
+
+# class LlamaBackend(LLMBackend):
+
+#     def __init__(self, name, model="llama-2-7b-chat", config=None):
+#         super().__init__(name, model, config=config)
+#         self.client = LlamaClient(api_key=LLAMA_API_KEY)
+
+#     def generate_response(self, messages):
+#         try:
+#             schema = ResponseSchema.model_json_schema()
+#             data = {
+#                 "model": self.model,
+#                 "messages": messages,
+#                 "response_model": ResponseSchema,
+#             }
+
+#             response = self.client.chat.completions.create(**data)
+#             return response
+#         except Exception as e:
+#             self.logger.error(f"Error communicating with Llama backend: {e}")
+#             raise e

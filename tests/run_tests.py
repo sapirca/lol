@@ -3,6 +3,7 @@ import os
 import logging
 from animation.animation_manager import AnimationManager
 from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, DeepSeekBackend, StubBackend
+# LlamaBackend
 import csv
 # from config import config as basic_config
 
@@ -16,7 +17,9 @@ from prompt import intro_prompt
 RELATIVE_DATA_PATH = "tests/data/"
 
 # TEST_FILENAME = "test_data.json"
-TEST_FILENAME = "mini_test_data.json"
+# TEST_FILENAME = "mini_test_data.json"
+# TEST_FILENAME = "test_01.json"
+TEST_FILENAME = "test_02.json"
 
 
 def prepare_full_prompt(animation_manager):
@@ -80,6 +83,13 @@ def run_tests(test_data, backends):
             "expected_output": test.get("expected_output", "")
         }
 
+        input_animation = test.get("input_animation", None)
+        if input_animation:
+            test_results["input_animation"] = json.dump(input_animation,
+                                                        indent=2)
+        else:
+            test_results["input_animation"] = ""
+
         for backend_name, backend in backends.items():
             messages = [{
                 "role": "system",
@@ -88,28 +98,47 @@ def run_tests(test_data, backends):
                 "role": "user",
                 "content": instruction
             }]
+
+            if input_animation:
+                messages.append({
+                    "role": "user",
+                    "content": json.dump(input_animation, indent=2)
+                })
+
             try:
                 response = backend.generate_response(messages)
             except Exception as e:
                 response = f"Error: {str(e)}"
 
-            if isinstance(response, ResponseSchema):
-                test_results[backend_name] = response.model_dump_json(indent=4)
-            elif isinstance(response, str):
-                data = json.loads(response)
-                formatted_json = json.dumps(data, indent=2)
-                test_results[backend_name] = formatted_json
-            else:
-                test_results[backend_name] = response
+            process_response(response, backend_name, test_results)
 
         results.setdefault("tests", []).append(test_results)
     return results
 
 
+def process_response(response, backend_name, test_results):
+    if isinstance(response, ResponseSchema):
+        test_results[backend_name] = response.model_dump_json(
+            indent=4, exclude_none=True)
+    elif isinstance(response, str):
+        try:
+            data = json.loads(response)
+            schema_instance = ResponseSchema.model_validate(data)
+            test_results[backend_name] = schema_instance.model_dump_json(
+                indent=4, exclude_none=True)
+        except json.JSONDecodeError:
+            test_results[backend_name] = f"Invalid JSON string:{response}"
+        except Exception as e:
+            test_results[
+                backend_name] = f"{e}\nInvalid Scheme structure:\n{data}"
+    else:
+        test_results[backend_name] = response
+
+
 def write_csv(results):
     try:
         tested_backends = "_".join([backend for backend in results.keys()])
-        csv_filename = f"tests/output/csv_{basic_config['framework']}_{tested_backends}.csv"
+        csv_filename = f"tests/output/_{TEST_FILENAME}_{basic_config['framework']}_{tested_backends}.csv"
         with open(csv_filename, mode='w+', newline='',
                   encoding="utf-8") as csvfile:
             fieldnames = ['instruction', 'difficulty', 'expected_output'
@@ -121,7 +150,7 @@ def write_csv(results):
                 writer.writerow(test_result)
     except Exception as e:
         print(f"Error writing results to CSV: {e}")
-        full_name = f"tests/output/dump_{basic_config['framework']}_results.txt"
+        full_name = f"tests/output/dump_{TEST_FILENAME}_{basic_config['framework']}_results.txt"
         with open(full_name, "w+") as text_file:
             text_file.write(json.dumps(results, indent=2))
         print(f"Results dumped to {full_name}")
@@ -131,11 +160,40 @@ def main():
     logging.basicConfig(level=logging.INFO)
     test_data = load_test_data(TEST_FILENAME)
     backends = {
-        # "GPT": GPTBackend(name="GPT", config=basic_config),
-        # "Claude": ClaudeBackend(name="Claude", config=basic_config),
-        # "Gemini": GeminiBackend(name="Gemini", config=basic_config),
-        "DeepSeek": DeepSeekBackend(name="DeepSeek", config=basic_config),
+        "GPT-4o-Mini":
+        GPTBackend(name="GPT-4o-Mini", model="gpt-4o", config=basic_config),
+        "GPT-4o":
+        GPTBackend(name="GPT-4o", model="gpt-4o", config=basic_config),
+        "Claude 3.5 Haiku":
+        ClaudeBackend(name="Claude 3.5 Haiku",
+                      model="claude-3-5-haiku-20241022",
+                      config=basic_config),
+        "Claude 3.5 Sonnet v2":
+        ClaudeBackend(name="Claude 3.5 Sonnet v2",
+                      model="claude-3-5-sonnet-latest",
+                      config=basic_config),
+        "Claude 3.7 Sonnet":
+        ClaudeBackend(name="Claude 3.7 Sonnet",
+                      model="claude-3-7-sonnet-20250219",
+                      config=basic_config),
+        "Gemini 1.5 Flash 8B":
+        GeminiBackend(name="Gemini 1.5 Flash 8B",
+                      model="gemini-1.5-flash-8b",
+                      config=basic_config),
+        "Gemini 2.0 Flash":
+        GeminiBackend(name="Gemini 2.0 Flash",
+                      model="gemini-2.0-flash",
+                      config=basic_config),
+        # "DeepSeek-V3":
+        # DeepSeekBackend(name="DeepSeek-V3",
+        #                 model="DeepSeek-V3",
+        #                 config=basic_config),
+        # "DeepSeek-R1":
+        # DeepSeekBackend(name="DeepSeek-R1",
+        #                 model="DeepSeek-R1",
+        #                 config=basic_config),
     }
+    # "IIama": LlamaBackend(name="Llama", config=basic_config),
     results = run_tests(test_data, backends)
     write_csv(results)
 

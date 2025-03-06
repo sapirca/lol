@@ -1,7 +1,7 @@
 {
   "tests": [
     {
-      "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK",
+      "instruction": "Generate animation for beats 0-4 that lit ring1 in const pink color",
       "difficulty": "Simple",
       "expected_output": {
         "animation": {
@@ -92,7 +92,7 @@
               ],
               "coloring": {
                 "type": "constant",
-                "hue": "HUE_PINK"
+                "hue": "PINK"
               }
             }
           ]
