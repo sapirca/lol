@@ -1,0 +1,64 @@
+{
+    "tests": [
+        {
+            "instruction": "In the third bar, decrease the brightness in half",
+            "difficulty": "Moderate",
+            "input_animation": {
+                "animation": {
+                    "name": "Hey Mister Stranger",
+                    "duration": "517",
+                    "beats": [
+                        {
+                            "beat_start": 0,
+                            "beat_end": 32,
+                            "elements": [
+                                "ring3",
+                                "ring6"
+                            ],
+                            "coloring": {
+                                "type": "constant",
+                                "hue": "0.3"
+                            }
+                        }
+                    ]
+                }
+            },
+            "expected_output": {
+                "animation": {
+                    "name": "Hey Mister Stranger",
+                    "duration": "517",
+                    "beats": [
+                        {
+                            "beat_start": 0,
+                            "beat_end": 32,
+                            "elements": [
+                                "ring3",
+                                "ring6"
+                            ],
+                            "coloring": {
+                                "type": "constant",
+                                "hue": "0.3"
+                            },
+                            "brightness": {
+                                "type": "constant",
+                                "hue": "0.7"
+                            }
+                        },
+                        {
+                            "beat_start": 12,
+                            "beat_end": 16,
+                            "elements": [
+                                "ring3",
+                                "ring6"
+                            ],
+                            "brightness": {
+                                "type": "constant",
+                                "hue": "0.5"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

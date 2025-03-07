@@ -54,11 +54,11 @@ class Motion(BaseModel):
 class Beat(BaseModel):
     beat_start: int = Field(
         description=
-        "The beat at which the effect starts. Song is 4/4 time signature. 1 beat = 1/4 note. 1 bar = 4 beats. XYZ BPM = 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds."
+        "The beat at which the effect starts. Song is 4/4 time signature. 1 bar = 4 beats, 1 beat = 1/4 of a bar. Song BPM is XYZ, then 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds. Carefully examin the units in the requests and do the converation to beats. This field is in beats only. E.g convert bars 3-4 to beats 12-16."
     )
     beat_end: int = Field(
         description=
-        "The beat at which the effect ends. Song is 4/4 time signature. 1 beat = 1/4 note. 1 bar = 4 beats. XYZ BPM = 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds."
+        "The beat at which the effect ends. Song is 4/4 time signature. 1 bar = 4 beats, 1 beat = 1/4 of a bar. Song BPM is XYZ, then 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds. Carefully examin the units in the requests and do the converation to beats. This field is in beats only. E.g convert bars 3-4 to beats 12-16."
     )
     elements: List[str] = Field(
         description=

@@ -19,7 +19,7 @@ RELATIVE_DATA_PATH = "tests/data/"
 # TEST_FILENAME = "test_data.json"
 # TEST_FILENAME = "mini_test_data.json"
 # TEST_FILENAME = "test_01.json"
-TEST_FILENAME = "test_02.json"
+TEST_FILENAME = "01_moderate/02.json"
 
 
 def prepare_full_prompt(animation_manager):
@@ -139,8 +139,9 @@ def process_response(response, backend_name, test_results):
 
 def write_csv(results):
     try:
+        tests_names = TEST_FILENAME.replace("/", "_").replace(".", "_")
         tested_backends = "_".join([backend for backend in results.keys()])
-        csv_filename = f"tests/output/_{TEST_FILENAME}_{basic_config['framework']}_{tested_backends}.csv"
+        csv_filename = f"tests/output/_{tests_names}_{basic_config['framework']}_{tested_backends}.csv"
         with open(csv_filename, mode='w+', newline='',
                   encoding="utf-8") as csvfile:
             predefined_fieldnames = [
@@ -158,7 +159,7 @@ def write_csv(results):
                 writer.writerow(test_result)
     except Exception as e:
         print(f"Error writing results to CSV: {e}")
-        full_name = f"tests/output/dump_{TEST_FILENAME}_{basic_config['framework']}_results.txt"
+        full_name = f"tests/output/dump_{tests_names}_{basic_config['framework']}_results.txt"
         with open(full_name, "w+") as text_file:
             text_file.write(json.dumps(results, indent=2))
         print(f"Results dumped to {full_name}")

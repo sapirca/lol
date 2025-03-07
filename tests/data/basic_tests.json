@@ -1,0 +1,186 @@
+{
+    "tests":
+[
+    {
+        "instruction": "Generate animation that lit ALL elements in const color BLUE for the entire duration of the song, which is 10 seconds, BPM 120.",
+        "difficulty": "Basic",
+        "expected_output": {
+            "animation": {
+                "name": "ANY",
+                "duration": 10,
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 20,
+                        "elements": [
+                            "all"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "HUE_BLUE"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Given existing animation, add fade-in and fade out throughout the entire section (e.g. intro)",
+        "difficulty": "Basic",
+        "input_animation": {
+            "animation": {
+                "name": "input_animation",
+                "duration": 100,
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 20,
+                        "elements": [
+                            "ring1",
+                            "ring2"
+                        ],
+                        "coloring": {
+                            "type": "rainbow"
+                        }
+                    }
+                ]
+            }
+        },
+        "expected_output": {
+            "animation": {
+                "name": "input_animation",
+                "duration": 100,
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 10,
+                        "elements": [
+                            "ring1",
+                            "ring2"
+                        ],
+                        "coloring": {
+                            "type": "rainbow"
+                        },
+                        "brightness": {
+                            "type": "fadeIn"
+                        }
+                    },
+                    {
+                        "beat_start": 10,
+                        "beat_end": 20,
+                        "elements": [
+                            "ring1",
+                            "ring2"
+                        ],
+                        "coloring": {
+                            "type": "rainbow"
+                        },
+                        "brightness": {
+                            "type": "fadeOut"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Generate animation for bars 1-5 that lit all rings from ring9 until ring12 in const color HUE_RED.",
+        "difficulty": "Basic",
+        "expected_output": {
+            "animation": {
+                "name": "ANY",
+                "duration": "ANY",
+                "beats": [
+                    {
+                        "beat_start": 4,
+                        "beat_end": 20,
+                        "elements": [
+                            "ring9",
+                            "ring10",
+                            "ring11",
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "HUE_RED"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK, song name is pink_const_color_ring1, duration 100 secs.",
+        "difficulty": "Basic",
+        "expected_output": {
+            "animation": {
+                "name": "pink_const_color_ring1",
+                "duration": 100,
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 4,
+                        "elements": [
+                            "ring1"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "PINK"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Generate animation for beats 0-4 that lit ring1 in const pink color",
+        "difficulty": "Basic",
+        "expected_output": {
+            "animation": {
+                "name": "ANY",
+                "duration": "ANY",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 4,
+                        "elements": [
+                            "ring1"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "HUE_PINK"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Turn off ring6 during bars 1-2",
+        "difficulty": "Basic",
+        "expected_output": {
+            "animation": {
+                "name": "ANY",
+                "duration": "ANY",
+                "beats": [
+                    {
+                        "beat_start": 4,
+                        "beat_end": 8,
+                        "elements": [
+                            "ring6"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 0
+                        },
+                        "brightness": {
+                            "type": "constant",
+                            "value": 0
+                        }
+                    }
+                ]
+            }
+        }
+    }
+]
+}

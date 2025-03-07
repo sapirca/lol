@@ -1,0 +1,27 @@
+{
+    "tests": [
+{
+    "instruction": "Generate animation for beats 0-4 that lit ring1 in const color HUE_PINK, song name is pink_const_color_ring1, duration 100 secs.",
+    "difficulty": "Basic",
+    "expected_output": {
+        "animation": {
+            "name": "pink_const_color_ring1",
+            "duration": 100,
+            "beats": [
+                {
+                    "beat_start": 0,
+                    "beat_end": 4,
+                    "elements": [
+                        "ring1"
+                    ],
+                    "coloring": {
+                        "type": "constant",
+                        "hue": "PINK"
+                    }
+                }
+            ]
+        }
+    }
+}
+    ]
+}

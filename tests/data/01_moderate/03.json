@@ -1,0 +1,47 @@
+{
+    "tests": [
+{
+    "instruction": "Apply the same effect from ring3, ring5 to elements even",
+    "difficulty": "Moderate",
+    "input_animation": {
+        "animation": {
+            "name": "I Got You",
+            "duration": "100",
+            "beats": [
+                {
+                    "beat_start": 0,
+                    "beat_end": 24,
+                    "elements": [
+                        "ring3",
+                        "ring5"
+                    ],
+                    "coloring": {
+                        "type": "rainbow"
+                    }
+                }
+            ]
+        }
+    },
+    "expected_output": {
+        "animation": {
+            "name": "I Got You",
+            "duration": "100",
+            "beats": [
+                {
+                    "beat_start": 0,
+                    "beat_end": 24,
+                    "elements": [
+                        "ring3",
+                        "ring5",
+                        "even"
+                    ],
+                    "coloring": {
+                        "type": "rainbow"
+                    }
+                }
+            ]
+        }
+    }
+}
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "tests": [
+{
+    "instruction": "Generate animation for bars 1-5 that lit all rings from ring9 until ring12 in const color HUE_RED.",
+    "difficulty": "Basic",
+    "expected_output": {
+        "animation": {
+            "name": "ANY",
+            "duration": "ANY",
+            "beats": [
+                {
+                    "beat_start": 4,
+                    "beat_end": 20,
+                    "elements": [
+                        "ring9",
+                        "ring10",
+                        "ring11",
+                        "ring12"
+                    ],
+                    "coloring": {
+                        "type": "constant",
+                        "hue": "HUE_RED"
+                    }
+                }
+            ]
+        }
+    }
+}
+    ]
+}

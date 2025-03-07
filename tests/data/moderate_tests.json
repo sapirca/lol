@@ -1,0 +1,332 @@
+{
+    "tests":
+[
+    {
+        "instruction": "Add brightness effect fadeIn on all active elements - during the second and third bars",
+        "difficulty": "Moderate",
+        "input_animation": {
+            "animation": {
+                "name": "I Got You",
+                "duration": "100",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 24,
+                        "elements": [
+                            "ring3",
+                            "ring5",
+                            "even"
+                        ],
+                        "coloring": {
+                            "type": "rainbow"
+                        }
+                    }
+                ]
+            }
+        },
+        "expected_output": {
+            "animation": {
+                "name": "I Got You",
+                "duration": "100",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 24,
+                        "elements": [
+                            "ring3",
+                            "ring5",
+                            "even"
+                        ],
+                        "coloring": {
+                            "type": "rainbow"
+                        }
+                    },
+                    {
+                        "beat_start": 4,
+                        "beat_end": 12,
+                        "elements": [
+                            "ring3",
+                            "ring5",
+                            "even"
+                        ],
+                        "brightness": {
+                            "type": "fadeIn"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "In the third bar, decrease the brightness in half",
+        "difficulty": "Moderate",
+        "input_animation": {
+            "animation": {
+                "name": "Hey Mister Stranger",
+                "duration": "517",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 32,
+                        "elements": [
+                            "ring3",
+                            "ring6"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "0.3"
+                        }
+                    }
+                ]
+            }
+        },
+        "expected_output": {
+            "animation": {
+                "name": "Hey Mister Stranger",
+                "duration": "517",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 32,
+                        "elements": [
+                            "ring3",
+                            "ring6"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "0.3"
+                        },
+                        "brightness": {
+                            "type": "constant",
+                            "hue": "0.7"
+                        }
+                    },
+                    {
+                        "beat_start": 12,
+                        "beat_end": 16,
+                        "elements": [
+                            "ring3",
+                            "ring6"
+                        ],
+                        "brightness": {
+                            "type": "constant",
+                            "hue": "0.5"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Create an animation where ring12's color cycles through 8 hues, synchronized to the first 8 beats, starting with HUE_PINK, during the first 8 bars.",
+        "difficulty": "Moderate",
+        "expected_output": {
+            "animation": {
+                "name": "ANY",
+                "duration": "ANY",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 1,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 330
+                        }
+                    },
+                    {
+                        "beat_start": 1,
+                        "beat_end": 2,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 15
+                        }
+                    },
+                    {
+                        "beat_start": 2,
+                        "beat_end": 3,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 60
+                        }
+                    },
+                    {
+                        "beat_start": 3,
+                        "beat_end": 4,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 105
+                        }
+                    },
+                    {
+                        "beat_start": 4,
+                        "beat_end": 5,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 150
+                        }
+                    },
+                    {
+                        "beat_start": 5,
+                        "beat_end": 6,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 195
+                        }
+                    },
+                    {
+                        "beat_start": 6,
+                        "beat_end": 7,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 240
+                        }
+                    },
+                    {
+                        "beat_start": 7,
+                        "beat_end": 8,
+                        "elements": [
+                            "ring12"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": 285
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Alternate between two contrasting colors, red and green, each color for a group of elements: On even rings you should fade-in even bars and fade out on odd bars On odd rings you should fade-in odd bars and fade out on even bars",
+        "difficulty": "Moderate",
+        "expected_output": {
+            "animation": {
+                "name": "ANY",
+                "duration": "ANY",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 1,
+                        "elements": [
+                            "element_group_1"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "HUE_RED"
+                        },
+                        "brightness": {
+                            "type": "fadeIn"
+                        }
+                    },
+                    {
+                        "beat_start": 1,
+                        "beat_end": 2,
+                        "elements": [
+                            "element_group_1"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "HUE_RED"
+                        },
+                        "brightness": {
+                            "type": "fadeOut"
+                        }
+                    },
+                    {
+                        "beat_start": 0,
+                        "beat_end": 1,
+                        "elements": [
+                            "element_group_2"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "HUE_GREEN"
+                        },
+                        "brightness": {
+                            "type": "fadeOut"
+                        }
+                    },
+                    {
+                        "beat_start": 1,
+                        "beat_end": 2,
+                        "elements": [
+                            "element_group_2"
+                        ],
+                        "coloring": {
+                            "type": "constant",
+                            "hue": "HUE_GREEN"
+                        },
+                        "brightness": {
+                            "type": "fadeIn"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "instruction": "Apply the same effect from ring3, ring5 to elements even",
+        "difficulty": "Moderate",
+        "input_animation": {
+            "animation": {
+                "name": "I Got You",
+                "duration": "100",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 24,
+                        "elements": [
+                            "ring3",
+                            "ring5"
+                        ],
+                        "coloring": {
+                            "type": "rainbow"
+                        }
+                    }
+                ]
+            }
+        },
+        "expected_output": {
+            "animation": {
+                "name": "I Got You",
+                "duration": "100",
+                "beats": [
+                    {
+                        "beat_start": 0,
+                        "beat_end": 24,
+                        "elements": [
+                            "ring3",
+                            "ring5",
+                            "even"
+                        ],
+                        "coloring": {
+                            "type": "rainbow"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+]
+}
