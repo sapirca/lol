@@ -1,31 +1,27 @@
 {
     "tests": [
-{
-    "instruction": "Turn off ring6 during bars 1-2",
-    "difficulty": "Basic",
-    "expected_output": {
-        "animation": {
-            "name": "ANY",
-            "duration": "ANY",
-            "beats": [
-                {
-                    "beat_start": 4,
-                    "beat_end": 8,
-                    "elements": [
-                        "ring6"
-                    ],
-                    "coloring": {
-                        "type": "constant",
-                        "hue": 0
-                    },
-                    "brightness": {
-                        "type": "constant",
-                        "value": 0
-                    }
+        {
+            "instruction": "Turn off ring6 during bars 1-2",
+            "difficulty": "Basic",
+            "expected_output": {
+                "animation": {
+                    "name": "ANY",
+                    "duration": "ANY",
+                    "beats": [
+                        {
+                            "beat_start": 4,
+                            "beat_end": 8,
+                            "elements": [
+                                "ring6"
+                            ],
+                            "brightness": {
+                                "type": "constant",
+                                "value": 0
+                            }
+                        }
+                    ]
                 }
-            ]
+            }
         }
-    }
-}
     ]
 }

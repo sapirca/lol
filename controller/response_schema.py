@@ -5,7 +5,7 @@ from typing import List, Literal, Union, Optional
 class Coloring(BaseModel):
     type: str = Field(
         description=
-        "Coloring effects define the base color of an element. If no coloring effect is applied, the element will not be visible.",
+        "Coloring effects define the base color of an element. If no coloring effect is applied, the element will not be visible. When adding a coloring effect, the LEDs will be lit with a default brightness of 1.0. To adjust it, add a brightness effect.",
         enum=["constant", "rainbow"])
     hue: Optional[Union[float, Literal[
         "RED", "ORANGE", "YELLOW", "GREEN", "AQUA", "BLUE", "PURPLE",
@@ -24,78 +24,72 @@ class Coloring(BaseModel):
                 "Hue should not be provided for 'rainbow' coloring type.")
         return self
 
-        # Optional[int] = Field(
-        #     description="Hue is measured in degrees from 0 to 360. Required for constant type, not needed for rainbow",
-        #     default=None)
-        # Optional[str] = Field(
-        #     description="predefined hue values. Set hue for constant type, not needed for rainbow",
-        #           enum=["HUE_RED", "HUE_ORANGE", "HUE_YELLOW", "HUE_GREEN", "HUE_AQUA", "HUE_BLUE", "HUE_PURPLE", "HUE_PINK"],
-        #             default=None)
-
 
 class Brightness(BaseModel):
     type: str = Field(
         description=
-        "Brightness effects modify the intensity of the light over time. If no brightness effect is set, brightness remains constant. No need to put this field if no brightness effect is needed.",
-        enum=["fadeIn", "fadeOut", "blink", "fadeInOut", "fadeOutIn"])
-    value: Optional[float] = Field(description="Required if type is constant",
-                                   default=None,
-                                   ge=0.3,
-                                   le=0.8)
+        "Brightness effects modify the intensity of the light over time. If no brightness effect is set, brightness remains constant. No need to include this field if no brightness changes are needed. Coloring effects lit elements with default brightness of 1.0",
+        enum=[
+            "constant", "fadeIn", "fadeOut", "blink", "fadeInOut", "fadeOutIn"
+        ])
+    factor_value: Optional[float] = Field(
+        description=
+        "Required if type is constant. This value is a multiplication factor of the current brightness. A value of 0.5 decreases the current brightness by half.",
+        default=None,
+        ge=0.0,
+        le=1.0)
 
 
 class Motion(BaseModel):
     type: str = Field(
         description=
-        "Motion effects create movement in the animation. If no motion is needed, dont include this field. The motion effect added intrest to the viewer, and a sense of movement to the lights.",
+        "Motion effects create movement in the animation. If no motion is needed, do not include this field. The motion effect adds interest to the viewer and a sense of movement to the lights.",
         enum=["snake", "snakeInOut"])
 
 
 class Beat(BaseModel):
     beat_start: int = Field(
         description=
-        "The beat at which the effect starts. Song is 4/4 time signature. 1 bar = 4 beats, 1 beat = 1/4 of a bar. Song BPM is XYZ, then 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds. Carefully examin the units in the requests and do the converation to beats. This field is in beats only. E.g convert bars 3-4 to beats 12-16."
-    )
+        "The beat at which the effect starts. The song starts at Beat 0 and Bar 0. All songs are in 4/4 or 3/4 time signature, meaning that 1 bar = 4 beats, 1 beat = 1/4 of a bar. If a song BPM is XYZ, then it takes 60/XYZ seconds per beat. For example, 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*4 = 2 seconds per bar. Carefully examine the units in the requests and convert them to beats. This field is in beats only. For example, convert bars 3-4 to beats 12-16.",
+        ge=0)
     beat_end: int = Field(
         description=
-        "The beat at which the effect ends. Song is 4/4 time signature. 1 bar = 4 beats, 1 beat = 1/4 of a bar. Song BPM is XYZ, then 60/XYZ seconds per beat. 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*2 = 2 seconds. Carefully examin the units in the requests and do the converation to beats. This field is in beats only. E.g convert bars 3-4 to beats 12-16."
-    )
+        "The beat at which the effect ends. For beat_end=4, the effect will be rendered until and including beat 3, but not including beat 4. The song starts at Beat 0 and Bar 0. All songs are in 4/4 or 3/4 time signature, meaning that 1 bar = 4 beats, 1 beat = 1/4 of a bar. If a song BPM is XYZ, then it takes 60/XYZ seconds per beat. For example, 120 BPM = 0.5 seconds per beat. 1 Bar = 4 beats = 0.5*4 = 2 seconds per bar. Carefully examine the units in the requests and convert them to beats. This field is in beats only. For example, convert bars 3-4 to beats 12-16.",
+        ge=0)
     elements: List[str] = Field(
         description=
-        "Name of individual Elements (ring1-ring12) or groups of elements (all, odd, even, left, right, center, outer) affected during this time period. Groups select all element in the group (e.g., 'odd' selects odd-numbered rings, 'left' selects left-side rings).",
+        "Names of individual elements (ring1-ring12) or groups of elements (all, odd, even, left, right, center, outer) affected during this time period. Groups select all elements in the group (e.g., 'odd' selects odd-numbered rings, 'left' selects left-side rings).",
         enum=[
             "ring1", "ring2", "ring3", "ring4", "ring5", "ring6", "ring7",
             "ring8", "ring9", "ring10", "ring11", "ring12", "all", "odd",
             "even", "left", "right", "center", "outer"
         ])
+    mapping: Optional[List[str]] = Field(
+        description=
+        "Optionally, you can light only a subgroup of pixels of an element or reorder the LEDs, which affects the order of colors and movement. You can use this field to increase the variety and interest in effects. If no value is set, the entire element will be lit in the default physical order of LEDs.",
+        enum=[
+            "centric", "updown", "arc", "ind", "1_pixel_every_4",
+            "1_pixel_every_2"
+        ])
     coloring: Coloring
     brightness: Optional[Brightness] = None
     motion: Optional[Motion] = None
 
-    # @model_validator(mode='before')
-    # def check_coloring_dependency(cls, values):
-    #     motion = values.get('motion')
-    #     coloring = values.get('coloring')
-    #     if motion and not coloring:
-    #         raise ValueError(
-    #             'If motion is provided, coloring must also be provided.')
-    #     return values
-
 
 class Animation(BaseModel):
-    name: str = Field(description="The song title")
+    name: str = Field(description="The song title.")
     duration: float = Field(description="Total length in **seconds**.", ge=0)
     beats: List[Beat]
 
 
 class ResponseSchema(BaseModel):
-    instruction: str = Field(
-        description=
-        "The instruction that was given to the model to generate this response."
-    )
     name: str
     animation: Animation
     reasoning: str = Field(
         description=
         "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
+    )
+    instruction: str = Field(
+        description=
+        "The instruction that was given to the model to generate this response."
     )

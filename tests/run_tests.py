@@ -19,7 +19,8 @@ RELATIVE_DATA_PATH = "tests/data/"
 # TEST_FILENAME = "test_data.json"
 # TEST_FILENAME = "mini_test_data.json"
 # TEST_FILENAME = "test_01.json"
-TEST_FILENAME = "01_moderate/02.json"
+# TEST_FILENAME = "01_moderate/02.json"
+TEST_FILENAME = "moderate_tests.json"
 
 
 def prepare_full_prompt(animation_manager):
@@ -78,9 +79,12 @@ def run_tests(test_data, backends):
     for test in test_data["tests"]:
         instruction = test["instruction"]
         test_results = {
-            "instruction": instruction,
-            "difficulty": test.get('difficulty', ""),
-            "expected_output": test.get("expected_output", "")
+            "instruction":
+            instruction,
+            "expected_output":
+            json.dumps(test.get("expected_output", ""), indent=2),
+            "difficulty":
+            test.get('difficulty', "")
         }
 
         input_animation = test.get("input_animation", None)
@@ -185,10 +189,14 @@ def main():
         ClaudeBackend(name="Claude 3.7 Sonnet",
                       model="claude-3-7-sonnet-20250219",
                       config=basic_config),
-        "Gemini 1.5 Flash 8B":
-        GeminiBackend(name="Gemini 1.5 Flash 8B",
-                      model="gemini-1.5-flash-8b",
-                      config=basic_config),
+        # "Gemini 1.5 Flash 8B":
+        # GeminiBackend(name="Gemini 1.5 Flash 8B",
+        #               model="gemini-1.5-flash-8b",
+        #               config=basic_config),
+        # "Gemini 2.0 Flash Lite":
+        # GeminiBackend(name="Gemini 2.0 Flash Lite",
+        #               model="gemini-2.0-flash-lite",
+        #               config=basic_config),
         "Gemini 2.0 Flash":
         GeminiBackend(name="Gemini 2.0 Flash",
                       model="gemini-2.0-flash",

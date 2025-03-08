@@ -2,62 +2,6 @@
     "tests":
 [
     {
-        "instruction": "Add brightness effect fadeIn on all active elements - during the second and third bars",
-        "difficulty": "Moderate",
-        "input_animation": {
-            "animation": {
-                "name": "I Got You",
-                "duration": "100",
-                "beats": [
-                    {
-                        "beat_start": 0,
-                        "beat_end": 24,
-                        "elements": [
-                            "ring3",
-                            "ring5",
-                            "even"
-                        ],
-                        "coloring": {
-                            "type": "rainbow"
-                        }
-                    }
-                ]
-            }
-        },
-        "expected_output": {
-            "animation": {
-                "name": "I Got You",
-                "duration": "100",
-                "beats": [
-                    {
-                        "beat_start": 0,
-                        "beat_end": 24,
-                        "elements": [
-                            "ring3",
-                            "ring5",
-                            "even"
-                        ],
-                        "coloring": {
-                            "type": "rainbow"
-                        }
-                    },
-                    {
-                        "beat_start": 4,
-                        "beat_end": 12,
-                        "elements": [
-                            "ring3",
-                            "ring5",
-                            "even"
-                        ],
-                        "brightness": {
-                            "type": "fadeIn"
-                        }
-                    }
-                ]
-            }
-        }
-    },
-    {
         "instruction": "In the third bar, decrease the brightness in half",
         "difficulty": "Moderate",
         "input_animation": {
@@ -211,74 +155,6 @@
                         "coloring": {
                             "type": "constant",
                             "hue": 285
-                        }
-                    }
-                ]
-            }
-        }
-    },
-    {
-        "instruction": "Alternate between two contrasting colors, red and green, each color for a group of elements: On even rings you should fade-in even bars and fade out on odd bars On odd rings you should fade-in odd bars and fade out on even bars",
-        "difficulty": "Moderate",
-        "expected_output": {
-            "animation": {
-                "name": "ANY",
-                "duration": "ANY",
-                "beats": [
-                    {
-                        "beat_start": 0,
-                        "beat_end": 1,
-                        "elements": [
-                            "element_group_1"
-                        ],
-                        "coloring": {
-                            "type": "constant",
-                            "hue": "HUE_RED"
-                        },
-                        "brightness": {
-                            "type": "fadeIn"
-                        }
-                    },
-                    {
-                        "beat_start": 1,
-                        "beat_end": 2,
-                        "elements": [
-                            "element_group_1"
-                        ],
-                        "coloring": {
-                            "type": "constant",
-                            "hue": "HUE_RED"
-                        },
-                        "brightness": {
-                            "type": "fadeOut"
-                        }
-                    },
-                    {
-                        "beat_start": 0,
-                        "beat_end": 1,
-                        "elements": [
-                            "element_group_2"
-                        ],
-                        "coloring": {
-                            "type": "constant",
-                            "hue": "HUE_GREEN"
-                        },
-                        "brightness": {
-                            "type": "fadeOut"
-                        }
-                    },
-                    {
-                        "beat_start": 1,
-                        "beat_end": 2,
-                        "elements": [
-                            "element_group_2"
-                        ],
-                        "coloring": {
-                            "type": "constant",
-                            "hue": "HUE_GREEN"
-                        },
-                        "brightness": {
-                            "type": "fadeIn"
                         }
                     }
                 ]

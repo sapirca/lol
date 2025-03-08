@@ -1,7 +1,7 @@
 {
     "tests": [
         {
-            "instruction": "Alternate between two contrasting colors, red and green, each color for a group of elements: On even rings you should fade-in even bars and fade out on odd bars On odd rings you should fade-in odd bars and fade out on even bars",
+            "instruction": "Alternate between two contrasting colors, red and green. On even rings you should fade-in even bars with red color, and fade out on odd bars with green color. On odd rings you should do the opposite, fade-in odd bars with red color, and fade out on even bars with green color. Do it for the first 8 beats.",
             "difficulty": "Moderate",
             "expected_output": {
                 "animation": {
@@ -10,27 +10,27 @@
                     "beats": [
                         {
                             "beat_start": 0,
-                            "beat_end": 1,
+                            "beat_end": 4,
                             "elements": [
-                                "element_group_1"
+                                "even"
                             ],
                             "coloring": {
                                 "type": "constant",
-                                "hue": "HUE_RED"
+                                "hue": "RED"
                             },
                             "brightness": {
                                 "type": "fadeIn"
                             }
                         },
                         {
-                            "beat_start": 1,
-                            "beat_end": 2,
+                            "beat_start": 4,
+                            "beat_end": 8,
                             "elements": [
-                                "element_group_1"
+                                "even"
                             ],
                             "coloring": {
                                 "type": "constant",
-                                "hue": "HUE_RED"
+                                "hue": "GREEN"
                             },
                             "brightness": {
                                 "type": "fadeOut"
@@ -38,27 +38,27 @@
                         },
                         {
                             "beat_start": 0,
-                            "beat_end": 1,
+                            "beat_end": 4,
                             "elements": [
-                                "element_group_2"
+                                "odd"
                             ],
                             "coloring": {
                                 "type": "constant",
-                                "hue": "HUE_GREEN"
+                                "hue": "GREEN"
                             },
                             "brightness": {
                                 "type": "fadeOut"
                             }
                         },
                         {
-                            "beat_start": 1,
-                            "beat_end": 2,
+                            "beat_start": 4,
+                            "beat_end": 8,
                             "elements": [
-                                "element_group_2"
+                                "odd"
                             ],
                             "coloring": {
                                 "type": "constant",
-                                "hue": "HUE_GREEN"
+                                "hue": "RED"
                             },
                             "brightness": {
                                 "type": "fadeIn"

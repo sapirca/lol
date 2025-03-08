@@ -18,6 +18,10 @@
                             "coloring": {
                                 "type": "constant",
                                 "hue": "0.3"
+                            },
+                            "brightness": {
+                                "type": "constant",
+                                "hue": "0.7"
                             }
                         }
                     ]
@@ -45,8 +49,8 @@
                             }
                         },
                         {
-                            "beat_start": 12,
-                            "beat_end": 16,
+                            "beat_start": 8,
+                            "beat_end": 12,
                             "elements": [
                                 "ring3",
                                 "ring6"

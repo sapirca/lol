@@ -1,63 +1,63 @@
 {
     "tests": [
-{
-    "instruction": "Given existing animation, add fade-in and fade out throughout the entire section (e.g. intro)",
-    "difficulty": "Basic",
-    "input_animation": {
-        "animation": {
-            "name": "input_animation",
-            "duration": 100,
-            "beats": [
-                {
-                    "beat_start": 0,
-                    "beat_end": 20,
-                    "elements": [
-                        "ring1",
-                        "ring2"
-                    ],
-                    "coloring": {
-                        "type": "rainbow"
-                    }
+        {
+            "instruction": "Given existing animation, add fade-in and fade out throughout the entire section (e.g. intro)",
+            "difficulty": "Basic",
+            "input_animation": {
+                "animation": {
+                    "name": "input_animation",
+                    "duration": 100,
+                    "beats": [
+                        {
+                            "beat_start": 0,
+                            "beat_end": 20,
+                            "elements": [
+                                "ring1",
+                                "ring2"
+                            ],
+                            "coloring": {
+                                "type": "rainbow"
+                            }
+                        }
+                    ]
                 }
-            ]
-        }
-    },
-    "expected_output": {
-        "animation": {
-            "name": "input_animation",
-            "duration": 100,
-            "beats": [
-                {
-                    "beat_start": 0,
-                    "beat_end": 10,
-                    "elements": [
-                        "ring1",
-                        "ring2"
-                    ],
-                    "coloring": {
-                        "type": "rainbow"
-                    },
-                    "brightness": {
-                        "type": "fadeIn"
-                    }
-                },
-                {
-                    "beat_start": 10,
-                    "beat_end": 20,
-                    "elements": [
-                        "ring1",
-                        "ring2"
-                    ],
-                    "coloring": {
-                        "type": "rainbow"
-                    },
-                    "brightness": {
-                        "type": "fadeOut"
-                    }
+            },
+            "expected_output": {
+                "animation": {
+                    "name": "input_animation",
+                    "duration": 100,
+                    "beats": [
+                        {
+                            "beat_start": 0,
+                            "beat_end": 10,
+                            "elements": [
+                                "ring1",
+                                "ring2"
+                            ],
+                            "coloring": {
+                                "type": "rainbow"
+                            },
+                            "brightness": {
+                                "type": "fadeIn"
+                            }
+                        },
+                        {
+                            "beat_start": 10,
+                            "beat_end": 20,
+                            "elements": [
+                                "ring1",
+                                "ring2"
+                            ],
+                            "coloring": {
+                                "type": "rainbow"
+                            },
+                            "brightness": {
+                                "type": "fadeOut"
+                            }
+                        }
+                    ]
                 }
-            ]
+            }
         }
-    }
-}
     ]
 }
