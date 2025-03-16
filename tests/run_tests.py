@@ -20,7 +20,8 @@ RELATIVE_DATA_PATH = "tests/data/"
 # TEST_FILENAME = "mini_test_data.json"
 # TEST_FILENAME = "test_01.json"
 # TEST_FILENAME = "01_moderate/02.json"
-TEST_FILENAME = "moderate_tests.json"
+# TEST_FILENAME = "moderate_tests.json"
+TEST_FILENAME = "05_imaginary/02.json"
 
 
 def prepare_full_prompt(animation_manager):
@@ -173,18 +174,18 @@ def main():
     logging.basicConfig(level=logging.INFO)
     test_data = load_test_data(TEST_FILENAME)
     backends = {
-        "GPT-4o-Mini":
-        GPTBackend(name="GPT-4o-Mini", model="gpt-4o", config=basic_config),
-        "GPT-4o":
-        GPTBackend(name="GPT-4o", model="gpt-4o", config=basic_config),
-        "Claude 3.5 Haiku":
-        ClaudeBackend(name="Claude 3.5 Haiku",
-                      model="claude-3-5-haiku-20241022",
-                      config=basic_config),
-        "Claude 3.5 Sonnet v2":
-        ClaudeBackend(name="Claude 3.5 Sonnet v2",
-                      model="claude-3-5-sonnet-latest",
-                      config=basic_config),
+        # "GPT-4o-Mini":
+        # GPTBackend(name="GPT-4o-Mini", model="gpt-4o-mini", config=basic_config),
+        # "GPT-4o":
+        # GPTBackend(name="GPT-4o", model="gpt-4o", config=basic_config),
+        # "Claude 3.5 Haiku":
+        # ClaudeBackend(name="Claude 3.5 Haiku",
+        #               model="claude-3-5-haiku-20241022",
+        #               config=basic_config),
+        # "Claude 3.5 Sonnet v2":
+        # ClaudeBackend(name="Claude 3.5 Sonnet v2",
+        #               model="claude-3-5-sonnet-latest",
+        #               config=basic_config),
         "Claude 3.7 Sonnet":
         ClaudeBackend(name="Claude 3.7 Sonnet",
                       model="claude-3-7-sonnet-20250219",
@@ -197,10 +198,10 @@ def main():
         # GeminiBackend(name="Gemini 2.0 Flash Lite",
         #               model="gemini-2.0-flash-lite",
         #               config=basic_config),
-        "Gemini 2.0 Flash":
-        GeminiBackend(name="Gemini 2.0 Flash",
-                      model="gemini-2.0-flash",
-                      config=basic_config),
+        # "Gemini 2.0 Flash":
+        # GeminiBackend(name="Gemini 2.0 Flash",
+        #               model="gemini-2.0-flash",
+        #               config=basic_config),
         # "DeepSeek-V3":
         # DeepSeekBackend(name="DeepSeek-V3",
         #                 model="DeepSeek-V3",

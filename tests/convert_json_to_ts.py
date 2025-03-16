@@ -13,7 +13,7 @@ def json_to_typescript(json_data, output_file="tests/output/animation.ts"):
     try:
         # Extract animation data from the new schema
         animation_data = json_data.get("animation", {})
-        song_name = animation_data.get("name", "")
+        song_name = animation_data.get("name", "").replace(" ", "_").replace("/", "_").replace("\\", "_")
         duration = animation_data.get("duration", 0)
         # BPM isn't in the new schema, so we'll set a default value or calculate it
         # based on duration and beats if needed
@@ -59,94 +59,97 @@ const animationSequence = async () => {
 
             typescript_code += f"""        beats({beat_start}, {beat_end}, () => {{\n"""
 
+            elements_array = "[" + ",".join(elements_list) + "]"
+
             # Process each element in the elements list
-            for element_name in elements_list:
-                typescript_code += f"            elements({element_name}, () => {{\n"
+            # for element_name in elements_list:
 
-                # Handle mapping if present
-                if mapping:
-                    for map_type in mapping:
-                        if map_type == "centric":
-                            typescript_code += "                segment_centric();\n"
-                        elif map_type == "updown":
-                            typescript_code += "                segment_updown();\n"
-                        elif map_type == "arc":
-                            typescript_code += "                segment_arc();\n"
-                        elif map_type == "ind":
-                            typescript_code += "                segment_ind();\n"
-                        elif map_type == "1_pixel_every_4":
-                            typescript_code += "                segment_b1();\n"
-                        elif map_type == "1_pixel_every_2":
-                            typescript_code += "                segment_b2();\n"
+            typescript_code += f"            elements({elements_array}, () => {{\n"
 
-                # Process coloring
-                coloring = beat.get("coloring")
-                if coloring:
-                    coloring_type = coloring.get("type")
-                    if coloring_type == "constant":
-                        hue = coloring.get("hue")
-                        # Handle named colors
-                        if isinstance(hue, str):
-                            color_map = {
-                                "RED": 0.0,
-                                "ORANGE": 0.125,
-                                "YELLOW": 0.250,
-                                "GREEN": 0.376,
-                                "AQUA": 0.502,
-                                "BLUE": 0.627,
-                                "PURPLE": 0.752,
-                                "PINK": 0.878
-                            }
-                            hue = color_map.get(hue, 0.0)
+            # Handle mapping if present
+            if mapping:
+                for map_type in mapping:
+                    if map_type == "centric":
+                        typescript_code += "                segment_centric();\n"
+                    elif map_type == "updown":
+                        typescript_code += "                segment_updown();\n"
+                    elif map_type == "arc":
+                        typescript_code += "                segment_arc();\n"
+                    elif map_type == "ind":
+                        typescript_code += "                segment_ind();\n"
+                    elif map_type == "1_pixel_every_4":
+                        typescript_code += "                segment_b1();\n"
+                    elif map_type == "1_pixel_every_2":
+                        typescript_code += "                segment_b2();\n"
 
-                        typescript_code += f"                constColor({{ hue: {hue}, saturation: 1.0, value: 1.0 }});\n"
-                    elif coloring_type == "rainbow":
-                        typescript_code += "                rainbow();\n"
+            # Process coloring
+            coloring = beat.get("coloring")
+            if coloring:
+                coloring_type = coloring.get("type")
+                if coloring_type == "constant":
+                    hue = coloring.get("hue")
+                    # Handle named colors
+                    if isinstance(hue, str):
+                        color_map = {
+                            "RED": 0.0,
+                            "ORANGE": 0.125,
+                            "YELLOW": 0.250,
+                            "GREEN": 0.376,
+                            "AQUA": 0.502,
+                            "BLUE": 0.627,
+                            "PURPLE": 0.752,
+                            "PINK": 0.878
+                        }
+                        hue = color_map.get(hue, 0.0)
 
-                # Process brightness
-                brightness = beat.get("brightness")
-                if brightness:
-                    brightness_type = brightness.get("type")
-                    if brightness_type == "constant":
-                        factor_value = brightness.get("factor_value", 1.0)
-                        typescript_code += f"                constantBrightness({{ factor: {factor_value} }});\n"
-                    elif brightness_type == "fadeIn":
-                        typescript_code += "                fadeIn();\n"
-                    elif brightness_type == "fadeOut":
-                        typescript_code += "                fadeOut();\n"
-                    elif brightness_type == "blink":
-                        typescript_code += "                blink();\n"
-                    elif brightness_type == "fadeInOut":
-                        typescript_code += "                fadeInOut();\n"
-                    elif brightness_type == "fadeOutIn":
-                        typescript_code += "                fadeOutIn();\n"
+                    typescript_code += f"                constColor({{ hue: {hue}, saturation: 1.0, value: 1.0 }});\n"
+                elif coloring_type == "rainbow":
+                    typescript_code += "                rainbow();\n"
 
-                # Process motion
-                motion = beat.get("motion")
-                if motion:
-                    motion_type = motion.get("type")
-                    if motion_type == "snake":
-                        typescript_code += "                snake();\n"
-                    elif motion_type == "snakeInOut":
-                        typescript_code += "                snakeInOut();\n"
+            # Process brightness
+            brightness = beat.get("brightness")
+            if brightness:
+                brightness_type = brightness.get("type")
+                if brightness_type == "constant":
+                    factor_value = brightness.get("factor_value", 1.0)
+                    typescript_code += f"                brightness({{ factor: {factor_value} }});\n"
+                elif brightness_type == "fadeIn":
+                    typescript_code += "                fadeIn();\n"
+                elif brightness_type == "fadeOut":
+                    typescript_code += "                fadeOut();\n"
+                elif brightness_type == "blink":
+                    typescript_code += "                blink();\n"
+                elif brightness_type == "fadeInOut":
+                    typescript_code += "                fadeInOut();\n"
+                elif brightness_type == "fadeOutIn":
+                    typescript_code += "                fadeOutIn();\n"
 
-                typescript_code += "            });\n"
-            typescript_code += "        });\n"
+            # Process motion
+            motion = beat.get("motion")
+            if motion:
+                motion_type = motion.get("type")
+                if motion_type == "snake":
+                    typescript_code += "                snake();\n"
+                elif motion_type == "snakeInOut":
+                    typescript_code += "                snakeInOut();\n"
+
+            typescript_code += "            });\n"
+        typescript_code += "        });\n"
 
         typescript_code += "    });"
         addition = f"""
     await sendSequence("{song_name}", animation.getSequence());
-    await startSong("{song_name}");
+    await trigger("{song_name}");
 """.format(song_name=song_name)
 
+        # await trigger();
         addition += """
-    await trigger();
 };
 
 
-(async () => {{
+(async () => {
     await animationSequence();
-}})();
+})();
 """
 
         typescript_code += addition
@@ -163,26 +166,21 @@ const animationSequence = async () => {
 # Example Usage based on the new schema:
 json_data = {
     "animation": {
-        "name":
-        "sandstorm",
-        "duration":
-        180,
-        "beats": [{
-            "beat_start": 0,
-            "beat_end": 10,
-            "elements": ["all", "even"],
-            "mapping": ["centric"],
-            "coloring": {
-                "type": "constant",
-                "hue": "BLUE"
-            },
-            "brightness": {
-                "type": "fadeIn"
-            },
-            "motion": {
-                "type": "snake"
+        "name": "Custom Animation 01",
+        "duration": 2.0,
+        "beats": [
+            {
+                "beat_start": 0,
+                "beat_end": 4,
+                "elements": [
+                    "ring1"
+                ],
+                "coloring": {
+                    "type": "constant",
+                    "hue": "PINK"
+                }
             }
-        }]
+        ]
     }
 }
 

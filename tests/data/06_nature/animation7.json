@@ -1,0 +1,12 @@
+{
+  "instruction": "Generate an animation that creates a 'chasing rainbow' effect, with colors moving sequentially along the segments.",
+  "expected_output": {
+    "animation": {
+      "name": "chasing_rainbow",
+      "duration": "ANY",
+      "beats": [
+        // ...animation creating a chasing rainbow effect...
+      ]
+    }
+  }
+}
