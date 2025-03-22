@@ -1,0 +1,12 @@
+{
+  "instruction": "Generate an animation that simulates a sunrise, with colors gradually shifting from dark blues and purples to oranges and yellows.",
+  "expected_output": {
+    "animation": {
+      "name": "sunrise_simulation",
+      "duration": "ANY",
+      "beats": [
+        // ...animation simulating a sunrise...
+      ]
+    }
+  }
+}

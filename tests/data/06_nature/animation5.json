@@ -1,0 +1,12 @@
+{
+  "instruction": "Generate an animation that creates a 'fireworks' display, with bursts of colorful light and trails.",
+  "expected_output": {
+    "animation": {
+      "name": "fireworks_display",
+      "duration": "ANY",
+      "beats": [
+        // ...animation creating a fireworks display...
+      ]
+    }
+  }
+}

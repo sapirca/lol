@@ -1,0 +1,12 @@
+{
+  "instruction": "Generate an animation that simulates a 'breathing' effect, with a slow, rhythmic expansion and contraction of light.",
+  "expected_output": {
+    "animation": {
+      "name": "breathing_effect",
+      "duration": "ANY",
+      "beats": [
+        // ...animation simulating a breathing effect...
+      ]
+    }
+  }
+}

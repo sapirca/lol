@@ -13,6 +13,13 @@ class Coloring(BaseModel):
             description=
             "The hue value in HSV describes the base color. When represented as a float from 0.0 to 1.0, 0.0 and 1.0 both represent red, as they are the start and end of the color wheel. The values in between transition through the other colors of the spectrum. Required for constant type, not needed for rainbow. Can be a float from 0.0 to 1.0, or one of the predefined color names: RED, ORANGE, YELLOW, GREEN, AQUA, BLUE, PURPLE, PINK.",
             default=None)
+    sat: Optional[float] = Field(
+        description=
+        "The saturation value in HSV describes the intensity of the color. A low value (e.g., 0.8) results in a pastel color, while 0.0 results in white. Values below 0.8 may result in less vibrant colors. Most of the times it's better to put the value above 0.8.",
+        default=None,
+        ge=0.0,
+        le=1.0)
+    
     # RED = 0.0, ORANGE = 0.125, YELLOW = 0.250, GREEN = 0.376, AQUA = 0.502, BLUE = 0.627, PURPLE = 0.752, PINK = 0.878, RED = 1.0
 
     @model_validator(mode='after')

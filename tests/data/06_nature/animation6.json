@@ -1,0 +1,12 @@
+{
+  "instruction": "Generate an animation that simulates a 'heartbeat,' with a pulsing red light that varies in intensity.",
+  "expected_output": {
+    "animation": {
+      "name": "heartbeat_simulation",
+      "duration": "ANY",
+      "beats": [
+        // ...animation simulating a heartbeat...
+      ]
+    }
+  }
+}

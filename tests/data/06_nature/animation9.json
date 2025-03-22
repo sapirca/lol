@@ -1,0 +1,12 @@
+{
+  "instruction": "Generate an animation that creates a 'stargazing' effect, with twinkling white lights on a dark blue background.",
+  "expected_output": {
+    "animation": {
+      "name": "stargazing_effect",
+      "duration": "ANY",
+      "beats": [
+        // ...animation creating a stargazing effect...
+      ]
+    }
+  }
+}
