@@ -11,7 +11,8 @@ import logging
 import os
 from datetime import datetime
 import json
-from config import config as basic_config
+# from config import config as basic_config
+from configs.config_conceptual import config as basic_config
 from animation.animation_manager import AnimationManager
 
 
@@ -270,6 +271,9 @@ class LogicPlusPlus:
         messages = self.formatter.build_messages()
         response = backend.generate_response(messages)
 
+        # TODO(sapir) - Move to work with response
+        # if (type(response) == ResponseScheme):
+        #     response = response.get_response()
         # The raw response contains a WIP animation which does not need to be added to the context.
         self.message_streamer.add_message("llm_raw_response",
                                           response,
