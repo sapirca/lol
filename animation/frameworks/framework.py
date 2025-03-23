@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from pydantic import BaseModel
+
 
 class Framework(ABC):
 
@@ -15,3 +17,7 @@ class Framework(ABC):
     def get_domain_knowledge(self):
         # Abstract method to enforce implementation in subclasses
         pass
+
+    def get_response_scheme_obj(self) -> BaseModel:
+        # Stub implementation
+        return None

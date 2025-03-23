@@ -1,4 +1,6 @@
+from pydantic import BaseModel
 from animation.frameworks.framework import Framework
+from animation.frameworks.xlights.xlights_scheme import XlightsScheme
 from animation.frameworks.xlights.xlights_sequence import XlightsSequence
 import os
 import xml.etree.ElementTree as ET
@@ -24,3 +26,6 @@ class XLightsFramework(Framework):
         except Exception as e:
             print(f"Logger: Error reading domain knowledge: {e}")
             return f"Xlights: Error reading domain knowledge: {e}"
+
+    def get_response_scheme_obj(self) -> BaseModel:
+        return XlightsScheme()

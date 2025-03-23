@@ -11,7 +11,7 @@ from configs.config_conceptual import config as basic_config
 # from configs.config_kivsee import config as basic_config
 
 from controller.interpreter import Interpreter
-from controller.response_schema import ResponseSchema
+from animation.frameworks.conceptual.response_schema import ResponseSchema
 from prompt import intro_prompt
 
 RELATIVE_DATA_PATH = "tests/data/"
@@ -21,7 +21,7 @@ RELATIVE_DATA_PATH = "tests/data/"
 # TEST_FILENAME = "test_01.json"
 # TEST_FILENAME = "01_moderate/02.json"
 # TEST_FILENAME = "moderate_tests.json"
-TEST_FILENAME = "05_imaginary/02.json"
+TEST_FILENAME = "00_basic/02.json"
 
 
 def prepare_full_prompt(animation_manager):
@@ -174,44 +174,52 @@ def main():
     logging.basicConfig(level=logging.INFO)
     test_data = load_test_data(TEST_FILENAME)
     backends = {
-        # "GPT-4o-Mini":
-        # GPTBackend(name="GPT-4o-Mini", model="gpt-4o-mini", config=basic_config),
+        "GPT-4o-Mini":
+        GPTBackend(name="GPT-4o-Mini", model="gpt-4o-mini", config=basic_config, response_object=ResponseSchema),
         # "GPT-4o":
-        # GPTBackend(name="GPT-4o", model="gpt-4o", config=basic_config),
+        # GPTBackend(name="GPT-4o", model="gpt-4o", config=basic_config, response_object=ResponseSchema),
         # "Claude 3.5 Haiku":
         # ClaudeBackend(name="Claude 3.5 Haiku",
         #               model="claude-3-5-haiku-20241022",
-        #               config=basic_config),
+        #               config=basic_config,
+        #               response_object=ResponseSchema),
         # "Claude 3.5 Sonnet v2":
         # ClaudeBackend(name="Claude 3.5 Sonnet v2",
         #               model="claude-3-5-sonnet-latest",
+        #               config=basic_config,
+        #               response_object=ResponseSchema),
+        # "Claude 3.7 Sonnet":
+        # ClaudeBackend(name="Claude 3.7 Sonnet",
+        #               model="claude-3-7-sonnet-20250219",
+        #               response_object=ResponseSchema,
         #               config=basic_config),
-        "Claude 3.7 Sonnet":
-        ClaudeBackend(name="Claude 3.7 Sonnet",
-                      model="claude-3-7-sonnet-20250219",
-                      config=basic_config),
         # "Gemini 1.5 Flash 8B":
         # GeminiBackend(name="Gemini 1.5 Flash 8B",
         #               model="gemini-1.5-flash-8b",
-        #               config=basic_config),
+        #               config=basic_config,
+        #               response_object=ResponseSchema),
         # "Gemini 2.0 Flash Lite":
         # GeminiBackend(name="Gemini 2.0 Flash Lite",
         #               model="gemini-2.0-flash-lite",
-        #               config=basic_config),
+        #               config=basic_config,
+        #               response_object=ResponseSchema),
         # "Gemini 2.0 Flash":
         # GeminiBackend(name="Gemini 2.0 Flash",
         #               model="gemini-2.0-flash",
-        #               config=basic_config),
+        #               config=basic_config,
+        #               response_object=ResponseSchema),
         # "DeepSeek-V3":
         # DeepSeekBackend(name="DeepSeek-V3",
         #                 model="DeepSeek-V3",
-        #                 config=basic_config),
+        #                 config=basic_config,
+        #                 response_object=ResponseSchema),
         # "DeepSeek-R1":
         # DeepSeekBackend(name="DeepSeek-R1",
         #                 model="DeepSeek-R1",
-        #                 config=basic_config),
+        #                 config=basic_config,
+        #                 response_object=ResponseSchema),
     }
-    # "IIama": LlamaBackend(name="Llama", config=basic_config),
+    # "IIama": LlamaBackend(name="Llama", config=basic_config, response_object=ResponseSchema),
     results = run_tests(test_data, backends)
     write_csv(results)
 

@@ -7,7 +7,6 @@ import logging
 import json
 from lol_secrets import DEEP_SEEK_API_KEY, OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 from pydantic import BaseModel
-from controller.response_schema import ResponseSchema
 # from llama import LlamaClient  # Assuming there's a LlamaClient to import
 
 
@@ -17,7 +16,7 @@ class LLMBackend:
     Each backend should inherit from this class and implement the generate_response method.
     """
 
-    def __init__(self, name, model, config=None):
+    def __init__(self, name, response_object: BaseModel, model, config=None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
@@ -29,8 +28,9 @@ class LLMBackend:
                                                     False)
         self.w_structured_output = self.config.get("with_structured_output",
                                                    False)
+        self.response_schema_obj = response_object
 
-    def generate_response(self, messages):
+    def generate_response(self, messages) -> BaseModel:
         """Generate a response based on the provided messages array."""
         raise NotImplementedError("Subclasses must implement this method.")
 
@@ -48,11 +48,11 @@ class LLMBackend:
 
 class StubBackend(LLMBackend):
 
-    def __init__(self, name, config=None):
+    def __init__(self, name, response_object: BaseModel, config=None):
         super().__init__(name, "stub", config=config)
 
-    def generate_response(self, messages):
-        response_schema = ResponseSchema(
+    def generate_response(self, messages) -> BaseModel:
+        response_schema_obj = self.response_schema_obj(
             name="stub_response",
             reasoning="This is a stubbed reasoning.",
             animation={
@@ -61,8 +61,8 @@ class StubBackend(LLMBackend):
                 "beats": []
             })
 
-        self.log_tokens(messages, response_schema.dict())
-        return response_schema
+        self.log_tokens(messages, response_schema_obj.dict())
+        return response_schema_obj
 
 
 # *************************************** #
@@ -72,24 +72,24 @@ class StubBackend(LLMBackend):
 
 class GPTBackend(LLMBackend):
 
-    def __init__(self, name, model="gpt-4o-mini-2024-07-18", config=None):
-        super().__init__(name, model, config=config)
+    def __init__(self, name, response_object: BaseModel, model="gpt-4o-mini-2024-07-18", config=None):
+        super().__init__(name, model, response_object, config=config)
         self.client = openai.OpenAI(api_key=OPENAI_API_KEY)
 
-    def generate_response(self, messages):
+    def generate_response(self, messages) -> BaseModel:
         data = {
             "messages": messages,
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
             "model": self.model,
-            # "response_format": ResponseSchema
+            # "response_format": self.response_schema_obj
         }
 
         data["response_format"] = {
             "type": "json_schema",
             "json_schema": {
-                "name": "ResponseSchema",
-                "schema": ResponseSchema.model_json_schema()
+                "name": self.response_schema_obj.get_name(), # Fix
+                "schema": self.response_schema_obj.model_json_schema()
             }
         }
 
@@ -101,7 +101,7 @@ class GPTBackend(LLMBackend):
             # else:
             response = self.client.chat.completions.create(**data)
             response = response.choices[0].message.content.strip()
-            return ResponseSchema(response)
+            return self.response_schema_obj(response)
         except Exception as e:
             self.logger.error(f"Error communicating with GPT API: {e}")
             raise e
@@ -114,8 +114,8 @@ class GPTBackend(LLMBackend):
 
 class ClaudeBackend(LLMBackend):
 
-    def __init__(self, name, model="claude-3-5-sonnet-20241022", config=None):
-        super().__init__(name, model, config=config)
+    def __init__(self, name, response_object: BaseModel, model="claude-3-5-sonnet-20241022", config=None):
+        super().__init__(name, model, response_object, config=config)
         self.client = instructor.from_anthropic(
             client=anthropic.Anthropic(api_key=CLAUDE_API_KEY),
             # model=self.model,
@@ -123,7 +123,7 @@ class ClaudeBackend(LLMBackend):
 
         # self.client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
 
-    def generate_response(self, messages):
+    def generate_response(self, messages) -> BaseModel:
         system_messages = []
         chat_messages = []
 
@@ -152,7 +152,7 @@ class ClaudeBackend(LLMBackend):
                 "system":
                 system_prompt,  # Correct usage of system instructions
                 "messages": claude_messages,
-                "response_model": ResponseSchema,
+                "response_model": self.response_schema_obj,
             }
             completion = self.client.messages.create(**data)
             # response = completion.choices[0].message.content.strip()
@@ -161,12 +161,11 @@ class ClaudeBackend(LLMBackend):
                     completion.content, list):
                 result = completion.content[0].text
                 parsed_result = json.loads(result)
-                response = ResponseSchema(**parsed_result)
+                response = self.response_schema_obj(**parsed_result)
             else:
                 # If response_model was accepted, result is already parsed
-                response = completion
-
-            return response
+                assert type(completion, self.response_schema_obj)
+                return response
 
         except Exception as e:
             error_message = f"Error, Claude backend: {str(e)}"
@@ -178,18 +177,18 @@ class ClaudeBackend(LLMBackend):
 # *************************************** #
 class GeminiBackend(LLMBackend):
 
-    def __init__(self, name, model="gemini-1.5-flash-latest", config=None):
-        super().__init__(name, model, config=config)
+    def __init__(self, name, response_object: BaseModel, model="gemini-1.5-flash-latest", config=None):
+        super().__init__(name, model, response_object, config=config)
         # genai.configure(api_key=GEMINI_API_KEY)
         # self.client = genai.GenerativeModel(model_name=self.model)
         self.api_key = GEMINI_API_KEY
         self.client = genai.Client(api_key=self.api_key)
 
-    def generate_response(self, messages):
+    def generate_response(self, messages) -> BaseModel:
         try:
             prompt = "\n".join(
                 [f'{msg["role"]}: {msg["content"]}' for msg in messages])
-            schema = ResponseSchema.model_json_schema()
+            schema = self.response_schema_obj.model_json_schema()
             prompt += "\nUse this JSON schema:" + json.dumps(schema)
             response = self.client.models.generate_content(model=self.model,
                                                            contents=prompt)
@@ -197,7 +196,8 @@ class GeminiBackend(LLMBackend):
             response_text = response_text.replace("```json",
                                                   "").replace("```",
                                                               "").strip()
-            return response_text
+            # TODO test it and fix it
+            return self.response_schema_obj(response_text)
         except Exception as e:
             self.logger.error(f"Error communicating with Gemini backend: {e}")
             raise e
@@ -210,27 +210,26 @@ class GeminiBackend(LLMBackend):
 
 class DeepSeekBackend(LLMBackend):
 
-    def __init__(self, name, model="deepseek-chat", config=None):
-        super().__init__(name, model, config=config)
+    def __init__(self, name, response_object: BaseModel, model="deepseek-chat", config=None):
+        super().__init__(name, model, response_object, config=config)
         self.client = instructor.from_openai(
             openai.OpenAI(api_key=DEEP_SEEK_API_KEY,
                           base_url="https://api.deepseek.com"))
 
-    def generate_response(self, messages):
+    def generate_response(self, messages) -> BaseModel:
         try:
-            schema = ResponseSchema.model_json_schema()
+            schema = self.response_schema_obj.model_json_schema()
             data = {
                 "model": self.model,
                 "messages": messages,
-                "response_model": ResponseSchema,
+                "response_model": self.response_schema_obj,
             }
 
             response = self.client.chat.completions.create(**data)
-
-            # TODO Sapir RTokens
-            # response, completion = self.client.chat.completions.create_with_completion(
-            # print(completion.usage)
-            return response
+            
+            full_response = self.response_schema_obj(**response)
+            # TODO test? 
+            return full_response
         except Exception as e:
             self.logger.error(
                 f"Error communicating with DeepSeek backend: {e}")
@@ -249,11 +248,11 @@ class DeepSeekBackend(LLMBackend):
 
 #     def generate_response(self, messages):
 #         try:
-#             schema = ResponseSchema.model_json_schema()
+#             schema = self.response_schema_obj.model_json_schema()
 #             data = {
 #                 "model": self.model,
 #                 "messages": messages,
-#                 "response_model": ResponseSchema,
+#                 "response_model": self.response_schema_obj,
 #             }
 
 #             response = self.client.chat.completions.create(**data)
@@ -269,8 +268,8 @@ class DeepSeekBackend(LLMBackend):
 
 class TogetherAIBackend(LLMBackend):
 
-    def __init__(self, name, model="together-gpt", config=None):
-        super().__init__(name, model, config=config)
+    def __init__(self, name, response_object: BaseModel, model="together-gpt", config=None):
+        super().__init__(name, model, response_object, config=config)
         self.api_key = self.config.get("together_api_key")
         if not self.api_key:
             raise ValueError("TogetherAI API key is required.")
@@ -278,20 +277,27 @@ class TogetherAIBackend(LLMBackend):
             openai.OpenAI(api_key=self.api_key,
                           base_url="https://api.together.ai"))
 
-    def generate_response(self, messages):
+    def generate_response(self, messages) -> BaseModel:
         try:
-            schema = ResponseSchema.model_json_schema()
+            schema = self.response_schema_obj.model_json_schema()
             data = {
                 "model": self.model,
                 "messages": messages,
                 "max_tokens": self.max_tokens,
                 "temperature": self.temperature,
                 "stop": ["<|im_end|>", "<|endoftext|>"],
-                "response_model": ResponseSchema,
+                "response_model": self.response_schema_obj,
             }
 
             response = self.client.chat.completions.create(**data)
-            return response
+            if isinstance(response, str):
+                response = json.loads(response)
+                response = self.response_schema_obj(**response)
+            elif isinstance(response, self.response_schema_obj):
+                return response
+            self.logger.error(
+                f"Error communicating with TogetherAI backend!...")
+
         except Exception as e:
             self.logger.error(
                 f"Error communicating with TogetherAI backend: {e}")

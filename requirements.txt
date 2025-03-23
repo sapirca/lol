@@ -7,3 +7,5 @@ google-genai
 #python>=3.9
 instructor
 # llamaapi ?
+pydantic
+protobuf-to-pydantic

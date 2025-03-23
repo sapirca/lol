@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from controller.constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, KIVSEE_SEQUENCE_PATH, CONCEPTUAL_SEQUENCE_PATH
 from animation.frameworks.kivsee.kivsee_framework import KivseeFramework
 from animation.frameworks.framework import Framework
@@ -105,3 +106,7 @@ class AnimationManager:
 
     def get_suffix(self):
         return self.sequence_manager.get_suffix()
+    
+    def get_response_object(self) -> BaseModel:
+        return self.framework.get_response_object()
+

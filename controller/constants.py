@@ -20,11 +20,13 @@ ANIMATION_OUT_TEMP_DIR = "outputs/tmp"
 
 # Kivsee
 KIVSEE_HOUSE_PATH = "animation/frameworks/kivsee/world_structure.txt"
-KIVSEE_SEQUENCE_PATH = "animation/frameworks/kivsee/sequence_skeleton.ts"
-KIVSEE_KNOWLEDGE_PATH = "animation/frameworks/kivsee/knowledge_api.ts"
-KIVSEE_PROMPT = "animation/frameworks/kivsee/prompt.txt"
-KIVSEE_ADD_ONS_PATH = "animation/frameworks/kivsee/knowledge_rules.txt"
-KIVSEE_ANIMATION_EXAMPLE = "animation/frameworks/kivsee/knowledge_example"
+
+KIVSEE_SEQUENCE_PATH = "animation/frameworks/kivsee/prompts/sequence_skeleton.ts"
+KIVSEE_KNOWLEDGE_PATH = "animation/frameworks/kivsee/prompts/knowledge_api.ts"
+KIVSEE_PROMPT = "animation/frameworks/kivsee/prompts/prompt.txt"
+KIVSEE_ADD_ONS_PATH = "animation/frameworks/kivsee/prompts/knowledge_rules.txt"
+KIVSEE_ANIMATION_EXAMPLE = "animation/frameworks/kivsee/prompts/prompts/knowledge_example"
+
 KIVSEE_TEMP_ANIMATION_FILE = "kivsee_tmp.ts"
 KIVSEE_ANIMATION_SUFFIX = 'ts'
 # Xlights

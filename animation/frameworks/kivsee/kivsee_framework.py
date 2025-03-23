@@ -1,4 +1,6 @@
+from pydantic import BaseModel
 from animation.frameworks.framework import Framework
+from animation.frameworks.kivsee.scheme.kivsee_schema import KivseeSchema
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 import os
 import xml.etree.ElementTree as ET
@@ -24,7 +26,7 @@ class KivseeFramework(Framework):
         try:
             with open(KIVSEE_PROMPT, 'r') as file:
                 content = file.read()
-            # with open(KIVSEE_KNOWLEDGE_PATH, 'r') as file:
+# with open(KIVSEE_KNOWLEDGE_PATH, 'r') as file:
             #     content = file.read()
             # with open(KIVSEE_ADD_ONS_PATH, 'r') as file:
             #     content += file.read()
@@ -35,3 +37,6 @@ class KivseeFramework(Framework):
         except Exception as e:
             print(f"Logger: Error reading domain knowledge: {e}")
             return "Kivsee domain knowledge"
+
+    def get_response_scheme_obj(self) -> BaseModel:
+        return KivseeSchema()

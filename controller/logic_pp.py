@@ -152,7 +152,8 @@ class LogicPlusPlus:
         }
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(
-                backend_class(name=backend_name, config=self.config))
+                backend_class(name=backend_name, response_object=self.animation_manager.get_response_object(), config=self.config,
+                              ))
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):
