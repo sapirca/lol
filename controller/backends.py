@@ -6,7 +6,7 @@ from google import genai
 import logging
 import json
 from animation.frameworks.conceptual.response_schema import ResponseSchema
-from animation.frameworks.kivsee.scheme.effects_p2p import ResponseProto
+from animation.frameworks.kivsee.scheme.effects_scheme import ResponseProto
 from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY
 from pydantic import BaseModel
 
@@ -17,7 +17,11 @@ class LLMBackend:
     Each backend should inherit from this class and implement the generate_response method.
     """
 
-    def __init__(self, name, response_schema_obj: BaseModel, model, config=None):
+    def __init__(self,
+                 name,
+                 response_schema_obj: BaseModel,
+                 model,
+                 config=None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
@@ -53,9 +57,17 @@ class LLMBackend:
 class GPTBackend(LLMBackend):
     # gpt-4o-mini-2024-07-18
     # gpt-4o-2024-08-06
-    def __init__(self, name, response_schema_obj: BaseModel, model="gpt-4o-2024-08-06", config=None):
-        super().__init__(name=name, response_schema_obj=response_schema_obj, model=model, config=config)
-        self.client = instructor.from_openai(openai.OpenAI(api_key=OPENAI_API_KEY))
+    def __init__(self,
+                 name,
+                 response_schema_obj: BaseModel,
+                 model="gpt-4o-2024-08-06",
+                 config=None):
+        super().__init__(name=name,
+                         response_schema_obj=response_schema_obj,
+                         model=model,
+                         config=config)
+        self.client = instructor.from_openai(
+            openai.OpenAI(api_key=OPENAI_API_KEY))
 
     def generate_response(self, messages) -> BaseModel:
         data = {
@@ -77,14 +89,20 @@ class GPTBackend(LLMBackend):
 # **************** Claude *************** #
 # *************************************** #
 
+
 class ClaudeBackend(LLMBackend):
 
-    def __init__(self, name, response_schema_obj: BaseModel, model="claude-3-5-sonnet-20241022", config=None):
-        super().__init__(name=name, response_schema_obj=response_schema_obj, model=model, config=config)
+    def __init__(self,
+                 name,
+                 response_schema_obj: BaseModel,
+                 model="claude-3-5-sonnet-20241022",
+                 config=None):
+        super().__init__(name=name,
+                         response_schema_obj=response_schema_obj,
+                         model=model,
+                         config=config)
         self.client = instructor.from_anthropic(
-            client=anthropic.Anthropic(api_key=CLAUDE_API_KEY),
-        )
-
+            client=anthropic.Anthropic(api_key=CLAUDE_API_KEY), )
 
     def generate_response(self, messages) -> BaseModel:
         system_messages = []
@@ -123,4 +141,3 @@ class ClaudeBackend(LLMBackend):
         except Exception as e:
             error_message = f"Error, Claude backend: {str(e)}"
             raise e
-

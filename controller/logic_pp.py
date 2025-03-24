@@ -307,7 +307,8 @@ class LogicPlusPlus:
         # consistency_justification = processed_response.get(
         #     "consistency_justification")
         response_dict = processed_response.model_dump()
-        animation_sequence_dict = response_dict.get("animation")
+        # animation_sequence_dict = response_dict.get("animation")
+        animation_sequence_dict = processed_response.model_dump()
 
         output = ""
 

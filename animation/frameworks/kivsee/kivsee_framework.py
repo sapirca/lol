@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from animation.frameworks.framework import Framework
-from animation.frameworks.kivsee.scheme.effects_p2p import ResponseProto
+from animation.frameworks.kivsee.scheme.effects_scheme import ResponseProto
 from animation.frameworks.kivsee.scheme.kivsee_schema import KivseeSchema
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 import os

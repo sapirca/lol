@@ -1,6 +1,7 @@
 import json
 
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
+from animation.frameworks.kivsee.scheme.effects_scheme import ResponseProto
 
 
 class Render:
@@ -12,19 +13,22 @@ class Render:
         # Get the path to the animation file
         animation_file_path = self.sequence_manager.get_animation_filename()
 
-        try:
-            # Open and load the JSON file
-            with open(animation_file_path, 'r') as file:
-                animation_data = json.load(file)
+        # Open and load the JSON file
+        with open(animation_file_path, 'r') as file:
+            animation_data = json.load(file)
 
-            # Print all fields in the JSON
-            for key, value in animation_data.items():
-                print(f"{key}: {value}")
-        except FileNotFoundError:
-            print(f"File not found: {animation_file_path}")
-        except json.JSONDecodeError:
-            print(f"Error decoding JSON from file: {animation_file_path}")
+        # Print all fields in the JSON
+        for key, value in animation_data.items():
+            print(f"{key}: {value}")
 
+        # Convert the animation data to proto
+        response_proto = ResponseProto(response=animation_data)
+
+        # >>> duplicate it for all things names and do http post to the trigger service
+        # request = {
+        #     "trigger": "animation",
+        #     "animation": animation_data
+        # }
         # >>> duplicate it for all things names and do http post to the trigger service
         # request = {
         #     "trigger": "animation",
@@ -36,16 +40,6 @@ class Render:
         # print(response.json())
         # except requests.exceptions.RequestException as e:
         #     print(f"Error sending request to trigger service: {e}")
-
-        except FileNotFoundError:
-            print(f"File not found: {animation_file_path}")
-        except json.JSONDecodeError:
-            print(f"Error decoding JSON from file: {animation_file_path}")
-
-
-# Example usage
-# render = Render()
-# render.load_and_print_animation()
 
 
 def main():
