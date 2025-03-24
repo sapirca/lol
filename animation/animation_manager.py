@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from controller.constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, KIVSEE_SEQUENCE_PATH, CONCEPTUAL_SEQUENCE_PATH
+from controller.constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, CONCEPTUAL_SEQUENCE_PATH
 from animation.frameworks.kivsee.kivsee_framework import KivseeFramework
 from animation.frameworks.framework import Framework
 from animation.frameworks.xlights.xlights_framework import XLightsFramework
@@ -23,7 +23,7 @@ class AnimationManager:
 
     def _load_animation_framework(self):
         if self.framework_name == 'kivsee':
-            self.sequence_manager = KivseeSequence(KIVSEE_SEQUENCE_PATH)
+            self.sequence_manager = KivseeSequence()
             self.framework = KivseeFramework()
         elif self.framework_name == 'xlights':
             self.sequence_manager = XlightsSequence(XLIGHTS_SEQUENCE_PATH)
@@ -38,7 +38,7 @@ class AnimationManager:
     def get_prompt(self):
         return self.framework.get_prompt()
 
-    def store_temp_animation(self, animation_sequence):
+    def store_temp_animation(self, animation_sequence: str):
         output_dir = ANIMATION_OUT_TEMP_DIR
         os.makedirs(output_dir, exist_ok=True)
 

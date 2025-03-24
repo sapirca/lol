@@ -62,8 +62,15 @@ class ConstColorEffectConfig(BaseModel):
     color: HSV = Field(default_factory=HSV, description="Constant HSV color.")
 
 class RainbowEffectConfig(BaseModel):
-    hue_start: FloatFunction = Field(default_factory=FloatFunction, description="Starting hue function for the rainbow.")
-    hue_end: FloatFunction = Field(default_factory=FloatFunction, description="Ending hue function for the rainbow.")
+    """
+     message RainbowEffectConfig {
+     FloatFunction hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
+     FloatFunction hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
+ }
+    """
+
+    hue_start: float = Field(default=0.0, description="Starting hue function for the rainbow.")
+    hue_end: float = Field(default=0.0, description="Ending hue function for the rainbow.")
 
 class BrightnessEffectConfig(BaseModel):
     mult_factor: FloatFunction = Field(default_factory=FloatFunction, description="Multiplier factor for brightness.")
@@ -102,18 +109,11 @@ class EffectConfig(BaseModel):
     repeat_end: float = Field(default=0.0, description="End time of the repeat.")
 
 class EffectProto(BaseModel):
-    _one_of_dict = {"EffectProto.effect": {"fields": {"alternate", "brightness", "const_color", "glitter", "hue", "rainbow", "saturation", "segment", "snake"}}}
+    _one_of_dict = {"EffectProto.effect": {"fields": {"const_color", "rainbow"}}}
     one_of_validator = model_validator(mode="before")(check_one_of)
     effect_config: EffectConfig = Field(default_factory=EffectConfig, description="General configuration for the effect.")
     const_color: ConstColorEffectConfig = Field(default_factory=ConstColorEffectConfig, description="The color is constant for the entire duration of the effect.")
     rainbow: RainbowEffectConfig = Field(default_factory=RainbowEffectConfig, description="A gradient of colors, from hue start to hue end, 0-1 gives the whole spectrum of colors .")
-    brightness: BrightnessEffectConfig = Field(default_factory=BrightnessEffectConfig, description="Brightness effect.")
-    hue: HueEffectConfig = Field(default_factory=HueEffectConfig, description="Hue effect.")
-    saturation: SaturationEffectConfig = Field(default_factory=SaturationEffectConfig, description="Saturation effect.")
-    snake: SnakeEffectConfig = Field(default_factory=SnakeEffectConfig, description="Snake effect.")
-    segment: SegmentEffectConfig = Field(default_factory=SegmentEffectConfig, description="Segment effect.")
-    glitter: GlitterEffectConfig = Field(default_factory=GlitterEffectConfig, description="Glitter effect.")
-    alternate: AlternateEffectConfig = Field(default_factory=AlternateEffectConfig, description="Alternate effect.")
 
 class ElementsEffectProto(BaseModel):
     elements: typing.List[str] = Field(default_factory=list, description="List of effects in the animation.")
@@ -124,7 +124,7 @@ class AnimationProto(BaseModel):
      TODO sapir how to split it per element?
     """
 
-    effects: typing.List[ElementsEffectProto] = Field(default_factory=list, description="List of effects in the animation.")
+    effects: typing.List[EffectProto] = Field(default_factory=list, description="List of effects in the animation.")
     duration_ms: int = Field(default=0, description="Duration of the entire animation in milliseconds.")
     num_repeats: int = Field(default=0, description="Number of times to repeat the animation (0 means forever).")
 

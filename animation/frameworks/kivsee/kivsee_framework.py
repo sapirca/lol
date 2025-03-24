@@ -5,14 +5,15 @@ from animation.frameworks.kivsee.scheme.kivsee_schema import KivseeSchema
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 import os
 import xml.etree.ElementTree as ET
-from controller.constants import KIVSEE_ADD_ONS_PATH, KIVSEE_ANIMATION_EXAMPLE, KIVSEE_HOUSE_PATH, KIVSEE_KNOWLEDGE_PATH, KIVSEE_PROMPT, KIVSEE_TEMP_ANIMATION_FILE, KIVSEE_SEQUENCE_PATH
+# from controller.constants import KIVSEE_ADD_ONS_PATH, KIVSEE_ANIMATION_EXAMPLE, KIVSEE_HOUSE_PATH, KIVSEE_KNOWLEDGE_PATH, KIVSEE_PROMPT, KIVSEE_TEMP_ANIMATION_FILE, KIVSEE_SEQUENCE_PATH
+from controller.constants import KIVSEE_HOUSE_PATH, KIVSEE_PROMPT
 
 
 class KivseeFramework(Framework):
 
     def __init__(self):
-        self.sequence_manager = KivseeSequence(KIVSEE_SEQUENCE_PATH)
-
+        pass
+    
     def get_world_structure(self):
         try:
             with open(KIVSEE_HOUSE_PATH, 'r') as file:

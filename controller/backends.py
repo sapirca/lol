@@ -63,7 +63,7 @@ class GPTBackend(LLMBackend):
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
             "model": self.model,
-            "response_model": ResponseSchema,
+            "response_model": ResponseProto,
         }
         try:
             response = self.client.chat.completions.create(**data)
@@ -115,9 +115,10 @@ class ClaudeBackend(LLMBackend):
                 "system":
                 system_prompt,  # Correct usage of system instructions
                 "messages": claude_messages,
-                "response_model": ResponseSchema,
+                "response_model": ResponseProto,
             }
-            return self.client.messages.create(**data)
+            response = self.client.messages.create(**data)
+            return response
 
         except Exception as e:
             error_message = f"Error, Claude backend: {str(e)}"

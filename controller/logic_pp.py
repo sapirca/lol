@@ -270,51 +270,47 @@ class LogicPlusPlus:
         model_response = backend.generate_response(messages)
 
         printable_response = json.dumps(model_response.model_dump(), indent=4)
-
-        # TODO(sapir) - Move to work with response
-        # if (type(response) == ResponseScheme):
-        #     response = response.get_response()
-        # The raw response contains a WIP animation which does not need to be added to the context.
         self.message_streamer.add_message("llm_raw_response",
                                           printable_response,
                                           visible=False,
                                           context=False)
 
         # parsed_response = self.response_manager.parse_response(model_response, self.animation_manager.get_response_object())
-
         # assistant_response = parsed_response.get("visible_answer", "") or ""
-
         assistant_response = printable_response
-        # Add this trimmed short response to the context
-        # for better understanding.
+
+        
+        # Add this trimmed short response to the context for better understanding.
+        # assistant_response + " The animation was trimmed out"
         self.message_streamer.add_message("assistant",
-                                          assistant_response +
-                                          " The animation was trimmed out",
+                                          assistant_response,
                                           visible=True,
                                           context=True)
-
-        # act_on_response_msg = self.act_on_response(parsed_response)
-        # self.message_streamer.add_message(
-        #     "system_output", act_on_response_msg, visible=True,
-        #     context=False)  # Information about agent actions shared
-        # # with the user.
-
+        
         system_responses.append(("assistant", assistant_response))
-        # if act_on_response_msg:
-        #     system_responses.append(("system", act_on_response_msg))
+
+        act_on_response_msg = self.act_on_response(model_response)
+        self.message_streamer.add_message(
+            "system_output", act_on_response_msg, visible=True,
+            context=False)
+
+        if act_on_response_msg:
+            system_responses.append(("system", act_on_response_msg))
+
         return system_responses
 
     def act_on_response(self, processed_response):
-        reasoning = processed_response.get("visible_answer")
+        # reasoning = processed_response.get("visible_answer")
         # consistency_justification = processed_response.get(
         #     "consistency_justification")
-        animation_sequence = processed_response.get("animation_sequence")
+        response_dict = processed_response.model_dump()
+        animation_sequence_dict = response_dict.get("animation")
 
         output = ""
 
-        if animation_sequence:
-            self.temp_animation_path = self.animation_manager.store_temp_animation(
-                animation_sequence)
+        if animation_sequence_dict:
+            animation_json = json.dumps(animation_sequence_dict, indent=4)
+            self.temp_animation_path = self.animation_manager.store_temp_animation(animation_json)
             self.logger.info(
                 f"Generated {self.temp_animation_path} for the user's observation."
             )
@@ -324,8 +320,8 @@ class LogicPlusPlus:
             output += "Preview and edit the animation as needed.\n"
             output += "Save this temporary animation file to the sequence manager? (y/n): "
 
-        for action in processed_response.get("requested_actions", []):
-            output += f"Unhandled action: {action['action']}\n"
+        # for action in processed_response.get("requested_actions", []):
+        #     output += f"Unhandled action: {action['action']}\n"
 
         return output
 
