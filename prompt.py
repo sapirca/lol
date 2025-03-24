@@ -74,6 +74,23 @@ A structured animation plan in JSON format, representing the light show as a seq
 -   **EDM (Electronic Dance Music):** A genre with structured, predictable beats, enabling precise timing calculations
 """
 
+reversed_task = """
+# Part 1: Animation Description from JSON
+
+## Objective:
+
+Given a JSON structure representing an animation sequence for an LED light show, your task is to describe the visual output of each time frame in detail. This involves interpreting the JSON data and translating it into a clear, concise, and human-readable description of the animation.
+
+## Input:
+
+You will be provided with a JSON structure that adheres the provided scheme. 
+
+## Output:
+
+json that contains the time-frames from the original animation, and replace the effects on the elements with text description
+
+"""
+
 # intro_prompt = """
 # ### Light Sequence Design Prompt
 

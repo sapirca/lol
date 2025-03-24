@@ -1,12 +1,11 @@
 config = {
-    "with_structured_output": False,  #True #False
+    "selected_backend": "Claude",
     "framework": "kivsee",  #kivsee #xlights #conceptual
 }
 
 # "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude
 # config = {
 #     "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude
-#     "with_structured_output": True,  #True #False
 #     "framework": "conceptual",  #kivsee #xlights #conceptual
 # }
 

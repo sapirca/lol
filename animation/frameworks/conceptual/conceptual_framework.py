@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+from animation.frameworks.conceptual.response_schema import ResponseSchema
 from animation.frameworks.framework import Framework
 from animation.frameworks.conceptual.conceptual_sequence import ConceptualSequence
 import os
@@ -29,3 +31,6 @@ class ConceptualFramework(Framework):
         except Exception as e:
             print(f"Logger: Error reading domain knowledge: {e}")
             return "Conceptual domain knowledge"
+
+    def get_response_scheme_obj(self) -> BaseModel:
+        return ResponseSchema()

@@ -7,3 +7,13 @@ google-genai
 #python>=3.9
 instructor
 # llamaapi ?
+pydantic
+
+# brew install protobuf
+# pip install protobuf-to-pydantic
+# protoc --protobuf-to-pydantic_out=. effects.proto
+# export PATH="$PATH:/Users/sapir/miniconda3/envs/lol_agent/bin"
+# ls /Users/sapir/miniconda3/envs/lol_agent/bin/protoc-gen-protobuf-to-pydantic
+
+# https://github.com/KivSee/kivsee-render.git
+# https://github.com/KivSee/led-rings.git
