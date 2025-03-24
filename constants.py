@@ -16,7 +16,7 @@ MESSAGE_SNAPSHOT_FILE = "messages.json"
 CONFIG_FILE = "config.json"
 
 # Animations
-ANIMATION_OUT_TEMP_DIR = "outputs/tmp"
+ANIMATION_OUT_TEMP_DIR = "outputs/"
 
 # Kivsee
 KIVSEE_HOUSE_PATH = "animation/frameworks/kivsee/world_structure.txt"

@@ -1,7 +1,7 @@
 from animation.frameworks.sequence import Sequence
 import os
 import json
-from controller.constants import CONCEPTUAL_ANIMATION_SUFFIX, CONCEPTUAL_TEMP_ANIMATION_FILE
+from constants import ANIMATION_OUT_TEMP_DIR, CONCEPTUAL_ANIMATION_SUFFIX, CONCEPTUAL_TEMP_ANIMATION_FILE
 
 
 class ConceptualSequence(Sequence):
@@ -12,10 +12,10 @@ class ConceptualSequence(Sequence):
         self.steps = []
         # self._load_sequence_skeleton()
 
-    def build_temp_animation_file_path(self, output_dir):
-        temp_file_path = os.path.join(output_dir,
-                                      CONCEPTUAL_TEMP_ANIMATION_FILE)
-        return os.path.abspath(temp_file_path)
+    def get_animation_filename(self):
+        working_dir = os.path.dirname(os.path.abspath(__file__))
+        return super().build_temp_animation_file_path(
+            working_dir, CONCEPTUAL_TEMP_ANIMATION_FILE)
 
     def _load_sequence_skeleton(self):
         """Load the initial sequence skeleton."""

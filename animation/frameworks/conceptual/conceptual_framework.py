@@ -4,7 +4,7 @@ from animation.frameworks.framework import Framework
 from animation.frameworks.conceptual.conceptual_sequence import ConceptualSequence
 import os
 import json
-from controller.constants import CONCEPTUAL_HOUSE_PATH, CONCEPTUAL_KNOWLEDGE_PATH, CONCEPTUAL_PROMPT, CONCEPTUAL_SEQUENCE_PATH
+from constants import CONCEPTUAL_HOUSE_PATH, CONCEPTUAL_KNOWLEDGE_PATH, CONCEPTUAL_PROMPT, CONCEPTUAL_SEQUENCE_PATH
 
 
 class ConceptualFramework(Framework):

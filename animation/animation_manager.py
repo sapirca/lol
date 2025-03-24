@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from controller.constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, CONCEPTUAL_SEQUENCE_PATH
+from constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, CONCEPTUAL_SEQUENCE_PATH
 from animation.frameworks.kivsee.kivsee_framework import KivseeFramework
 from animation.frameworks.framework import Framework
 from animation.frameworks.xlights.xlights_framework import XLightsFramework
@@ -17,6 +17,7 @@ class AnimationManager:
     def __init__(self, framework_name, message_streamer):
         self.framework_name = framework_name
         self.framework: Framework = None
+        # TODO(sapir): rename to sequence_db
         self.sequence_manager: Sequence = None
         self.message_streamer = message_streamer
         self._load_animation_framework()
@@ -38,17 +39,10 @@ class AnimationManager:
     def get_prompt(self):
         return self.framework.get_prompt()
 
-    def store_temp_animation(self, animation_sequence: str):
-        output_dir = ANIMATION_OUT_TEMP_DIR
-        os.makedirs(output_dir, exist_ok=True)
-
-        temp_file_path = self.sequence_manager.build_temp_animation_file_path(
-            output_dir)
-        abs_temp_file_path = os.path.abspath(temp_file_path)
-
+    def save_tmp_animation(self, animation_sequence: str):
+        abs_temp_file_path = self.sequence_manager.get_animation_filename()
         with open(abs_temp_file_path, "w") as temp_file:
             temp_file.write(animation_sequence)
-
         return abs_temp_file_path
 
     def delete_temp_file(self, file_path):
@@ -107,7 +101,6 @@ class AnimationManager:
 
     def get_suffix(self):
         return self.sequence_manager.get_suffix()
-    
+
     def get_response_object(self) -> BaseModel:
         return self.framework.get_response_scheme_obj()
-

@@ -5,7 +5,7 @@ from animation.songs.song_provider import SongProvider
 import xml.etree.ElementTree as ET
 from interpreter import Interpreter
 from formatter import Formatter
-from controller.constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
+from constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
 from controller.message_streamer import MessageStreamer
 import logging
 import os
@@ -150,7 +150,10 @@ class LogicPlusPlus:
         }
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(
-                backend_class(name=backend_name, response_schema_obj=self.animation_manager.get_response_object(), config=self.config))
+                backend_class(name=backend_name,
+                              response_schema_obj=self.animation_manager.
+                              get_response_object(),
+                              config=self.config))
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):
@@ -279,20 +282,20 @@ class LogicPlusPlus:
         # assistant_response = parsed_response.get("visible_answer", "") or ""
         assistant_response = printable_response
 
-        
         # Add this trimmed short response to the context for better understanding.
         # assistant_response + " The animation was trimmed out"
         self.message_streamer.add_message("assistant",
                                           assistant_response,
                                           visible=True,
                                           context=True)
-        
+
         system_responses.append(("assistant", assistant_response))
 
         act_on_response_msg = self.act_on_response(model_response)
-        self.message_streamer.add_message(
-            "system_output", act_on_response_msg, visible=True,
-            context=False)
+        self.message_streamer.add_message("system_output",
+                                          act_on_response_msg,
+                                          visible=True,
+                                          context=False)
 
         if act_on_response_msg:
             system_responses.append(("system", act_on_response_msg))
@@ -310,13 +313,14 @@ class LogicPlusPlus:
 
         if animation_sequence_dict:
             animation_json = json.dumps(animation_sequence_dict, indent=4)
-            self.temp_animation_path = self.animation_manager.store_temp_animation(animation_json)
+            self.temp_animation_path = self.animation_manager.save_tmp_animation(
+                animation_json)
             self.logger.info(
                 f"Generated {self.temp_animation_path} for the user's observation."
             )
             # self.wait_for_response = True
 
-            output += f"Animation sequence generated and saved to {self.temp_animation_path}\n"
+            output += f"Animation sequence generated and saved to {self.temp_animation_path} "
             output += "Preview and edit the animation as needed.\n"
             # output += "Save this temporary animation file to the sequence manager? (y/n): "
 

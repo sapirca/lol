@@ -7,8 +7,8 @@ from controller.logic_pp import LogicPlusPlus
 import re
 import subprocess
 import platform
-from controller.constants import ANIMATION_OUT_TEMP_DIR, SNAPSHOTS_DIR
-from controller.constants import TIME_FORMAT
+from constants import ANIMATION_OUT_TEMP_DIR, SNAPSHOTS_DIR
+from constants import TIME_FORMAT
 import threading
 import _tkinter
 
@@ -21,6 +21,7 @@ CHAT_FONT = "Verdana"
 
 # Global variables
 active_chat_snapshot = None
+
 controller = None  # Will be initialized dynamically based on selected snapshot
 active_chat_button = None  # Store the currently active chat button
 button_mapping = {}  # Dictionary to store button references
@@ -91,13 +92,11 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
         chat_window.tag_bind(link_tag, "<Button-1>",
                              lambda e: open_file_in_editor(e, file_path))
 
-    working_dir = os.getcwd()
-    full_path = os.path.join(working_dir, ANIMATION_OUT_TEMP_DIR)
-    absolute_path = os.path.abspath(full_path)
-    # Match file paths that start with ANIMATION_OUT_TEMP_DIR
-    file_links = re.finditer(rf"({re.escape(absolute_path)}[^\s\n]+)",
-                             message)  # Match full file path
-    last_end = 0
+    tmp_animation_path = controller.animation_manager.sequence_manager.get_animation_filename(
+    )
+    last_end = 0  # Initialize last_end to 0
+    file_links = re.finditer(rf"({re.escape(tmp_animation_path)}[^\s]*)",
+                             message)
 
     for match in file_links:
         chat_window.insert(tk.END, message[last_end:match.start()],

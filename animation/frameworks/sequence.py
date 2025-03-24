@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+import os
+
+from constants import ANIMATION_OUT_TEMP_DIR
 
 
 class Sequence(ABC):
@@ -31,6 +34,14 @@ class Sequence(ABC):
         pass
 
     @abstractmethod
-    def build_temp_animation_file_path(self, output_dir):
-        # Default implementation for building temp animation file path
+    def get_animation_filename(self):
+        """Build the temporary animation file path."""
         pass
+
+    def build_temp_animation_file_path(self, working_dir, animation_file_name):
+        output_dir = ANIMATION_OUT_TEMP_DIR
+        full_output_dir = os.path.join(working_dir, output_dir)
+        os.makedirs(full_output_dir, exist_ok=True)
+        full_temp_file_path = os.path.join(full_output_dir,
+                                           animation_file_name)
+        return os.path.abspath(full_temp_file_path)

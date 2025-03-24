@@ -2,8 +2,10 @@ import os
 import json
 from datetime import datetime, timedelta
 import threading
-from controller.constants import TIME_FORMAT, LOG_INTERVAL_IN_SECONDS, MESSAGE_SNAPSHOT_FILE
-from controller.constants import SNAPSHOTS_DIR
+from constants import TIME_FORMAT, LOG_INTERVAL_IN_SECONDS, MESSAGE_SNAPSHOT_FILE
+from constants import SNAPSHOTS_DIR
+
+
 def count_words(text):
     """Utility function to count words in a given text."""
     return len(text.split())
@@ -16,16 +18,19 @@ def estimate_tokens(words):
 
 class MessageStreamer:  # Updated class name
 
-    def __init__(self, snapshots_dir=SNAPSHOTS_DIR, snapshot_interval=LOG_INTERVAL_IN_SECONDS):
+    def __init__(self,
+                 snapshots_dir=SNAPSHOTS_DIR,
+                 snapshot_interval=LOG_INTERVAL_IN_SECONDS):
         """Initialize the MessageStreamer with optional periodic snapshot caching."""
-        
+
         self.snapshots_dir = snapshots_dir
         os.makedirs(self.snapshots_dir, exist_ok=True)
 
         self.messages = []  # Unified log storage for all messages
         # self.msgs_full_path = os.path.join(self.snapshots_dir, MESSAGE_SNAPSHOT_FILE)
-        
-        self.periodic_snapshot = os.path.join(self.snapshots_dir,"preiodic_snapshot.json")
+
+        self.periodic_snapshot = os.path.join(self.snapshots_dir,
+                                              "preiodic_snapshot.json")
         self.snapshot_interval = snapshot_interval
         self._start_periodic_snapshot()
 
@@ -74,10 +79,12 @@ class MessageStreamer:  # Updated class name
 
     def finalize(self):
         """Save all logs to a file and add a summary log."""
-        total_sent_tokens = sum(message["tokens_estimation"] for message in self.messages
+        total_sent_tokens = sum(message["tokens_estimation"]
+                                for message in self.messages
                                 if message["context"])
         total_received_tokens = sum(message["tokens_estimation"]
-                                    for message in self.messages if not message["context"])
+                                    for message in self.messages
+                                    if not message["context"])
 
         # Add a system log for the overall sent and received tokens
         self.add_log(
@@ -99,7 +106,8 @@ class MessageStreamer:  # Updated class name
 
     def get_context_to_llm(self):
         """Retrieve the full context for LLM, including logs marked as context."""
-        return "\n".join(message["content"] for message in self.messages if message["context"])
+        return "\n".join(message["content"] for message in self.messages
+                         if message["context"])
 
     def get_visible_chat(self):
         """Retrieve all visible messages as a dictionary."""

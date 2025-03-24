@@ -4,7 +4,7 @@ from animation.frameworks.xlights.xlights_scheme import XlightsScheme
 from animation.frameworks.xlights.xlights_sequence import XlightsSequence
 import os
 import xml.etree.ElementTree as ET
-from controller.constants import XLIGHTS_HOUSE_PATH, XLIGHTS_KNOWLEDGE_PATH, XLIGHTS_TEMP_ANIMATION_FILE, XLIGHTS_SEQUENCE_PATH
+from constants import XLIGHTS_HOUSE_PATH, XLIGHTS_KNOWLEDGE_PATH, XLIGHTS_TEMP_ANIMATION_FILE, XLIGHTS_SEQUENCE_PATH
 
 
 class XLightsFramework(Framework):
