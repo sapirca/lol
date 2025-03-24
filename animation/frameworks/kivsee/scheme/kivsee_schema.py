@@ -16,5 +16,5 @@ class KivseeSchema(BaseModel):
                 "description": "This is an example schema",
                 "version": "1.0.0",
                 "tags": ["example", "schema"]
-            }
+            } 
         }

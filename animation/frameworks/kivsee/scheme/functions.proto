@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+message ConstValueFloatFunctionConfig {
+    float value = 1;
+}
+
+message LinearFloatFunctionConfig {
+    float start = 1;
+    float end = 2;
+}
+
+message SinFloatFunctionConfig {
+    float min = 1;
+    float max = 2;
+    float phase = 3;
+    float repeats = 4;
+}
+
+message StepsFloatFunctionConfig {
+    float num_steps = 1;
+    float diff_per_step = 2;
+    float first_step_value = 3;
+}
+
+message RepeatFloatFunctionConfig {
+    float numberOfTimes = 1;
+    FloatFunction funcToRepeat = 2;
+}
+
+message HalfFloatFunctionConfig {
+    FloatFunction f1 = 1;
+    FloatFunction f2 = 2;
+}
+
+message Comb2FloatFunctionConfig {
+    FloatFunction f1 = 1;
+    float amount1 = 2;
+    FloatFunction f2 = 3;
+    float amount2 = 4;
+}
+
+message FloatFunction {
+    oneof function {
+        ConstValueFloatFunctionConfig const_value = 1;
+        LinearFloatFunctionConfig linear = 2;
+        SinFloatFunctionConfig sin = 3;
+        StepsFloatFunctionConfig steps = 4;
+        RepeatFloatFunctionConfig repeat = 5;
+        HalfFloatFunctionConfig half = 6;
+        Comb2FloatFunctionConfig comb2 = 7;
+    }
+}

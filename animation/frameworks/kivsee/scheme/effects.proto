@@ -1,0 +1,83 @@
+syntax = "proto3";
+import "functions.proto";
+
+message HSV {
+    float hue = 1;
+    float sat = 2;
+    float val = 3;
+}
+
+message ConstColorEffectConfig {
+    HSV color = 1;
+}
+
+message RainbowEffectConfig {
+    FloatFunction hue_start = 1;
+    FloatFunction hue_end = 2;
+}
+
+message BrightnessEffectConfig {
+    FloatFunction mult_factor = 1;
+}
+
+message HueEffectConfig {
+    FloatFunction offset_factor = 1;
+}
+
+message SaturationEffectConfig {
+    FloatFunction mult_factor = 1;
+}
+
+message SnakeEffectConfig {
+    FloatFunction head = 1;
+    FloatFunction tail_length = 2;
+    bool cyclic = 3;
+}
+
+message SegmentEffectConfig {
+    FloatFunction start = 1;
+    FloatFunction end = 2;
+}
+
+message GlitterEffectConfig {
+    FloatFunction intensity = 1;
+    FloatFunction sat_mult_factor = 2;
+}
+
+
+message AlternateEffectConfig {
+    uint32 numberOfPixels = 1;
+    FloatFunction hue_offset = 2;
+    FloatFunction sat_mult = 3;
+    FloatFunction brightness_mult = 4;
+}
+
+message EffectConfig {
+    uint32 start_time = 1;
+    uint32 end_time = 2;
+    string segments = 3;
+
+    float repeat_num = 4;
+    float repeat_start = 5;
+    float repeat_end = 6;
+}
+
+message EffectProto {
+
+    EffectConfig effect_config = 1;
+
+    oneof effect {
+        ConstColorEffectConfig const_color = 2;
+        RainbowEffectConfig rainbow = 3;
+        BrightnessEffectConfig brightness = 4;
+        HueEffectConfig hue = 5;
+        SaturationEffectConfig saturation = 6;
+        SnakeEffectConfig snake = 7;
+    }
+}
+
+message AnimationProto {
+    repeated EffectProto effects = 1;
+    uint32 duration_ms = 2;
+    uint32 num_repeats = 3; // 0 means forever
+}

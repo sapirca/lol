@@ -8,4 +8,9 @@ google-genai
 instructor
 # llamaapi ?
 pydantic
-protobuf-to-pydantic
+
+# brew install protobuf
+# pip install protobuf-to-pydantic
+# protoc --protobuf-to-pydantic_out=. effects.proto
+# export PATH="$PATH:/Users/sapir/miniconda3/envs/lol_agent/bin"
+# ls /Users/sapir/miniconda3/envs/lol_agent/bin/protoc-gen-protobuf-to-pydantic
