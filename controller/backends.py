@@ -17,7 +17,7 @@ class LLMBackend:
     Each backend should inherit from this class and implement the generate_response method.
     """
 
-    def __init__(self, name, response_object: BaseModel, model, config=None):
+    def __init__(self, name, response_schema_obj: BaseModel, model, config=None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
@@ -27,7 +27,7 @@ class LLMBackend:
         self.logger.info(f"Using {name} model: {self.model}")
         self.intstructor_response = self.config.get("instructor_response",
                                                     False)
-        self.response_schema_obj = response_object
+        self.response_schema_obj = response_schema_obj
 
     def generate_response(self, messages) -> BaseModel:
         """Generate a response based on the provided messages array."""
@@ -53,8 +53,8 @@ class LLMBackend:
 class GPTBackend(LLMBackend):
     # gpt-4o-mini-2024-07-18
     # gpt-4o-2024-08-06
-    def __init__(self, name, response_object: BaseModel, model="gpt-4o-2024-08-06", config=None):
-        super().__init__(name=name, response_object=response_object, model=model, config=config)
+    def __init__(self, name, response_schema_obj: BaseModel, model="gpt-4o-2024-08-06", config=None):
+        super().__init__(name=name, response_schema_obj=response_schema_obj, model=model, config=config)
         self.client = instructor.from_openai(openai.OpenAI(api_key=OPENAI_API_KEY))
 
     def generate_response(self, messages) -> BaseModel:
@@ -63,7 +63,7 @@ class GPTBackend(LLMBackend):
             "max_tokens": self.max_tokens,
             "temperature": self.temperature,
             "model": self.model,
-            "response_model": ResponseProto,
+            "response_model": self.response_schema_obj,
         }
         try:
             response = self.client.chat.completions.create(**data)
@@ -79,8 +79,8 @@ class GPTBackend(LLMBackend):
 
 class ClaudeBackend(LLMBackend):
 
-    def __init__(self, name, response_object: BaseModel, model="claude-3-5-sonnet-20241022", config=None):
-        super().__init__(name=name, response_object=response_object, model=model, config=config)
+    def __init__(self, name, response_schema_obj: BaseModel, model="claude-3-5-sonnet-20241022", config=None):
+        super().__init__(name=name, response_schema_obj=response_schema_obj, model=model, config=config)
         self.client = instructor.from_anthropic(
             client=anthropic.Anthropic(api_key=CLAUDE_API_KEY),
         )
@@ -115,7 +115,7 @@ class ClaudeBackend(LLMBackend):
                 "system":
                 system_prompt,  # Correct usage of system instructions
                 "messages": claude_messages,
-                "response_model": ResponseProto,
+                "response_model": self.response_schema_obj,
             }
             response = self.client.messages.create(**data)
             return response

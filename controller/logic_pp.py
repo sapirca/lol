@@ -150,7 +150,7 @@ class LogicPlusPlus:
         }
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(
-                backend_class(name=backend_name, response_object=self.animation_manager.get_response_object(), config=self.config))
+                backend_class(name=backend_name, response_schema_obj=self.animation_manager.get_response_object(), config=self.config))
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):
@@ -314,11 +314,11 @@ class LogicPlusPlus:
             self.logger.info(
                 f"Generated {self.temp_animation_path} for the user's observation."
             )
-            self.wait_for_response = True
+            # self.wait_for_response = True
 
             output += f"Animation sequence generated and saved to {self.temp_animation_path}\n"
             output += "Preview and edit the animation as needed.\n"
-            output += "Save this temporary animation file to the sequence manager? (y/n): "
+            # output += "Save this temporary animation file to the sequence manager? (y/n): "
 
         # for action in processed_response.get("requested_actions", []):
         #     output += f"Unhandled action: {action['action']}\n"
