@@ -1,83 +1,159 @@
 syntax = "proto3";
-import "functions.proto";
+
+message ConstValueFloatFunctionConfig {
+    float value = 1; // p2p: {"description": "Constant float value."}
+}
+
+message LinearFloatFunctionConfig {
+    float start = 1; // p2p: {"description": "Starting float value."}
+    float end = 2;   // p2p: {"description": "Ending float value."}
+}
+
+message SinFloatFunctionConfig {
+    float min = 1;     // p2p: {"description": "Minimum float value."}
+    float max = 2;     // p2p: {"description": "Maximum float value."}
+    float phase = 3;   // p2p: {"description": "Phase offset of the sine wave."}
+    float repeats = 4; // p2p: {"description": "Number of repetitions of the sine wave."}
+}
+
+message StepsFloatFunctionConfig {
+    float num_steps = 1;         // p2p: {"description": "Number of steps in the function."}
+    float diff_per_step = 2;     // p2p: {"description": "Difference between each step."}
+    float first_step_value = 3; // p2p: {"description": "Value of the first step."}
+}
+
+message RepeatFloatFunctionConfig {
+    float numberOfTimes = 1; // p2p: {"description": "Number of times to repeat the function."}
+    FloatFunction funcToRepeat = 2; // p2p: {"description": "Function to repeat."}
+}
+
+message HalfFloatFunctionConfig {
+    FloatFunction f1 = 1; // p2p: {"description": "First half function."}
+    FloatFunction f2 = 2; // p2p: {"description": "Second half function."}
+}
+
+message Comb2FloatFunctionConfig {
+    FloatFunction f1 = 1; // p2p: {"description": "First function to combine."}
+    float amount1 = 2;     // p2p: {"description": "Amount of the first function."}
+    FloatFunction f2 = 3; // p2p: {"description": "Second function to combine."}
+    float amount2 = 4;     // p2p: {"description": "Amount of the second function."}
+}
+
+message FloatFunction {
+    oneof function {
+        ConstValueFloatFunctionConfig const_value = 1; // p2p: {"description": "Constant float function."}
+        LinearFloatFunctionConfig linear = 2;         // p2p: {"description": "Linear float function."}
+        SinFloatFunctionConfig sin = 3;              // p2p: {"description": "Sine wave float function."}
+        StepsFloatFunctionConfig steps = 4;           // p2p: {"description": "Steps float function."}
+        RepeatFloatFunctionConfig repeat = 5;        // p2p: {"description": "Repeat float function."}
+        HalfFloatFunctionConfig half = 6;            // p2p: {"description": "Half float function."}
+        Comb2FloatFunctionConfig comb2 = 7;           // p2p: {"description": "Combine 2 float functions."}
+    }
+}
 
 message HSV {
-    float hue = 1;
-    float sat = 2;
-    float val = 3;
+    float hue = 1; // p2p: {"description": "Hue value."}
+    float sat = 2; // p2p: {"description": "Saturation value."}
+    float val = 3; // p2p: {"description": "Value (brightness) value."}
 }
 
 message ConstColorEffectConfig {
-    HSV color = 1;
+    HSV color = 1; // p2p: {"description": "Constant HSV color."}
 }
 
 message RainbowEffectConfig {
-    FloatFunction hue_start = 1;
-    FloatFunction hue_end = 2;
+    FloatFunction hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
+    FloatFunction hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
 }
 
 message BrightnessEffectConfig {
-    FloatFunction mult_factor = 1;
+    FloatFunction mult_factor = 1; // p2p: {"description": "Multiplier factor for brightness."}
 }
 
 message HueEffectConfig {
-    FloatFunction offset_factor = 1;
+    FloatFunction offset_factor = 1; // p2p: {"description": "Offset factor for hue."}
 }
 
 message SaturationEffectConfig {
-    FloatFunction mult_factor = 1;
+    FloatFunction mult_factor = 1; // p2p: {"description": "Multiplier factor for saturation."}
 }
 
 message SnakeEffectConfig {
-    FloatFunction head = 1;
-    FloatFunction tail_length = 2;
-    bool cyclic = 3;
+    FloatFunction head = 1;        // p2p: {"description": "Head position function for the snake."}
+    FloatFunction tail_length = 2; // p2p: {"description": "Tail length function for the snake."}
+    bool cyclic = 3;               // p2p: {"description": "Whether the snake is cyclic."}
 }
 
 message SegmentEffectConfig {
-    FloatFunction start = 1;
-    FloatFunction end = 2;
+    FloatFunction start = 1; // p2p: {"description": "Segment start position function."}
+    FloatFunction end = 2;   // p2p: {"description": "Segment end position function."}
 }
 
 message GlitterEffectConfig {
-    FloatFunction intensity = 1;
-    FloatFunction sat_mult_factor = 2;
+    FloatFunction intensity = 1;        // p2p: {"description": "Glitter intensity function."}
+    FloatFunction sat_mult_factor = 2; // p2p: {"description": "Saturation multiplier factor for glitter."}
 }
 
-
 message AlternateEffectConfig {
-    uint32 numberOfPixels = 1;
-    FloatFunction hue_offset = 2;
-    FloatFunction sat_mult = 3;
-    FloatFunction brightness_mult = 4;
+    uint32 numberOfPixels = 1;      // p2p: {"description": "Number of pixels for the alternate effect."}
+    FloatFunction hue_offset = 2;      // p2p: {"description": "Hue offset function for the alternate effect."}
+    FloatFunction sat_mult = 3;        // p2p: {"description": "Saturation multiplier function for the alternate effect."}
+    FloatFunction brightness_mult = 4; // p2p: {"description": "Brightness multiplier function for the alternate effect."}
 }
 
 message EffectConfig {
-    uint32 start_time = 1;
-    uint32 end_time = 2;
-    string segments = 3;
+    uint32 start_time = 1;  // p2p: {"description": "Start time of the effect in milliseconds."}
+    uint32 end_time = 2;    // p2p: {"description": "End time of the effect in milliseconds."}
+    string segments = 3;    // p2p: {"description": "Segments to apply the effect to."}
 
-    float repeat_num = 4;
-    float repeat_start = 5;
-    float repeat_end = 6;
+    float repeat_num = 4;   // p2p: {"description": "Number of times to repeat the effect."}
+    float repeat_start = 5; // p2p: {"description": "Start time of the repeat."}
+    float repeat_end = 6;   // p2p: {"description": "End time of the repeat."}
 }
 
 message EffectProto {
 
-    EffectConfig effect_config = 1;
-
+    EffectConfig effect_config = 1; // p2p: {"description": "General configuration for the effect."}
+    
     oneof effect {
-        ConstColorEffectConfig const_color = 2;
-        RainbowEffectConfig rainbow = 3;
-        BrightnessEffectConfig brightness = 4;
-        HueEffectConfig hue = 5;
-        SaturationEffectConfig saturation = 6;
-        SnakeEffectConfig snake = 7;
+        ConstColorEffectConfig const_color = 2;   // p2p: {"description": "The color is constant for the entire duration of the effect."}
+        RainbowEffectConfig rainbow = 3;          // p2p: {"description": "A gradient of colors, from hue start to hue end, 0-1 gives the whole spectrum of colors ."}
+        BrightnessEffectConfig brightness = 4;    // p2p: {"description": "Brightness effect."}
+        HueEffectConfig hue = 5;                  // p2p: {"description": "Hue effect."}
+        SaturationEffectConfig saturation = 6;     // p2p: {"description": "Saturation effect."}
+        SnakeEffectConfig snake = 7;              // p2p: {"description": "Snake effect."}
+        SegmentEffectConfig segment = 8;          // p2p: {"description": "Segment effect."}
+        GlitterEffectConfig glitter = 9;          // p2p: {"description": "Glitter effect."}
+        AlternateEffectConfig alternate = 10;     // p2p: {"description": "Alternate effect."}
     }
 }
 
+// message AnimationProto {
+//     repeated EffectProto effects = 1; // p2p: {"description": "List of effects in the animation."}
+//     uint32 duration_ms = 2;           // p2p: {"description": "Duration of the entire animation in milliseconds."}
+//     uint32 num_repeats = 3;           // p2p: {"description": "Number of times to repeat the animation (0 means forever)."}
+// }
+
+message ElementsEffectProto {
+
+    repeated string elements = 1; // p2p: {"description": "List of effects in the animation."}
+    repeated EffectProto effects = 2; // p2p: {"description": "List of effects in the animation."}
+}
+
+// TODO sapir how to split it per element?
 message AnimationProto {
-    repeated EffectProto effects = 1;
-    uint32 duration_ms = 2;
-    uint32 num_repeats = 3; // 0 means forever
+    repeated ElementsEffectProto effects = 1; // p2p: {"description": "List of effects in the animation."}
+    uint32 duration_ms = 2;           // p2p: {"description": "Duration of the entire animation in milliseconds."}
+    uint32 num_repeats = 3;           // p2p: {"description": "Number of times to repeat the animation (0 means forever)."}
+}
+
+//Represents the full animation response, with the song name and reasoning.
+message ResponseProto {
+  string instruction = 1;       // p2p: {"description": "The user instruction that the was given to the model to generate this animation response."}
+  string reasoning = 2;         // p2p: {"description": "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."}
+  AnimationProto animation = 3; // p2p: {"description": "The whole animation."}
+  string name = 4;              // p2p: {"description": "The animation title."}
+  
+//   __hash__ = object.__hash__
+
 }

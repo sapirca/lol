@@ -2,7 +2,7 @@ import json
 import os
 import logging
 from animation.animation_manager import AnimationManager
-from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, DeepSeekBackend, StubBackend
+from controller.backends import GPTBackend, ClaudeBackend
 # LlamaBackend
 import csv
 # from config import config as basic_config

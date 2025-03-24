@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from animation.frameworks.framework import Framework
+from animation.frameworks.kivsee.scheme.effects_p2p import ResponseProto
 from animation.frameworks.kivsee.scheme.kivsee_schema import KivseeSchema
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 import os
@@ -39,4 +40,7 @@ class KivseeFramework(Framework):
             return "Kivsee domain knowledge"
 
     def get_response_scheme_obj(self) -> BaseModel:
-        return KivseeSchema()
+        # return KivseeSchema()
+        # /Users/sapir/repos/lol/animation/frameworks/kivsee/scheme/effects_p2p.py
+        return ResponseProto
+    

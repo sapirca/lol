@@ -81,7 +81,8 @@ class AnimationManager:
         return self.framework.get_domain_knowledge()
 
     def get_latest_sequence(self):
-        return f"<animation> {self.sequence_manager.get_latest_sequence()} </animation>"
+        # return f"<animation> {self.sequence_manager.get_latest_sequence()} </animation>"
+        return f"{self.sequence_manager.get_latest_sequence()}"
 
     def get_all_sequences(self):
         return self.sequence_manager.get_all_sequences()
@@ -108,5 +109,5 @@ class AnimationManager:
         return self.sequence_manager.get_suffix()
     
     def get_response_object(self) -> BaseModel:
-        return self.framework.get_response_object()
+        return self.framework.get_response_scheme_obj()
 

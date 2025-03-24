@@ -1,5 +1,5 @@
 import random
-from controller.backends import GPTBackend, ClaudeBackend, GeminiBackend, StubBackend, LLMBackend, DeepSeekBackend
+from controller.backends import GPTBackend, ClaudeBackend, LLMBackend
 from prompt import intro_prompt
 from animation.songs.song_provider import SongProvider
 import xml.etree.ElementTree as ET
@@ -12,7 +12,8 @@ import os
 from datetime import datetime
 import json
 # from config import config as basic_config
-from configs.config_conceptual import config as basic_config
+# from configs.config_conceptual import config as basic_config
+from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
 
 
@@ -146,14 +147,10 @@ class LogicPlusPlus:
         backend_mapping = {
             "GPT": GPTBackend,
             "Claude": ClaudeBackend,
-            "Gemini": GeminiBackend,
-            "DeepSeek": DeepSeekBackend,
-            "Stub": StubBackend
         }
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(
-                backend_class(name=backend_name, response_object=self.animation_manager.get_response_object(), config=self.config,
-                              ))
+                backend_class(name=backend_name, response_object=self.animation_manager.get_response_object(), config=self.config))
 
     def register_backend(self, backend):
         if not isinstance(backend, LLMBackend):
@@ -270,20 +267,24 @@ class LogicPlusPlus:
 
         # Build the messages array for the LLM
         messages = self.formatter.build_messages()
-        response = backend.generate_response(messages)
+        model_response = backend.generate_response(messages)
+
+        printable_response = json.dumps(model_response.model_dump(), indent=4)
 
         # TODO(sapir) - Move to work with response
         # if (type(response) == ResponseScheme):
         #     response = response.get_response()
         # The raw response contains a WIP animation which does not need to be added to the context.
         self.message_streamer.add_message("llm_raw_response",
-                                          response,
+                                          printable_response,
                                           visible=False,
                                           context=False)
 
-        parsed_response = self.response_manager.parse_response(response)
+        # parsed_response = self.response_manager.parse_response(model_response, self.animation_manager.get_response_object())
 
-        assistant_response = parsed_response.get("reasoning", "") or ""
+        # assistant_response = parsed_response.get("visible_answer", "") or ""
+
+        assistant_response = printable_response
         # Add this trimmed short response to the context
         # for better understanding.
         self.message_streamer.add_message("assistant",
@@ -292,21 +293,21 @@ class LogicPlusPlus:
                                           visible=True,
                                           context=True)
 
-        act_on_response_msg = self.act_on_response(parsed_response)
-        self.message_streamer.add_message(
-            "system_output", act_on_response_msg, visible=True,
-            context=False)  # Information about agent actions shared
-        # with the user.
+        # act_on_response_msg = self.act_on_response(parsed_response)
+        # self.message_streamer.add_message(
+        #     "system_output", act_on_response_msg, visible=True,
+        #     context=False)  # Information about agent actions shared
+        # # with the user.
 
         system_responses.append(("assistant", assistant_response))
-        if act_on_response_msg:
-            system_responses.append(("system", act_on_response_msg))
+        # if act_on_response_msg:
+        #     system_responses.append(("system", act_on_response_msg))
         return system_responses
 
     def act_on_response(self, processed_response):
-        reasoning = processed_response.get("reasoning")
-        consistency_justification = processed_response.get(
-            "consistency_justification")
+        reasoning = processed_response.get("visible_answer")
+        # consistency_justification = processed_response.get(
+        #     "consistency_justification")
         animation_sequence = processed_response.get("animation_sequence")
 
         output = ""
