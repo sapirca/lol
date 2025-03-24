@@ -25,6 +25,23 @@ class Render:
         except json.JSONDecodeError:
             print(f"Error decoding JSON from file: {animation_file_path}")
 
+        # >>> duplicate it for all things names and do http post to the trigger service
+        # request = {
+        #     "trigger": "animation",
+        #     "animation": animation_data
+        # }
+        # send request to trigger service
+        # response = requests.post("http://trigger-service:5000/trigger", json=request)
+        # print
+        # print(response.json())
+        # except requests.exceptions.RequestException as e:
+        #     print(f"Error sending request to trigger service: {e}")
+
+        except FileNotFoundError:
+            print(f"File not found: {animation_file_path}")
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON from file: {animation_file_path}")
+
 
 # Example usage
 # render = Render()
