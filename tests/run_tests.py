@@ -14,7 +14,7 @@ from controller.interpreter import Interpreter
 from controller.response_schema import ResponseSchema
 from prompt import intro_prompt
 
-RELATIVE_DATA_PATH = "tests/data/"
+RELATIVE_DATA_PATH = os.getcwd()
 
 # TEST_FILENAME = "test_data.json"
 # TEST_FILENAME = "mini_test_data.json"

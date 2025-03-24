@@ -96,7 +96,7 @@ class ResponseSchema(BaseModel):
         description=
         "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
     )
-    instruction: str = Field(
+    user_instruction: str = Field(
         description=
         "The instruction that was given to the model to generate this response."
     )

@@ -1,7 +1,9 @@
 import json
+import os
 
+RELATIVE_DATA_PATH = os.getcwd()
 
-def json_to_typescript(json_data, output_file="tests/output/animation.ts"):
+def json_to_typescript(json_data, output_file=f"{RELATIVE_DATA_PATH}/animation.ts"):
     """
     Converts a JSON object to a TypeScript file representing an animation sequence.
 
