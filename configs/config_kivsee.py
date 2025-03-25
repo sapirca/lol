@@ -1,5 +1,5 @@
 config = {
-    "selected_backend": "GPT",
+    "selected_backend": "Claude",
     "framework": "kivsee",  #kivsee #xlights #conceptual
 }
 

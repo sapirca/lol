@@ -47,14 +47,14 @@ class Render:
         for key, value in animation_data.items():
             print(f"{key}: {value}")
 
-        # Convert the animation data to proto
-        response_proto = KivseeSchema(response=animation_data)
+        # Convert the animation data to proto using model_validate
+        # response_proto = KivseeSchema.model_validate(animation_data)
 
         # Store the animation data
-        self.store_animation(response_proto)
+        self.store_animation(json.dumps(animation_data))
 
         # Trigger the song
-        self.trigger_song(response_proto)
+        self.trigger_song("song_name")
 
 
 def main():

@@ -276,9 +276,8 @@ class LogicPlusPlus:
             system_responses.append(("system", f"Error: {str(e)}"))
             return system_responses
 
-        # Use `exclude_none=True` to remove null fields from the output
-        printable_response = json.dumps(
-            model_response.model_dump(exclude_none=True), indent=4)
+        model_dict_wo_none = model_response.model_dump(exclude_none=True)
+        printable_response = json.dumps(model_dict_wo_none, indent=4)
         self.message_streamer.add_message("llm_raw_response",
                                           printable_response,
                                           visible=False,
@@ -298,7 +297,8 @@ class LogicPlusPlus:
 
         system_responses.append(("assistant", assistant_response))
 
-        act_on_response_msg = self.act_on_response(model_response)
+        act_on_response_msg = self.act_on_response(model_response,
+                                                   printable_response)
         self.message_streamer.add_message("system_output",
                                           act_on_response_msg,
                                           visible=True,
@@ -309,20 +309,20 @@ class LogicPlusPlus:
 
         return system_responses
 
-    def act_on_response(self, processed_response):
+    def act_on_response(self, model_response, printable_response):
         # reasoning = processed_response.get("visible_answer")
         # consistency_justification = processed_response.get(
         #     "consistency_justification")
-        response_dict = processed_response.model_dump()
-        # animation_sequence_dict = response_dict.get("animation")
-        animation_sequence_dict = processed_response.model_dump()
+        # response_dict = processed_response.model_dump()
+        # # animation_sequence_dict = response_dict.get("animation")
+        # animation_sequence_dict = model_response.model_dump()
 
         output = ""
 
-        if animation_sequence_dict:
+        if model_response:
             # Use `exclude_none=True` to remove null fields from the animation JSON
             animation_json = json.dumps(
-                animation_sequence_dict,
+                model_response,
                 indent=4,
                 default=lambda o: o.model_dump(exclude_none=True))
             self.temp_animation_path = self.animation_manager.save_tmp_animation(

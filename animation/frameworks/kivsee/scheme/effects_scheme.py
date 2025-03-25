@@ -165,40 +165,31 @@ class EffectProto(BaseModel):
         default_factory=EffectConfig,
         description="General configuration for the effect.")
     const_color: typing.Optional[ConstColorEffectConfig] = Field(
-        default=None,
         description="The LEDs will display a single, constant color.")
     rainbow: typing.Optional[RainbowEffectConfig] = Field(
-        default=None,
         description=
         "The LEDs will cycle through a spectrum of colors, creating a rainbow effect."
     )
     brightness: typing.Optional[BrightnessEffectConfig] = Field(
-        default=None,
         description="Adjusts the overall brightness of the LEDs.")
     hue: typing.Optional[HueEffectConfig] = Field(
-        default=None,
         description="Cycles through different hues (colors) on the LEDs.")
     saturation: typing.Optional[SaturationEffectConfig] = Field(
-        default=None,
         description=
         "Adjusts the purity of the colors displayed on the LEDs. Below 0.8 is less saturated, pastel appearance."
     )
     snake: typing.Optional[SnakeEffectConfig] = Field(
-        default=None,
         description=
         "A segment of lit LEDs will move along the strip, resembling a snake.")
     segment: typing.Optional[SegmentEffectConfig] = Field(
-        default=None,
         description=
         "Applies an effect to a specific segment of LEDs, identified by its ID."
     )
     glitter: typing.Optional[GlitterEffectConfig] = Field(
-        default=None,
         description=
         "Randomly lights up individual LEDs in a specified color, creating a glittery appearance."
     )
     alternate: typing.Optional[AlternateEffectConfig] = Field(
-        default=None,
         description=
         "The LEDs will alternate between two specified colors at a defined period."
     )
