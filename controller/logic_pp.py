@@ -270,7 +270,11 @@ class LogicPlusPlus:
 
         # Build the messages array for the LLM
         messages = self.formatter.build_messages()
-        model_response = backend.generate_response(messages)
+        try:
+            model_response = backend.generate_response(messages)
+        except Exception as e:
+            system_responses.append(("system", f"Error: {str(e)}"))
+            return system_responses
 
         printable_response = json.dumps(model_response.model_dump(), indent=4)
         self.message_streamer.add_message("llm_raw_response",

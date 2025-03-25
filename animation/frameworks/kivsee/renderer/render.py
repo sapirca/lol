@@ -1,7 +1,7 @@
 import json
 
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
-from animation.frameworks.kivsee.scheme.effects_scheme import ResponseProto
+from animation.frameworks.kivsee.scheme.effects_scheme import KivseeSchema
 
 
 class Render:
@@ -22,7 +22,7 @@ class Render:
             print(f"{key}: {value}")
 
         # Convert the animation data to proto
-        response_proto = ResponseProto(response=animation_data)
+        response_proto = KivseeSchema(response=animation_data)
 
         # >>> duplicate it for all things names and do http post to the trigger service
         # request = {

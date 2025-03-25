@@ -4,9 +4,6 @@ import tiktoken
 import anthropic
 from google import genai
 import logging
-import json
-from animation.frameworks.conceptual.response_schema import ResponseSchema
-from animation.frameworks.kivsee.scheme.effects_scheme import ResponseProto
 from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY
 from pydantic import BaseModel
 
@@ -139,5 +136,5 @@ class ClaudeBackend(LLMBackend):
             return response
 
         except Exception as e:
-            error_message = f"Error, Claude backend: {str(e)}"
+            self.logger.error(f"Error, Claude backend: {str(e)}")
             raise e
