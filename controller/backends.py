@@ -23,7 +23,7 @@ class LLMBackend:
         self.logger = logging.getLogger(name)
         self.config = config or {}
         self.model = model
-        self.max_tokens = self.config.get("max_tokens", 2048)
+        self.max_tokens = self.config.get("max_tokens", 4096)
         self.temperature = self.config.get("temperature", 0.5)
         self.logger.info(f"Using {name} model: {self.model}")
         self.intstructor_response = self.config.get("instructor_response",
@@ -88,11 +88,12 @@ class GPTBackend(LLMBackend):
 
 
 class ClaudeBackend(LLMBackend):
-
+    #claude-3-7-sonnet-latest
+    #claude-3-5-sonnet-20241022
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
-                 model="claude-3-5-sonnet-20241022",
+                 model="claude-3-7-sonnet-latest",
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,

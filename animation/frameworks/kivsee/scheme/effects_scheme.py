@@ -9,28 +9,34 @@ from pydantic import Field
 from pydantic import model_validator
 import typing
 
-# class ConstValueFloatFunctionConfig(BaseModel):
-#     value: float = Field(default=0.0, description="Constant float value.")
 
-# class LinearFloatFunctionConfig(BaseModel):
-#     start: float = Field(default=0.0, description="Starting float value.")
-#     end: float = Field(default=0.0, description="Ending float value.")
+class ConstValueFloatFunctionConfig(BaseModel):
+    value: float = Field(..., description="Constant float value.")
 
-# class SinFloatFunctionConfig(BaseModel):
-#     min: float = Field(default=0.0, description="Minimum float value.")
-#     max: float = Field(default=0.0, description="Maximum float value.")
-#     phase: float = Field(default=0.0,
-#                          description="Phase offset of the sine wave.")
-#     repeats: float = Field(
-#         default=0.0, description="Number of repetitions of the sine wave.")
 
-# class StepsFloatFunctionConfig(BaseModel):
-#     num_steps: float = Field(default=0.0,
-#                              description="Number of steps in the function.")
-#     diff_per_step: float = Field(default=0.0,
-#                                  description="Difference between each step.")
-#     first_step_value: float = Field(default=0.0,
-#                                     description="Value of the first step.")
+class LinearFloatFunctionConfig(BaseModel):
+    start: float = Field(..., description="Starting float value.")
+    end: float = Field(..., description="Ending float value.")
+
+
+class SinFloatFunctionConfig(BaseModel):
+    min: float = Field(..., description="Minimum float value.")
+    max: float = Field(..., description="Maximum float value.")
+    phase: float = Field(..., description="Phase offset of the sine wave.")
+    repeats: float = Field(
+        ..., description="Number of repetitions of the sine wave.")
+
+
+class StepsFloatFunctionConfig(BaseModel):
+    num_steps: float = Field(description="Number of steps in the function.")
+    diff_per_step: float = Field(description="Difference between each step.")
+    first_step_value: float = Field(description="Value of the first step.")
+
+
+# class RepeatFloatFunctionConfig(BaseModel):
+#     numberOfTimes: float = Field(
+#         description="Number of times to repeat the function.")
+#     funcToRepeat: FloatFunction = Field(description="Function to repeat.")
 
 # class HalfFloatFunctionConfig(BaseModel):
 #     f1: "FloatFunction" = Field(default_factory=lambda: FloatFunction(),
@@ -41,47 +47,49 @@ import typing
 # class Comb2FloatFunctionConfig(BaseModel):
 #     f1: "FloatFunction" = Field(default_factory=lambda: FloatFunction(),
 #                                 description="First function to combine.")
-#     amount1: float = Field(default=0.0,
-#                            description="Amount of the first function.")
+#     amount1: float = Field(description="Amount of the first function.")
 #     f2: "FloatFunction" = Field(default_factory=lambda: FloatFunction(),
 #                                 description="Second function to combine.")
-#     amount2: float = Field(default=0.0,
-#                            description="Amount of the second function.")
+#     amount2: float = Field(description="Amount of the second function.")
 
-# class FloatFunction(BaseModel):
-#     _one_of_dict = {
-#         "FloatFunction.function": {
-#             "fields": {
-#                 "comb2", "const_value", "half", "linear", "repeat", "sin",
-#                 "steps"
-#             }
-#         }
-#     }
-#     one_of_validator = model_validator(mode="before")(check_one_of)
-#     const_value: ConstValueFloatFunctionConfig = Field(
-#         description="Constant float function.")
-#     linear: LinearFloatFunctionConfig = Field(
-#         description="Linear float function.")
-#     sin: SinFloatFunctionConfig = Field(
-#         description="Sine wave float function.")
-#     steps: StepsFloatFunctionConfig = Field(
-#         description="Steps float function.")
-#     repeat: "RepeatFloatFunctionConfig" = Field(
-#         description="Repeat float function.")
-#     half: HalfFloatFunctionConfig = Field(description="Half float function.")
-#     comb2: Comb2FloatFunctionConfig = Field(
-#         description="Combine 2 float functions.")
 
-# class RepeatFloatFunctionConfig(BaseModel):
-#     numberOfTimes: float = Field(
-#         default=0.0, description="Number of times to repeat the function.")
-#     funcToRepeat: FloatFunction = Field(description="Function to repeat.")
+class FloatFunction(BaseModel):
+    const_value: typing.Optional[ConstValueFloatFunctionConfig] = Field(
+        default=None, description="Constant float function.")
+    linear: typing.Optional[LinearFloatFunctionConfig] = Field(
+        default=None, description="Linear float function.")
+    sin: typing.Optional[SinFloatFunctionConfig] = Field(
+        default=None, description="Sine wave float function.")
+    steps: typing.Optional[StepsFloatFunctionConfig] = Field(
+        default=None, description="Steps float function.")
+    # repeat: typing.Optional[RepeatFloatFunctionConfig] = Field(
+    #     description="Repeat float function.")
+    # half: typing.Optional[HalfFloatFunctionConfig] = Field(
+    #     description="Half float function.")
+    # comb2: typing.Optional[Comb2FloatFunctionConfig] = Field(
+    #     description="Combine 2 float functions.")
+
+    @model_validator(mode="after")
+    def check_one_of_effect(self):
+        effects = [
+            self.const_value,
+            self.linear,
+            self.sin,
+            self.steps,
+            # self.repeat,
+            # self.half,
+            # self.comb2,
+        ]
+        effects_set = sum(1 for effect in effects if effect is not None)
+        if effects_set != 1:
+            raise ValueError(f"all effects are {effects}.")
+        return self
 
 
 class HSV(BaseModel):
-    hue: float = Field(default=0.0, description="Hue value.")
-    sat: float = Field(default=0.0, description="Saturation value.")
-    val: float = Field(default=0.0, description="Value (brightness) value.")
+    hue: float = Field(description="Hue value.")
+    sat: float = Field(description="Saturation value.")
+    val: float = Field(description="Value (brightness) value.")
 
 
 class ConstColorEffectConfig(BaseModel):
@@ -89,74 +97,74 @@ class ConstColorEffectConfig(BaseModel):
 
 
 class RainbowEffectConfig(BaseModel):
-    """
-     message RainbowEffectConfig {
-     float hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
-     float hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
- }
-    """
-
-    hue_start: float = Field(
-        default=0.0, description="Starting hue function for the rainbow.")
-    hue_end: float = Field(default=0.0,
-                           description="Ending hue function for the rainbow.")
+    hue_start: FloatFunction = Field(
+        ..., description="Starting hue function for the rainbow.")
+    hue_end: FloatFunction = Field(
+        ..., description="Ending hue function for the rainbow.")
 
 
 class BrightnessEffectConfig(BaseModel):
-    mult_factor: float = Field(description="Multiplier factor for brightness.")
+    mult_factor: FloatFunction = Field(
+        ..., description="Multiplier factor for brightness.")
 
 
 class HueEffectConfig(BaseModel):
-    offset_factor: float = Field(description="Offset factor for hue.")
+    offset_factor: FloatFunction = Field(...,
+                                         description="Offset factor for hue.")
 
 
 class SaturationEffectConfig(BaseModel):
-    mult_factor: float = Field(description="Multiplier factor for saturation.")
+    mult_factor: FloatFunction = Field(
+        ..., description="Multiplier factor for saturation.")
 
 
 class SnakeEffectConfig(BaseModel):
-    head: float = Field(description="Head position function for the snake.")
-    tail_length: float = Field(
-        description="Tail length function for the snake.")
+    head: FloatFunction = Field(
+        ..., description="Head position function for the snake.")
+    tail_length: FloatFunction = Field(
+        ..., description="Tail length function for the snake.")
     cyclic: bool = Field(default=False,
                          description="Whether the snake is cyclic.")
 
 
 class SegmentEffectConfig(BaseModel):
-    start: float = Field(description="Segment start position function.")
-    end: float = Field(description="Segment end position function.")
+    start: FloatFunction = Field(
+        ..., description="Segment start position function.")
+    end: FloatFunction = Field(...,
+                               description="Segment end position function.")
 
 
 class GlitterEffectConfig(BaseModel):
-    intensity: float = Field(description="Glitter intensity function.")
-    sat_mult_factor: float = Field(
-        description="Saturation multiplier factor for glitter.")
+    intensity: FloatFunction = Field(...,
+                                     description="Glitter intensity function.")
+    sat_mult_factor: FloatFunction = Field(
+        ..., description="Saturation multiplier factor for glitter.")
 
 
 class AlternateEffectConfig(BaseModel):
     numberOfPixels: int = Field(
-        default=0, description="Number of pixels for the alternate effect.")
-    hue_offset: float = Field(
-        description="Hue offset function for the alternate effect.")
-    sat_mult: float = Field(
+        ..., description="Number of pixels for the alternate effect.")
+    hue_offset: FloatFunction = Field(
+        ..., description="Hue offset function for the alternate effect.")
+    sat_mult: FloatFunction = Field(
+        ...,
         description="Saturation multiplier function for the alternate effect.")
-    brightness_mult: float = Field(
+    brightness_mult: FloatFunction = Field(
+        ...,
         description="Brightness multiplier function for the alternate effect.")
 
 
 class EffectConfig(BaseModel):
     start_time: int = Field(
-        default=0, description="Start time of the effect in milliseconds.")
+        ..., description="Start time of the effect in milliseconds.")
     end_time: int = Field(
-        default=0, description="End time of the effect in milliseconds.")
-    segments: str = Field(default="",
-                          description="Segments to apply the effect to.")
+        ..., description="End time of the effect in milliseconds.")
+    # segments: str = Field(default="",
+    #                       description="Segments to apply the effect to.")
     repeat_num: float = Field(
-        default=0.0, description="Number of times to repeat the effect.")
-    repeat_start: float = Field(default=0.0,
-                                description="Start time of the repeat.")
-    repeat_end: float = Field(default=0.0,
-                              description="End time of the repeat.")
+        description="Number of times to repeat the effect.")
+    repeat_start: float = Field(description="Start time of the repeat.")
+    repeat_end: float = Field(description="End time of the repeat.")
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>
@@ -164,44 +172,45 @@ class EffectProto(BaseModel):
     effect_config: EffectConfig = Field(
         default_factory=EffectConfig,
         description="General configuration for the effect.")
+
     const_color: typing.Optional[ConstColorEffectConfig] = Field(
+        default=None,
         description="The LEDs will display a single, constant color.")
     rainbow: typing.Optional[RainbowEffectConfig] = Field(
+        default=None,
         description=
         "The LEDs will cycle through a spectrum of colors, creating a rainbow effect."
     )
     brightness: typing.Optional[BrightnessEffectConfig] = Field(
+        default=None,
         description="Adjusts the overall brightness of the LEDs.")
     hue: typing.Optional[HueEffectConfig] = Field(
+        default=None,
         description="Cycles through different hues (colors) on the LEDs.")
     saturation: typing.Optional[SaturationEffectConfig] = Field(
+        default=None,
         description=
         "Adjusts the purity of the colors displayed on the LEDs. Below 0.8 is less saturated, pastel appearance."
     )
     snake: typing.Optional[SnakeEffectConfig] = Field(
+        default=None,
         description=
         "A segment of lit LEDs will move along the strip, resembling a snake.")
-    segment: typing.Optional[SegmentEffectConfig] = Field(
-        description=
-        "Applies an effect to a specific segment of LEDs, identified by its ID."
-    )
-    glitter: typing.Optional[GlitterEffectConfig] = Field(
-        description=
-        "Randomly lights up individual LEDs in a specified color, creating a glittery appearance."
-    )
-    alternate: typing.Optional[AlternateEffectConfig] = Field(
-        description=
-        "The LEDs will alternate between two specified colors at a defined period."
-    )
-
-    # @model_validator(mode="after")
-    # def check_one_of_effect(self):
-    #     effects_set = sum(1 for effect in [self.const_color, self.rainbow]
-    #                       if effect is not None)
-    #     if effects_set != 1:
-    #         raise ValueError(
-    #             "Exactly one of const_color or rainbow must be set.")
-    #     return self
+    # segment: typing.Optional[SegmentEffectConfig] = Field(
+    #     default=None,
+    #     description=
+    #     "Applies an effect to a specific segment of LEDs, identified by its ID."
+    # )
+    # glitter: typing.Optional[GlitterEffectConfig] = Field(
+    #     default=None,
+    #     description=
+    #     "Randomly lights up individual LEDs in a specified color, creating a glittery appearance."
+    # )
+    # alternate: typing.Optional[AlternateEffectConfig] = Field(
+    #     default=None,
+    #     description=
+    #     "The LEDs will alternate between two specified colors at a defined period."
+    # )
 
     @model_validator(mode="after")
     def check_one_of_effect(self):
@@ -212,13 +221,14 @@ class EffectProto(BaseModel):
             self.hue,
             self.saturation,
             self.snake,
-            self.segment,
-            self.glitter,
-            self.alternate,
+            # self.segment,
+            # self.glitter,
+            # self.alternate,
         ]
         effects_set = sum(1 for effect in effects if effect is not None)
         if effects_set != 1:
-            raise ValueError("Exactly one effect type must be set.")
+            raise ValueError(
+                f"Exactly one effect type must be set. got: {effects}")
         return self
 
 

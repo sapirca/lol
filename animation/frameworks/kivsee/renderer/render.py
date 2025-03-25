@@ -4,7 +4,13 @@ from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 from animation.frameworks.kivsee.scheme.effects_scheme import KivseeSchema
 import requests
 
-BASE_URL = "http://10.45.0.0"
+SEQUENCE_URL = "http://10.0.0.49:8082"
+TRIGGER_URL = "http://10.0.0.49:8083"
+
+all_elements = [
+    "ring1", "ring2", "ring3", "ring4", "ring5", "ring6", "ring7", "ring8",
+    "ring9", "ring10", "ring11", "ring12"
+]
 
 
 class Render:
@@ -14,20 +20,48 @@ class Render:
 
     def store_animation(self, animation_data):
         # Stub method to send a POST request to store the animation
-        url = f"{BASE_URL}/store-animation"
-        payload = {"animation_data": animation_data}
-        response = self._post_request(url, payload)
+        # TOOD(sapir): update name
+        # url = f"{SEQUENCE_URL}/triggers/{animation_data['name']}"
+        # payload = {element_name: animation_data["animation"]}
+        # response = self._put_request(url, payload)
+        # # save guid
+        # print(
+        #     f"Store animation response: {response.status_code}, {response.text}"
+        # )
+
+        for element_name in all_elements:
+            url = f"{SEQUENCE_URL}/triggers/{animation_data['name']}/objects/{element_name}"
+            payload = animation_data["animation"]
+            response = self._put_request(url, payload)
+            # save guid
+            print(
+                f"Store animation response: {response.status_code}, {response.text}"
+            )
+
+    def trigger_animation(self, animation_data):
+        # Stub method to send a POST request to trigger the song
+        # TODO(sapir): ask amir how to send to more than one element
+        url = f"{TRIGGER_URL}/trigger/{animation_data['name']}"
+        print(f"url: {url}")
+        # payload = {"sequence_guid": "{guid}",
+        #            "start_offset_ms": 5000}
+        response = self._post_request(url, {})
         print(
-            f"Store animation response: {response.status_code}, {response.text}"
-        )
+            f"Trigger song response: {response.status_code}, {response.text}")
 
     def trigger_song(self, animation_data):
         # Stub method to send a POST request to trigger the song
-        url = f"{BASE_URL}/trigger-song"
+        url = f"{TRIGGER_URL}/song/{animation_data['name']}/play"
         payload = {"animation_data": animation_data}
         response = self._post_request(url, payload)
         print(
             f"Trigger song response: {response.status_code}, {response.text}")
+
+    def _put_request(self, url, payload):
+        # Helper method to send a PUT request
+        headers = {"Content-Type": "application/json"}
+        response = requests.put(url, json=payload, headers=headers)
+        return response
 
     def _post_request(self, url, payload):
         # Helper method to send a POST request
@@ -47,14 +81,21 @@ class Render:
         for key, value in animation_data.items():
             print(f"{key}: {value}")
 
+        animation_data['name'] = "test_123"
+
+        self.preprocess_animation(animation_data)
         # Convert the animation data to proto using model_validate
         # response_proto = KivseeSchema.model_validate(animation_data)
 
         # Store the animation data
-        self.store_animation(json.dumps(animation_data))
+        self.store_animation(animation_data)
 
         # Trigger the song
-        self.trigger_song("song_name")
+        self.trigger_animation(animation_data)
+
+    def preprocess_animation(self, animation_data):
+        for effect in animation_data.get("effects", []):
+            print(f"Effect: {effect}")
 
 
 def main():

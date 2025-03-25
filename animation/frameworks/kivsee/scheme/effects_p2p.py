@@ -62,15 +62,8 @@ class ConstColorEffectConfig(BaseModel):
     color: HSV = Field(default_factory=HSV, description="Constant HSV color.")
 
 class RainbowEffectConfig(BaseModel):
-    """
-     message RainbowEffectConfig {
-     FloatFunction hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
-     FloatFunction hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
- }
-    """
-
-    hue_start: float = Field(default=0.0, description="Starting hue function for the rainbow.")
-    hue_end: float = Field(default=0.0, description="Ending hue function for the rainbow.")
+    hue_start: FloatFunction = Field(default_factory=FloatFunction, description="Starting hue function for the rainbow.")
+    hue_end: FloatFunction = Field(default_factory=FloatFunction, description="Ending hue function for the rainbow.")
 
 class BrightnessEffectConfig(BaseModel):
     mult_factor: FloatFunction = Field(default_factory=FloatFunction, description="Multiplier factor for brightness.")

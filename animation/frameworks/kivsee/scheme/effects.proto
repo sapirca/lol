@@ -61,14 +61,14 @@ message ConstColorEffectConfig {
     HSV color = 1; // p2p: {"description": "Constant HSV color."}
 }
 
-// message RainbowEffectConfig {
-//     FloatFunction hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
-//     FloatFunction hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
-// }
 message RainbowEffectConfig {
-    float hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
-    float hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
+    FloatFunction hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
+    FloatFunction hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
 }
+// message RainbowEffectConfig {
+//     float hue_start = 1; // p2p: {"description": "Starting hue function for the rainbow."}
+//     float hue_end = 2;   // p2p: {"description": "Ending hue function for the rainbow."}
+// }
 
 message BrightnessEffectConfig {
     FloatFunction mult_factor = 1; // p2p: {"description": "Multiplier factor for brightness."}
