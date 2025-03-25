@@ -2,12 +2,38 @@ import json
 
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 from animation.frameworks.kivsee.scheme.effects_scheme import KivseeSchema
+import requests
+
+BASE_URL = "http://10.45.0.0"
 
 
 class Render:
 
     def __init__(self):
         self.sequence_manager = KivseeSequence()
+
+    def store_animation(self, animation_data):
+        # Stub method to send a POST request to store the animation
+        url = f"{BASE_URL}/store-animation"
+        payload = {"animation_data": animation_data}
+        response = self._post_request(url, payload)
+        print(
+            f"Store animation response: {response.status_code}, {response.text}"
+        )
+
+    def trigger_song(self, animation_data):
+        # Stub method to send a POST request to trigger the song
+        url = f"{BASE_URL}/trigger-song"
+        payload = {"animation_data": animation_data}
+        response = self._post_request(url, payload)
+        print(
+            f"Trigger song response: {response.status_code}, {response.text}")
+
+    def _post_request(self, url, payload):
+        # Helper method to send a POST request
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(url, json=payload, headers=headers)
+        return response
 
     def load_and_print_animation(self):
         # Get the path to the animation file
@@ -24,22 +50,11 @@ class Render:
         # Convert the animation data to proto
         response_proto = KivseeSchema(response=animation_data)
 
-        # >>> duplicate it for all things names and do http post to the trigger service
-        # request = {
-        #     "trigger": "animation",
-        #     "animation": animation_data
-        # }
-        # >>> duplicate it for all things names and do http post to the trigger service
-        # request = {
-        #     "trigger": "animation",
-        #     "animation": animation_data
-        # }
-        # send request to trigger service
-        # response = requests.post("http://trigger-service:5000/trigger", json=request)
-        # print
-        # print(response.json())
-        # except requests.exceptions.RequestException as e:
-        #     print(f"Error sending request to trigger service: {e}")
+        # Store the animation data
+        self.store_animation(response_proto)
+
+        # Trigger the song
+        self.trigger_song(response_proto)
 
 
 def main():

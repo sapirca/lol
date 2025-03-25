@@ -276,7 +276,9 @@ class LogicPlusPlus:
             system_responses.append(("system", f"Error: {str(e)}"))
             return system_responses
 
-        printable_response = json.dumps(model_response.model_dump(), indent=4)
+        # Use `exclude_none=True` to remove null fields from the output
+        printable_response = json.dumps(
+            model_response.model_dump(exclude_none=True), indent=4)
         self.message_streamer.add_message("llm_raw_response",
                                           printable_response,
                                           visible=False,
@@ -287,6 +289,7 @@ class LogicPlusPlus:
         assistant_response = printable_response
 
         # Add this trimmed short response to the context for better understanding.
+        # assistant_response + " The animation was trimmed out"
         # assistant_response + " The animation was trimmed out"
         self.message_streamer.add_message("assistant",
                                           assistant_response,
@@ -317,7 +320,11 @@ class LogicPlusPlus:
         output = ""
 
         if animation_sequence_dict:
-            animation_json = json.dumps(animation_sequence_dict, indent=4)
+            # Use `exclude_none=True` to remove null fields from the animation JSON
+            animation_json = json.dumps(
+                animation_sequence_dict,
+                indent=4,
+                default=lambda o: o.model_dump(exclude_none=True))
             self.temp_animation_path = self.animation_manager.save_tmp_animation(
                 animation_json)
             self.logger.info(
@@ -327,10 +334,12 @@ class LogicPlusPlus:
 
             output += f"Animation sequence generated and saved to {self.temp_animation_path} "
             output += "Preview and edit the animation as needed.\n"
-            # output += "Save this temporary animation file to the sequence manager? (y/n): "
 
-        # for action in processed_response.get("requested_actions", []):
-        #     output += f"Unhandled action: {action['action']}\n"
+
+# output += "Save this temporary animation file to the sequence manager? (y/n): "
+
+# for action in processed_response.get("requested_actions", []):
+#     output += f"Unhandled action: {action['action']}\n"
 
         return output
 
