@@ -20,6 +20,15 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:1101",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": false, // Disable source maps to suppress warnings
+            "args": [ ] // No incognito mode
         }
     ]
 }
