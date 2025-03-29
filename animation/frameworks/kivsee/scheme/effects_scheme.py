@@ -127,31 +127,29 @@ class SnakeEffectConfig(BaseModel):
                          description="Whether the snake is cyclic.")
 
 
-class SegmentEffectConfig(BaseModel):
-    start: FloatFunction = Field(
-        ..., description="Segment start position function.")
-    end: FloatFunction = Field(...,
-                               description="Segment end position function.")
+# class SegmentEffectConfig(BaseModel):
+#     start: FloatFunction = Field(
+#         ..., description="Segment start position function.")
+#     end: FloatFunction = Field(...,
+#                                description="Segment end position function.")
 
+# class GlitterEffectConfig(BaseModel):
+#     intensity: FloatFunction = Field(...,
+#                                      description="Glitter intensity function.")
+#     sat_mult_factor: FloatFunction = Field(
+#         ..., description="Saturation multiplier factor for glitter.")
 
-class GlitterEffectConfig(BaseModel):
-    intensity: FloatFunction = Field(...,
-                                     description="Glitter intensity function.")
-    sat_mult_factor: FloatFunction = Field(
-        ..., description="Saturation multiplier factor for glitter.")
-
-
-class AlternateEffectConfig(BaseModel):
-    numberOfPixels: int = Field(
-        ..., description="Number of pixels for the alternate effect.")
-    hue_offset: FloatFunction = Field(
-        ..., description="Hue offset function for the alternate effect.")
-    sat_mult: FloatFunction = Field(
-        ...,
-        description="Saturation multiplier function for the alternate effect.")
-    brightness_mult: FloatFunction = Field(
-        ...,
-        description="Brightness multiplier function for the alternate effect.")
+# class AlternateEffectConfig(BaseModel):
+#     numberOfPixels: int = Field(
+#         ..., description="Number of pixels for the alternate effect.")
+#     hue_offset: FloatFunction = Field(
+#         ..., description="Hue offset function for the alternate effect.")
+#     sat_mult: FloatFunction = Field(
+#         ...,
+#         description="Saturation multiplier function for the alternate effect.")
+#     brightness_mult: FloatFunction = Field(
+#         ...,
+#         description="Brightness multiplier function for the alternate effect.")
 
 
 class EffectConfig(BaseModel):
@@ -159,8 +157,11 @@ class EffectConfig(BaseModel):
         ..., description="Start time of the effect in milliseconds.")
     end_time: int = Field(
         ..., description="End time of the effect in milliseconds.")
-    # segments: str = Field(default="",
-    #                       description="Segments to apply the effect to.")
+    segments: typing.List[str] = Field(
+        default_factory=list,
+        description=
+        "Specifies the segments of LEDs to which the effect will be applied. This allows targeting specific subsets of LEDs for more variety in the animation. For example, 'b1' might represent every 4th LED. The default segment is 'all', which means the effect will apply to all LEDs of the element.",
+        enum=["centric", "updown", "arc", "ind", "b1", "b2", "all"])
     repeat_num: float = Field(
         description="Number of times to repeat the effect.")
     repeat_start: float = Field(description="Start time of the repeat.")
@@ -230,17 +231,6 @@ class EffectProto(BaseModel):
             raise ValueError(
                 f"Exactly one effect type must be set. got: {effects}")
         return self
-
-
-# class ElementsEffectProto(BaseModel):
-#     elements: typing.List[str] = Field(
-#         default_factory=list,
-#         description=
-#         "List of elements to be animated. Each element name is a string.")
-#     effects: typing.List[EffectProto] = Field(
-#         default_factory=list,
-#         description="List of effects to be animated on the given elements list."
-#     )
 
 
 class AnimationProto(BaseModel):
