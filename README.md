@@ -156,7 +156,7 @@ This project integrates multiple LLM backends including OpenAI's GPT, Anthropic'
 
 ---
 
-## Additional Notes
+<!-- ## Additional Notes
 
 - To create a new React app, use:
   ```bash
@@ -167,8 +167,11 @@ This project integrates multiple LLM backends including OpenAI's GPT, Anthropic'
   npm uninstall -g create-react-app
   ```
 
-Let me know if you encounter any issues!
+Let me know if you encounter any issues! -->
 
+npx create-next-app@latest my-next-app
+cd my-next-app
+npm run dev
 
 # Linter
 npm install -g eslint
