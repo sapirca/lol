@@ -3,8 +3,8 @@ from controller.backends import GPTBackend, ClaudeBackend, LLMBackend
 from prompt import intro_prompt
 from animation.songs.song_provider import SongProvider
 import xml.etree.ElementTree as ET
-from interpreter import Interpreter
-from formatter import Formatter
+from controller.interpreter import Interpreter
+from controller.formatter import Formatter
 from constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
 from controller.message_streamer import MessageStreamer
 import logging
