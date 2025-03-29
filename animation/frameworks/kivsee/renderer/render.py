@@ -4,13 +4,22 @@ from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 from animation.frameworks.kivsee.scheme.effects_scheme import KivseeSchema
 import requests
 
-SEQUENCE_URL = "http://10.0.0.49:8082"
-TRIGGER_URL = "http://10.0.0.49:8083"
+# Kivsee-sapir IP 10.0.1.204
+# VNC?
+# 10.0.0.36
+# pi@raspberrypi
+# kivsee12
 
-all_elements = [
-    "ring1", "ring2", "ring3", "ring4", "ring5", "ring6", "ring7", "ring8",
-    "ring9", "ring10", "ring11", "ring12"
-]
+# SEQUENCE_URL = "http://10.0.0.49:8082"
+# TRIGGER_URL = "http://10.0.0.49:8083"
+# all_elements = [
+#     "ring1", "ring2", "ring3", "ring4", "ring5", "ring6", "ring7", "ring8",
+#     "ring9", "ring10", "ring11", "ring12"
+# ]
+
+SEQUENCE_URL = "http://10.0.0.36:8082"
+TRIGGER_URL = "http://10.0.0.36:8083"
+all_elements = ["ring0"]
 
 
 class Render:
@@ -81,8 +90,6 @@ class Render:
         for key, value in animation_data.items():
             print(f"{key}: {value}")
 
-        animation_data['name'] = "test_123"
-
         self.preprocess_animation(animation_data)
         # Convert the animation data to proto using model_validate
         # response_proto = KivseeSchema.model_validate(animation_data)
@@ -91,7 +98,11 @@ class Render:
         self.store_animation(animation_data)
 
         # Trigger the song
-        self.trigger_animation(animation_data)
+        animation_data['name'] = "aladdin"
+        self.trigger_song(animation_data)
+
+        # animation_data['name'] = "test_123"
+        # self.trigger_animation(animation_data)
 
     def preprocess_animation(self, animation_data):
         for effect in animation_data.get("effects", []):
@@ -105,3 +116,16 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Speaker
+# 1. Understand aladdin notes
+# 2. synchronize with the right miliseconds
+# 3. beats - millis
+# 4. add offset
+
+# Proto not readable?
+# Make animation beautiful
+# Surpises - in the right part of song
+# what is the line that connects the story
+# Either have the same color between the two parts or have a line that connects them
+# Need to have animation of the song

@@ -87,7 +87,10 @@ class FloatFunction(BaseModel):
 
 
 class HSV(BaseModel):
-    hue: float = Field(description="Hue value.")
+    hue: float = Field(
+        description=
+        "Hue value between 0.0 to 1.0. Where 0.0 is red, 0.33 is green, 0.67 is blue, and 1.0 is red."
+    )
     sat: float = Field(description="Saturation value.")
     val: float = Field(description="Value (brightness) value.")
 
@@ -154,18 +157,27 @@ class SnakeEffectConfig(BaseModel):
 
 class EffectConfig(BaseModel):
     start_time: int = Field(
-        ..., description="Start time of the effect in milliseconds.")
+        ...,
+        description=
+        "Start time of the effect in milliseconds. Extract from the list of bars you provided in the prompt."
+    )
     end_time: int = Field(
-        ..., description="End time of the effect in milliseconds.")
-    segments: typing.List[str] = Field(
+        ...,
+        description=
+        "End time of the effect in milliseconds. The end of a bar is the begining of the next bar, use the miliseconds from the list of bars you provided in the prompt."
+    )
+    segments: str = Field(
         default_factory=list,
         description=
         "Specifies the segments of LEDs to which the effect will be applied. This allows targeting specific subsets of LEDs for more variety in the animation. For example, 'b1' might represent every 4th LED. The default segment is 'all', which means the effect will apply to all LEDs of the element.",
         enum=["centric", "updown", "arc", "ind", "b1", "b2", "all"])
-    repeat_num: float = Field(
-        description="Number of times to repeat the effect.")
-    repeat_start: float = Field(description="Start time of the repeat.")
-    repeat_end: float = Field(description="End time of the repeat.")
+    # repeat_num: float = Field(
+    #     description="Number of times to repeat the effect.")
+    # repeat_start: float = Field(description="Start time of the repeat.")
+    # repeat_end: float = Field(
+    #     description=
+    #     "End time of the repeat. number bewteen 0-1. where 1 is 100% of this time, end_time, and zero is the begining of start_time."
+    # )
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>
@@ -266,4 +278,9 @@ class KivseeSchema(BaseModel):
     )
     animation: AnimationProto = Field(default_factory=AnimationProto,
                                       description="The whole animation.")
-    name: str = Field(default="", description="The animation title.")
+    name: str = Field(
+        default="",
+        description=
+        ("The animation title. If the user specifies the song name as 'some_name', "
+         "you should put 'some_name' here. The name must not contain spaces or special characters; "
+         "it should only include letters, numbers, and underscores (_)."))
