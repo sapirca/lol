@@ -168,3 +168,10 @@ This project integrates multiple LLM backends including OpenAI's GPT, Anthropic'
   ```
 
 Let me know if you encounter any issues!
+
+
+# Linter
+npm install -g eslint
+also install the extension eslint
+
+Once the ESLint extension is installed and VS Code reloaded, you'll want to create an ESLint configuration file, .eslintrc.js. You can create one using the extension's ESLint: Create ESLint configuration command from the Command Palette (⇧⌘P).
