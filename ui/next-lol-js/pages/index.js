@@ -2,6 +2,8 @@ import Head from "next/head";
 import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 import styles from "@/styles/Home.module.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Import FontAwesome
+import { faCoffee, faRocket } from "@fortawesome/free-solid-svg-icons"; // Import specific icons
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +28,9 @@ export default function Home() {
         className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
       >
         <main className={styles.main}>
+          <h1>
+            Hello, World! <FontAwesomeIcon icon={faCoffee} /> {/* Add FontAwesome icon */}
+          </h1>
           <Image
             className={styles.logo}
             src="/next.svg"
@@ -48,13 +53,7 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Image
-                className={styles.logo}
-                src="/vercel.svg"
-                alt="Vercel logomark"
-                width={20}
-                height={20}
-              />
+              <FontAwesomeIcon icon={faRocket} /> {/* Add FontAwesome icon */}
               Deploy now
             </a>
             <a
