@@ -1,0 +1,79 @@
+Okay, here is the list with the numbers removed from the `//` preceding each lyrics line:
+
+1. ** Lyrics:** `// when the wind's from the east`
+  ** Beats:** 31.5 - 33.5
+
+2. ** Lyrics:** `// and the sun's from the west`
+  ** Beats:** 33.5 - 35.5
+
+3. ** Lyrics:** `// and the sand in the glass is right`
+  ** Beats:** 35.5 - 37.5
+
+4. ** Lyrics:** `// glass`
+  ** Beats:** 36.5 - 38.5
+
+5. ** Lyrics:** `// is right`
+  ** Beats:** 37.5 - 38.5
+
+6. ** Lyrics:** `// come on`
+  ** Beats:** 39 - 40
+
+7. ** Lyrics:** `// down`
+  ** Beats:** 40 - 40.5
+
+8. ** Lyrics:** `// stop on by`
+  ** Beats:** 40.5 - 41.5
+
+9. ** Lyrics:** `// hop a carpet`
+  ** Beats:** 41.5 - 42.5
+
+10. ** Lyrics:** `// and fly`
+  ** Beats:** 42.5 - 43
+
+11. ** Lyrics:** `// to another Arabian night`
+  ** Beats:** 43.5 - 46
+
+12. ** Lyrics:** `// Ahuuuuuuuu`
+  ** Beats:** 46 - 48
+
+13. ** Lyrics:** `// boom`
+  ** Beats:** 48.5 - 50
+
+14. ** Lyrics:** `// boom fade out and psychedelic`
+  ** Beats:** 49 - 50
+
+15. ** Lyrics:** `// - Arabian nights`
+  ** Beats:** 50 - 53
+
+16. ** Lyrics:** `// - like Arabian days`
+  ** Beats:** 53 - 57
+
+17. ** Lyrics:** `// more often than not`
+  ** Beats:** 57 - 59
+
+18. ** Lyrics:** `// are hotter than hot`
+  ** Beats:** 59 - 64
+
+19. ** Lyrics:** `// in a lot of good ways`
+  ** Beats:** 60 - 64
+
+20. ** Lyrics:** `// boom`
+  ** Beats:** 64 - 66
+
+21. ** Lyrics:** `// boom fade out and psychedelic`
+  ** Beats:** 64.5 - 66
+
+22. ** Lyrics:** `// Arabian nights`
+  ** Beats:** 66 - 69
+
+23. ** Lyrics:** `// 'neath Arabian moons`
+  ** Beats:** 70 - 73
+
+24. ** Lyrics:** `// A fool off his guard`
+  ** Beats:** 73 - 75
+
+25. ** Lyrics:** `// could fall and fall hard`
+  ** Beats:** 75 - 87
+
+26. ** Lyrics:** `// out there on the dunes`
+  ** Beats:** 81 - 85

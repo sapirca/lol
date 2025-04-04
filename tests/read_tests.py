@@ -15,8 +15,8 @@ def read_and_print_tests(filename):
         print()
         print("-" * 20)  # Separator
         print("Loading test file data...")
-        # Use the current directory as the working directory.
-        working_dir = os.path.dirname(os.path.abspath(__file__))
+        # Assuming the workspace directory is the directory containing the script.
+        working_dir = os.getcwd()
 
         print(working_dir)
         # Construct the full file path by joining the working directory and the filename.
@@ -53,7 +53,7 @@ def read_and_print_tests(filename):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
-
+RELATIVE_DATA_PATH = "tests/data/"
 if __name__ == "__main__":
     # read_and_print_tests(filename="tests/data/basic_tests.json")
-    read_and_print_tests(filename=f"{os.getcwd()}/moderate_tests.json")
+    read_and_print_tests(filename=f"{RELATIVE_DATA_PATH}moderate_tests.json")
