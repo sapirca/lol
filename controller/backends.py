@@ -1,12 +1,12 @@
-import instructor
-import openai
-import tiktoken
-import anthropic
-from google import genai
-import logging
-from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY
 from pydantic import BaseModel
+import os
+import litellm
+import logging
+from typing import List, Dict, Union
+from animation.frameworks.conceptual.response_schema import ResponseSchema
+from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 
+litellm._turn_on_debug()
 
 class LLMBackend:
     """
@@ -15,10 +15,10 @@ class LLMBackend:
     """
 
     def __init__(self,
-                 name,
+                 name: str,
                  response_schema_obj: BaseModel,
-                 model,
-                 config=None):
+                 model: str,
+                 config: Dict = None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
@@ -26,116 +26,100 @@ class LLMBackend:
         self.max_tokens = self.config.get("max_tokens", 4096)
         self.temperature = self.config.get("temperature", 0.5)
         self.logger.info(f"Using {name} model: {self.model}")
-        self.intstructor_response = self.config.get("instructor_response",
-                                                    False)
         self.response_schema_obj = response_schema_obj
+        self.api_key = None
 
-    def generate_response(self, messages) -> BaseModel:
+        if "gpt-" in model or "openai" in model:
+            self.api_key = OPENAI_API_KEY
+        elif "claude" in model or "anthropic" in model:
+            self.api_key = CLAUDE_API_KEY
+        elif "gemini" in model:
+            self.api_key = GEMINI_API_KEY
+        else:
+            raise ValueError(f"Unsupported model: {model}")
+        
+
+    def generate_response(self, messages: List[Dict[str, str]]) -> BaseModel:
         """Generate a response based on the provided messages array."""
-        raise NotImplementedError("Subclasses must implement this method.")
+        try:
+            response = litellm.completion(
+                model=self.model,
+                messages=messages,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                response_model=ResponseSchema(),
+                api_key=self.api_key
+            )
+            self.log_tokens(messages, response.choices[0].message.content)
+            return response
 
-    def log_tokens(self, messages, response):
+        except Exception as e:
+            self.logger.error(f"Error communicating with LLM API ({self.name}): {e}")
+            raise e
+
+    def log_tokens(self, messages: List[Dict[str, str]], response: str):
         """Log the number of tokens sent and received."""
-        prompt_tokens = self.token_count(messages)
-        response_tokens = self.token_count([{"content": response}])
-        log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
-        self.logger.info(log_message)
+        try:
+            prompt_tokens = litellm.token_counter(model=self.model, messages=messages)
+            response_tokens = litellm.token_counter(model=self.model, messages=[{"content": response}])
+            log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
+            self.logger.info(log_message)
+        except Exception as e:
+            self.logger.warning(f"Error counting tokens: {e}")
 
-    def token_count(self, messages):
-        """Default token counting method using word splits."""
-        return sum(len(message["content"].split()) for message in messages)
+    def token_count(self, messages: List[Dict[str, str]]) -> int:
+        """
+        Token counting method using LiteLLM's utility.
+        """
+        try:
+            return litellm.token_counter(model=self.model, messages=messages)
+        except Exception as e:
+            self.logger.warning(f"Error counting tokens: {e}.  Using a rough estimate.")
+            return sum(len(message["content"].split()) for message in messages)
+
 
 
 # *************************************** #
 # ***************** GPT ***************** #
 # *************************************** #
-
-
 class GPTBackend(LLMBackend):
-    # gpt-4o-mini-2024-07-18
-    # gpt-4o-2024-08-06
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
                  model="gpt-4o-2024-08-06",
-                 config=None):
+                 config: Dict = None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
                          config=config)
-        self.client = instructor.from_openai(
-            openai.OpenAI(api_key=OPENAI_API_KEY))
 
-    def generate_response(self, messages) -> BaseModel:
-        data = {
-            "messages": messages,
-            "max_tokens": self.max_tokens,
-            "temperature": self.temperature,
-            "model": self.model,
-            "response_model": self.response_schema_obj,
-        }
-        try:
-            response = self.client.chat.completions.create(**data)
-            return response
-        except Exception as e:
-            self.logger.error(f"Error communicating with GPT API: {e}")
-            raise e
 
 
 # *************************************** #
 # **************** Claude *************** #
 # *************************************** #
-
-
 class ClaudeBackend(LLMBackend):
-    #claude-3-7-sonnet-latest
-    #claude-3-5-sonnet-20241022
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
                  model="claude-3-7-sonnet-latest",
-                 config=None):
+                 config: Dict = None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
                          config=config)
-        self.client = instructor.from_anthropic(
-            client=anthropic.Anthropic(api_key=CLAUDE_API_KEY), )
 
-    def generate_response(self, messages) -> BaseModel:
-        system_messages = []
-        chat_messages = []
 
-        try:
-            for message in messages:
-                if message['role'] == 'system':
-                    system_messages.append(message['content'])
-                else:
-                    chat_messages.append({
-                        'role': message['role'],
-                        'content': message['content']
-                    })
-
-            claude_messages = [{
-                "role": chat_message["role"],
-                "content": chat_message["content"]
-            } for chat_message in chat_messages]
-
-            system_prompt = "\n".join(
-                system_messages) if system_messages else ""
-
-            data = {
-                "model": self.model,
-                "max_tokens": self.max_tokens,
-                "temperature": self.temperature,
-                "system":
-                system_prompt,  # Correct usage of system instructions
-                "messages": claude_messages,
-                "response_model": self.response_schema_obj,
-            }
-            response = self.client.messages.create(**data)
-            return response
-
-        except Exception as e:
-            self.logger.error(f"Error, Claude backend: {str(e)}")
-            raise e
+# *************************************** #
+# **************** Gemini *************** #
+# *************************************** #
+class GeminiBackend(LLMBackend):
+    def __init__(self,
+                 name,
+                 response_schema_obj: BaseModel,
+                 model="gemini/gemini-pro",
+                 config: Dict = None):
+        super().__init__(name=name,
+                         response_schema_obj=response_schema_obj,
+                         model=model,
+                         config=config)
