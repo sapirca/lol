@@ -70,6 +70,10 @@ class LLMBackend:
         try:
             if response_content:
                 json_output = json.loads(response_content)
+                assert isinstance(json_output, dict)
+                print(f"\nResponse content: {response_content}")
+                print(f"\nParsed JSON output: {json_output}\n")
+                print(self.response_schema_obj.model_fields.keys())
                 return self.response_schema_obj(**json_output)
             else:
                 raise ValueError("Empty response content received from LLM.")
@@ -139,7 +143,7 @@ class GeminiBackend(LLMBackend):
     def __init__(self,
                  name,
                  response_schema_obj: Type[BaseModel],
-                 model="gemini/gemini-pro",
+                 model="gemini/gemini-2.0-flash", # "gemini/emini-1.5-pro-latest"
                  config: Dict = None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
