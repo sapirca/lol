@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ValidationError
 import os
 import litellm
 import logging
-from typing import List, Dict, Union
-from animation.frameworks.conceptual.response_schema import ResponseSchema
+from typing import List, Dict, Union, Type
 from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
+import json
 
 litellm._turn_on_debug()
 
@@ -16,7 +16,7 @@ class LLMBackend:
 
     def __init__(self,
                  name: str,
-                 response_schema_obj: BaseModel,
+                 response_schema_obj: Type[BaseModel],
                  model: str,
                  config: Dict = None):
         self.name = name
@@ -37,25 +37,51 @@ class LLMBackend:
             self.api_key = GEMINI_API_KEY
         else:
             raise ValueError(f"Unsupported model: {model}")
-        
 
     def generate_response(self, messages: List[Dict[str, str]]) -> BaseModel:
-        """Generate a response based on the provided messages array."""
+        """Generate a response based on the provided messages array and Pydantic schema."""
         try:
+            # Add the Pydantic schema to the user's instructions
+            schema_str = json.dumps(self.response_schema_obj.model_json_schema(), indent=2)
+            updated_messages = messages + [
+                {
+                    "role": "user",
+                    "content": f"Please respond with a JSON object that adheres to the following schema:\n\n{schema_str}"
+                }
+            ]
+
             response = litellm.completion(
                 model=self.model,
-                messages=messages,
+                messages=updated_messages,
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,
-                response_model=ResponseSchema(),
+                response_format={"type": "json_object"},
                 api_key=self.api_key
             )
             self.log_tokens(messages, response.choices[0].message.content)
-            return response
+            return self._parse_response(response.choices[0].message.content)
 
         except Exception as e:
             self.logger.error(f"Error communicating with LLM API ({self.name}): {e}")
             raise e
+
+    def _parse_response(self, response_content: str) -> BaseModel:
+        """Parses the JSON response and validates it against the Pydantic schema."""
+        try:
+            if response_content:
+                json_output = json.loads(response_content)
+                return self.response_schema_obj(**json_output)
+            else:
+                raise ValueError("Empty response content received from LLM.")
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Error decoding JSON response: {e}\nRaw Response: {response_content}")
+            raise
+        except ValidationError as e:
+            self.logger.error(f"Pydantic validation error: {e}\nRaw Response: {response_content}")
+            raise
+        except Exception as e:
+            self.logger.error(f"An unexpected error occurred during response parsing: {e}\nRaw Response: {response_content}")
+            raise
 
     def log_tokens(self, messages: List[Dict[str, str]], response: str):
         """Log the number of tokens sent and received."""
@@ -78,14 +104,12 @@ class LLMBackend:
             return sum(len(message["content"].split()) for message in messages)
 
 
-
 # *************************************** #
 # ***************** GPT ***************** #
-# *************************************** #
 class GPTBackend(LLMBackend):
     def __init__(self,
                  name,
-                 response_schema_obj: BaseModel,
+                 response_schema_obj: Type[BaseModel],
                  model="gpt-4o-2024-08-06",
                  config: Dict = None):
         super().__init__(name=name,
@@ -94,14 +118,12 @@ class GPTBackend(LLMBackend):
                          config=config)
 
 
-
 # *************************************** #
 # **************** Claude *************** #
-# *************************************** #
 class ClaudeBackend(LLMBackend):
     def __init__(self,
                  name,
-                 response_schema_obj: BaseModel,
+                 response_schema_obj: Type[BaseModel],
                  model="claude-3-7-sonnet-latest",
                  config: Dict = None):
         super().__init__(name=name,
@@ -116,7 +138,7 @@ class ClaudeBackend(LLMBackend):
 class GeminiBackend(LLMBackend):
     def __init__(self,
                  name,
-                 response_schema_obj: BaseModel,
+                 response_schema_obj: Type[BaseModel],
                  model="gemini/gemini-pro",
                  config: Dict = None):
         super().__init__(name=name,
