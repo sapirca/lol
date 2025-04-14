@@ -340,10 +340,11 @@ class LogicPlusPlus:
             self.logger.info(
                 f"Generated {self.temp_animation_path} for the user's observation."
             )
-            # self.wait_for_response = True
+            self.wait_for_response = True
 
             output += f"Animation sequence generated and saved to {self.temp_animation_path} "
-            output += "Preview and edit the animation as needed.\n"
+            output += "Preview and edit the animation as needed."
+            output += "Do you want to render y/n?\n"
 
 
 # output += "Save this temporary animation file to the sequence manager? (y/n): "
@@ -355,35 +356,47 @@ class LogicPlusPlus:
 
     def handle_user_approval(self, user_input):
         if user_input.lower() in ["y", "yes"]:
-            step_number = len(
+            
+            # step_number = self.add_animation_snapshot()
+            # self.wait_for_response = False
+            # self.logger.info("Animation approved and saved.")
+            # return f"Animation saved successfully as step {step_number}.\n"
+
+            self.animation_manager.render()
+            
+            self.wait_for_response = False
+            return f"Rendered! Sent to render's ring.\n"
+
+        elif user_input.lower() in ["n", "no"]:
+            # self.animation_manager.delete_temp_file(self.temp_animation_path)
+            # self.wait_for_response = False
+            #  self.logger.info("Animation discarded by user.")
+            
+            self.wait_for_response = False
+            return "Ok. Didn't render.\n"
+
+        self.logger.warning(
+            "Invalid response received during approval process.")
+        return "Invalid response. Please reply with one of y/Y/yes/YES or n/N/no/NO\n"
+
+    def add_animation_snapshot(self):
+        step_number = len(
                 self.animation_manager.sequence_manager.steps) + 1
-            with open(self.temp_animation_path, "r") as temp_file:
-                animation_sequence = temp_file.read()
-            self.message_streamer.add_message(
+        with open(self.temp_animation_path, "r") as temp_file:
+            animation_sequence = temp_file.read()
+        self.message_streamer.add_message(
                 "animation_update",
                 animation_sequence,
                 visible=False,
                 context=False)  # save every sequence update to streamer
-            seq_message = self.animation_manager.add_sequence(
+        seq_message = self.animation_manager.add_sequence(
                 step_number, animation_sequence)
-            self.message_streamer.add_message("animation_update",
+        self.message_streamer.add_message("animation_update",
                                               seq_message,
                                               visible=False,
                                               context=False)
-            self.animation_manager.delete_temp_file(self.temp_animation_path)
-            self.wait_for_response = False
-            self.logger.info("Animation approved and saved.")
-            return f"Animation saved successfully as step {step_number}.\n"
-
-        elif user_input.lower() in ["n", "no"]:
-            self.animation_manager.delete_temp_file(self.temp_animation_path)
-            self.wait_for_response = False
-            self.logger.info("Animation discarded by user.")
-            return "Animation discarded.\n"
-
-        self.logger.warning(
-            "Invalid response received during approval process.")
-        return "Invalid response. Please reply with 'y' or 'n'.\n"
+        self.animation_manager.delete_temp_file(self.temp_animation_path)
+        return step_number
 
     def delete_temp_file(self, file_path):
         absolute_path = os.path.abspath(file_path)

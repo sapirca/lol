@@ -17,8 +17,11 @@ import requests
 #     "ring9", "ring10", "ring11", "ring12"
 # ]
 
-SEQUENCE_URL = "http://10.0.0.36:8082"
-TRIGGER_URL = "http://10.0.0.36:8083"
+SEQUENCE_URL = "http://10.0.1.204:8082"
+TRIGGER_URL = "http://10.0.1.204:8083"
+
+# SEQUENCE_URL = "http://10.0.0.36:8082"
+# TRIGGER_URL = "http://10.0.0.36:8083"
 all_elements = ["ring0"]
 
 
