@@ -102,10 +102,12 @@ class AnimationManager:
     def get_suffix(self):
         return self.sequence_manager.get_suffix()
 
-    # def get_response_object(self) -> BaseModel:
-    #     return self.framework.get_response_scheme_obj    
-    
-    from typing import Type
 
-    def get_response_object(self) -> Type[BaseModel]:
+    def get_response_object(self) -> BaseModel:
         return self.framework.get_response_scheme_obj()
+    
+    def render():
+        # render.call()
+        print("Rendered by animation manager!")
+        # TODO sapir fill  this
+        return
