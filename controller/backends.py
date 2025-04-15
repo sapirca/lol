@@ -81,7 +81,6 @@ class GPTBackend(LLMBackend):
             self.logger.error(f"Error communicating with GPT API: {e}")
             raise e
 
-
 # *************************************** #
 # **************** Claude *************** #
 # *************************************** #

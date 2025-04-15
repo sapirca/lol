@@ -104,9 +104,20 @@ class AnimationManager:
 
     def get_response_object(self) -> BaseModel:
         return self.framework.get_response_scheme_obj()
-    
-    def render():
+
+    def render(self):
+        """
+        Render the animation sequence using the appropriate framework.
+        """
+        animation_sequence = self.sequence_manager.get_latest_sequence()
+        if self.framework_name == 'kivsee':
+            render = self.framework.render(animation_sequence)
+        elif self.framework_name == 'xlights':
+            render = self.framework.render(animation_sequence)
+        elif self.framework_name == 'conceptual':
+            render = self.framework.render(animation_sequence)
+        else:
+            raise ValueError(f"Unsupported framework: {self.framework_name}")
         # render.call()
         print("Rendered by animation manager!")
-        # TODO sapir fill  this
         return
