@@ -1,12 +1,12 @@
-from pydantic import BaseModel, Field, ValidationError
-import os
-import litellm
+import instructor
+import openai
+import tiktoken
+import anthropic
+from google import genai
 import logging
-from typing import List, Dict, Union, Type
-from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
-import json
+from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY
+from pydantic import BaseModel
 
-litellm._turn_on_debug()
 
 class LLMBackend:
     """
@@ -15,10 +15,10 @@ class LLMBackend:
     """
 
     def __init__(self,
-                 name: str,
-                 response_schema_obj: Type[BaseModel],
-                 model: str,
-                 config: Dict = None):
+                 name,
+                 response_schema_obj: BaseModel,
+                 model,
+                 config=None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
@@ -26,126 +26,115 @@ class LLMBackend:
         self.max_tokens = self.config.get("max_tokens", 4096)
         self.temperature = self.config.get("temperature", 0.5)
         self.logger.info(f"Using {name} model: {self.model}")
+        self.intstructor_response = self.config.get("instructor_response",
+                                                    False)
         self.response_schema_obj = response_schema_obj
-        self.api_key = None
 
-        if "gpt-" in model or "openai" in model:
-            self.api_key = OPENAI_API_KEY
-        elif "claude" in model or "anthropic" in model:
-            self.api_key = CLAUDE_API_KEY
-        elif "gemini" in model:
-            self.api_key = GEMINI_API_KEY
-        else:
-            raise ValueError(f"Unsupported model: {model}")
+    def generate_response(self, messages) -> BaseModel:
+        """Generate a response based on the provided messages array."""
+        raise NotImplementedError("Subclasses must implement this method.")
 
-    def generate_response(self, messages: List[Dict[str, str]]) -> BaseModel:
-        """Generate a response based on the provided messages array and Pydantic schema."""
-        try:
-            # Add the Pydantic schema to the user's instructions
-            schema_str = json.dumps(self.response_schema_obj.model_json_schema(), indent=2)
-            updated_messages = messages + [
-                {
-                    "role": "user",
-                    "content": f"Please respond with a JSON object that adheres to the following schema:\n\n{schema_str}"
-                }
-            ]
-
-            response = litellm.completion(
-                model=self.model,
-                messages=updated_messages,
-                max_tokens=self.max_tokens,
-                temperature=self.temperature,
-                response_format={"type": "json_object"},
-                api_key=self.api_key
-            )
-            self.log_tokens(messages, response.choices[0].message.content)
-            return self._parse_response(response.choices[0].message.content)
-
-        except Exception as e:
-            self.logger.error(f"Error communicating with LLM API ({self.name}): {e}")
-            raise e
-
-    def _parse_response(self, response_content: str) -> BaseModel:
-        """Parses the JSON response and validates it against the Pydantic schema."""
-        try:
-            if response_content:
-                json_output = json.loads(response_content)
-                assert isinstance(json_output, dict)
-                print(f"\nResponse content: {response_content}")
-                print(f"\nParsed JSON output: {json_output}\n")
-                print(self.response_schema_obj.model_fields.keys())
-                return self.response_schema_obj(**json_output)
-            else:
-                raise ValueError("Empty response content received from LLM.")
-        except json.JSONDecodeError as e:
-            self.logger.error(f"Error decoding JSON response: {e}\nRaw Response: {response_content}")
-            raise
-        except ValidationError as e:
-            self.logger.error(f"Pydantic validation error: {e}\nRaw Response: {response_content}")
-            raise
-        except Exception as e:
-            self.logger.error(f"An unexpected error occurred during response parsing: {e}\nRaw Response: {response_content}")
-            raise
-
-    def log_tokens(self, messages: List[Dict[str, str]], response: str):
+    def log_tokens(self, messages, response):
         """Log the number of tokens sent and received."""
-        try:
-            prompt_tokens = litellm.token_counter(model=self.model, messages=messages)
-            response_tokens = litellm.token_counter(model=self.model, messages=[{"content": response}])
-            log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
-            self.logger.info(log_message)
-        except Exception as e:
-            self.logger.warning(f"Error counting tokens: {e}")
+        prompt_tokens = self.token_count(messages)
+        response_tokens = self.token_count([{"content": response}])
+        log_message = f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
+        self.logger.info(log_message)
 
-    def token_count(self, messages: List[Dict[str, str]]) -> int:
-        """
-        Token counting method using LiteLLM's utility.
-        """
-        try:
-            return litellm.token_counter(model=self.model, messages=messages)
-        except Exception as e:
-            self.logger.warning(f"Error counting tokens: {e}.  Using a rough estimate.")
-            return sum(len(message["content"].split()) for message in messages)
+    def token_count(self, messages):
+        """Default token counting method using word splits."""
+        return sum(len(message["content"].split()) for message in messages)
 
 
 # *************************************** #
 # ***************** GPT ***************** #
+# *************************************** #
+
+
 class GPTBackend(LLMBackend):
+    # gpt-4o-mini-2024-07-18
+    # gpt-4o-2024-08-06
     def __init__(self,
                  name,
-                 response_schema_obj: Type[BaseModel],
+                 response_schema_obj: BaseModel,
                  model="gpt-4o-2024-08-06",
-                 config: Dict = None):
+                 config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
                          config=config)
+        self.client = instructor.from_openai(
+            openai.OpenAI(api_key=OPENAI_API_KEY))
 
+    def generate_response(self, messages) -> BaseModel:
+        data = {
+            "messages": messages,
+            "max_tokens": self.max_tokens,
+            "temperature": self.temperature,
+            "model": self.model,
+            "response_model": self.response_schema_obj,
+        }
+        try:
+            response = self.client.chat.completions.create(**data)
+            return response
+        except Exception as e:
+            self.logger.error(f"Error communicating with GPT API: {e}")
+            raise e
 
 # *************************************** #
 # **************** Claude *************** #
+# *************************************** #
+
+
 class ClaudeBackend(LLMBackend):
+    #claude-3-7-sonnet-latest
+    #claude-3-5-sonnet-20241022
     def __init__(self,
                  name,
-                 response_schema_obj: Type[BaseModel],
+                 response_schema_obj: BaseModel,
                  model="claude-3-7-sonnet-latest",
-                 config: Dict = None):
+                 config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
                          config=config)
+        self.client = instructor.from_anthropic(
+            client=anthropic.Anthropic(api_key=CLAUDE_API_KEY), )
 
+    def generate_response(self, messages) -> BaseModel:
+        system_messages = []
+        chat_messages = []
 
-# *************************************** #
-# **************** Gemini *************** #
-# *************************************** #
-class GeminiBackend(LLMBackend):
-    def __init__(self,
-                 name,
-                 response_schema_obj: Type[BaseModel],
-                 model="gemini/gemini-2.0-flash", # "gemini/emini-1.5-pro-latest"
-                 config: Dict = None):
-        super().__init__(name=name,
-                         response_schema_obj=response_schema_obj,
-                         model=model,
-                         config=config)
+        try:
+            for message in messages:
+                if message['role'] == 'system':
+                    system_messages.append(message['content'])
+                else:
+                    chat_messages.append({
+                        'role': message['role'],
+                        'content': message['content']
+                    })
+
+            claude_messages = [{
+                "role": chat_message["role"],
+                "content": chat_message["content"]
+            } for chat_message in chat_messages]
+
+            system_prompt = "\n".join(
+                system_messages) if system_messages else ""
+
+            data = {
+                "model": self.model,
+                "max_tokens": self.max_tokens,
+                "temperature": self.temperature,
+                "system":
+                system_prompt,  # Correct usage of system instructions
+                "messages": claude_messages,
+                "response_model": self.response_schema_obj,
+            }
+            response = self.client.messages.create(**data)
+            return response
+
+        except Exception as e:
+            self.logger.error(f"Error, Claude backend: {str(e)}")
+            raise e
