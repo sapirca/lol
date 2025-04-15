@@ -1,5 +1,5 @@
 config = {
-    "selected_backend": "Claude",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude
+    "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude
     "framework": "kivsee",  #kivsee #xlights #conceptual
 }
 

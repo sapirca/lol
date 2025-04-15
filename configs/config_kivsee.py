@@ -1,8 +1,7 @@
 config = {
-    "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude
+    "selected_backend": "Claude",
     "framework": "kivsee",  #kivsee #xlights #conceptual
     "song_name": "aladdin",  #  "nikki", "sandstorm", "req", "overthinker"
-    "animation_name": "aladdin_dance", # TODO sapir add implementation for this
 }
 
 # "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude
