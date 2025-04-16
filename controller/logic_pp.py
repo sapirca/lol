@@ -1,5 +1,5 @@
 import random
-from controller.backends import GPTBackend, ClaudeBackend, LLMBackend
+from controller.backends import GPTBackend, ClaudeBackend, LLMBackend, GeminiBackend
 from prompt import intro_prompt
 from animation.songs.song_provider import SongProvider
 import xml.etree.ElementTree as ET
@@ -150,6 +150,7 @@ class LogicPlusPlus:
         backend_mapping = {
             "GPT": GPTBackend,
             "Claude": ClaudeBackend,
+            "Gemini": GeminiBackend,
         }
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(
