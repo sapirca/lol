@@ -228,10 +228,11 @@ class LogicPlusPlus:
 
             # Always send the original animation structure to the LLM for reference.
             latest_sequence = self.animation_manager.get_latest_sequence()
-            self.message_streamer.add_message("initial_animation",
-                                              latest_sequence,
-                                              visible=False,
-                                              context=True)
+            if latest_sequence:
+                self.message_streamer.add_message("initial_animation",
+                                                latest_sequence,
+                                                visible=False,
+                                                context=True)
 
             self.initial_prompt_added = True
             
