@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from animation.frameworks.framework import Framework
-from animation.frameworks.kivsee.scheme.effects_scheme import KivseeSchema
 from constants import KIVSEE_HOUSE_PATH, KIVSEE_PROMPT
+from schemes.kivsee_scheme.effects_scheme import KivseeSchema
 
 
 class KivseeFramework(Framework):
