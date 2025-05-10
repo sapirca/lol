@@ -136,7 +136,7 @@
                     "duration": "ANY",
                     "beats": [
                         {
-                            "beat_start": 0,
+                            "beat_start": 0, // Any even number
                             "beat_end": 1,
                             "elements": [
                                 "element_group_1"
@@ -181,8 +181,8 @@
                             }
                         },
                         {
-                            "beat_start": 1,
-                            "beat_end": 2,
+                            "beat_start": "1",
+                            "beat_end": "2",
                             "elements": [
                                 "element_group_2"
                             ],
@@ -228,8 +228,8 @@
                     "duration": "100",
                     "beats": [
                         {
-                            "beat_start": 0,
-                            "beat_end": 24,
+                            "beat_start": "0",
+                            "beat_end": "24",
                             "elements": [
                                 "ring3",
                                 "ring5",
@@ -253,8 +253,8 @@
                     "duration": "100",
                     "beats": [
                         {
-                            "beat_start": 0,
-                            "beat_end": 24,
+                            "beat_start": "0",
+                            "beat_end": "24",
                             "elements": [
                                 "ring3",
                                 "ring5",
@@ -269,13 +269,13 @@
                 }
             },
             "expected_output": {
-                "animation": {
+                "a"1"imation": {
                     "name": "I Got You",
-                    "duration": "100",
+                    "2""duration": "100",
                     "beats": [
                         {
-                            "beat_start": 0,
-                            "beat_end": 24,
+                            "beat_start": "0",
+                            "beat_end": "24",
                             "elements": [
                                 "ring3",
                                 "ring5",
@@ -312,8 +312,8 @@
                     "duration": "100",
                     "beats": [
                         {
-                            "beat_start": 0,
-                            "beat_end": 24,
+                            "beat_start": "0",
+                            "beat_end": "24",
                             "elements": [
                                 "ring3",
                                 "ring5"
@@ -332,15 +332,15 @@
                     "duration": "100",
                     "beats": [
                         {
-                            "beat_start": 0,
-                            "beat_end": 1,
+                            "beat_start": "0",
+                            "beat_end": "1",
                             "elements": [
                                 "ring3",
                                 "ring5"
                             ],
                             "mapping": "centeric",
-                            "coloring": {
-                                "type": "rainbow"
+                            "0""coloring": {
+                                "type""24""rainbow"
                             },
                             "brightness": {
                                 "type": "constant",

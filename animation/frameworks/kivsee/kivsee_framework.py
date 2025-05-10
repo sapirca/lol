@@ -20,30 +20,30 @@ class KivseeFramework(Framework):
                 "Kivsee: Failed to load the house configuration") from e
 
     def get_domain_knowledge(self):
-        content = ''
+        content = ""
         try:
-            # with open(KIVSEE_PROMPT, 'r') as file:
-            #     content = file.read()
-            content += "\n\n You are generating the animation to the song named aladdin. The song is 79 seconds long and has a BPM of 64.725."
-            # with open(
-            #         '/Users/sapir/repos/lol/animation/frameworks/kivsee/songs/aladdin_bars.txt',
-            #         'r') as file:
-            #     content += "Here's a list of bars and their corresponding start time in miliseconds:\n" + file.read(
-            #     )
+            with open(KIVSEE_PROMPT, 'r') as file:
+                content += "##Here's a memory of what you learnt and remembered in previous conversations with the user: \n"
+                content += file.read()
+            content += "##Aladdin song details "
+            "\nYou are generating the animation to the song named aladdin. The song is 79 seconds long and has a BPM of 64.725."
             with open(
-                    '/Users/sapir/repos/lol/animation/frameworks/kivsee/songs/aladdin_info.txt',
+                    '/Users/sapir/repos/lol/animation/frameworks/kivsee/songs/aladdin_bars.txt',
                     'r') as file:
-                content += "These are important parts in the song you should make animation changes\n" + file.read(
-                )
+                content += "## Bars"
+                content += "\n A list of Aladdin bars their corresponding start time in miliseconds:\n"
+                content += file.read()
             with open(
                     '/Users/sapir/repos/lol/animation/frameworks/kivsee/songs/aladdin_beats.txt',
                     'r') as file:
-                content += "Here's a list of beats and their corresponding start time in miliseconds:\n" + file.read(
-                )
-            # with open(
-            #         '/Users/sapir/repos/lol/animation/frameworks/kivsee/songs/aladdin_lyrics.txt',
-            #         'r') as file:
-            #     content += "These are the lyrics of the song:\n" + file.read()
+                content += "## Beats"
+                content += "\n A list of aladdin beats and their corresponding start time in miliseconds:\n"
+                content += file.read()
+            with open(
+                    '/Users/sapir/repos/lol/animation/frameworks/kivsee/songs/aladdin_info.txt',
+                    'r') as file:
+                content += "These are important parts in the song you should make animation changes\n"
+                content += file.read()
 
             # with open(KIVSEE_KNOWLEDGE_PATH, 'r') as file:
             #     content = file.read()

@@ -20,16 +20,6 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}"
             }
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:3001", // Ensure this matches your app's port
-            "webRoot": "${workspaceFolder}/ui/next-lol-js",
-            "sourceMaps": true, // Ensure source maps are enabled
-            "trace": true, // Enable tracing to debug debugger issues
-            "skipFiles": [ "<node_internals>/**" ] // Skip Node.js internals
         }
     ]
 }

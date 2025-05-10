@@ -75,6 +75,10 @@ class AnimationManager:
         return self.framework.get_domain_knowledge()
 
     def get_latest_sequence(self):
+        latest_sequence = self.sequence_manager.get_latest_sequence()
+        if not latest_sequence:
+            return None
+        return f"{latest_sequence}"
         # return f"<animation> {self.sequence_manager.get_latest_sequence()} </animation>"
         return f"{self.sequence_manager.get_latest_sequence()}"
 
@@ -102,5 +106,12 @@ class AnimationManager:
     def get_suffix(self):
         return self.sequence_manager.get_suffix()
 
+
     def get_response_object(self) -> BaseModel:
         return self.framework.get_response_scheme_obj()
+    
+    def render():
+        # render.call()
+        print("Rendered by animation manager!")
+        # TODO sapir fill  this
+        return

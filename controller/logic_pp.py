@@ -1,5 +1,5 @@
 import random
-from controller.backends import GPTBackend, ClaudeBackend, LLMBackend
+from controller.backends import GPTBackend, ClaudeBackend, LLMBackend, GeminiBackend
 from prompt import intro_prompt
 from animation.songs.song_provider import SongProvider
 import xml.etree.ElementTree as ET
@@ -44,6 +44,7 @@ class LogicPlusPlus:
             self.selected_framework = self.config.get("framework", None)
             self.animation_manager = AnimationManager(self.selected_framework,
                                                       self.message_streamer)
+            
 
         self._initialize_backends()
         # Shared initialization logic
@@ -52,6 +53,8 @@ class LogicPlusPlus:
                                             config=self.config)
         self.formatter = Formatter(self.message_streamer,
                                    self.animation_manager)
+        
+        
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
@@ -147,6 +150,7 @@ class LogicPlusPlus:
         backend_mapping = {
             "GPT": GPTBackend,
             "Claude": ClaudeBackend,
+            "Gemini": GeminiBackend,
         }
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(
@@ -193,6 +197,58 @@ class LogicPlusPlus:
             prompt_parts.append("\n### World Structure\n")
             prompt_parts.append(world_structure)
         return "\n".join(prompt_parts)
+    
+        
+    def process_init_prompt(self):
+        latest_sequence = None
+        if not self.initial_prompt_added:
+            song_name = self.config.get("song_name")
+            song_structure = self.song_provider.get_song_structure(
+                song_name) if song_name else ""
+
+            #TODO(sapir): Handle song name from the
+            print(f" >>> Song name: {song_name}")
+
+            world_structure = self.animation_manager.get_world_structure()
+            general_knowledge = self.animation_manager.get_general_knowledge()
+            animation_knowledge = self.animation_manager.get_domain_knowledge()
+
+            # Get the song from the song provider
+            initial_prompt = self.build_prompt(intro_prompt,
+                                               animation_knowledge,
+                                               general_knowledge,
+                                               song_structure, world_structure)
+            # initial_prompt += "\n### Only answer OK \n"
+
+            # Ensure the main instructions are always sent to the LLM for proper context.
+            self.message_streamer.add_message("initial_prompt_context",
+                                              initial_prompt,
+                                              visible=False,
+                                              context=True)
+
+            # Always send the original animation structure to the LLM for reference.
+            latest_sequence = self.animation_manager.get_latest_sequence()
+            if latest_sequence:
+                self.message_streamer.add_message("initial_animation",
+                                                latest_sequence,
+                                                visible=False,
+                                                context=True)
+
+            self.initial_prompt_added = True
+            
+            initial_prompt_report = (
+                f"Request sent to {self.selected_backend} with the following information"
+                f"\n  * General prompt and knowledge files"
+                f"\n  * {self.selected_framework}'s World structure file"
+                f"\n  * {self.selected_framework}'s Animation sequence file"
+                f"\n  * Song name: {song_name}")
+
+            self.message_streamer.add_message("system",
+                                              initial_prompt_report,
+                                              visible=True,
+                                              context=False)
+            
+            return initial_prompt_report            
 
     def communicate(self, user_input):
         system_responses = []
@@ -213,52 +269,8 @@ class LogicPlusPlus:
             return system_responses
 
         backend = self.select_backend()
-
-        latest_sequence = None
-        if not self.initial_prompt_added:
-            song_name = self.config.get("song_name")
-            song_structure = self.song_provider.get_song_structure(
-                song_name) if song_name else ""
-
-            #TODO(sapir): Handle song name from the
-            print(f" >>> Song name: {song_name}")
-
-            world_structure = self.animation_manager.get_world_structure()
-            general_knowledge = self.animation_manager.get_general_knowledge()
-            animation_knowledge = self.animation_manager.get_domain_knowledge()
-
-            # Get the song from the song provider
-            initial_prompt = self.build_prompt(intro_prompt,
-                                               animation_knowledge,
-                                               general_knowledge,
-                                               song_structure, world_structure)
-
-            # Ensure the main instructions are always sent to the LLM for proper context.
-            self.message_streamer.add_message("initial_prompt_context",
-                                              initial_prompt,
-                                              visible=False,
-                                              context=True)
-
-            # Always send the original animation structure to the LLM for reference.
-            latest_sequence = self.animation_manager.get_latest_sequence()
-            self.message_streamer.add_message("initial_animation",
-                                              latest_sequence,
-                                              visible=False,
-                                              context=True)
-            self.initial_prompt_added = True
-
-            initial_prompt_report = (
-                f"Request sent to {self.selected_backend} with the following information"
-                f"\n  * General prompt and knowledge files"
-                f"\n  * {self.selected_framework}'s World structure file"
-                f"\n  * {self.selected_framework}'s Animation sequence file"
-                f"\n  * Song name: {song_name}")
-
-            self.message_streamer.add_message("system",
-                                              initial_prompt_report,
-                                              visible=True,
-                                              context=False)
-
+        initial_prompt_report = self.process_init_prompt()
+        if (initial_prompt_report):
             system_responses.append(("system", initial_prompt_report))
 
         self.message_streamer.add_message("user_input",
@@ -266,9 +278,9 @@ class LogicPlusPlus:
                                           visible=True,
                                           context=True)
 
-        # Update the UI with the prompt that was sent
 
-        # Build the messages array for the LLM
+        # TODO: Should I send the entire message history? or trimmed?
+
         messages = self.formatter.build_messages()
         try:
             model_response = backend.generate_response(messages)

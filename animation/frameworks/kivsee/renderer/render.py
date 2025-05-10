@@ -5,10 +5,11 @@ from animation.frameworks.kivsee.scheme.effects_scheme import KivseeSchema
 import requests
 
 # Kivsee-sapir IP 10.0.1.204
-# VNC?
-# 10.0.0.36
+# VNC Viewer, host 10.0.1.204, username pi, password kivsee12
 # pi@raspberrypi
 # kivsee12
+
+# 10.0.0.36
 
 # SEQUENCE_URL = "http://10.0.0.49:8082"
 # TRIGGER_URL = "http://10.0.0.49:8083"

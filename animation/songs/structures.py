@@ -64,3 +64,16 @@ Energy 38
 Danceability 13
 Happiness 10
 """
+
+aladdin_song_prompt = """"
+BPM: 64.725
+Dueration: 79 seconds
+Song structure:
+2 Bars: Intro
+2 Bars: Intro part 2
+4 Bars: Verse
+4 Bars: Build up
+4 Bars: Drop (chorus)
+2 Bars: Drop (chorus) part 2
+3 Bars: Outro
+"""
