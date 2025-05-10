@@ -25,7 +25,7 @@ class XLightsFramework(Framework):
             return content
         except Exception as e:
             print(f"Logger: Error reading domain knowledge: {e}")
-            return f"Xlights: Error reading domain knowledge: {e}"
+            raise ValueError(f"Xlights: Error reading domain knowledge: {e}")
 
     def get_response_scheme_obj(self) -> BaseModel:
         return XlightsScheme()

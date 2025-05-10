@@ -17,8 +17,20 @@ import requests
 #     "ring9", "ring10", "ring11", "ring12"
 # ]
 
-SEQUENCE_URL = "http://10.0.0.36:8082"
-TRIGGER_URL = "http://10.0.0.36:8083"
+# SEQUENCE_URL = "http://10.0.0.36:8082"
+# TRIGGER_URL = "http://10.0.0.36:8083"
+# all_elements = ["ring0"]
+
+# SEQUENCE_URL = "http://172.18.0.1:8082"
+# TRIGGER_URL = "http://172.18.0.1:8083"
+# all_elements = ["ring0"]
+
+# SEQUENCE_URL = "http://172.18.51.92:8082"
+# TRIGGER_URL = "http://172.18.51.92:8083"
+# all_elements = ["ring0"]
+
+SEQUENCE_URL = "http://10.0.1.204:8082"
+TRIGGER_URL = "http://10.0.1.204:8083"
 all_elements = ["ring0"]
 
 
@@ -37,6 +49,8 @@ class Render:
         # print(
         #     f"Store animation response: {response.status_code}, {response.text}"
         # )
+
+        animation_data['name'] = "aladdin"
 
         for element_name in all_elements:
             url = f"{SEQUENCE_URL}/triggers/{animation_data['name']}/objects/{element_name}"
@@ -97,11 +111,9 @@ class Render:
         # Store the animation data
         self.store_animation(animation_data)
 
-        # Trigger the song
-        animation_data['name'] = "aladdin"
+        # # Trigger the song
         self.trigger_song(animation_data)
 
-        # animation_data['name'] = "test_123"
         # self.trigger_animation(animation_data)
 
     def preprocess_animation(self, animation_data):
