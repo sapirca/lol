@@ -224,7 +224,7 @@ class LogicPlusPlus:
 
             # Always send the original animation structure to the LLM for reference.
             latest_sequence = self.animation_manager.get_latest_sequence()
-            if latest_sequence:
+            if (latest_sequence):
                 self.message_streamer.add_message("initial_animation",
                                                   latest_sequence,
                                                   visible=False,
@@ -357,32 +357,38 @@ class LogicPlusPlus:
                 self.animation_manager.sequence_manager.steps) + 1
             with open(self.temp_animation_path, "r") as temp_file:
                 animation_sequence = temp_file.read()
-            try:
-                animation_json = json.loads(animation_sequence)
-                self.animation_manager.render(animation_json)
-                output += f"Animation rendered successfully.\n"
-            except Exception as e:
-                self.logger.error(f"Error rendering animation: {e}")
-                output += f"Error rendering animation: {e}\n"
-                output += "Did not save animation.\n"
-                return output
-
+            # Save the animation sequence to the message streamer before rendering
             self.message_streamer.add_message(
                 "animation_update",
                 animation_sequence,
                 visible=False,
                 context=False)  # save every sequence update to streamer
+
             seq_message = self.animation_manager.add_sequence(
                 step_number, animation_sequence)
+
             self.message_streamer.add_message("animation_update",
                                               seq_message,
                                               visible=False,
                                               context=False)
-            self.animation_manager.delete_temp_file(self.temp_animation_path)
+
+            output += f"Animation sequence added to the sequence manager as step {step_number}.\n"
+            try:
+                render_result = self.render()
+                if "Error" in render_result:
+                    output += f"{render_result}\nAnimation was saved but not rendered.\n"
+                    return output
+                output += f"{render_result}\n"
+            except Exception as e:
+                self.logger.error(f"Error rendering animation: {e}")
+                output += f"Error rendering animation: {e}\nAnimation was saved but not rendered.\n"
+                return output
+
             self.wait_for_response = False
             self.logger.info("Animation approved and saved.")
 
-            output += f"Animation saved successfully as step {step_number}.\n"
+            # Commenting out the deletion of the temporary file
+            # self.animation_manager.delete_temp_file(self.temp_animation_path)
 
             return output
 
@@ -414,3 +420,30 @@ class LogicPlusPlus:
         except Exception as e:
             self.logger.error(
                 f"An error occurred while deleting {absolute_path}: {e}")
+
+    def render(self):
+        """Render the current animation sequence."""
+        try:
+            latest_sequence = self.animation_manager.get_latest_sequence()
+            if not latest_sequence:
+                self.logger.warning(
+                    "No animation sequence available to render.")
+                return "No animation sequence available to render."
+
+            animation_json = json.loads(latest_sequence)
+            self.animation_manager.render(animation_json)
+            self.logger.info("Animation rendered successfully.")
+            return "Animation rendered successfully."
+        except Exception as e:
+            self.logger.error(f"Error rendering animation: {e}")
+            return f"Error rendering animation: {e}"
+
+    def stop(self):
+        """Stop the current animation rendering process."""
+        try:
+            self.animation_manager.stop_rendering()
+            self.logger.info("Animation rendering stopped successfully.")
+            return "Animation rendering stopped successfully."
+        except Exception as e:
+            self.logger.error(f"Error stopping animation rendering: {e}")
+            return f"Error stopping animation rendering: {e}"

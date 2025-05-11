@@ -73,6 +73,11 @@ class Render:
         print(
             f"Trigger song response: {response.status_code}, {response.text}")
 
+    def stop(self):
+        url = f"{TRIGGER_URL}/stop"
+        response = self._put_request(url, {})
+        print(f"Stop response: {response.status_code}, {response.text}")
+
     def _put_request(self, url, payload):
         headers = {"Content-Type": "application/json"}
         response = requests.put(url, json=payload, headers=headers)
