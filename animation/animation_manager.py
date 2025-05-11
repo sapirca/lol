@@ -84,6 +84,12 @@ class AnimationManager:
         else:
             print("Render method is not available for this framework.")
 
+    def stop_rendering(self):
+        if self.renderer:
+            self.renderer.stop()
+        else:
+            print("Stop rendering method is not available for this framework.")
+
     def get_general_knowledge(self):
         return "".join(knowledge_prompts)
 

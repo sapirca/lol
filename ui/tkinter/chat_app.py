@@ -468,22 +468,30 @@ save_status_label.pack(side=tk.LEFT, padx=10)
 save_button = tk.Button(top_bar, text="Save", command=save_chat)
 save_button.pack(side=tk.RIGHT, padx=5)
 
+
 # Add a stop button to the top bar
-stop_button = tk.Button(top_bar,
-                        text="Stop",
-                        command=lambda: append_message_to_window(
-                            "System",
-                            controller.stop()
-                            if controller else "Controller not initialized."))
+def handle_stop():
+    if controller:
+        response = controller.stop()
+        append_message_to_window("System", response)
+    else:
+        append_message_to_window("System", "Controller not initialized.")
+
+
+stop_button = tk.Button(top_bar, text="Stop", command=handle_stop)
 stop_button.pack(side=tk.RIGHT, padx=5)
 
+
 # Add a render button to the top bar
-render_button = tk.Button(
-    top_bar,
-    text="Render",
-    command=lambda: append_message_to_window(
-        "System",
-        controller.render() if controller else "Controller not initialized."))
+def handle_render():
+    if controller:
+        response = controller.render()
+        append_message_to_window("System", response)
+    else:
+        append_message_to_window("System", "Controller not initialized.")
+
+
+render_button = tk.Button(top_bar, text="Render", command=handle_render)
 render_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a scrolled text widget for the chat window
