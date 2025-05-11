@@ -8,7 +8,7 @@ secrets.py
 
 outputs/
 tests/output/
-ui/tinker/snapshots/
+ui/tkinter/snapshots/
 
 # Environment variables
 .env
