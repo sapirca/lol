@@ -75,7 +75,7 @@ class Render:
 
     def stop(self):
         url = f"{TRIGGER_URL}/stop"
-        response = self._put_request(url, {})
+        response = self._post_request(url, {})
         print(f"Stop response: {response.status_code}, {response.text}")
 
     def _put_request(self, url, payload):
