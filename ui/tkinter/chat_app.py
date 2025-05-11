@@ -454,17 +454,37 @@ active_chat_label = tk.Label(top_bar,
                              font=(CHAT_FONT, 12))
 active_chat_label.pack(side=tk.LEFT, padx=5)
 
-# Add a status label for saving feedback
+# Add a save status label for feedback with text wrapping
 save_status_label = tk.Label(top_bar,
                              text="",
                              fg="light gray",
                              bg="#2c2c2c",
-                             font=(CHAT_FONT, 10))
+                             font=(CHAT_FONT, 10),
+                             anchor="w",
+                             wraplength=200)  # Wrap text after 200 pixels
 save_status_label.pack(side=tk.LEFT, padx=10)
 
 # Add a save button for snapshots
-save_button = tk.Button(top_bar, text="Snapshot", command=save_chat)
+save_button = tk.Button(top_bar, text="Save", command=save_chat)
 save_button.pack(side=tk.RIGHT, padx=5)
+
+# Add a stop button to the top bar
+stop_button = tk.Button(top_bar,
+                        text="Stop",
+                        command=lambda: append_message_to_window(
+                            "System",
+                            controller.stop()
+                            if controller else "Controller not initialized."))
+stop_button.pack(side=tk.RIGHT, padx=5)
+
+# Add a render button to the top bar
+render_button = tk.Button(
+    top_bar,
+    text="Render",
+    command=lambda: append_message_to_window(
+        "System",
+        controller.render() if controller else "Controller not initialized."))
+render_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(chat_frame,
