@@ -1,5 +1,5 @@
 config = {
-    "selected_backend": "Gemini",
+    "selected_backend": "Claude",
     "framework": "kivsee",  #kivsee #xlights #conceptual
     "song_name": "aladdin",  #  "nikki", "sandstorm", "req", "overthinker"
 }
