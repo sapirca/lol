@@ -1,0 +1,2 @@
+#### Smooth Transition
+A smooth transition means there should be a similarity between two effects. This could involve using the same color, a subtle color shift, or ensuring that if the colors change, all other parameters (such as motion, segments, etc.) remain consistent. For a smooth transition, there must be a clear similarity between the two effects.
