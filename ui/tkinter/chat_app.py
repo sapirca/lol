@@ -66,6 +66,10 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
     label_tag = f"{sender.lower()}_label"
     message_tag = f"{sender.lower()}_message"
 
+    # Ensure chat_window is writable
+    original_state = chat_window.cget("state")
+    chat_window.config(state=tk.NORMAL)
+
     chat_window.insert(tk.END, f"[{timestamp}] {sender}:\n", label_tag)
 
     def open_file_in_editor(event, file_path):
@@ -92,20 +96,26 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
         chat_window.tag_bind(link_tag, "<Button-1>",
                              lambda e: open_file_in_editor(e, file_path))
 
-    tmp_animation_path = controller.animation_manager.sequence_manager.get_animation_filename(
-    )
+    # Check if controller exists before trying to access its attributes
+    tmp_animation_path = None
+    if controller and hasattr(controller, 'animation_manager') and \
+       hasattr(controller.animation_manager, 'sequence_manager'):
+        tmp_animation_path = controller.animation_manager.sequence_manager.get_animation_filename(
+        )
+
     last_end = 0  # Initialize last_end to 0
-    file_links = re.finditer(rf"({re.escape(tmp_animation_path)}[^\s]*)",
-                             message)
+    if tmp_animation_path:
+        file_links = re.finditer(rf"({re.escape(tmp_animation_path)}[^\s]*)",
+                                 message)
 
-    for match in file_links:
-        chat_window.insert(tk.END, message[last_end:match.start()],
-                           message_tag)
+        for match in file_links:
+            chat_window.insert(tk.END, message[last_end:match.start()],
+                               message_tag)
 
-        # Use the matched group directly as the file path
-        file_path = match.group()
-        add_link(file_path, f"link_{match.start()}", file_path)
-        last_end = match.end()
+            # Use the matched group directly as the file path
+            file_path = match.group()
+            add_link(file_path, f"link_{match.start()}", file_path)
+            last_end = match.end()
 
     chat_window.insert(tk.END, message[last_end:], message_tag)
     chat_window.insert(tk.END, "\n\n")
@@ -130,14 +140,18 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
     # Automatically scroll to the bottom
     chat_window.see(tk.END)
 
+    # Restore original state
+    chat_window.config(state=original_state)
+
 
 def update_active_chat_label(button_name):
     """Update the active chat label to reflect the currently active chat."""
     button = button_mapping[button_name]
+    # Ensure controller is initialized before accessing its attributes
+    backend_info = controller.selected_backend if controller else "N/A"
+    framework_info = controller.selected_framework if controller else "N/A"
     active_chat_label.config(
-        text=
-        f"{controller.selected_backend} | {controller.selected_framework} | {button_name}"
-    )
+        text=f"{backend_info} | {framework_info} | {button_name}")
     set_active_chat_button(button)
 
 
@@ -231,7 +245,8 @@ def save_and_load_chat_content(a_snapshot):
             lambda: _load_chat(a_snapshot))
         root.update()  # Ensure the main loop is updated
 
-        update_active_chat_label(a_snapshot)
+    # Call update_active_chat_label even if no save popup, just to update the label
+    update_active_chat_label(a_snapshot)
 
 
 def _load_chat(a_snapshot):
@@ -402,7 +417,7 @@ def show_save_popup(proceed_callback, cancel_callback):
     def on_close():
         unsaved_warning.destroy()
 
-        unsaved_warning.protocol("WM_DELETE_WINDOW", on_close)
+    unsaved_warning.protocol("WM_DELETE_WINDOW", on_close)
 
     yes_button = tk.Button(button_frame, text="Yes", command=on_yes)
     yes_button.pack(side=tk.LEFT, padx=5)
@@ -471,11 +486,14 @@ save_button.pack(side=tk.RIGHT, padx=5)
 
 # Add a stop button to the top bar
 def handle_stop():
+    original_state = chat_window.cget("state")
+    chat_window.config(state=tk.NORMAL)
     if controller:
         response = controller.stop()
         append_message_to_window("System", response)
     else:
         append_message_to_window("System", "Controller not initialized.")
+    chat_window.config(state=original_state)
 
 
 stop_button = tk.Button(top_bar, text="Stop", command=handle_stop)
@@ -484,11 +502,14 @@ stop_button.pack(side=tk.RIGHT, padx=5)
 
 # Add a render button to the top bar
 def handle_render():
+    original_state = chat_window.cget("state")
+    chat_window.config(state=tk.NORMAL)
     if controller:
         response = controller.render()
         append_message_to_window("System", response)
     else:
         append_message_to_window("System", "Controller not initialized.")
+    chat_window.config(state=original_state)
 
 
 render_button = tk.Button(top_bar, text="Render", command=handle_render)
