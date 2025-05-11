@@ -44,7 +44,6 @@ class LogicPlusPlus:
             self.selected_framework = self.config.get("framework", None)
             self.animation_manager = AnimationManager(self.selected_framework,
                                                       self.message_streamer)
-            
 
         self._initialize_backends()
         # Shared initialization logic
@@ -53,8 +52,6 @@ class LogicPlusPlus:
                                             config=self.config)
         self.formatter = Formatter(self.message_streamer,
                                    self.animation_manager)
-        
-        
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
@@ -197,8 +194,7 @@ class LogicPlusPlus:
             prompt_parts.append("\n### World Structure\n")
             prompt_parts.append(world_structure)
         return "\n".join(prompt_parts)
-    
-        
+
     def process_init_prompt(self):
         latest_sequence = None
         if not self.initial_prompt_added:
@@ -230,12 +226,12 @@ class LogicPlusPlus:
             latest_sequence = self.animation_manager.get_latest_sequence()
             if latest_sequence:
                 self.message_streamer.add_message("initial_animation",
-                                                latest_sequence,
-                                                visible=False,
-                                                context=True)
+                                                  latest_sequence,
+                                                  visible=False,
+                                                  context=True)
 
             self.initial_prompt_added = True
-            
+
             initial_prompt_report = (
                 f"Request sent to {self.selected_backend} with the following information"
                 f"\n  * General prompt and knowledge files"
@@ -247,8 +243,8 @@ class LogicPlusPlus:
                                               initial_prompt_report,
                                               visible=True,
                                               context=False)
-            
-            return initial_prompt_report            
+
+            return initial_prompt_report
 
     def communicate(self, user_input):
         system_responses = []
@@ -277,7 +273,6 @@ class LogicPlusPlus:
                                           user_input,
                                           visible=True,
                                           context=True)
-
 
         # TODO: Should I send the entire message history? or trimmed?
 
@@ -342,25 +337,36 @@ class LogicPlusPlus:
             self.logger.info(
                 f"Generated {self.temp_animation_path} for the user's observation."
             )
-            # self.wait_for_response = True
 
             output += f"Animation sequence generated and saved to {self.temp_animation_path} "
-            output += "Preview and edit the animation as needed.\n"
+            # output += "Preview and edit the animation as needed.\n"
+            output += "Do you want me to save a snapshot and render? \n"
+            self.wait_for_response = True
 
+        # output += "Save this temporary animation file to the sequence manager? (y/n): "
 
-# output += "Save this temporary animation file to the sequence manager? (y/n): "
-
-# for action in processed_response.get("requested_actions", []):
-#     output += f"Unhandled action: {action['action']}\n"
+        # for action in processed_response.get("requested_actions", []):
+        #     output += f"Unhandled action: {action['action']}\n"
 
         return output
 
     def handle_user_approval(self, user_input):
+        output = ""
         if user_input.lower() in ["y", "yes"]:
             step_number = len(
                 self.animation_manager.sequence_manager.steps) + 1
             with open(self.temp_animation_path, "r") as temp_file:
                 animation_sequence = temp_file.read()
+            try:
+                animation_json = json.loads(animation_sequence)
+                self.animation_manager.render(animation_json)
+                output += f"Animation rendered successfully.\n"
+            except Exception as e:
+                self.logger.error(f"Error rendering animation: {e}")
+                output += f"Error rendering animation: {e}\n"
+                output += "Did not save animation.\n"
+                return output
+
             self.message_streamer.add_message(
                 "animation_update",
                 animation_sequence,
@@ -375,7 +381,10 @@ class LogicPlusPlus:
             self.animation_manager.delete_temp_file(self.temp_animation_path)
             self.wait_for_response = False
             self.logger.info("Animation approved and saved.")
-            return f"Animation saved successfully as step {step_number}.\n"
+
+            output += f"Animation saved successfully as step {step_number}.\n"
+
+            return output
 
         elif user_input.lower() in ["n", "no"]:
             self.animation_manager.delete_temp_file(self.temp_animation_path)

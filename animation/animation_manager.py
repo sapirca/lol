@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from animation.frameworks.kivsee.renderer.render import Render
 from constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_SEQUENCE_PATH, CONCEPTUAL_SEQUENCE_PATH
 from animation.frameworks.kivsee.kivsee_framework import KivseeFramework
 from animation.frameworks.framework import Framework
@@ -26,13 +27,16 @@ class AnimationManager:
         if self.framework_name == 'kivsee':
             self.sequence_manager = KivseeSequence()
             self.framework = KivseeFramework()
+            self.renderer = Render()
         elif self.framework_name == 'xlights':
             self.sequence_manager = XlightsSequence(XLIGHTS_SEQUENCE_PATH)
             self.framework = XLightsFramework()
+            self.renderer = None
         elif self.framework_name == 'conceptual':
             self.sequence_manager = ConceptualSequence(
                 CONCEPTUAL_SEQUENCE_PATH)
             self.framework = ConceptualFramework()
+            self.renderer = None
         else:
             raise ValueError(f"Unsupported framework: {self.framework_name}")
 
@@ -67,6 +71,18 @@ class AnimationManager:
 
     def get_world_structure(self):
         return self.framework.get_world_structure()
+
+    def replay(self):
+        if self.renderer:
+            self.renderer.load_and_print_animation()
+        else:
+            print("Replay method is not available for this framework.")
+
+    def render(self, animation_sequence):
+        if self.renderer:
+            self.renderer.render(animation_data=animation_sequence)
+        else:
+            print("Render method is not available for this framework.")
 
     def get_general_knowledge(self):
         return "".join(knowledge_prompts)
@@ -106,12 +122,5 @@ class AnimationManager:
     def get_suffix(self):
         return self.sequence_manager.get_suffix()
 
-
     def get_response_object(self) -> BaseModel:
         return self.framework.get_response_scheme_obj()
-    
-    def render():
-        # render.call()
-        print("Rendered by animation manager!")
-        # TODO sapir fill  this
-        return

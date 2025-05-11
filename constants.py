@@ -8,15 +8,13 @@ API_TIMEOUT = 10
 TIME_FORMAT = "%d-%m-%Y %H:%M:%S"
 LOG_INTERVAL_IN_SECONDS = 60
 
-OUTPUT_DIR = "outputs"
-
 # Snapshots
-SNAPSHOTS_DIR = "outputs/snapshots"
+SNAPSHOTS_DIR = "ui/tkinter/snapshots"
 MESSAGE_SNAPSHOT_FILE = "messages.json"
 CONFIG_FILE = "config.json"
 
 # Animations
-ANIMATION_OUT_TEMP_DIR = "outputs/"
+ANIMATION_OUT_TEMP_DIR = "tmp_animation/"
 
 # Kivsee
 KIVSEE_HOUSE_PATH = "animation/frameworks/kivsee/world_structure.txt"
