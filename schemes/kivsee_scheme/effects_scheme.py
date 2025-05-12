@@ -182,6 +182,26 @@ class EffectConfig(BaseModel):
 
 # >>>>>>>>>>>>>>>>>>>>>>>>
 class EffectProto(BaseModel):
+    effect_number: int = Field(
+        ...,
+        description=
+        "The position of the effect in the animation sequence, starting from 1. This is used to reference the effect if needed. For example, the first effect is 1, the second is 2, and so on. The user can specify the effect number in the request, and this field will help identify the corresponding effect."
+    )
+    beat_and_bar: str = Field(
+        ...,
+        description=
+        "Specifies the beat and bar this effect is applied to, e.g., '11th beat which is the 2nd bar'."
+    )
+    effect_summary: str = Field(
+        default="",
+        description=
+        "A brief summary of what this effect does. This provides a high-level overview of the effect's purpose or visual impact."
+    )
+    reasoning: str = Field(
+        default="",
+        description=
+        "A brief explanation of why this effect was chosen or how it contributes to the overall animation."
+    )
     effect_config: EffectConfig = Field(
         default_factory=EffectConfig,
         description="General configuration for the effect.")
@@ -254,10 +274,10 @@ class AnimationProto(BaseModel):
         default_factory=list, description="List of effects in the animation.")
     duration_ms: int = Field(
         default=0,
-        description="Duration of the entire animation in milliseconds.")
+        description="Duration of the entire song in milliseconds. Even if the animation does not last the entire song, this value should be the same as the song duration.")
     num_repeats: int = Field(
-        default=0,
-        description="Number of times to repeat the animation (0 means forever)."
+        default=1,
+        description="Number of times to repeat the animation (0 means forever). Usually, this should be 1, but if the user specifies a repeat count in the prompt, you should put it here. If the user does not specify a repeat count, you should put 1 here. If the user specifies a repeat count of 0, it means forever.")
     )
 
 

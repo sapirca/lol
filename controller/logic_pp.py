@@ -338,7 +338,8 @@ class LogicPlusPlus:
                 f"Generated {self.temp_animation_path} for the user's observation."
             )
 
-            output += f"Animation sequence generated and saved to {self.temp_animation_path} "
+            output += f"Animation sequence generated and saved to:"
+            output += f"{self.temp_animation_path}\n"
             # output += "Preview and edit the animation as needed.\n"
             output += "Do you want me to save a snapshot and render? \n"
             self.wait_for_response = True

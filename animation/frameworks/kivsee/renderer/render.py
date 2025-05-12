@@ -17,10 +17,17 @@ import requests
 #     "ring9", "ring10", "ring11", "ring12"
 # ]
 
-RASPBERRY_PI_IP = "192.168.1.27"
+# RED
+# RASPBERRY_PI_IP = "192.168.1.27"
+
+RASPBERRY_PI_IP = "192.168.1.12"
 SEQUENCE_URL = f"http://{RASPBERRY_PI_IP}:8082"
 TRIGGER_URL = f"http://{RASPBERRY_PI_IP}:8083"
-all_elements = ["ring0"]
+# all_elements = ["ring0"]
+all_elements = [
+    "ring1", "ring2", "ring3", "ring4", "ring5", "ring6", "ring7", "ring8",
+    "ring9", "ring10", "ring11", "ring12"
+]
 
 
 class Render:
@@ -96,13 +103,42 @@ class Render:
 
     def render(self, animation_data):
         print("Rendering animation...")
-        self.store_animation(animation_data)
-        self.trigger_animation(animation_data)
-        self.trigger_song(animation_data)
+        animation_seq = self.preprocess_animation(animation_data)
+        self.store_animation(animation_seq)
+        self.trigger_animation(animation_seq)
+        self.trigger_song(animation_seq)
 
-    def preprocess_animation(self, animation_data):
+    def preprocess_animation(self, input_data):
+        # return input_data
+        animation_data = input_data.get("animation", {})
         effects = animation_data.get("effects", [])
         if effects.__len__() > 0:
             print(f"Effects len: {effects.__len__()}")
         else:
             print("No effects found in the animation data.")
+
+        # Convert effects to a slim format - remove the field effect_number
+        slim_effects = [{
+            key: value
+            for key, value in effect.items() if key not in
+            {"effect_number", "effect_summary", "reasoning", "beat_and_bar"}
+        } for effect in effects]
+
+        output_data = {
+            "name": animation_data.get("name", "default_animation"),
+            "animation": {
+                "effects": slim_effects,
+                'duration_ms': animation_data.get("duration_ms", 0),
+                'num_repeats': animation_data.get("num_repeats", 0),
+            }
+        }
+        return output_data
+
+
+def main():
+    render = Render()
+    render.load_and_print_animation()
+
+
+if __name__ == "__main__":
+    main()
