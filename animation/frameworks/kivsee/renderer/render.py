@@ -19,6 +19,7 @@ all_elements = [
     "ring9", "ring10", "ring11", "ring12"
 ]
 
+# TODO(sapir): pull the offset from the song file
 ADD_OFFSET = False
 offset = 575
 

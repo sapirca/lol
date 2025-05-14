@@ -2,6 +2,7 @@ config = {
     "selected_backend": "Claude",
     "framework": "kivsee",  #kivsee #xlights #conceptual
     "song_name": "aladdin",  #  "nikki", "sandstorm", "req", "overthinker"
+    "auto_render": True,
 }
 
 # "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude

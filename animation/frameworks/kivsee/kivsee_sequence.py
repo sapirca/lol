@@ -10,7 +10,6 @@ class KivseeSequence(Sequence):
         self.sequence_path = sequence_path
         self.sequence_data = None
         self.steps = []
-        self._load_sequence_skeleton()
 
     def get_animation_filename(self):
         working_dir = os.path.dirname(os.path.abspath(__file__))

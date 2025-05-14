@@ -16,7 +16,7 @@ def estimate_tokens(words):
     return int(words * 1.33 + 0.5)  # Round up to nearest integer
 
 
-class MessageStreamer:  # Updated class name
+class MessageStreamer:
 
     def __init__(self,
                  snapshots_dir=SNAPSHOTS_DIR,

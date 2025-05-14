@@ -275,6 +275,8 @@ class LogicPlusPlus:
         try:
             model_response = backend.generate_response(messages)
         except Exception as e:
+            # TODO(sapir): Consider sending the error message to the LLM ?
+
             self.message_streamer.add_message("system",
                                               f"Error: {str(e)}",
                                               visible=True,
@@ -318,87 +320,104 @@ class LogicPlusPlus:
         return system_responses
 
     def act_on_response(self, model_response, printable_response):
-        # reasoning = processed_response.get("visible_answer")
-        # consistency_justification = processed_response.get(
-        #     "consistency_justification")
-        # response_dict = processed_response.model_dump()
-        # # animation_sequence_dict = response_dict.get("animation")
-        # animation_sequence_dict = model_response.model_dump()
-
         output = ""
 
-        if model_response:
-            # Use `exclude_none=True` to remove null fields from the animation JSON
-            animation_json = json.dumps(
-                model_response,
-                indent=4,
-                default=lambda o: o.model_dump(exclude_none=True))
-            self.temp_animation_path = self.animation_manager.save_tmp_animation(
-                animation_json)
-            self.logger.info(
-                f"Generated {self.temp_animation_path} for the user's observation."
-            )
+        try:
+            if model_response:
+                # Use `exclude_none=True` to remove null fields from the animation JSON
+                animation_str = json.dumps(
+                    model_response,
+                    indent=4,
+                    default=lambda o: o.model_dump(exclude_none=True))
 
-            output += f"Animation sequence generated and saved to:"
-            output += f"{self.temp_animation_path}\n"
-            # output += "Preview and edit the animation as needed.\n"
-            output += "Do you want me to save a snapshot and render? \n"
-            self.wait_for_response = True
+                # Save the animation sequence to a temporary file
+                self.temp_animation_path = self.animation_manager.save_tmp_animation(
+                    animation_str)
+                self.logger.info(
+                    f"Generated {self.temp_animation_path} for the user's observation."
+                )
 
-        # output += "Save this temporary animation file to the sequence manager? (y/n): "
+                output += f"Animation sequence generated and saved to:\n"
+                output += f"{self.temp_animation_path}\n"
+                output += "Do you want me to save a snapshot to the sequence manager? (y/n)\n"
+                self.wait_for_response = True
 
-        # for action in processed_response.get("requested_actions", []):
-        #     output += f"Unhandled action: {action['action']}\n"
+                # Auto-render the animation for preview if auto_render is enabled in the config
+                if self.config.get("auto_render", False):
+                    animation_dict = json.loads(animation_str)
+                    render_result = self.render_preview(animation_dict)
+                    if "Error" in render_result:
+                        output += f"{render_result}\nAnimation was not rendered for preview.\n"
+                    else:
+                        output += f"{render_result}\n"
+
+        except Exception as e:
+            self.logger.error(
+                f"Error processing response and rendering animation: {e}")
+            output += f"Error processing response and rendering animation: {e}\n"
 
         return output
 
     def handle_user_approval(self, user_input):
         output = ""
         if user_input.lower() in ["y", "yes"]:
-            step_number = len(
-                self.animation_manager.sequence_manager.steps) + 1
-            with open(self.temp_animation_path, "r") as temp_file:
-                animation_sequence = temp_file.read()
-            # Save the animation sequence to the message streamer before rendering
-            self.message_streamer.add_message(
-                "animation_update",
-                animation_sequence,
-                visible=False,
-                context=False)  # save every sequence update to streamer
+            if self.temp_animation_path:  # Ensure there's an animation path to process
+                step_number = len(
+                    self.animation_manager.sequence_manager.steps) + 1
+                try:
+                    with open(self.temp_animation_path, "r") as temp_file:
+                        animation_sequence = temp_file.read()
 
-            seq_message = self.animation_manager.add_sequence(
-                step_number, animation_sequence)
+                    # Save the animation sequence to the message streamer
+                    # This is distinct from the 'preview' message if the user approves saving
+                    self.message_streamer.add_message("animation_update",
+                                                      animation_sequence,
+                                                      visible=False,
+                                                      context=False)
 
-            self.message_streamer.add_message("animation_update",
-                                              seq_message,
-                                              visible=False,
-                                              context=False)
+                    # Add the animation to the sequence manager
+                    seq_message = self.animation_manager.add_sequence(
+                        step_number, animation_sequence)
 
-            output += f"Animation sequence added to the sequence manager as step {step_number}.\n"
-            try:
-                render_result = self.render()
-                if "Error" in render_result:
-                    output += f"{render_result}\nAnimation was saved but not rendered.\n"
-                    return output
-                output += f"{render_result}\n"
-            except Exception as e:
-                self.logger.error(f"Error rendering animation: {e}")
-                output += f"Error rendering animation: {e}\nAnimation was saved but not rendered.\n"
-                return output
+                    self.message_streamer.add_message("animation_update",
+                                                      seq_message,
+                                                      visible=False,
+                                                      context=False)
 
+                    output += f"Animation sequence added to the sequence manager as step {step_number}.\n"
+                    self.logger.info(
+                        "User approved and animation saved to sequence manager."
+                    )
+
+                except Exception as e:
+                    self.logger.error(
+                        f"Error saving animation from temp file to sequence manager: {e}"
+                    )
+                    output += f"Error saving animation: {e}\n"
+            else:
+                output += "No pending animation to save.\n"
+                self.logger.warning(
+                    "User approved, but no temporary animation path was set.")
+
+            self.temp_animation_path = None
             self.wait_for_response = False
-            self.logger.info("Animation approved and saved.")
-
-            # Commenting out the deletion of the temporary file
-            # self.animation_manager.delete_temp_file(self.temp_animation_path)
-
+            self.logger.info("User approval received.")
             return output
 
         elif user_input.lower() in ["n", "no"]:
-            self.animation_manager.delete_temp_file(self.temp_animation_path)
+            if self.temp_animation_path:
+                self.animation_manager.delete_temp_file(
+                    self.temp_animation_path)
+                self.temp_animation_path = None
+                self.logger.info("Animation discarded by user.")
+                output += "Animation discarded.\n"
+            else:
+                output += "Action discarded (no pending animation to discard).\n"
+                self.logger.warning(
+                    "User discarded, but no temporary animation path was set.")
+
             self.wait_for_response = False
-            self.logger.info("Animation discarded by user.")
-            return "Animation discarded.\n"
+            return output
 
         self.logger.warning(
             "Invalid response received during approval process.")
@@ -439,6 +458,20 @@ class LogicPlusPlus:
         except Exception as e:
             self.logger.error(f"Error rendering animation: {e}")
             return f"Error rendering animation: {e}"
+
+    def render_preview(self, animation_json):
+        """Render a preview of the provided animation JSON."""
+        try:
+            if not animation_json:
+                self.logger.warning("No animation JSON provided for preview.")
+                return "No animation JSON provided for preview."
+
+            self.animation_manager.render(animation_json)
+            self.logger.info("Animation preview rendered successfully.")
+            return "Animation preview rendered successfully."
+        except Exception as e:
+            self.logger.error(f"Error rendering animation preview: {e}")
+            return f"Error rendering animation preview: {e}"
 
     def stop(self):
         """Stop the current animation rendering process."""
