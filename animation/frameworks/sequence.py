@@ -14,9 +14,7 @@ class Sequence(ABC):
 
     def get_latest_sequence(self):
         """Return the latest sequence available."""
-        if not self.steps:
-            return None
-        return self.steps[-1]["sequence"]
+        return self.steps[-1]["sequence"] if self.steps else None
 
     def get_all_sequences(self):
         """Return all sequences as a list."""

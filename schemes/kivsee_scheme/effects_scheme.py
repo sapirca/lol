@@ -170,7 +170,7 @@ class EffectConfig(BaseModel):
         default_factory=list,
         description=
         "Specifies the segments of LEDs to which the effect will be applied. This allows targeting specific subsets of LEDs for more variety in the animation. For example, 'b1' might represent every 4th LED. The default segment is 'all', which means the effect will apply to all LEDs of the element.",
-        enum=["centric", "updown", "arc", "ind", "b1", "b2", "all"])
+        enum=["centric", "updown", "arc", "ind", "b1", "b2", "random", "all"])
     # repeat_num: float = Field(
     #     description="Number of times to repeat the effect.")
     # repeat_start: float = Field(description="Start time of the repeat.")
@@ -187,20 +187,26 @@ class EffectProto(BaseModel):
         description=
         "The position of the effect in the animation sequence, starting from 1. This is used to reference the effect if needed. For example, the first effect is 1, the second is 2, and so on. The user can specify the effect number in the request, and this field will help identify the corresponding effect."
     )
+    effect_group: str = Field(
+        default="",
+        description=
+        "The group time frame to which this effect belongs. This is used to categorize the effect and can be used for grouping similar effects together. More specically, all effects that rendered during the same time frame. e.g \"effect_group\": \"time_frame_0_89000\", \"effect_group\": \"time_frame_1190_1290\","
+    )
     beat_and_bar: str = Field(
         ...,
         description=
-        "Specifies the beat and bar this effect is applied to, e.g., '11th beat which is the 2nd bar'."
+        "Specifies the beat and bar this effect is applied to. Make sure to write the beat number and bar number. e.g., 'Bar 2: 11th beat'."
     )
     effect_summary: str = Field(
         default="",
         description=
-        "A brief summary of what this effect does. This provides a high-level overview of the effect's purpose or visual impact."
+        "A brief summary of what this effect does. Focus on the colors and motions. Provides a visual overview so that the user can understand which one is it.."
     )
-    reasoning: str = Field(
-        default="",
+    elements: typing.List[str] = Field(
+        default_factory=list,
+        enum=["ring7", "ring8", "ring9", "ring10", "ring11", "ring12"],
         description=
-        "A brief explanation of why this effect was chosen or how it contributes to the overall animation."
+        "Specifies the list of elements (rings) to which this effect applies. The rings are arranged in a row, with 'ring7' being the leftmost and 'ring12' the rightmost. This allows for creating diverse animations by targeting specific rings or combinations. For example, you can animate rings sequentially, alternate between left and right, or create patterns that move across the rings for more dynamic effects."
     )
     effect_config: EffectConfig = Field(
         default_factory=EffectConfig,
@@ -274,10 +280,13 @@ class AnimationProto(BaseModel):
         default_factory=list, description="List of effects in the animation.")
     duration_ms: int = Field(
         default=0,
-        description="Duration of the entire song in milliseconds. Even if the animation does not last the entire song, this value should be the same as the song duration.")
+        description=
+        "Duration of the entire song in milliseconds. Even if the animation does not last the entire song, this value should be the same as the song duration."
+    )
     num_repeats: int = Field(
         default=1,
-        description="Number of times to repeat the animation (0 means forever). Usually, this should be 1, but if the user specifies a repeat count in the prompt, you should put it here. If the user does not specify a repeat count, you should put 1 here. If the user specifies a repeat count of 0, it means forever.")
+        description=
+        "Number of times to repeat the animation (0 means forever). Usually, this should be 1, but if the user specifies a repeat count in the prompt, you should put it here. If the user does not specify a repeat count, you should put 1 here. If the user specifies a repeat count of 0, it means forever."
     )
 
 
