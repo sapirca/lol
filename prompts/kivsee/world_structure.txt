@@ -1,0 +1,4 @@
+The art installation consists of six sequentially arranged rings, numbered 7 through 12, categorized based on their arrangement and characteristics.  
+Categories include all rings, odd/even rings, left/right sides, center rings, and outer rings.  
+Each category emphasizes specific groupings, such as odd rings [ring7, ring9, ring11] or outer rings [ring7, ring8, ring11, ring12].  
+In your response, list all the rings you want to animate. For all the even rings, specify [ring8, ring10, ring12].

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
+
 class Head(BaseModel):
     version: str
     author: Optional[str]
@@ -17,6 +18,7 @@ class Head(BaseModel):
     sequenceDuration: float
     imageDir: Optional[str]
 
+
 class DataLayer(BaseModel):
     lor_params: int
     channel_offset: int
@@ -26,6 +28,7 @@ class DataLayer(BaseModel):
     source: str
     name: str
 
+
 class DisplayElement(BaseModel):
     collapsed: int
     type: str
@@ -34,13 +37,16 @@ class DisplayElement(BaseModel):
     views: Optional[str]
     active: Optional[int]
 
+
 class ElementEffect(BaseModel):
     type: str
     name: str
 
+
 class TimingTag(BaseModel):
     number: int
     position: int
+
 
 class XlightsScheme(BaseModel):
     BaseChannel: int

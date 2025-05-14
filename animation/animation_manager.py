@@ -9,7 +9,7 @@ from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 from animation.frameworks.conceptual.conceptual_framework import ConceptualFramework
 from animation.frameworks.conceptual.conceptual_sequence import ConceptualSequence
 from animation.frameworks.sequence import Sequence
-from animation.knowledge import knowledge_prompts
+from prompts.knowledge import knowledge_prompts
 import os
 
 
@@ -40,9 +40,6 @@ class AnimationManager:
         else:
             raise ValueError(f"Unsupported framework: {self.framework_name}")
 
-    def get_prompt(self):
-        return self.framework.get_prompt()
-
     def save_tmp_animation(self, animation_sequence: str):
         abs_temp_file_path = self.sequence_manager.get_animation_filename()
         with open(abs_temp_file_path, "w") as temp_file:
@@ -69,18 +66,16 @@ class AnimationManager:
                 f"Logger: An error occurred while deleting {absolute_path}: {e}"
             )
 
-    def get_world_structure(self):
-        return self.framework.get_world_structure()
-
     def replay(self):
         if self.renderer:
-            self.renderer.load_and_print_animation()
+            self.renderer.load_and_print_animation(playback_offest=0)
         else:
             print("Replay method is not available for this framework.")
 
     def render(self, animation_sequence):
         if self.renderer:
-            self.renderer.render(animation_data=animation_sequence)
+            self.renderer.render(animation_data=animation_sequence,
+                                 playback_offest=0)
         else:
             print("Render method is not available for this framework.")
 
@@ -93,16 +88,11 @@ class AnimationManager:
     def get_general_knowledge(self):
         return "".join(knowledge_prompts)
 
-    def get_domain_knowledge(self):
-        return self.framework.get_domain_knowledge()
-
     def get_latest_sequence(self):
         latest_sequence = self.sequence_manager.get_latest_sequence()
         if not latest_sequence:
             return None
         return f"{latest_sequence}"
-        # return f"<animation> {self.sequence_manager.get_latest_sequence()} </animation>"
-        return f"{self.sequence_manager.get_latest_sequence()}"
 
     def get_all_sequences(self):
         return self.sequence_manager.get_all_sequences()

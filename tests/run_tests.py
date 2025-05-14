@@ -12,7 +12,7 @@ from configs.config_conceptual import config as basic_config
 
 from controller.interpreter import Interpreter
 from animation.frameworks.conceptual.response_schema import ResponseSchema
-from prompt import intro_prompt
+from prompts.main_prompt import intro_prompt
 
 RELATIVE_DATA_PATH = os.getcwd()
 
@@ -175,7 +175,10 @@ def main():
     test_data = load_test_data(TEST_FILENAME)
     backends = {
         "GPT-4o-Mini":
-        GPTBackend(name="GPT-4o-Mini", model="gpt-4o-mini", config=basic_config, response_schema_obj=ResponseSchema),
+        GPTBackend(name="GPT-4o-Mini",
+                   model="gpt-4o-mini",
+                   config=basic_config,
+                   response_schema_obj=ResponseSchema),
         # "GPT-4o":
         # GPTBackend(name="GPT-4o", model="gpt-4o", config=basic_config, response_schema_obj=ResponseSchema),
         # "Claude 3.5 Haiku":

@@ -1,0 +1,39 @@
+{
+  "animation_principles": [
+    {
+      "id": "smooth_transitions",
+      "title": "Smooth Transitions",
+      "description": "Achieve fluid visual flow by ensuring discernible similarity between consecutive effects.",
+      "key_aspects": [
+        "Color consistency or subtle shifts",
+        "Cohesion in other parameters (motion, segments, shape) even if colors change"
+      ],
+      "principle": "Intentional connection or shared attribute between elements for seamless flow.",
+      "tags": [ "transition", "visual flow", "cohesion", "color", "motion", "similarity" ]
+    },
+    {
+      "id": "appealing_animation_timing",
+      "title": "Appealing Animation Timing",
+      "description": "Synchronize visual effects precisely with specific moments in music/audio to enhance impact.",
+      "timing_strategies": [
+        "Bar-based timing (start of musical bar)",
+        "Beat synchronization (every beat/half-beat for energy)",
+        "Instrument-specific triggers (e.g., drum hits)"
+      ],
+      "principle": "Visual rhythm should complement and amplify auditory rhythm.",
+      "tags": [ "timing", "music", "audio", "synchronization", "rhythm", "beat", "instrument" ]
+    },
+    {
+      "id": "brightness_pulsing_sine_function",
+      "title": "Brightness Pulsing (Sine Function)",
+      "description": "Use the Sine function for dynamic, cyclical brightness effects with precise timing and repetition.",
+      "application_details": [
+        "Sine wave peaks timed to musical beats",
+        "Function cycle stretched across specific timeframe (e.g., 6 beats)",
+        "`repeat` parameter dictates cycles within timeframe (e.g., `repeat=6` for one pulse/beat)"
+      ],
+      "principle": "Leverage mathematical functions for programmatic control over visual properties.",
+      "tags": [ "brightness", "pulsing", "sine function", "mathematical", "timing", "repetition", "dynamic effect" ]
+    }
+  ]
+}

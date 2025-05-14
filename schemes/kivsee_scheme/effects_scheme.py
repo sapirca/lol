@@ -197,17 +197,14 @@ class EffectProto(BaseModel):
         description=
         "Specifies the beat and bar this effect is applied to. Make sure to write the beat number and bar number. e.g., 'Bar 2: 11th beat'."
     )
-    effect_summary: str = Field(
-        default="",
-        description=
-        "A brief summary of what this effect does. Focus on the colors and motions. Provides a visual overview so that the user can understand which one is it.."
-    )
-    elements: typing.List[str] = Field(
-        default_factory=list,
-        enum=["ring7", "ring8", "ring9", "ring10", "ring11", "ring12"],
-        description=
-        "Specifies the list of elements (rings) to which this effect applies. The rings are arranged in a row, with 'ring7' being the leftmost and 'ring12' the rightmost. This allows for creating diverse animations by targeting specific rings or combinations. For example, you can animate rings sequentially, alternate between left and right, or create patterns that move across the rings for more dynamic effects."
-    )
+
+    elements: typing.List[typing.Literal[
+        "ring7", "ring8", "ring9", "ring10", "ring11", "ring12"]] = Field(
+            default_factory=list,
+            min_length=1,
+            description=
+            "Specifies the list of elements (rings) to which this effect applies. The art installation consists of six sequentially arranged rings, numbered 7 through 12, categorized based on their arrangement and characteristics. Categories include all rings, odd/even rings, left/right sides, center rings, and outer rings. For example, odd rings [ring7, ring9, ring11], even rings [ring8, ring10, ring12], or outer rings [ring7, ring8, ring11, ring12]. This allows for creating diverse animations by targeting specific rings or combinations. For example, you can animate rings sequentially, alternate between left and right, or create patterns that move across the rings for more dynamic effects. In your response, list all the rings you want to animate."
+        )
     effect_config: EffectConfig = Field(
         default_factory=EffectConfig,
         description="General configuration for the effect.")
@@ -250,6 +247,11 @@ class EffectProto(BaseModel):
     #     description=
     #     "The LEDs will alternate between two specified colors at a defined period."
     # )
+    effect_summary: str = Field(
+        default="",
+        description=
+        "A brief summary of what this effect does. Focus on which colors the user see and which patterns and motions (e.g. rapid blinking pink snake, with green b1 segment). Provides a visual overview so that the user can understand which one is it.."
+    )
 
     @model_validator(mode="after")
     def check_one_of_effect(self):

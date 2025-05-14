@@ -1,7 +1,8 @@
 import random
 from controller.backends import GPTBackend, ClaudeBackend, LLMBackend, GeminiBackend
-from prompt import intro_prompt
-from animation.songs.song_provider import SongProvider
+from memory.memory_manager import MemoryManager
+from prompts.main_prompt import intro_prompt
+from music.song_provider import SongProvider
 import xml.etree.ElementTree as ET
 from controller.interpreter import Interpreter
 from controller.formatter import Formatter
@@ -46,6 +47,7 @@ class LogicPlusPlus:
                                                       self.message_streamer)
 
         self._initialize_backends()
+        self.memory_manager = MemoryManager(self.selected_framework)
         # Shared initialization logic
         self.selected_backend = self.config.get("selected_backend", None)
         self.response_manager = Interpreter(self.animation_manager,
@@ -176,67 +178,60 @@ class LogicPlusPlus:
 
         return random.choice(list(self.backends.values()))
 
-    def build_prompt(self, intro_prompt, general_knowledge,
-                     animation_knowledge, song_structure, world_structure):
+    def build_prompt(self, intro_prompt, general_knowledge, song_structure):
         prompt_parts = []
         if intro_prompt:
             prompt_parts.append(intro_prompt)
         if general_knowledge:
             prompt_parts.append("\n### General Knowledge\n")
             prompt_parts.append(general_knowledge)
-        if animation_knowledge:
-            prompt_parts.append("\n### Animation Knowledge\n")
-            prompt_parts.append(animation_knowledge)
         if song_structure:
             prompt_parts.append("\n### Song Structure\n")
             prompt_parts.append(song_structure)
-        if world_structure:
-            prompt_parts.append("\n### World Structure\n")
-            prompt_parts.append(world_structure)
         return "\n".join(prompt_parts)
 
     def process_init_prompt(self):
         latest_sequence = None
         if not self.initial_prompt_added:
-            song_name = self.config.get("song_name")
-            song_structure = self.song_provider.get_song_structure(
-                song_name) if song_name else ""
 
-            #TODO(sapir): Handle song name from the
+            # Provide song structure
+            song_name = self.config.get("song_name")
+            song_info = self.song_provider.get_song_structure(
+                song_name) if song_name else ""
             print(f" >>> Song name: {song_name}")
 
-            world_structure = self.animation_manager.get_world_structure()
-            general_knowledge = self.animation_manager.get_general_knowledge()
-            animation_knowledge = self.animation_manager.get_domain_knowledge()
+            # Provide general knowledge
+            timing_knowledge = self.animation_manager.get_general_knowledge()
 
-            # Get the song from the song provider
-            initial_prompt = self.build_prompt(intro_prompt,
-                                               animation_knowledge,
-                                               general_knowledge,
-                                               song_structure, world_structure)
-            # initial_prompt += "\n### Only answer OK \n"
+            # Build the initial prompt
+            initial_prompt = self.build_prompt(intro_prompt, timing_knowledge,
+                                               song_info)
 
-            # Ensure the main instructions are always sent to the LLM for proper context.
             self.message_streamer.add_message("initial_prompt_context",
                                               initial_prompt,
                                               visible=False,
                                               context=True)
 
-            # Always send the original animation structure to the LLM for reference.
-            latest_sequence = self.animation_manager.get_latest_sequence()
-            if (latest_sequence):
-                self.message_streamer.add_message("initial_animation",
-                                                  latest_sequence,
+            # Add memory to the initial prompt
+            memory = self.memory_manager.get_memory()
+            if memory:
+                self.message_streamer.add_message("system",
+                                                  f"Memory: {memory}",
                                                   visible=False,
                                                   context=True)
+
+            # Do not add the last animation
+            # latest_sequence = self.animation_manager.get_latest_sequence()
+            # if (latest_sequence):
+            #     self.message_streamer.add_message("initial_animation",
+            #                                       latest_sequence,
+            #                                       visible=False,
+            #                                       context=True)
 
             self.initial_prompt_added = True
 
             initial_prompt_report = (
-                f"Request sent to {self.selected_backend} with the following information"
-                f"\n  * General prompt and knowledge files"
-                f"\n  * {self.selected_framework}'s World structure file"
-                f"\n  * {self.selected_framework}'s Animation sequence file"
+                f"Request sent to {self.selected_backend}, {self.selected_framework}'s framework.\n"
                 f"\n  * Song name: {song_name}")
 
             self.message_streamer.add_message("system",
@@ -280,7 +275,13 @@ class LogicPlusPlus:
         try:
             model_response = backend.generate_response(messages)
         except Exception as e:
+            self.message_streamer.add_message("system",
+                                              f"Error: {str(e)}",
+                                              visible=True,
+                                              context=False)
+
             system_responses.append(("system", f"Error: {str(e)}"))
+
             return system_responses
 
         model_dict_wo_none = model_response.model_dump(exclude_none=True)

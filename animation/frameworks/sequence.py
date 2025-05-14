@@ -8,13 +8,19 @@ class Sequence(ABC):
 
     def add_sequence(self, step_number, sequence):
         """Add a new sequence to the manager and log the update."""
+        # TODO(sapir) this is a bag!!! It does not append in the right order ???
         step = {"step": step_number, "sequence": sequence}
         self.steps.append(step)
         return f"Animation updated for step {step_number}"
 
     def get_latest_sequence(self):
         """Return the latest sequence available."""
-        return self.steps[-1]["sequence"] if self.steps else None
+        latest_key_val = max(self.steps, key=lambda x: x["step"], default=None)
+        if latest_key_val:
+            return latest_key_val["sequence"]
+        else:
+            return None
+        # return self.steps[-1]["sequence"] if self.steps else None
 
     def get_all_sequences(self):
         """Return all sequences as a list."""
