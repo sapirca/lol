@@ -11,6 +11,10 @@ from constants import ANIMATION_OUT_TEMP_DIR, SNAPSHOTS_DIR
 from constants import TIME_FORMAT
 import threading
 import _tkinter
+import asyncio
+from queue import Queue
+from tkinter import filedialog
+import concurrent.futures
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -25,6 +29,16 @@ active_chat_snapshot = None
 controller = None  # Will be initialized dynamically based on selected snapshot
 active_chat_button = None  # Store the currently active chat button
 button_mapping = {}  # Dictionary to store button references
+
+# Create a queue for async communication
+message_queue = Queue()
+
+# Create an event loop for the main thread
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+# Create a thread pool executor for running blocking operations
+thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
 
 
 # Function to detect macOS appearance (light or dark)
@@ -171,63 +185,72 @@ def send_message(event=None):
 
     if user_message:
         chat_window.config(state=tk.NORMAL)
-        send_button.config(
-            state=tk.DISABLED,
-            text="Waiting...",
-            foreground="black",
-            background="grey"
-        )  # Disable send button and change text color to black
+        send_button.config(state=tk.DISABLED,
+                           text="Waiting...",
+                           foreground="black",
+                           background="grey")
         user_input.unbind("<Return>")  # Disable Enter key
         append_message_to_window("You", user_message)
 
-        # Run the backend communication in a separate thread
-        threading.Thread(target=communicate_with_backend,
-                         args=(user_message, ),
-                         daemon=True).start()
+        # Use the thread pool to run the backend communication
+        thread_pool.submit(run_backend_communication, user_message)
 
 
-def communicate_with_backend(user_message):
-    """Handles communication with the backend without freezing the UI."""
-    global controller
-    replies = controller.communicate(user_message)
+def run_backend_communication(user_message):
+    """Runs the backend communication in a separate thread."""
+    try:
+        replies = controller.communicate(user_message)
 
-    auto_continue = False
-    auto_continue_value = None
+        auto_continue = False
+        auto_continue_value = None
 
-    for tag, system_reply in replies:
-        if tag == 'auto_continue':
-            auto_continue = True
-            auto_continue_value = system_reply
-        elif tag == 'assistant':
-            append_message_to_window('Assistant', system_reply)
-        elif tag == 'system':
-            append_message_to_window('System', system_reply)
+        for tag, system_reply in replies:
+            if tag == 'auto_continue':
+                auto_continue = True
+                auto_continue_value = system_reply
+            else:
+                # Update UI immediately for each message
+                root.after(
+                    0, lambda t=tag, m=system_reply: update_chat_window(t, m))
+
+        if auto_continue:
+            root.after(0, lambda: handle_auto_continue(auto_continue_value))
         else:
-            append_message_to_window(tag.capitalize(), system_reply)
+            root.after(0, enable_ui)
 
+    except Exception as e:
+        root.after(0, lambda: update_chat_window('system', f"Error: {str(e)}"))
+        root.after(0, enable_ui)
+
+
+def update_chat_window(tag, message):
+    """Updates the chat window with a new message."""
+    append_message_to_window(tag.capitalize(), message)
+
+
+def enable_ui():
+    """Re-enables the UI elements."""
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
     send_button.config(state=tk.NORMAL, text="Send")
+    user_input.config(state=tk.NORMAL)  # Re-enable the text input
     user_input.bind("<Return>", handle_keypress)
 
-    # If we got a value to auto-continue with, make another call
-    if auto_continue:
-        append_message_to_window('System',
-                                 f"Automatically continuing conversation.")
-        # Schedule the next communication after a short delay to allow UI to update
-        root.after(100, lambda: communicate_with_backend(auto_continue_value))
+
+def handle_auto_continue(auto_continue_value):
+    """Handles auto-continue functionality."""
+    update_chat_window('system', "Automatically continuing conversation...")
+    # Schedule the next backend communication
+    thread_pool.submit(run_backend_communication, auto_continue_value)
 
 
 def close_current_chat():
-    """Gracefully close the current chat controller, terminate threads, and save changes if necessary."""
+    """Gracefully close the current chat controller and terminate threads."""
     global controller, active_chat_snapshot
     if controller:
-        shutdown_msg = controller.shutdown()
-        print(shutdown_msg)
-
-    # Clear global references to free resources
-    controller = None
-    active_chat_snapshot = None
+        # Don't call shutdown here, just clear references
+        controller = None
+        active_chat_snapshot = None
 
 
 def save_chat():
@@ -237,6 +260,11 @@ def save_chat():
         try:
             save_message = controller.shutdown()
             save_status_label.config(text=save_message, fg="light gray")
+            # Clear the chat window after saving
+            chat_window.config(state=tk.NORMAL)
+            chat_window.delete("1.0", tk.END)
+            chat_window.config(state=tk.DISABLED)
+            # Clear the controller and active snapshot
             controller = None
             active_chat_snapshot = None
             populate_snapshot_list()  # Refresh the snapshot list
@@ -247,52 +275,119 @@ def save_chat():
         save_status_label.config(text="No active chat to save", fg="red")
 
 
-def save_and_load_chat_content(a_snapshot):
-    """Load chat content and display the backend name."""
-    save_status_label.config(text="",
-                             fg="light gray")  # Clear the status label
+def batch_insert_messages(messages):
+    """Efficiently insert multiple messages into the chat window."""
+    # Pre-configure tags
+    chat_window.tag_configure("system_label",
+                              foreground="lime",
+                              justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("assistant_label",
+                              foreground="yellow",
+                              justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("assistant_message", justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("user_label",
+                              foreground="hot pink",
+                              justify=USER_ALIGNMENT)
+    chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
 
-    # Check for unsaved changes
-    if controller and controller.message_streamer.messages:
-        show_save_popup(
-            lambda: [save_chat(), _load_chat(a_snapshot)],
-            lambda: _load_chat(a_snapshot))
-        root.update()  # Ensure the main loop is updated
+    # Build content in memory
+    content = []
+    for timestamp, message, tag in messages:
+        if tag == 'user_input':
+            label_tag = "user_label"
+            message_tag = "user_message"
+            sender = "You"
+        elif tag == 'assistant':
+            label_tag = "assistant_label"
+            message_tag = "assistant_message"
+            sender = "Assistant"
+        else:
+            label_tag = "system_label"
+            message_tag = "system_message"
+            sender = "System"
 
-    # Call update_active_chat_label even if no save popup, just to update the label
-    update_active_chat_label(a_snapshot)
+        content.append((f"[{timestamp}] {sender}:\n", label_tag))
+        content.append((f"{message}\n\n", message_tag))
+
+    # Insert all content at once
+    for text, tag in content:
+        chat_window.insert(tk.END, text, tag)
+
+    chat_window.see(tk.END)
 
 
 def _load_chat(a_snapshot):
-    save_status_label.config(
-        text="", fg="light gray"
-    )  # Ensure the status label is cleared when switching chats
     """Load chat content and alert if the current chat is unsaved."""
-    if controller:
-        # Alert user if current chat is not saved
-        if not controller.message_streamer.messages:  # Assuming the message_streamer's messages indicate changes
-            print("Warning: Current chat session is not saved!")
+    global controller, active_chat_snapshot
 
-    global active_chat_snapshot
-    active_chat_snapshot = a_snapshot
+    save_status_label.config(text="", fg="light gray")
 
-    initialize_logic_controller(a_snapshot)  # Updated function call
+    try:
+        # Clean up old controller without saving
+        if controller:
+            close_current_chat()
 
-    chat_history = controller.get_visible_chat()
-    chat_window.config(state=tk.NORMAL)
-    chat_window.delete("1.0", tk.END)
-
-    for timestamp, message, tag in chat_history:
-        if tag == 'user_input':
-            sender = 'You'
-        elif tag == 'assistant':
-            sender = 'Assistant'
+        # Initialize the new controller
+        if a_snapshot == "untitled":
+            controller = LogicPlusPlus()
         else:
-            sender = 'System'
-        append_message_to_window_w_timestamp(timestamp, sender, message)
+            snapshot_path = os.path.abspath(
+                os.path.join(SNAPSHOTS_DIR, a_snapshot))
+            controller = LogicPlusPlus(snapshot_path)
 
-    print_system_info()
-    chat_window.config(state=tk.DISABLED)
+        active_chat_snapshot = a_snapshot
+
+        # Load chat history
+        chat_history = controller.get_visible_chat()
+
+        # Update chat window in one go
+        chat_window.config(state=tk.NORMAL)
+        chat_window.delete("1.0", tk.END)
+
+        if chat_history:
+            batch_insert_messages(chat_history)
+        elif a_snapshot == "untitled":
+            message = "Welcome to a new chat session!"
+            controller.message_streamer.add_message("system_output",
+                                                    message,
+                                                    visible=True,
+                                                    context=False)
+            append_message_to_window("System", message)
+        else:
+            message = "No chat history found in snapshot."
+            controller.message_streamer.add_message("system_output",
+                                                    message,
+                                                    visible=True,
+                                                    context=False)
+            append_message_to_window("System", message)
+
+        print_system_info()
+        update_active_chat_label(a_snapshot)
+
+        # Show success message
+        if a_snapshot == "untitled":
+            save_status_label.config(text="Started new chat session",
+                                     fg="light gray")
+        else:
+            save_status_label.config(
+                text=f"Successfully loaded snapshot: {a_snapshot}",
+                fg="light gray")
+
+    except Exception as e:
+        error_msg = f"Error loading snapshot {a_snapshot}: {str(e)}"
+        if controller:
+            controller.message_streamer.add_message("system_output",
+                                                    error_msg,
+                                                    visible=True,
+                                                    context=False)
+        append_message_to_window("System", error_msg)
+        save_status_label.config(text=f"Error loading chat: {str(e)}",
+                                 fg="red")
+
+    finally:
+        chat_window.config(state=tk.DISABLED)
+        enable_ui()  # Always re-enable the UI
 
 
 def print_system_info():
@@ -310,10 +405,7 @@ def save_and_load_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
     global controller, active_chat_snapshot
     if controller and controller.message_streamer.messages:
-        show_save_popup(
-            lambda: [save_chat(), _load_untitled_chat()],
-            lambda: _load_untitled_chat())
-        root.update()  # Ensure the main loop is updated
+        show_save_popup("untitled")
     else:
         _load_untitled_chat()
 
@@ -405,11 +497,13 @@ def handle_keypress(event):
         return "break"  # Prevent default newline behavior
 
 
-def show_save_popup(proceed_callback, cancel_callback):
+def show_save_popup(target_snapshot):
     """Show a warning dialog for unsaved changes."""
     unsaved_warning = tk.Toplevel(root)
     unsaved_warning.title("Unsaved Changes")
     unsaved_warning.geometry("300x150")
+    unsaved_warning.transient(root)  # Make it modal
+    unsaved_warning.grab_set()  # Make it modal
 
     label = tk.Label(
         unsaved_warning,
@@ -421,25 +515,37 @@ def show_save_popup(proceed_callback, cancel_callback):
     button_frame.pack(pady=10)
 
     def on_yes():
+        unsaved_warning.grab_release()
         unsaved_warning.destroy()
-        proceed_callback()
+        # First save the current chat
+        save_chat()
+        # Then load the target chat after a brief delay to ensure cleanup
+        root.after(100, lambda: _load_chat(target_snapshot))
 
     def on_no():
+        unsaved_warning.grab_release()
         unsaved_warning.destroy()
-        cancel_callback()
+        # Disable UI while loading
+        send_button.config(state=tk.DISABLED)
+        user_input.config(state=tk.DISABLED)
+        _load_chat(target_snapshot)
 
-    def on_close():
+    def on_cancel():
+        unsaved_warning.grab_release()
         unsaved_warning.destroy()
-
-    unsaved_warning.protocol("WM_DELETE_WINDOW", on_close)
+        enable_ui()
 
     yes_button = tk.Button(button_frame, text="Yes", command=on_yes)
     yes_button.pack(side=tk.LEFT, padx=5)
 
     no_button = tk.Button(button_frame, text="No", command=on_no)
-    no_button.pack(side=tk.RIGHT, padx=5)
+    no_button.pack(side=tk.LEFT, padx=5)
 
-    root.wait_window(unsaved_warning)  # Wait for the popup to be closed
+    cancel_button = tk.Button(button_frame, text="Cancel", command=on_cancel)
+    cancel_button.pack(side=tk.LEFT, padx=5)
+
+    # Handle window close button
+    unsaved_warning.protocol("WM_DELETE_WINDOW", on_cancel)
 
 
 def set_active_chat_button(button):
@@ -452,6 +558,20 @@ def set_active_chat_button(button):
     active_chat_button = button
     if active_chat_button:
         active_chat_button.config(relief="sunken")
+
+
+def save_and_load_chat_content(target_snapshot):
+    """Save current chat if needed and load the target snapshot."""
+    global controller, active_chat_snapshot
+
+    # Disable UI while checking
+    send_button.config(state=tk.DISABLED)
+    user_input.config(state=tk.DISABLED)
+
+    if controller and controller.message_streamer.messages:
+        show_save_popup(target_snapshot)
+    else:
+        _load_chat(target_snapshot)
 
 
 # Create the main window
@@ -600,5 +720,18 @@ user_input.bind("<Control-Button-5>",
 
 # Populate the snapshot list
 populate_snapshot_list()
+
+
+# Make sure to clean up the thread pool on exit
+def on_closing():
+    """Handle application shutdown."""
+    if controller:
+        controller.shutdown()  # Final save on application exit
+    thread_pool.shutdown(wait=False)
+    root.destroy()
+
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
 # Start the application
 root.mainloop()

@@ -21,6 +21,7 @@ from controller.actions import (ActionRegistry, UpdateAnimationAction,
                                 GetMusicStructureAction, ResponseToUserAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
+import threading
 
 
 class LogicPlusPlus:
@@ -33,6 +34,8 @@ class LogicPlusPlus:
         self.message_streamer = MessageStreamer()
         self.song_provider = SongProvider()
         self.backends = {}
+        self._is_processing = False
+        self._processing_lock = threading.Lock()
 
         # Initialize action registry
         self.action_registry = ActionRegistry()
@@ -265,7 +268,25 @@ class LogicPlusPlus:
 
             return initial_prompt_report
 
+    def is_processing(self):
+        """Check if the backend is currently processing a request."""
+        return self._is_processing
+
     def communicate(self, user_input):
+        """Thread-safe communication with the backend."""
+        with self._processing_lock:
+            if self._is_processing:
+                return [("system",
+                         "Still processing previous request. Please wait.")]
+
+            self._is_processing = True
+            try:
+                return self._communicate_internal(user_input)
+            finally:
+                self._is_processing = False
+
+    def _communicate_internal(self, user_input):
+        """Internal communication method that contains the original communicate logic."""
         system_responses = []
         if self.wait_for_save_approval:
             # Handle confirmation for pending action

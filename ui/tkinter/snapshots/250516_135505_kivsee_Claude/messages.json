@@ -1,0 +1,20 @@
+[
+    {
+        "tag": "system_output",
+        "content": "Welcome to a new chat session!",
+        "visible": true,
+        "context": false,
+        "words": 6,
+        "tokens_estimation": 8,
+        "timestamp": "16-05-2025 13:55:01"
+    },
+    {
+        "tag": "system_output",
+        "content": "Active Backend is: Claude",
+        "visible": true,
+        "context": false,
+        "words": 4,
+        "tokens_estimation": 5,
+        "timestamp": "16-05-2025 13:55:01"
+    }
+]
