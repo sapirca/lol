@@ -70,7 +70,8 @@ class LogicPlusPlus:
         self.response_manager = Interpreter(self.animation_manager,
                                             config=self.config)
         self.formatter = Formatter(self.message_streamer,
-                                   self.animation_manager)
+                                   self.animation_manager, self.memory_manager,
+                                   self.song_provider, self.config)
 
         self._register_actions()
 

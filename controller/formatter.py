@@ -1,20 +1,33 @@
 from animation.frameworks.xlights.xlights_sequence import XlightsSequence
 from controller.message_streamer import MessageStreamer
 from animation.animation_manager import AnimationManager
+from memory.memory_manager import MemoryManager
+from music.song_provider import SongProvider
+from typing import Optional, Dict, Any
 
 
 class Formatter:
 
-    def __init__(self, message_streamer: MessageStreamer,
-                 animation_manager: AnimationManager):
+    def __init__(self,
+                 message_streamer: MessageStreamer,
+                 animation_manager: AnimationManager,
+                 memory_manager: MemoryManager,
+                 song_provider: SongProvider,
+                 config: Optional[Dict[str, Any]] = None):
         """
         Initializes the Formatter class.
 
         :param message_streamer: MessageStreamer instance of the messages stream.
         :param animation_manager: AnimationManager instance to manage animations.
+        :param memory_manager: MemoryManager instance to manage memory.
+        :param song_provider: SongProvider instance to get song information.
+        :param config: Optional configuration dictionary.
         """
         self.message_streamer = message_streamer
         self.animation_manager = animation_manager
+        self.memory_manager = memory_manager
+        self.song_provider = song_provider
+        self.config = config or {}
 
     def build_messages(self):
         """
@@ -24,6 +37,28 @@ class Formatter:
         """
         messages = []
 
+        # Add memory info
+        memory = self.memory_manager.get_memory()
+        if memory:
+            messages.append({"role": "system", "content": f"Memory: {memory}"})
+
+        # Add song info if available
+        try:
+            song_name = self.config.get("song_name")
+            if song_name:
+                song_info = self.song_provider.get_song_structure(song_name)
+                if song_info:
+                    messages.append({
+                        "role":
+                        "system",
+                        "content":
+                        f"Song: {song_name}\nSong Info: {song_info}"
+                    })
+        except Exception as e:
+            # Log error but continue without song info
+            print(f"Error getting song info: {e}")
+
+        # Add message history
         for message in self.message_streamer.messages:
             if message['context']:
                 role = self._determine_role(message['tag'])
@@ -43,16 +78,16 @@ class Formatter:
 
     def _determine_role(self, tag):
         """
-        Determines the role of a message based on its tag.
+        Determines the role based on the message tag.
 
-        :param tag: The tag associated with the message.
-        :return: Corresponding role for the message.
+        :param tag: The message tag.
+        :return: The corresponding role for the message.
         """
         role_mapping = {
-            "initial_prompt_context": "system",
-            "initial_animation": "system",
-            "user_input": "user",
-            "assistant": "assistant"
+            'user_input': 'user',
+            'assistant': 'assistant',
+            'system': 'system',
+            'action_results': 'system',
+            'initial_prompt_context': 'system'
         }
-
-        return role_mapping.get(tag, "system")
+        return role_mapping.get(tag, 'system')
