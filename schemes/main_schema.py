@@ -13,55 +13,59 @@ class UpdateAnimationParams(BaseModel, Generic[T]):
         description=
         "The animation data to be processed - will be validated against framework-specific schema."
     )
-    immediate_response: bool = Field(
+    immediate_response: Literal[False] = Field(
         description=
-        "Should always be False for update_animation as it requires user confirmation",
-        default=False)
+        "Always False for update_animation as it requires user confirmation")
 
 
 class GetAnimationParams(BaseModel):
     step_number: int = Field(
         description=
-        "The step number of the animation to retrieve. If this parameter is missing, unknown to you or invalid (< 0), do not execute this action. Instead, use ResponseToUserAction with message_type='clarification' to ask the user for a valid step number.",
+        "The step number of the animation to retrieve. If this parameter is missing, unknown to you or invalid (< 0), do not execute this action. Instead, use AskUserAction to ask the user for a valid step number.",
         ge=0)
-    immediate_response: bool = Field(
-        description=
-        "Should always be True for get_animation as it's a retrieval action that doesn't need user input",
-        default=True)
+    immediate_response: Literal[True] = Field(
+        description="Always True for get_animation as it's a retrieval action")
 
 
-class GetMemoryParams(BaseModel):
-    immediate_response: bool = Field(
+class AddToMemoryParams(BaseModel):
+    key: str = Field(
+        description="The key under which to store the memory value")
+    value: str = Field(description="The value to store in memory")
+    immediate_response: Literal[False] = Field(
         description=
-        "Should always be True for get_memory as it's a retrieval action that doesn't need user input",
-        default=True)
+        "Always False for add_to_memory as it requires user confirmation")
 
 
 class GetMusicStructureParams(BaseModel):
     song_name: str = Field(
         description=
-        "Name of the song to get structure for. If this parameter is missing, do not execute this action. Instead, use ResponseToUserAction with message_type='clarification' to ask the user for the song name."
+        "Name of the song to get structure for. If this parameter is missing, do not execute this action. Instead, use AskUserAction to ask the user for the song name."
     )
-    immediate_response: bool = Field(
+    immediate_response: Literal[True] = Field(
         description=
-        "Should always be True for get_music_structure as it's a retrieval action that doesn't need user input",
-        default=True)
+        "Always True for get_music_structure as it's a retrieval action")
 
 
-class ResponseToUserParams(BaseModel):
+class InformUserParams(BaseModel):
     message: str = Field(description="The message to send to the user")
-    requires_response: bool = Field(
-        description="Whether this message requires a response from the user",
-        default=False)
-    message_type: str = Field(
+    message_type: Literal["information", "answer", "error"] = Field(
         description=
-        "The type of message being sent to the user. If the user asks you to perform an action (e.g. generate an animation), execute it directly without informing the user. If the user asks a question, provide your answer here.",
-        enum=["clarification", "answer"],
+        "The type of message being sent. Use 'information' for general info and success messages, 'answer' for answers to user questions, 'error' for error messages.",
         default="information")
-    immediate_response: bool = Field(
+    immediate_response: Literal[False] = Field(
         description=
-        "Should always be False for response_to_user when message_type is 'clarification' or 'question', or when requires_response is True. For information messages that don't require response, can be True.",
-        default=False)
+        "Always False for inform_user as it's a one-way communication")
+
+
+class AskUserParams(BaseModel):
+    message: str = Field(description="The question or request for the user")
+    message_type: Literal[
+        "clarification", "question", "memory_suggestion"] = Field(
+            description=
+            "The type of message being sent. Use 'clarification' for input clarification, 'question' for general questions, 'memory_suggestion' when suggesting a memory entry.",
+            default="question")
+    immediate_response: Literal[False] = Field(
+        description="Always False for ask_user as it requires user response")
 
 
 # Action models with specific parameter types
@@ -75,9 +79,9 @@ class GetAnimationAction(BaseModel):
     params: GetAnimationParams
 
 
-class GetMemoryAction(BaseModel):
-    name: Literal["get_memory"]
-    params: GetMemoryParams
+class AddToMemoryAction(BaseModel):
+    name: Literal["add_to_memory"]
+    params: AddToMemoryParams
 
 
 class GetMusicStructureAction(BaseModel):
@@ -85,16 +89,21 @@ class GetMusicStructureAction(BaseModel):
     params: GetMusicStructureParams
 
 
-class ResponseToUserAction(BaseModel):
-    name: Literal["response_to_user"]
-    params: ResponseToUserParams
+class InformUserAction(BaseModel):
+    name: Literal["inform_user"]
+    params: InformUserParams
+
+
+class AskUserAction(BaseModel):
+    name: Literal["ask_user"]
+    params: AskUserParams
 
 
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
-                                        GetAnimationAction, GetMemoryAction,
+                                        GetAnimationAction, AddToMemoryAction,
                                         GetMusicStructureAction,
-                                        ResponseToUserAction],
+                                        InformUserAction, AskUserAction],
                                   Field(discriminator='name')]
 
 

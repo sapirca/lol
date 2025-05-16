@@ -17,7 +17,7 @@ import json
 from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
 from controller.actions import (ActionRegistry, UpdateAnimationAction,
-                                GetAnimationAction, GetMemoryAction,
+                                GetAnimationAction, AddToMemoryAction,
                                 GetMusicStructureAction, ResponseToUserAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
@@ -31,6 +31,7 @@ class LogicPlusPlus:
         self.logger = logging.getLogger("LogicPlusPlusLogger")
         self.wait_for_save_approval = False
         self.temp_animation_path = None
+        self._pending_memory = None
         self.message_streamer = MessageStreamer()
         self.song_provider = SongProvider()
         self.backends = {}
@@ -82,7 +83,7 @@ class LogicPlusPlus:
         self.action_registry.register_action(
             "get_animation", GetAnimationAction(self.animation_manager))
         self.action_registry.register_action(
-            "get_memory", GetMemoryAction(self.memory_manager))
+            "add_to_memory", AddToMemoryAction(self.memory_manager))
         self.action_registry.register_action(
             "get_music_structure", GetMusicStructureAction(self.song_provider))
         self.action_registry.register_action("response_to_user",
@@ -114,6 +115,9 @@ class LogicPlusPlus:
         with open(messages_json_file, "w") as file:
             json.dump(self.message_streamer.messages, file,
                       indent=4)  # Save only the messages data
+
+        # Save memory
+        self.memory_manager.shutdown()
 
         # Finalize the message_streamer
         self.message_streamer.finalize()
@@ -496,7 +500,7 @@ class LogicPlusPlus:
     def handle_user_approval(self, user_input):
         output = ""
         if user_input.lower() in ["y", "yes"]:
-            if self.temp_animation_path:  # Ensure there's an animation path to process
+            if self.temp_animation_path:  # Handle animation approval
                 step_number = len(
                     self.animation_manager.sequence_manager.steps) + 1
                 try:
@@ -529,27 +533,45 @@ class LogicPlusPlus:
                         f"Error saving animation from temp file to sequence manager: {e}"
                     )
                     output += f"Error saving animation: {e}\n"
-            else:
-                output += "No pending animation to save. Should not happen. Please report this bug.\n"
-                self.logger.warning(
-                    "User approved, but no temporary animation path was set.")
 
-            self.temp_animation_path = None
+                self.temp_animation_path = None
+
+            elif self._pending_memory:  # Handle memory approval
+                try:
+                    key = self._pending_memory["key"]
+                    value = self._pending_memory["value"]
+                    self.memory_manager.write_to_memory(key, value)
+                    output += f"Memory saved with key: {key}\n"
+                    self.logger.info(
+                        f"User approved and memory saved with key: {key}")
+                    self._pending_memory = None
+                except Exception as e:
+                    self.logger.error(f"Error saving memory: {e}")
+                    output += f"Error saving memory: {e}\n"
+            else:
+                output += "No pending action to approve. Should not happen. Please report this bug.\n"
+                self.logger.warning(
+                    "User approved, but no pending action was found.")
+
             self.wait_for_save_approval = False
             self.logger.info("User approval received.")
             return output
 
         elif user_input.lower() in ["n", "no"]:
-            if self.temp_animation_path:
+            if self.temp_animation_path:  # Handle animation rejection
                 self.animation_manager.delete_temp_file(
                     self.temp_animation_path)
                 self.temp_animation_path = None
                 self.logger.info("Animation discarded by user.")
                 output += "Animation discarded.\n"
+            elif self._pending_memory:  # Handle memory rejection
+                self._pending_memory = None
+                self.logger.info("Memory addition discarded by user.")
+                output += "Memory addition discarded.\n"
             else:
-                output += "Action discarded (no pending animation to discard).\n"
+                output += "Action discarded (no pending action to discard).\n"
                 self.logger.warning(
-                    "User discarded, but no temporary animation path was set.")
+                    "User discarded, but no pending action was found.")
 
             self.wait_for_save_approval = False
             return output

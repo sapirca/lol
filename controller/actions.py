@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 import json
 import logging
 from configs.config_kivsee import config as basic_config
+from memory.memory_manager import MemoryManager
 
 
 class Action(ABC):
@@ -127,30 +128,39 @@ class GetAnimationAction(Action):
             }
 
 
-class GetMemoryAction(Action):
+class AddToMemoryAction(Action):
 
-    def __init__(self, memory_manager):
+    def __init__(self, memory_manager: MemoryManager):
         super().__init__()
         self.memory_manager = memory_manager
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
-        return True  # No parameters needed for this action
+        params_dict = self._get_params_dict(params)
+        return ("key" in params_dict and isinstance(params_dict["key"], str)
+                and "value" in params_dict
+                and isinstance(params_dict["value"], str))
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        params_dict = self._get_params_dict(params)
         try:
-            memory = self.memory_manager.get_memory()
+            key = params_dict["key"]
+            value = params_dict["value"]
+            # Don't write to memory yet, wait for user confirmation
             return {
                 "status": "success",
-                "message": "Retrieved memory",
-                "requires_confirmation": False,
+                "message":
+                f"Ready to add memory with key: {key} and value: {value}. Do you want to save this to memory? (y/n)",
+                "requires_confirmation": True,
                 "data": {
-                    "memory": memory if memory else "No memory available"
+                    "key": key,
+                    "value": value,
+                    "action": "add_to_memory"
                 }
             }
         except Exception as e:
             return {
                 "status": "error",
-                "message": f"Error retrieving memory: {str(e)}",
+                "message": f"Error preparing memory addition: {str(e)}",
                 "requires_confirmation": False
             }
 
