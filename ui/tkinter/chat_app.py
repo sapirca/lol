@@ -190,8 +190,14 @@ def communicate_with_backend(user_message):
     global controller
     replies = controller.communicate(user_message)
 
+    auto_continue = False
+    auto_continue_value = None
+
     for tag, system_reply in replies:
-        if tag == 'assistant':
+        if tag == 'auto_continue':
+            auto_continue = True
+            auto_continue_value = system_reply
+        elif tag == 'assistant':
             append_message_to_window('Assistant', system_reply)
         elif tag == 'system':
             append_message_to_window('System', system_reply)
@@ -202,6 +208,13 @@ def communicate_with_backend(user_message):
     chat_window.see(tk.END)
     send_button.config(state=tk.NORMAL, text="Send")
     user_input.bind("<Return>", handle_keypress)
+
+    # If we got a value to auto-continue with, make another call
+    if auto_continue:
+        append_message_to_window('System',
+                                 f"Automatically continuing conversation.")
+        # Schedule the next communication after a short delay to allow UI to update
+        root.after(100, lambda: communicate_with_backend(auto_continue_value))
 
 
 def close_current_chat():
@@ -282,7 +295,7 @@ def _load_chat(a_snapshot):
 
 
 def print_system_info():
-    current_time = datetime.now().strftime(TIME_FORMAT)
+    # current_time = datetime.now().strftime(TIME_FORMAT)
     backend_name = controller.selected_backend or "Unknown Backend"
     message = f"Active Backend is: {backend_name}"
     controller.message_streamer.add_message("system_output",
@@ -314,8 +327,8 @@ def _load_untitled_chat():
 
     print_system_info()
 
-    current_time = datetime.now().strftime(TIME_FORMAT)
-    append_message_to_window("System", "Welcome to a new chat session!")
+    # current_time = datetime.now().strftime(TIME_FORMAT)
+    # append_message_to_window("System", "Welcome to a new chat session!")
     chat_window.config(state=tk.DISABLED)
     print(f"Untitled chat session ensured")
     active_chat_snapshot = "untitled"

@@ -16,6 +16,11 @@ import json
 # from configs.config_conceptual import config as basic_config
 from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
+from controller.actions import (ActionRegistry, UpdateAnimationAction,
+                                GetAnimationAction, GetMemoryAction,
+                                GetMusicStructureAction, ResponseToUserAction)
+from schemes.main_schema import MainSchema
+from typing import Dict, Any
 
 
 class LogicPlusPlus:
@@ -23,11 +28,14 @@ class LogicPlusPlus:
     def __init__(self, snapshot_dir=None):
         """Initialize the LogicPlusPlus, optionally loading from a snapshot."""
         self.logger = logging.getLogger("LogicPlusPlusLogger")
-        self.wait_for_response = False
+        self.wait_for_save_approval = False
         self.temp_animation_path = None
         self.message_streamer = MessageStreamer()
         self.song_provider = SongProvider()
         self.backends = {}
+
+        # Initialize action registry
+        self.action_registry = ActionRegistry()
 
         if snapshot_dir is not None:
             try:
@@ -46,6 +54,12 @@ class LogicPlusPlus:
             self.animation_manager = AnimationManager(self.selected_framework,
                                                       self.message_streamer)
 
+        # Get the framework's schema and create the main schema
+        framework_schema = self.animation_manager.get_response_object()
+        self.response_schema = MainSchema.with_framework_schema(
+            framework_schema)
+
+        # Register available actions
         self._initialize_backends()
         self.memory_manager = MemoryManager(self.selected_framework)
         # Shared initialization logic
@@ -54,6 +68,21 @@ class LogicPlusPlus:
                                             config=self.config)
         self.formatter = Formatter(self.message_streamer,
                                    self.animation_manager)
+
+        self._register_actions()
+
+    def _register_actions(self):
+        """Register all available actions"""
+        self.action_registry.register_action(
+            "update_animation", UpdateAnimationAction(self.animation_manager))
+        self.action_registry.register_action(
+            "get_animation", GetAnimationAction(self.animation_manager))
+        self.action_registry.register_action(
+            "get_memory", GetMemoryAction(self.memory_manager))
+        self.action_registry.register_action(
+            "get_music_structure", GetMusicStructureAction(self.song_provider))
+        self.action_registry.register_action("response_to_user",
+                                             ResponseToUserAction())
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
@@ -154,8 +183,7 @@ class LogicPlusPlus:
         for backend_name, backend_class in backend_mapping.items():
             self.register_backend(
                 backend_class(name=backend_name,
-                              response_schema_obj=self.animation_manager.
-                              get_response_object(),
+                              response_schema_obj=self.response_schema,
                               config=self.config))
 
     def register_backend(self, backend):
@@ -178,47 +206,43 @@ class LogicPlusPlus:
 
         return random.choice(list(self.backends.values()))
 
-    def build_prompt(self, intro_prompt, general_knowledge, song_structure):
+    def build_prompt(self, intro_prompt, general_knowledge):
         prompt_parts = []
         if intro_prompt:
             prompt_parts.append(intro_prompt)
         if general_knowledge:
             prompt_parts.append("\n### General Knowledge\n")
             prompt_parts.append(general_knowledge)
-        if song_structure:
-            prompt_parts.append("\n### Song Structure\n")
-            prompt_parts.append(song_structure)
         return "\n".join(prompt_parts)
 
     def process_init_prompt(self):
         latest_sequence = None
         if not self.initial_prompt_added:
 
-            # Provide song structure
-            song_name = self.config.get("song_name")
-            song_info = self.song_provider.get_song_structure(
-                song_name) if song_name else ""
-            print(f" >>> Song name: {song_name}")
+            # # Provide song structure
+            # song_name = self.config.get("song_name")
+            # song_info = self.song_provider.get_song_structure(
+            #     song_name) if song_name else ""
+            # print(f" >>> Song name: {song_name}")
 
             # Provide general knowledge
             timing_knowledge = self.animation_manager.get_general_knowledge()
 
             # Build the initial prompt
-            initial_prompt = self.build_prompt(intro_prompt, timing_knowledge,
-                                               song_info)
+            initial_prompt = self.build_prompt(intro_prompt, timing_knowledge)
 
             self.message_streamer.add_message("initial_prompt_context",
                                               initial_prompt,
                                               visible=False,
                                               context=True)
 
-            # Add memory to the initial prompt
-            memory = self.memory_manager.get_memory()
-            if memory:
-                self.message_streamer.add_message("system",
-                                                  f"Memory: {memory}",
-                                                  visible=False,
-                                                  context=True)
+            # # Add memory to the initial prompt
+            # memory = self.memory_manager.get_memory()
+            # if memory:
+            #     self.message_streamer.add_message("system",
+            #                                       f"Memory: {memory}",
+            #                                       visible=False,
+            #                                       context=True)
 
             # Do not add the last animation
             # latest_sequence = self.animation_manager.get_latest_sequence()
@@ -231,8 +255,8 @@ class LogicPlusPlus:
             self.initial_prompt_added = True
 
             initial_prompt_report = (
-                f"Request sent to {self.selected_backend}, {self.selected_framework}'s framework.\n"
-                f"\n  * Song name: {song_name}")
+                f"Included initial prompt. Sent to {self.selected_backend}. {self.selected_framework} framework.\n"
+            )
 
             self.message_streamer.add_message("system",
                                               initial_prompt_report,
@@ -243,20 +267,19 @@ class LogicPlusPlus:
 
     def communicate(self, user_input):
         system_responses = []
-        if self.wait_for_response:
-            # User response for agent action (e.g., store to memory, update animation)
-            # This does not need to be added to the LLM context.
-            self.message_streamer.add_message(
-                "user_input", user_input, visible=True, context=False
-            )  # Need to add info that this is internal_actions communication
-            visible_system_message = self.handle_user_approval(user_input)
-            self.message_streamer.add_message(
-                "system_output",
-                visible_system_message,
-                visible=True,
-                context=False
-            )  # Need to add info that this is internal_actions communication
-            system_responses.append(("system", visible_system_message))
+        if self.wait_for_save_approval:
+            # Handle confirmation for pending action
+            self.message_streamer.add_message("user_input",
+                                              user_input,
+                                              visible=True,
+                                              context=False)
+            result = self.handle_user_approval(user_input)
+
+            self.message_streamer.add_message("system_output",
+                                              result,
+                                              visible=True,
+                                              context=False)
+            system_responses.append(("system", result))
             return system_responses
 
         backend = self.select_backend()
@@ -269,94 +292,154 @@ class LogicPlusPlus:
                                           visible=True,
                                           context=True)
 
-        # TODO: Should I send the entire message history? or trimmed?
-
         messages = self.formatter.build_messages()
         try:
             model_response = backend.generate_response(messages)
         except Exception as e:
-            # TODO(sapir): Consider sending the error message to the LLM ?
-
+            error_msg = f"Error: {str(e)}"
             self.message_streamer.add_message("system",
-                                              f"Error: {str(e)}",
+                                              error_msg,
                                               visible=True,
                                               context=False)
-
-            system_responses.append(("system", f"Error: {str(e)}"))
-
+            system_responses.append(("system", error_msg))
             return system_responses
 
-        model_dict_wo_none = model_response.model_dump(exclude_none=True)
-        printable_response = json.dumps(model_dict_wo_none, indent=4)
-        self.message_streamer.add_message("llm_raw_response",
-                                          printable_response,
-                                          visible=False,
-                                          context=False)
-
-        # parsed_response = self.response_manager.parse_response(model_response, self.animation_manager.get_response_object())
-        # assistant_response = parsed_response.get("visible_answer", "") or ""
-        assistant_response = printable_response
-
-        # Add this trimmed short response to the context for better understanding.
-        # assistant_response + " The animation was trimmed out"
-        # assistant_response + " The animation was trimmed out"
         self.message_streamer.add_message("assistant",
-                                          assistant_response,
+                                          model_response.reasoning,
                                           visible=True,
                                           context=True)
+        system_responses.append(("assistant", model_response.reasoning))
 
-        system_responses.append(("assistant", assistant_response))
+        # Execute actions and collect results
+        action_results = []
+        auto_continue = False
 
-        act_on_response_msg = self.act_on_response(model_response,
-                                                   printable_response)
-        self.message_streamer.add_message("system_output",
-                                          act_on_response_msg,
-                                          visible=True,
-                                          context=False)
+        for action in model_response.actions:
+            result = self.action_registry.execute_action(
+                action.name, action.params)
 
-        if act_on_response_msg:
-            system_responses.append(("system", act_on_response_msg))
+            if result["status"] == "error":
+                error_msg = f"Error executing action {action.name}: {result['message']}"
+                self.message_streamer.add_message("system",
+                                                  error_msg,
+                                                  visible=True,
+                                                  context=False)
+                system_responses.append(("system", error_msg))
+                # Add error result to context
+                action_results.append({
+                    "action": action.name,
+                    "status": "error",
+                    "error": result["message"]
+                })
+            else:
+                # Update wait_for_save_approval based on requires_confirmation
+                self.wait_for_save_approval = result.get(
+                    "requires_confirmation", False)
+
+                # Store temp_path if this is an UpdateAnimationAction
+                if action.name == "update_animation" and "temp_path" in result:
+                    self.temp_animation_path = result["temp_path"]
+
+                # All LLM responses (including action messages) should use assistant tag
+                self.message_streamer.add_message("assistant",
+                                                  result["message"],
+                                                  visible=True,
+                                                  context=True)
+                system_responses.append(("assistant", result["message"]))
+
+                # Add successful result to context and show data to user if present
+                action_result = {
+                    "action": action.name,
+                    "status": "success",
+                    "message": result["message"]
+                }
+                if "data" in result:
+                    action_result["data"] = result["data"]
+                    # Show the data to the user in a readable format
+                    data_msg = f"Action {action.name}, returned value: {json.dumps(result['data'], indent=2)}"
+                    self.message_streamer.add_message("assistant",
+                                                      data_msg,
+                                                      visible=True,
+                                                      context=True)
+                    system_responses.append(("assistant", data_msg))
+
+                # Check if this action wants immediate response
+                params_dict = action.params.model_dump() if hasattr(
+                    action.params, 'model_dump') else action.params
+                if params_dict.get("immediate_response",
+                                   False):  # Default to False - wait for user
+                    auto_continue = True
+                    self.message_streamer.add_message(
+                        "system",
+                        "Auto-continuing with action results",
+                        visible=True,
+                        context=True)
+                    system_responses.append(
+                        ("system", "Auto-continuing with action results"))
+
+                action_results.append(action_result)
+
+        # Add action results to context for the LLM
+        if action_results:
+            results_str = json.dumps(action_results, indent=2)
+            self.message_streamer.add_message(
+                "action_results",
+                f"Action Results:\n{results_str}",
+                visible=True,
+                context=True)
+
+            # If any action had immediate_response=True, send all results back to LLM
+            if auto_continue:
+                system_responses.append(("auto_continue", results_str))
+            # else:
+            #     self.message_streamer.add_message(
+            #         "system",
+            #         "Waiting for user response...",
+            #         visible=True,
+            #         context=False)
+            #     system_responses.append(
+            #         ("system", "Waiting for user response..."))
 
         return system_responses
 
-    def act_on_response(self, model_response, printable_response):
-        output = ""
+    # def act_on_response(self, model_response, printable_response):
+    #     output = ""
 
-        try:
-            if model_response:
-                # Use `exclude_none=True` to remove null fields from the animation JSON
-                animation_str = json.dumps(
-                    model_response,
-                    indent=4,
-                    default=lambda o: o.model_dump(exclude_none=True))
+    #     try:
+    #         if model_response:
+    #             # Use `exclude_none=True` to remove null fields from the animation JSON
+    #             animation_str = json.dumps(
+    #                 model_response,
+    #                 indent=4,
+    #                 default=lambda o: o.model_dump(exclude_none=True))
 
-                # Save the animation sequence to a temporary file
-                self.temp_animation_path = self.animation_manager.save_tmp_animation(
-                    animation_str)
-                self.logger.info(
-                    f"Generated {self.temp_animation_path} for the user's observation."
-                )
+    #             # Save the animation sequence to a temporary file
+    #             self.temp_animation_path = self.animation_manager.save_tmp_animation(
+    #                 animation_str)
+    #             self.logger.info(
+    #                 f"Generated {self.temp_animation_path} for the user's observation."
+    #             )
 
-                output += f"Animation sequence generated and saved to:\n"
-                output += f"{self.temp_animation_path}\n"
-                output += "Do you want me to save a snapshot to the sequence manager? (y/n)\n"
-                self.wait_for_response = True
+    #             output += f"Animation sequence generated and saved to:\n"
+    #             output += f"{self.temp_animation_path}\n"
+    #             output += "Do you want me to save a snapshot to the sequence manager? (y/n)\n"
+    #             self.wait_for_save_approval = True
 
-                # Auto-render the animation for preview if auto_render is enabled in the config
-                if self.config.get("auto_render", False):
-                    animation_dict = json.loads(animation_str)
-                    render_result = self.render_preview(animation_dict)
-                    if "Error" in render_result:
-                        output += f"{render_result}\nAnimation was not rendered for preview.\n"
-                    else:
-                        output += f"{render_result}\n"
+    #             # Auto-render the animation for preview if auto_render is enabled in the config
+    #             if self.config.get("auto_render", False):
+    #                 animation_dict = json.loads(animation_str)
+    #                 render_result = self.render_preview(animation_dict)
+    #                 if "Error" in render_result:
+    #                     output += f"{render_result}\nAnimation was not rendered for preview.\n"
+    #                 else:
+    #                     output += f"{render_result}\n"
 
-        except Exception as e:
-            self.logger.error(
-                f"Error processing response and rendering animation: {e}")
-            output += f"Error processing response and rendering animation: {e}\n"
+    #     except Exception as e:
+    #         self.logger.error(
+    #             f"Error processing response and rendering animation: {e}")
+    #         output += f"Error processing response and rendering animation: {e}\n"
 
-        return output
+    #     return output
 
     def handle_user_approval(self, user_input):
         output = ""
@@ -395,12 +478,12 @@ class LogicPlusPlus:
                     )
                     output += f"Error saving animation: {e}\n"
             else:
-                output += "No pending animation to save.\n"
+                output += "No pending animation to save. Should not happen. Please report this bug.\n"
                 self.logger.warning(
                     "User approved, but no temporary animation path was set.")
 
             self.temp_animation_path = None
-            self.wait_for_response = False
+            self.wait_for_save_approval = False
             self.logger.info("User approval received.")
             return output
 
@@ -416,7 +499,7 @@ class LogicPlusPlus:
                 self.logger.warning(
                     "User discarded, but no temporary animation path was set.")
 
-            self.wait_for_response = False
+            self.wait_for_save_approval = False
             return output
 
         self.logger.warning(
@@ -451,34 +534,26 @@ class LogicPlusPlus:
                     "No animation sequence available to render.")
                 return "No animation sequence available to render."
 
+            # Get the current step number
+            current_step = len(self.animation_manager.sequence_manager.steps)
+
             animation_json = json.loads(latest_sequence)
             self.animation_manager.render(animation_json)
-            self.logger.info("Animation rendered successfully.")
-            return "Animation rendered successfully."
+            self.logger.info(
+                f"Animation step {current_step} rendered successfully.")
+            return f"Animation step {current_step} rendered successfully."
         except Exception as e:
             self.logger.error(f"Error rendering animation: {e}")
             return f"Error rendering animation: {e}"
 
-    def render_preview(self, animation_json):
-        """Render a preview of the provided animation JSON."""
-        try:
-            if not animation_json:
-                self.logger.warning("No animation JSON provided for preview.")
-                return "No animation JSON provided for preview."
-
-            self.animation_manager.render(animation_json)
-            self.logger.info("Animation preview rendered successfully.")
-            return "Animation preview rendered successfully."
-        except Exception as e:
-            self.logger.error(f"Error rendering animation preview: {e}")
-            return f"Error rendering animation preview: {e}"
-
     def stop(self):
-        """Stop the current animation rendering process."""
+        """Stop the current animation rendering."""
         try:
-            self.animation_manager.stop_rendering()
-            self.logger.info("Animation rendering stopped successfully.")
-            return "Animation rendering stopped successfully."
+            if self.animation_manager.renderer:
+                self.animation_manager.renderer.stop()
+                return "Animation rendering stopped."
+            else:
+                return "No renderer available to stop."
         except Exception as e:
             self.logger.error(f"Error stopping animation rendering: {e}")
             return f"Error stopping animation rendering: {e}"
