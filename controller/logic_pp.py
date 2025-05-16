@@ -293,6 +293,7 @@ class LogicPlusPlus:
                                           context=True)
 
         messages = self.formatter.build_messages()
+        auto_continue = False
         try:
             model_response = backend.generate_response(messages)
         except Exception as e:
@@ -304,101 +305,113 @@ class LogicPlusPlus:
             system_responses.append(("system", error_msg))
             return system_responses
 
+        # Display the LLM's reasoning about the chosen action and overall strategy
         self.message_streamer.add_message("assistant",
+                                          "Reasoning:\n" +
                                           model_response.reasoning,
                                           visible=True,
                                           context=True)
         system_responses.append(("assistant", model_response.reasoning))
 
-        # Execute actions and collect results
-        action_results = []
-        auto_continue = False
+        # Show the action plan if provided
+        if model_response.actions_plan:
+            message = f"Actions plan:\n"
+            message += f"{model_response.actions_plan}\n"
+            self.message_streamer.add_message("assistant",
+                                              message,
+                                              visible=True,
+                                              context=True)
+            system_responses.append(("assistant", message))
 
-        for action in model_response.actions:
-            result = self.action_registry.execute_action(
-                action.name, action.params)
+        if not model_response.action:
+            message = f"No action to execute.\n"
+            self.message_streamer.add_message("system",
+                                              message,
+                                              visible=True,
+                                              context=True)
+            system_responses.append(("system", message))
+            return system_responses
 
-            if result["status"] == "error":
-                error_msg = f"Error executing action {action.name}: {result['message']}"
-                self.message_streamer.add_message("system",
-                                                  error_msg,
-                                                  visible=True,
-                                                  context=False)
-                system_responses.append(("system", error_msg))
-                # Add error result to context
-                action_results.append({
-                    "action": action.name,
-                    "status": "error",
-                    "error": result["message"]
-                })
-            else:
-                # Update wait_for_save_approval based on requires_confirmation
-                self.wait_for_save_approval = result.get(
-                    "requires_confirmation", False)
+        message = f"I will execute the action {model_response.action.name} with the following parameters:\n"
+        message += f"{model_response.action.params}\n"
 
-                # Store temp_path if this is an UpdateAnimationAction
-                if action.name == "update_animation" and "temp_path" in result:
-                    self.temp_animation_path = result["temp_path"]
+        self.message_streamer.add_message("assistant",
+                                          message,
+                                          visible=True,
+                                          context=True)
+        system_responses.append(("assistant", message))
 
-                # All LLM responses (including action messages) should use assistant tag
+        # Execute single action for this turn and handle its result
+        result = self.action_registry.execute_action(
+            model_response.action.name, model_response.action.params)
+
+        if result["status"] == "error":
+            error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
+            self.message_streamer.add_message("system",
+                                              error_msg,
+                                              visible=True,
+                                              context=False)
+            system_responses.append(("system", error_msg))
+            # Add error result to context
+            action_result = {
+                "action": model_response.action.name,
+                "status": "error",
+                "error": result["message"]
+            }
+        else:
+            # Handle successful action execution and prepare response
+            self.wait_for_save_approval = result.get("requires_confirmation",
+                                                     False)
+
+            if model_response.action.name == "update_animation" and "temp_path" in result:
+                self.temp_animation_path = result["temp_path"]
+
+            message = f"The result of the action {model_response.action.name} is:\n"
+            message += f"{result['message']}\n"
+            self.message_streamer.add_message("assistant",
+                                              message,
+                                              visible=True,
+                                              context=True)
+            system_responses.append(("assistant", message))
+
+            action_result = {
+                "action": model_response.action.name,
+                "status": "success",
+                "message": result["message"]
+            }
+            if "data" in result:
+                action_result["data"] = result["data"]
+                data_msg = f"Action data {model_response.action.name}, returned value: {json.dumps(result['data'], indent=2)}"
                 self.message_streamer.add_message("assistant",
-                                                  result["message"],
+                                                  data_msg,
                                                   visible=True,
                                                   context=True)
-                system_responses.append(("assistant", result["message"]))
+                system_responses.append(("assistant", data_msg))
 
-                # Add successful result to context and show data to user if present
-                action_result = {
-                    "action": action.name,
-                    "status": "success",
-                    "message": result["message"]
-                }
-                if "data" in result:
-                    action_result["data"] = result["data"]
-                    # Show the data to the user in a readable format
-                    data_msg = f"Action {action.name}, returned value: {json.dumps(result['data'], indent=2)}"
-                    self.message_streamer.add_message("assistant",
-                                                      data_msg,
-                                                      visible=True,
-                                                      context=True)
-                    system_responses.append(("assistant", data_msg))
+            # Check if immediate response is needed for this action type
+            params_dict = model_response.action.params.model_dump() if hasattr(
+                model_response.action.params,
+                'model_dump') else model_response.action.params
 
-                # Check if this action wants immediate response
-                params_dict = action.params.model_dump() if hasattr(
-                    action.params, 'model_dump') else action.params
-                if params_dict.get("immediate_response",
-                                   False):  # Default to False - wait for user
-                    auto_continue = True
-                    self.message_streamer.add_message(
-                        "system",
-                        "Auto-continuing with action results",
-                        visible=True,
-                        context=True)
-                    system_responses.append(
-                        ("system", "Auto-continuing with action results"))
+            if params_dict.get("immediate_response", False):
+                auto_continue = True
+                self.message_streamer.add_message(
+                    "system",
+                    "Auto-continuing with action result",
+                    visible=True,
+                    context=True)
+                system_responses.append(
+                    ("system", "Auto-continuing with action result"))
 
-                action_results.append(action_result)
+        # Store action result in context for next LLM turn
+        results_str = json.dumps(action_result, indent=2)
+        self.message_streamer.add_message("action_results",
+                                          f"Action Result:\n{results_str}",
+                                          visible=True,
+                                          context=True)
 
-        # Add action results to context for the LLM
-        if action_results:
-            results_str = json.dumps(action_results, indent=2)
-            self.message_streamer.add_message(
-                "action_results",
-                f"Action Results:\n{results_str}",
-                visible=True,
-                context=True)
-
-            # If any action had immediate_response=True, send all results back to LLM
-            if auto_continue:
-                system_responses.append(("auto_continue", results_str))
-            # else:
-            #     self.message_streamer.add_message(
-            #         "system",
-            #         "Waiting for user response...",
-            #         visible=True,
-            #         context=False)
-            #     system_responses.append(
-            #         ("system", "Waiting for user response..."))
+        if auto_continue:
+            system_responses.append(("auto_continue", results_str))
 
         return system_responses
 

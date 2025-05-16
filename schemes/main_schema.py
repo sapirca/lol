@@ -1,12 +1,15 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator, ValidationError
 from typing import List, Literal, Union, Optional, Dict, Any, Annotated, TypeVar, Generic
 from typing_extensions import TypeAlias
-from pydantic import root_validator
+import json  # Import the json module
+
+# Generic type for framework-specific animation schema
+T = TypeVar('T', bound=BaseModel)
 
 
 # Action parameter models
-class UpdateAnimationParams(BaseModel):
-    animation_sequence: Any = Field(
+class UpdateAnimationParams(BaseModel, Generic[T]):
+    animation_sequence: T = Field(
         description=
         "The animation data to be processed - will be validated against framework-specific schema."
     )
@@ -62,9 +65,9 @@ class ResponseToUserParams(BaseModel):
 
 
 # Action models with specific parameter types
-class UpdateAnimationAction(BaseModel):
+class UpdateAnimationAction(BaseModel, Generic[T]):
     name: Literal["update_animation"]
-    params: UpdateAnimationParams
+    params: UpdateAnimationParams[T]
 
 
 class GetAnimationAction(BaseModel):
@@ -88,16 +91,15 @@ class ResponseToUserAction(BaseModel):
 
 
 # Union type for all possible actions
-ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction,
+ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, GetMemoryAction,
                                         GetMusicStructureAction,
                                         ResponseToUserAction],
                                   Field(discriminator='name')]
 
-# Generic type for framework-specific animation schema
-T = TypeVar('T', bound=BaseModel)
 
-
+# Updated schema to support single action execution with action planning
+# This allows for more controlled execution while maintaining a clear plan of future actions
 class MainSchema(BaseModel, Generic[T]):
     """
     Main schema that combines action handling with framework-specific animation schemas.
@@ -105,78 +107,40 @@ class MainSchema(BaseModel, Generic[T]):
     """
     reasoning: str = Field(
         description=
-        "A brief explanation of the reasoning behind the chosen actions. Make sure to specify which actions were chosen and why."
+        "A brief explanation of the reasoning behind the chosen action and the overall plan. High level plan of the animation journey. Be concise and to the point."
     )
-    actions: List[ActionType] = Field(
-        description="List of actions to be executed in sequence",
-        default_factory=list)
-    user_instruction: str = Field(
+    actions_plan: str = Field(
         description=
-        "The instruction that was given to the model to generate this response."
-    )
-    animation_data: Optional[BaseModel] = Field(
-        default=None,
-        description=
-        "Framework-specific animation data that will be validated against the framework's schema"
-    )
+        "Write in natural language the planned actions, in bullet points, to be executed in sequence in future turns. This plan can be revised in subsequent turns. Only mention which actions and with what order. No need to explain why. You explain why in the reasoning field.",
+        default="")
+    action: ActionType = Field(
+        description="The single action to be executed in this turn. "
+        "This field now supports both direct JSON objects and stringified JSON objects. "
+        "If a string is provided, it will be parsed as JSON.")
 
-    # def validate_action_params(
-    #         self, action: ActionType) -> Optional[ResponseToUserAction]:
-    #     """
-    #     Validates the parameters of an action and returns a ResponseToUserAction if parameters are missing.
-    #     Returns None if all required parameters are present.
-    #     """
-    #     if action.name == "get_animation":
-    #         if action.params.step_number < 0:
-    #             return ResponseToUserAction(
-    #                 name="response_to_user",
-    #                 params=ResponseToUserParams(
-    #                     message="Please provide a valid step number (>= 0)",
-    #                     message_type="clarification",
-    #                     requires_response=True,
-    #                     immediate_response=False))
-    #     elif action.name == "get_music_structure":
-    #         if not action.params.song_name:
-    #             return ResponseToUserAction(
-    #                 name="response_to_user",
-    #                 params=ResponseToUserParams(
-    #                     message="Please provide the song name",
-    #                     message_type="clarification",
-    #                     requires_response=True,
-    #                     immediate_response=False))
-    #     return None
-
-    # @root_validator(pre=True)
-    # def validate_actions(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-    #     """
-    #     Validates all actions and replaces any action with missing parameters with a ResponseToUserAction.
-    #     """
-    #     if "actions" in values:
-    #         validated_actions = []
-    #         for action in values["actions"]:
-    #             if isinstance(action, dict):
-    #                 action = ActionType.parse_obj(action)
-    #             clarification = cls.validate_action_params(action)
-    #             if clarification:
-    #                 validated_actions.append(clarification)
-    #             else:
-    #                 validated_actions.append(action)
-    #         values["actions"] = validated_actions
-    #     return values
+    @validator('action', pre=True)
+    def validate_action(cls, v):
+        # If the input for 'action' is a string, attempt to parse it as JSON.
+        # This allows the schema to accept stringified JSON from the LLM.
+        if isinstance(v, str):
+            try:
+                parsed_v = json.loads(v)
+                return parsed_v
+            except json.JSONDecodeError as e:
+                raise ValueError(
+                    f"Action field is a string but not valid JSON: {e}") from e
+        # If it's not a string (e.g., already a dictionary/object), return it as is.
+        # Pydantic will then proceed with its normal validation against ActionType.
+        return v
 
     @classmethod
     def with_framework_schema(
             cls, framework_schema: type[BaseModel]) -> type['MainSchema']:
         """
-        Creates a new MainSchema class with the framework's schema as the animation_data type.
-        This ensures proper validation of the animation data against the framework's schema.
+        Creates a new MainSchema class with the framework's schema.
         """
 
-        class FrameworkMainSchema(cls):
-            animation_data: Optional[framework_schema] = Field(
-                default=None,
-                description=
-                f"Animation data validated against {framework_schema.__name__}"
-            )
+        class FrameworkMainSchema(cls[framework_schema]):
+            pass
 
         return FrameworkMainSchema
