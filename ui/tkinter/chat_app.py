@@ -447,7 +447,7 @@ def populate_snapshot_list():
             if os.path.isdir(os.path.join(SNAPSHOTS_DIR, f))
         ]
 
-    canvas = tk.Canvas(chat_list_frame)
+    canvas = tk.Canvas(chat_list_frame, width=280)  # Set explicit canvas width
     scrollbar_y = tk.Scrollbar(chat_list_frame,
                                orient="vertical",
                                command=canvas.yview)
@@ -455,35 +455,47 @@ def populate_snapshot_list():
     canvas.config(yscrollcommand=scrollbar_y.set)
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-    buttons_frame = tk.Frame(canvas)
-    canvas.create_window((0, 0), window=buttons_frame, anchor=tk.NW)
+    buttons_frame = tk.Frame(canvas, width=280)  # Set explicit frame width
+    canvas.create_window((0, 0), window=buttons_frame, anchor=tk.NW,
+                         width=280)  # Set explicit window width
 
     global button_mapping
     button_mapping = {}
 
-    max_width = 30  # Default value, will be updated after the first button is created
-
     for snapshot_folder in snapshot_folders:
-        formatted_text = format_button_text(snapshot_folder, max_width)
-        snapshot_button = tk.Button(buttons_frame,
-                                    text=formatted_text,
-                                    command=lambda folder=snapshot_folder:
-                                    save_and_load_chat_content(folder))
-        snapshot_button.pack(fill=tk.X, pady=2)
+        snapshot_button = tk.Button(
+            buttons_frame,
+            text=snapshot_folder,
+            command=lambda folder=snapshot_folder: save_and_load_chat_content(
+                folder),
+            wraplength=260,  # Allow text wrapping
+            justify=tk.CENTER,  # Center the wrapped text
+            anchor=tk.CENTER)  # Center the text in button
+        snapshot_button.pack(fill=tk.X, pady=2, padx=2)
         button_mapping[snapshot_folder] = snapshot_button
 
-        # Update max_width based on the actual button width
-        max_width = max(max_width, snapshot_button.winfo_reqwidth() // 10)
-
-    untitled_button = tk.Button(buttons_frame,
-                                text="untitled",
-                                command=save_and_load_untitled_chat)
-    untitled_button.pack(fill=tk.X, pady=2)
+    untitled_button = tk.Button(
+        buttons_frame,
+        text="untitled",
+        command=save_and_load_untitled_chat,
+        wraplength=260,  # Allow text wrapping
+        justify=tk.CENTER,  # Center the wrapped text
+        anchor=tk.CENTER)  # Center the text in button
+    untitled_button.pack(fill=tk.X, pady=2, padx=2)
     button_mapping["untitled"] = untitled_button
 
     buttons_frame.bind(
         "<Configure>",
         lambda e: canvas.config(scrollregion=canvas.bbox("all")))
+
+    # Update buttons frame width when window is resized
+    def update_buttons_width(event):
+        canvas_width = event.width
+        canvas.itemconfig(canvas.find_withtag("all")[0], width=canvas_width)
+        for button in buttons_frame.winfo_children():
+            button.config(wraplength=canvas_width - 20)
+
+    canvas.bind("<Configure>", update_buttons_width)
 
     buttons = buttons_frame.winfo_children()
     if buttons:
@@ -585,7 +597,7 @@ paned_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the left chat list
 chat_list_frame = tk.Frame(paned_window, bg="#2c2c2c")
-paned_window.add(chat_list_frame, minsize=200, width=210)
+paned_window.add(chat_list_frame, minsize=300, width=300)
 
 chat_frame = tk.Frame(paned_window)
 paned_window.add(chat_frame, minsize=400)
