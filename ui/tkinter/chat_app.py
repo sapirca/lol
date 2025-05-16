@@ -438,6 +438,7 @@ def _load_untitled_chat():
     print(f"Untitled chat session ensured")
     active_chat_snapshot = "untitled"
     update_active_chat_label("untitled")
+    update_animation_data()
 
 
 def format_button_text(text, max_width):
