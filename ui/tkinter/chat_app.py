@@ -176,7 +176,7 @@ def update_active_chat_label(button_name):
                       ) if controller and controller.message_streamer else 0
     if button_name == "untitled":
         save_status_label.config(
-            text=f"Started new chat session (Step {step_number})")
+            text=f"Started new chat session (msg no {step_number})")
     else:
         save_status_label.config(
             text=
@@ -649,7 +649,7 @@ def update_animation_data():
 # Create the main window
 root = tk.Tk()
 root.title("Chat App")
-root.geometry("1200x500")  # Increased width to accommodate new panel
+root.geometry("1600x800")  # Increased width and height for better visibility
 
 # Create a PanedWindow to make the divider adjustable
 paned_window = tk.PanedWindow(root, orient=tk.HORIZONTAL)
@@ -657,15 +657,17 @@ paned_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the left chat list
 chat_list_frame = tk.Frame(paned_window, bg="#2c2c2c")
-paned_window.add(chat_list_frame, minsize=300, width=300)
+paned_window.add(chat_list_frame, minsize=250,
+                 width=250)  # Slightly reduced width for chat list
 
 # Create a frame for the middle chat area
 chat_frame = tk.Frame(paned_window)
-paned_window.add(chat_frame, minsize=400)
+paned_window.add(chat_frame, minsize=650)  # Increased minsize for chat area
 
 # Create a frame for the right animation panel
 animation_frame = tk.Frame(paned_window, bg="#2c2c2c")
-paned_window.add(animation_frame, minsize=400, width=400)  # Increased width
+paned_window.add(animation_frame, minsize=500,
+                 width=600)  # Increased width for animation panel
 
 # Create a frame for the top bar
 top_bar = tk.Frame(chat_frame, bg="#2c2c2c")
@@ -748,13 +750,14 @@ render_button = tk.Button(animation_header,
 render_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a scrolled text widget for the animation data
-animation_window = scrolledtext.ScrolledText(animation_frame,
-                                             wrap=tk.WORD,
-                                             width=40,
-                                             height=20,
-                                             bg="#2c2c2c",
-                                             fg="#ffffff",
-                                             font=(CHAT_FONT, 12))
+animation_window = scrolledtext.ScrolledText(
+    animation_frame,
+    wrap=tk.WORD,
+    width=60,  # Increased width
+    height=30,  # Increased height
+    bg="#2c2c2c",
+    fg="#ffffff",
+    font=(CHAT_FONT, 12))
 animation_window.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
 # Add zoom capability to animation window
