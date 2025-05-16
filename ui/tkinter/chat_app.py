@@ -106,7 +106,7 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
         chat_window.insert(tk.END, text)
         end = chat_window.index(tk.INSERT)
         chat_window.tag_add(link_tag, start, end)
-        chat_window.tag_config(link_tag, foreground="light blue", underline=1)
+        chat_window.tag_config(link_tag, foreground="#8BE9FD", underline=1)
         chat_window.tag_bind(link_tag, "<Button-1>",
                              lambda e: open_file_in_editor(e, file_path))
 
@@ -137,19 +137,22 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
 
     # Style the labels
     if sender.lower() == "system":
-        chat_window.tag_configure(label_tag,
-                                  foreground="lime",
-                                  justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure(
+            label_tag,
+            foreground="#8BE9FD",  # Light cyan (keeping this)
+            justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
     elif sender.lower() == "assistant":
-        chat_window.tag_configure(label_tag,
-                                  foreground="yellow",
-                                  justify=SYSTEM_ALIGNMENT)
+        chat_window.tag_configure(
+            label_tag,
+            foreground="#FFB86C",  # Soft orange
+            justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
     elif sender.lower() == "you":
-        chat_window.tag_configure(label_tag,
-                                  foreground="hot pink",
-                                  justify=USER_ALIGNMENT)
+        chat_window.tag_configure(
+            label_tag,
+            foreground="#9580FF",  # Soft purple
+            justify=USER_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
 
     # Automatically scroll to the bottom
@@ -213,6 +216,9 @@ def run_backend_communication(user_message):
                 root.after(
                     0, lambda t=tag, m=system_reply: update_chat_window(t, m))
 
+        # Update animation data after processing replies
+        root.after(0, update_animation_data)
+
         if auto_continue:
             root.after(0, lambda: handle_auto_continue(auto_continue_value))
         else:
@@ -226,6 +232,7 @@ def run_backend_communication(user_message):
 def update_chat_window(tag, message):
     """Updates the chat window with a new message."""
     append_message_to_window(tag.capitalize(), message)
+    chat_window.see(tk.END)  # Make sure to scroll to bottom after each message
 
 
 def enable_ui():
@@ -364,6 +371,7 @@ def _load_chat(a_snapshot):
 
         print_system_info()
         update_active_chat_label(a_snapshot)
+        update_animation_data()  # Add this line to update animation data
 
         # Show success message
         if a_snapshot == "untitled":
@@ -586,10 +594,54 @@ def save_and_load_chat_content(target_snapshot):
         _load_chat(target_snapshot)
 
 
+def update_animation_data():
+    """Updates the animation data display with the latest animation information."""
+    if not controller:
+        animation_label.config(text="Animation Data - No active session")
+        animation_window.config(state=tk.NORMAL)
+        animation_window.delete(1.0, tk.END)
+        animation_window.insert(
+            tk.END,
+            "No active chat session.\nPlease start a chat to view animation data."
+        )
+        animation_window.config(state=tk.DISABLED)
+        return
+
+    try:
+        step_number = len(controller.message_streamer.messages
+                          ) if controller.message_streamer else 0
+        animation_label.config(text=f"Animation Data - Step {step_number}")
+
+        animation_window.config(state=tk.NORMAL)
+        animation_window.delete(1.0, tk.END)
+
+        if hasattr(controller,
+                   'animation_manager') and controller.animation_manager:
+            animation_data = controller.animation_manager.get_latest_sequence()
+            if animation_data:
+                animation_window.insert(tk.END, animation_data)
+            else:
+                animation_window.insert(
+                    tk.END,
+                    "No animation data available for the current step.")
+        else:
+            animation_window.insert(tk.END,
+                                    "Animation manager not initialized.")
+
+        animation_window.config(state=tk.DISABLED)
+        animation_window.see(tk.END)  # Auto scroll to bottom
+    except Exception as e:
+        animation_window.config(state=tk.NORMAL)
+        animation_window.delete(1.0, tk.END)
+        animation_window.insert(tk.END,
+                                f"Error fetching animation data: {str(e)}")
+        animation_window.config(state=tk.DISABLED)
+
+
 # Create the main window
 root = tk.Tk()
 root.title("Chat App")
-root.geometry("1000x500")
+root.geometry("1200x500")  # Increased width to accommodate new panel
 
 # Create a PanedWindow to make the divider adjustable
 paned_window = tk.PanedWindow(root, orient=tk.HORIZONTAL)
@@ -599,38 +651,63 @@ paned_window.pack(fill=tk.BOTH, expand=True)
 chat_list_frame = tk.Frame(paned_window, bg="#2c2c2c")
 paned_window.add(chat_list_frame, minsize=300, width=300)
 
+# Create a frame for the middle chat area
 chat_frame = tk.Frame(paned_window)
 paned_window.add(chat_frame, minsize=400)
+
+# Create a frame for the right animation panel
+animation_frame = tk.Frame(paned_window, bg="#2c2c2c")
+paned_window.add(animation_frame, minsize=400, width=400)  # Increased width
 
 # Create a frame for the top bar
 top_bar = tk.Frame(chat_frame, bg="#2c2c2c")
 top_bar.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
+# Create a frame for the labels (title and status) on the left
+labels_frame = tk.Frame(top_bar, bg="#2c2c2c")
+labels_frame.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
 # Add a label to display the active chat name
-active_chat_label = tk.Label(top_bar,
+active_chat_label = tk.Label(labels_frame,
                              text="Active Chat: None",
                              fg="#ffffff",
                              bg="#2c2c2c",
                              anchor="w",
                              font=(CHAT_FONT, 12))
-active_chat_label.pack(side=tk.LEFT, padx=5)
+active_chat_label.pack(side=tk.TOP, fill=tk.X, padx=5)
 
 # Add a save status label for feedback with text wrapping
-save_status_label = tk.Label(top_bar,
+save_status_label = tk.Label(labels_frame,
                              text="",
                              fg="light gray",
                              bg="#2c2c2c",
                              font=(CHAT_FONT, 10),
                              anchor="w",
-                             wraplength=200)  # Wrap text after 200 pixels
-save_status_label.pack(side=tk.LEFT, padx=10)
+                             wraplength=600)  # Increased wraplength
+save_status_label.pack(side=tk.TOP, fill=tk.X, padx=5)
+
+# Create a frame for the buttons on the right
+buttons_frame = tk.Frame(top_bar, bg="#2c2c2c")
+buttons_frame.pack(side=tk.RIGHT)
 
 # Add a save button for snapshots
-save_button = tk.Button(top_bar, text="Save", command=save_chat)
+save_button = tk.Button(buttons_frame, text="Save", command=save_chat)
 save_button.pack(side=tk.RIGHT, padx=5)
 
+# Create a header frame for the animation panel
+animation_header = tk.Frame(animation_frame, bg="#2c2c2c")
+animation_header.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
-# Add a stop button to the top bar
+# Add a label for the animation panel
+animation_label = tk.Label(animation_header,
+                           text="Animation Data",
+                           fg="#ffffff",
+                           bg="#2c2c2c",
+                           font=(CHAT_FONT, 12))
+animation_label.pack(side=tk.LEFT, padx=5)
+
+
+# Define handler functions for the buttons
 def handle_stop():
     original_state = chat_window.cget("state")
     chat_window.config(state=tk.NORMAL)
@@ -642,11 +719,6 @@ def handle_stop():
     chat_window.config(state=original_state)
 
 
-stop_button = tk.Button(top_bar, text="Stop", command=handle_stop)
-stop_button.pack(side=tk.RIGHT, padx=5)
-
-
-# Add a render button to the top bar
 def handle_render():
     original_state = chat_window.cget("state")
     chat_window.config(state=tk.NORMAL)
@@ -658,8 +730,32 @@ def handle_render():
     chat_window.config(state=original_state)
 
 
-render_button = tk.Button(top_bar, text="Render", command=handle_render)
+# Add render and stop buttons to animation header
+stop_button = tk.Button(animation_header, text="Stop", command=handle_stop)
+stop_button.pack(side=tk.RIGHT, padx=5)
+
+render_button = tk.Button(animation_header,
+                          text="Render",
+                          command=handle_render)
 render_button.pack(side=tk.RIGHT, padx=5)
+
+# Create a scrolled text widget for the animation data
+animation_window = scrolledtext.ScrolledText(animation_frame,
+                                             wrap=tk.WORD,
+                                             width=40,
+                                             height=20,
+                                             bg="#2c2c2c",
+                                             fg="#ffffff",
+                                             font=(CHAT_FONT, 12))
+animation_window.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+# Add zoom capability to animation window
+animation_window.bind("<Control-MouseWheel>",
+                      lambda e: zoom(e, animation_window))
+animation_window.bind("<Control-Button-4>",
+                      lambda e: zoom(e, animation_window))
+animation_window.bind("<Control-Button-5>",
+                      lambda e: zoom(e, animation_window))
 
 # Create a scrolled text widget for the chat window
 chat_window = scrolledtext.ScrolledText(chat_frame,
