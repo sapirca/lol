@@ -170,6 +170,19 @@ def update_active_chat_label(button_name):
     framework_info = controller.selected_framework if controller else "N/A"
     active_chat_label.config(
         text=f"{backend_info} | {framework_info} | {button_name}")
+
+    # Update status with step number
+    step_number = len(controller.message_streamer.messages
+                      ) if controller and controller.message_streamer else 0
+    if button_name == "untitled":
+        save_status_label.config(
+            text=f"Started new chat session (Step {step_number})")
+    else:
+        save_status_label.config(
+            text=
+            f"Successfully loaded snapshot: {button_name} (Step {step_number})"
+        )
+
     set_active_chat_button(button)
 
 
@@ -371,16 +384,7 @@ def _load_chat(a_snapshot):
 
         print_system_info()
         update_active_chat_label(a_snapshot)
-        update_animation_data()  # Add this line to update animation data
-
-        # Show success message
-        if a_snapshot == "untitled":
-            save_status_label.config(text="Started new chat session",
-                                     fg="light gray")
-        else:
-            save_status_label.config(
-                text=f"Successfully loaded snapshot: {a_snapshot}",
-                fg="light gray")
+        update_animation_data()
 
     except Exception as e:
         error_msg = f"Error loading snapshot {a_snapshot}: {str(e)}"
@@ -596,45 +600,48 @@ def save_and_load_chat_content(target_snapshot):
 
 def update_animation_data():
     """Updates the animation data display with the latest animation information."""
+    default_message = "No animations generated yet.\nStart chatting to generate animations!"
+
     if not controller:
-        animation_label.config(text="Animation Data - No active session")
+        animation_label.config(text="Animation Data")
         animation_window.config(state=tk.NORMAL)
         animation_window.delete(1.0, tk.END)
-        animation_window.insert(
-            tk.END,
-            "No active chat session.\nPlease start a chat to view animation data."
-        )
+        animation_window.insert(tk.END, default_message)
         animation_window.config(state=tk.DISABLED)
         return
 
     try:
-        step_number = len(controller.message_streamer.messages
-                          ) if controller.message_streamer else 0
-        animation_label.config(text=f"Animation Data - Step {step_number}")
-
         animation_window.config(state=tk.NORMAL)
         animation_window.delete(1.0, tk.END)
 
         if hasattr(controller,
                    'animation_manager') and controller.animation_manager:
-            animation_data = controller.animation_manager.get_latest_sequence()
-            if animation_data:
-                animation_window.insert(tk.END, animation_data)
-            else:
-                animation_window.insert(
-                    tk.END,
-                    "No animation data available for the current step.")
+            try:
+                sequence_data = controller.animation_manager.get_latest_sequence_with_step(
+                )
+                if sequence_data:
+                    animation_data, step_number = sequence_data
+                    animation_label.config(
+                        text=f"Animation Data - Step {step_number}")
+                    animation_window.insert(tk.END, animation_data)
+                else:
+                    animation_label.config(text="Animation Data")
+                    animation_window.insert(tk.END, default_message)
+            except AttributeError:
+                # Handle the case where sequences list is not initialized
+                animation_label.config(text="Animation Data")
+                animation_window.insert(tk.END, default_message)
         else:
-            animation_window.insert(tk.END,
-                                    "Animation manager not initialized.")
+            animation_label.config(text="Animation Data")
+            animation_window.insert(tk.END, default_message)
 
         animation_window.config(state=tk.DISABLED)
         animation_window.see(tk.END)  # Auto scroll to bottom
     except Exception as e:
+        animation_label.config(text="Animation Data")
         animation_window.config(state=tk.NORMAL)
         animation_window.delete(1.0, tk.END)
-        animation_window.insert(tk.END,
-                                f"Error fetching animation data: {str(e)}")
+        animation_window.insert(tk.END, default_message)
         animation_window.config(state=tk.DISABLED)
 
 

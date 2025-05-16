@@ -6,31 +6,37 @@ from constants import ANIMATION_OUT_TEMP_DIR
 
 class Sequence(ABC):
 
-    def add_sequence(self, step_number, sequence):
-        """Add a new sequence to the manager and log the update."""
-        # TODO(sapir) this is a bag!!! It does not append in the right order ???
-        step = {"step": step_number, "sequence": sequence}
-        self.steps.append(step)
-        return f"Animation updated for step {step_number}"
+    def __init__(self):
+        self.sequences = []
+
+    def add_sequence(self, sequence):
+        """Add a new sequence to the end of the array and return the current step number."""
+        self.sequences.append(sequence)
+        return f"Animation sequence added to step {len(self.sequences)}"
 
     def get_latest_sequence(self):
         """Return the latest sequence available."""
-        latest_key_val = max(self.steps, key=lambda x: x["step"], default=None)
-        if latest_key_val:
-            return latest_key_val["sequence"]
-        else:
+        if not self.sequences:
             return None
-        # return self.steps[-1]["sequence"] if self.steps else None
+        return self.sequences[-1]
+
+    def get_latest_sequence_with_step(self):
+        """Returns tuple of (latest_sequence, current_step) or None if no sequence exists."""
+        if not self.sequences:
+            return None
+        return self.sequences[-1], len(self.sequences)
+
+    def get_current_step(self):
+        """Returns the current step number (length of sequences array)."""
+        return len(self.sequences)
 
     def get_all_sequences(self):
         """Return all sequences as a list."""
-        return [step["sequence"] for step in self.steps]
+        return self.sequences
 
     def load_sequences(self, sequences):
         """Load sequences from a list."""
-        self.steps = []
-        for i, sequence in enumerate(sequences):
-            self.steps.append({"step": i, "sequence": sequence})
+        self.sequences = sequences.copy()
 
     @abstractmethod
     def get_suffix(self):

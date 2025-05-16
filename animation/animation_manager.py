@@ -94,15 +94,23 @@ class AnimationManager:
             return None
         return f"{latest_sequence}"
 
+    def get_latest_sequence_with_step(self):
+        """Returns the latest sequence and its step number."""
+        result = self.sequence_manager.get_latest_sequence_with_step()
+        if not result:
+            return None
+        sequence, step = result
+        return f"{sequence}", step
+
     def get_all_sequences(self):
         return self.sequence_manager.get_all_sequences()
 
     def load_sequences(self, animations):
         self.sequence_manager.load_sequences(animations)
 
-    def add_sequence(self, step_number, animation_sequence):
-        return self.sequence_manager.add_sequence(step_number,
-                                                  animation_sequence)
+    def add_sequence(self, animation_sequence):
+        """Add a new sequence and return the status message."""
+        return self.sequence_manager.add_sequence(animation_sequence)
 
     def save_all_animations(self, snapshot_dir, animation_suffix):
         """Save all animations to the specified directory."""
