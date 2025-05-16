@@ -105,17 +105,18 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
 
     last_end = 0  # Initialize last_end to 0
     if tmp_animation_path:
-        file_links = re.finditer(rf"({re.escape(tmp_animation_path)}[^\s]*)",
-                                 message)
+        # Look for the path in the message, allowing for newlines and other characters around it
+        file_links = re.finditer(
+            rf".*?({re.escape(tmp_animation_path)})[^\n]*", message, re.DOTALL)
 
         for match in file_links:
-            chat_window.insert(tk.END, message[last_end:match.start()],
+            chat_window.insert(tk.END, message[last_end:match.start(1)],
                                message_tag)
 
             # Use the matched group directly as the file path
-            file_path = match.group()
+            file_path = match.group(1)
             add_link(file_path, f"link_{match.start()}", file_path)
-            last_end = match.end()
+            last_end = match.end(1)
 
     chat_window.insert(tk.END, message[last_end:], message_tag)
     chat_window.insert(tk.END, "\n\n")

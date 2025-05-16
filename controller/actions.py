@@ -43,7 +43,7 @@ class UpdateAnimationAction(Action):
         try:
             if not animation_json:
                 # self.logger.warning("No animation JSON provided for preview.")
-                return "No animation JSON provided for preview."
+                return "Error: No animation JSON provided for preview."
 
             self.animation_manager.render(animation_json)
             # self.logger.info("Animation preview rendered successfully.")
@@ -67,7 +67,7 @@ class UpdateAnimationAction(Action):
         output = {
             "status": "success",
             "message":
-            f"Animation sequence generated and saved to:\n{self.temp_animation_path}\nDo you want me to save a snapshot to the sequence manager? (y/n)",
+            f"Animation sequence generated and saved to:\n{self.temp_animation_path}\n",
             "requires_confirmation": True,
             "temp_path": self.temp_animation_path,
             "data": {
@@ -79,12 +79,9 @@ class UpdateAnimationAction(Action):
         # Auto-render if configured
         if basic_config.get("auto_render", False):
             animation_dict = json.loads(animation_str)
+            output["message"] += "Rendering animation preview..."
             render_result = self.render_preview(animation_dict)
-            if "Error" in render_result:
-                output[
-                    "message"] += f"\n{render_result}\nAnimation was not rendered for preview."
-            else:
-                output["message"] += f"\n{render_result}"
+            output["message"] += f"\n{render_result}"
 
         return output
 

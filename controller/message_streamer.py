@@ -30,7 +30,7 @@ class MessageStreamer:
         # self.msgs_full_path = os.path.join(self.snapshots_dir, MESSAGE_SNAPSHOT_FILE)
 
         self.periodic_snapshot = os.path.join(self.snapshots_dir,
-                                              "preiodic_snapshot.json")
+                                              "periodic_snapshot.json")
         self.snapshot_interval = snapshot_interval
         self._start_periodic_snapshot()
 

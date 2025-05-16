@@ -332,8 +332,11 @@ class LogicPlusPlus:
             system_responses.append(("system", message))
             return system_responses
 
-        message = f"I will execute the action {model_response.action.name} with the following parameters:\n"
-        message += f"{model_response.action.params}\n"
+        if model_response.action.name == "update_animation":
+            message = f"I will execute the action {model_response.action.name}. The animation will be saved to temporary file.\n"
+        else:
+            message = f"I will execute the action {model_response.action.name} with the following parameters:\n"
+            message += f"{model_response.action.params}\n"
 
         self.message_streamer.add_message("assistant",
                                           message,
@@ -363,16 +366,21 @@ class LogicPlusPlus:
             self.wait_for_save_approval = result.get("requires_confirmation",
                                                      False)
 
-            if model_response.action.name == "update_animation" and "temp_path" in result:
-                self.temp_animation_path = result["temp_path"]
-
-            message = f"The result of the action {model_response.action.name} is:\n"
-            message += f"{result['message']}\n"
-            self.message_streamer.add_message("assistant",
-                                              message,
-                                              visible=True,
-                                              context=True)
-            system_responses.append(("assistant", message))
+            # For update_animation action, display the message directly to preserve the temp path format
+            if model_response.action.name == "update_animation":
+                self.message_streamer.add_message("assistant",
+                                                  result['message'],
+                                                  visible=True,
+                                                  context=True)
+                system_responses.append(("assistant", result['message']))
+            else:
+                message = f"The result of the action {model_response.action.name} is:\n"
+                message += f"{result['message']}\n"
+                self.message_streamer.add_message("assistant",
+                                                  message,
+                                                  visible=True,
+                                                  context=True)
+                system_responses.append(("assistant", message))
 
             action_result = {
                 "action": model_response.action.name,
@@ -387,6 +395,15 @@ class LogicPlusPlus:
                                                   visible=True,
                                                   context=True)
                 system_responses.append(("assistant", data_msg))
+
+            if model_response.action.name == "update_animation" and "temp_path" in result:
+                self.temp_animation_path = result["temp_path"]
+                message = f"Do you want me to save a snapshot to the sequence manager? (y/n)\n"
+                self.message_streamer.add_message("system",
+                                                  message,
+                                                  visible=True,
+                                                  context=True)
+                system_responses.append(("system", message))
 
             # Check if immediate response is needed for this action type
             params_dict = model_response.action.params.model_dump() if hasattr(
