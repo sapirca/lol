@@ -165,58 +165,18 @@ class AddToMemoryAction(Action):
             }
 
 
-class GetMusicStructureAction(Action):
-
-    def __init__(self, song_provider):
-        super().__init__()
-        self.song_provider = song_provider
-
-    def validate_params(self, params: Dict[str, Any]) -> bool:
-        params_dict = self._get_params_dict(params)
-        return "song_name" in params_dict and isinstance(
-            params_dict["song_name"], str)
-
-    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        params_dict = self._get_params_dict(params)
-        try:
-            # Convert song name to lowercase for case-insensitive comparison
-            song_name = params_dict["song_name"].lower()
-            song_structure = self.song_provider.get_song_structure(song_name)
-            if song_structure:
-                return {
-                    "status": "success",
-                    "message":
-                    f"Retrieved music structure for song: {song_name}",
-                    "requires_confirmation": False,
-                    "data": {
-                        "song_name": song_name,
-                        "structure": song_structure
-                    }
-                }
-            else:
-                return {
-                    "status": "error",
-                    "message":
-                    f"No music structure found for song: {song_name}",
-                    "requires_confirmation": False
-                }
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": f"Error retrieving music structure: {str(e)}",
-                "requires_confirmation": False
-            }
-
-
-class ResponseToUserAction(Action):
+class InformUserAction(Action):
 
     def __init__(self):
         super().__init__()
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
-        return "message" in params_dict and isinstance(params_dict["message"],
-                                                       str)
+        return ("message" in params_dict
+                and isinstance(params_dict["message"], str)
+                and "message_type" in params_dict
+                and params_dict["message_type"]
+                in ["information", "answer", "error"])
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         try:
@@ -226,13 +186,47 @@ class ResponseToUserAction(Action):
                 "message": params_dict["message"],
                 "requires_confirmation": False,
                 "data": {
-                    "message": params_dict["message"]
+                    "message": params_dict["message"],
+                    "message_type": params_dict["message_type"]
                 }
             }
         except Exception as e:
             return {
                 "status": "error",
-                "message": f"Error processing response to user: {str(e)}",
+                "message": f"Error processing inform user action: {str(e)}",
+                "requires_confirmation": False
+            }
+
+
+class AskUserAction(Action):
+
+    def __init__(self):
+        super().__init__()
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("message" in params_dict
+                and isinstance(params_dict["message"], str)
+                and "message_type" in params_dict
+                and params_dict["message_type"]
+                in ["clarification", "question", "memory_suggestion"])
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            return {
+                "status": "success",
+                "message": params_dict["message"],
+                "requires_confirmation": True,  # Always requires user response
+                "data": {
+                    "message": params_dict["message"],
+                    "message_type": params_dict["message_type"]
+                }
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "message": f"Error processing ask user action: {str(e)}",
                 "requires_confirmation": False
             }
 

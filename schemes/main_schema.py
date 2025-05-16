@@ -36,16 +36,6 @@ class AddToMemoryParams(BaseModel):
         "Always False for add_to_memory as it requires user confirmation")
 
 
-class GetMusicStructureParams(BaseModel):
-    song_name: str = Field(
-        description=
-        "Name of the song to get structure for. If this parameter is missing, do not execute this action. Instead, use AskUserAction to ask the user for the song name."
-    )
-    immediate_response: Literal[True] = Field(
-        description=
-        "Always True for get_music_structure as it's a retrieval action")
-
-
 class InformUserParams(BaseModel):
     message: str = Field(description="The message to send to the user")
     message_type: Literal["information", "answer", "error"] = Field(
@@ -84,11 +74,6 @@ class AddToMemoryAction(BaseModel):
     params: AddToMemoryParams
 
 
-class GetMusicStructureAction(BaseModel):
-    name: Literal["get_music_structure"]
-    params: GetMusicStructureParams
-
-
 class InformUserAction(BaseModel):
     name: Literal["inform_user"]
     params: InformUserParams
@@ -102,7 +87,6 @@ class AskUserAction(BaseModel):
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
-                                        GetMusicStructureAction,
                                         InformUserAction, AskUserAction],
                                   Field(discriminator='name')]
 

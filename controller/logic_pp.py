@@ -18,7 +18,7 @@ from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
 from controller.actions import (ActionRegistry, UpdateAnimationAction,
                                 GetAnimationAction, AddToMemoryAction,
-                                GetMusicStructureAction, ResponseToUserAction)
+                                InformUserAction, AskUserAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -28,7 +28,7 @@ class LogicPlusPlus:
 
     def __init__(self, snapshot_dir=None):
         """Initialize the LogicPlusPlus, optionally loading from a snapshot."""
-        self.logger = logging.getLogger("LogicPlusPlusLogger")
+        self.logger = logging.getLogger("LogicPlusPPlusLogger")
         self.wait_for_save_approval = False
         self.temp_animation_path = None
         self._pending_memory = None
@@ -84,10 +84,8 @@ class LogicPlusPlus:
             "get_animation", GetAnimationAction(self.animation_manager))
         self.action_registry.register_action(
             "add_to_memory", AddToMemoryAction(self.memory_manager))
-        self.action_registry.register_action(
-            "get_music_structure", GetMusicStructureAction(self.song_provider))
-        self.action_registry.register_action("response_to_user",
-                                             ResponseToUserAction())
+        self.action_registry.register_action("inform_user", InformUserAction())
+        self.action_registry.register_action("ask_user", AskUserAction())
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
