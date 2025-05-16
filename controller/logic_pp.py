@@ -511,7 +511,7 @@ class LogicPlusPlus:
 
                     # Add the animation to the sequence manager
                     seq_message = self.animation_manager.add_sequence(
-                        step_number, animation_sequence)
+                        animation_sequence)
 
                     self.message_streamer.add_message("animation_update",
                                                       seq_message,

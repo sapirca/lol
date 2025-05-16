@@ -40,6 +40,9 @@ asyncio.set_event_loop(loop)
 # Create a thread pool executor for running blocking operations
 thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
 
+FONT_SIZE_LABELS = 12
+FONT_SIZE_CHAT = 16
+
 
 # Function to detect macOS appearance (light or dark)
 def get_macos_appearance():
@@ -228,9 +231,8 @@ def run_backend_communication(user_message):
                 # Update UI immediately for each message
                 root.after(
                     0, lambda t=tag, m=system_reply: update_chat_window(t, m))
-
-        # Update animation data after processing replies
-        root.after(0, update_animation_data)
+                # Update animation data immediately after each message
+                root.after(0, update_animation_data)
 
         if auto_continue:
             root.after(0, lambda: handle_auto_continue(auto_continue_value))
@@ -666,7 +668,7 @@ paned_window.add(chat_frame, minsize=650)  # Increased minsize for chat area
 
 # Create a frame for the right animation panel
 animation_frame = tk.Frame(paned_window, bg="#2c2c2c")
-paned_window.add(animation_frame, minsize=500,
+paned_window.add(animation_frame, minsize=600,
                  width=600)  # Increased width for animation panel
 
 # Create a frame for the top bar
@@ -683,7 +685,7 @@ active_chat_label = tk.Label(labels_frame,
                              fg="#ffffff",
                              bg="#2c2c2c",
                              anchor="w",
-                             font=(CHAT_FONT, 12))
+                             font=(CHAT_FONT, FONT_SIZE_LABELS))
 active_chat_label.pack(side=tk.TOP, fill=tk.X, padx=5)
 
 # Add a save status label for feedback with text wrapping
@@ -713,7 +715,7 @@ animation_label = tk.Label(animation_header,
                            text="Animation Data",
                            fg="#ffffff",
                            bg="#2c2c2c",
-                           font=(CHAT_FONT, 12))
+                           font=(CHAT_FONT, FONT_SIZE_LABELS))
 animation_label.pack(side=tk.LEFT, padx=5)
 
 
@@ -757,7 +759,7 @@ animation_window = scrolledtext.ScrolledText(
     height=30,  # Increased height
     bg="#2c2c2c",
     fg="#ffffff",
-    font=(CHAT_FONT, 12))
+    font=(CHAT_FONT, FONT_SIZE_CHAT))
 animation_window.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
 # Add zoom capability to animation window
@@ -777,7 +779,7 @@ chat_window = scrolledtext.ScrolledText(chat_frame,
                                         bg="#2c2c2c",
                                         fg="#ffffff",
                                         insertbackground="#ffffff",
-                                        font=(CHAT_FONT, 16))
+                                        font=(CHAT_FONT, FONT_SIZE_CHAT))
 
 
 def zoom(event, widget):

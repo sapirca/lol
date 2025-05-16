@@ -70,10 +70,10 @@ class UpdateAnimationAction(Action):
             f"Animation sequence generated and saved to:\n{self.temp_animation_path}\n",
             "requires_confirmation": True,
             "temp_path": self.temp_animation_path,
-            "data": {
-                "next_step_number": next_step,
-                "current_steps_count": current_step
-            }
+            # "data": {
+            #     "next_step_number": next_step,
+            #     "current_steps_count": current_step
+            # }
         }
 
         # Auto-render if configured
