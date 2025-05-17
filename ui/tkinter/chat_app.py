@@ -250,10 +250,9 @@ def send_message(event=None):
 
     if user_message:
         chat_window.config(state=tk.NORMAL)
-        send_button.config(state=tk.DISABLED,
-                           text="Waiting...",
-                           foreground="black",
-                           background="grey")
+        send_button.configure(state=tk.DISABLED,
+                              text="Waiting...",
+                              style="Waiting.TButton")
 
         user_input.unbind("<Return>")  # Disable Enter key
         controller.add_user_input_to_chat(user_message)
@@ -307,7 +306,7 @@ def enable_ui():
     """Re-enables the UI elements."""
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
-    send_button.config(state=tk.NORMAL, text="Send")
+    send_button.configure(state=tk.NORMAL, text="Send", style="Normal.TButton")
     user_input.config(state=tk.NORMAL)  # Re-enable the text input
     user_input.bind("<Return>", handle_keypress)
 
@@ -752,6 +751,15 @@ root = tk.Tk()
 root.title("Chat App")
 root.geometry("1600x800")  # Increased width and height for better visibility
 
+# Create custom styles for buttons
+style = ttk.Style()
+style.configure("Waiting.TButton",
+                background="#4a4a4a",
+                foreground="white",
+                padding=5,
+                relief="flat")
+style.configure("Normal.TButton", padding=5)
+
 # Create a PanedWindow to make the divider adjustable
 paned_window = tk.PanedWindow(root, orient=tk.HORIZONTAL)
 paned_window.pack(fill=tk.BOTH, expand=True)
@@ -918,12 +926,14 @@ chat_window.bind("<Button-2>", show_context_menu)
 chat_window.pack(fill=tk.BOTH, expand=True)
 
 # Create a frame for the input
-# input_frame = tk.Frame(chat_frame)
 input_frame = tk.Frame(chat_frame,
                        height=10)  # Adjusted height to allow more space
 input_frame.pack(padx=10, pady=10, fill=tk.BOTH)
 
-send_button = tk.Button(input_frame, text="Send", command=send_message)
+send_button = ttk.Button(input_frame,
+                         text="Send",
+                         command=send_message,
+                         style="Normal.TButton")
 send_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
 # Create a text widget for user input
