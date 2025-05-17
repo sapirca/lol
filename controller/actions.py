@@ -34,7 +34,6 @@ class UpdateAnimationAction(Action):
     def __init__(self, animation_manager: AnimationManager):
         super().__init__()
         self.animation_manager = animation_manager
-        self.temp_animation_path = None
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Convert params to dictionary if it's a Pydantic model"""
@@ -50,30 +49,24 @@ class UpdateAnimationAction(Action):
         """Render a preview of the provided animation JSON."""
         try:
             if not animation_json:
-                # self.logger.warning("No animation JSON provided for preview.")
                 return "Error: No animation JSON provided for preview."
 
             self.animation_manager.render(animation_json)
-            # self.logger.info("Animation preview rendered successfully.")
             return "Animation preview rendered successfully."
         except Exception as e:
-            # self.logger.error(f"Error rendering animation preview: {e}")
             return f"Error rendering animation preview: {e}"
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         params_dict = self._get_params_dict(params)
         animation_str = json.dumps(params_dict["animation_sequence"], indent=4)
 
-        # Save the animation sequence to a temporary file
-        self.temp_animation_path = self.animation_manager.save_tmp_animation(
-            animation_str)
+        # Directly add the animation to the sequence manager
+        step_number = self.animation_manager.add_sequence(animation_str)
 
         output = {
             "status": "success",
-            "message":
-            f"Animation sequence generated and saved to:\n{self.temp_animation_path}\n",
-            "requires_confirmation": True,
-            "temp_path": self.temp_animation_path,
+            "message": f"Animation sequence added to step {step_number}.\n",
+            "requires_confirmation": False
         }
 
         # Auto-render if configured

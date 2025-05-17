@@ -235,7 +235,8 @@ def send_message(event=None):
                            foreground="black",
                            background="grey")
         user_input.unbind("<Return>")  # Disable Enter key
-        append_message_to_window("You", user_message, context=True)
+        # update_chat_window(get_label_tag(TYPE_INTERNAL),
+        #                    get_sender_name(TYPE_INTERNAL), user_message)
 
         # Use the thread pool to run the backend communication
         thread_pool.submit(run_backend_communication, user_message)
