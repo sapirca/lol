@@ -186,7 +186,7 @@ Accurate timing ensures effects align seamlessly with music.
 ================================================================================
 Role: system
 
-# Your Memory: {'favorite_color': 'purple', 'color_preference': 'hue shift of purple and orange', 'pastel_preference': 'likes pastel colors sometimes'}
+# Your Memory: {'favorite_color': 'purple', 'color_preference': 'hue shift of purple and orange', 'pastel_preference': 'likes pastel colors sometimes', 'animation_preferences': 'likes increasing fade-in effects in animations', 'animation_style_preferences': '- Create a surprising animation with innovative combinations of effects\n- Use varied segment patterns (b1, b2, random, centric, updown, arc, ind)\n- Implement creative snake effects with different head and tail configurations\n- Incorporate step functions for brightness and hue changes'}
 
 ================================================================================
 Role: system

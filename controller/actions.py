@@ -145,7 +145,7 @@ class AddToMemoryAction(Action):
 
             return {
                 "status": "success",
-                "message": f"Memory saved: {{{key}: {value}}}",
+                "message": f"Memory saved:\n {{\"{key}\": \"{value}\"}}",
                 "requires_confirmation": False,
             }
         except Exception as e:
@@ -245,6 +245,8 @@ class ActionRegistry:
             }
 
         result = action.execute(params)
+
+        result['name'] = name
 
         # Store pending confirmation if needed
         if result.get("requires_confirmation", False):

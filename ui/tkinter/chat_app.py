@@ -124,6 +124,9 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context,
     original_state = chat_window.cget("state")
     chat_window.config(state=tk.NORMAL)
 
+    # Configure tags with colors and alignments
+    configure_chat_tags(chat_window)
+
     title = build_message_title(timestamp, sender, context, visible)
     chat_window.insert(tk.END, title, label_tag)
 
@@ -175,26 +178,6 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context,
 
     chat_window.insert(tk.END, message[last_end:], message_tag)
     chat_window.insert(tk.END, "\n\n")
-
-    # Style the labels
-    if type_name == TYPE_SYSTEM:
-        chat_window.tag_configure(
-            label_tag,
-            foreground="#8BE9FD",  # Light cyan (keeping this)
-            justify=SYSTEM_ALIGNMENT)
-        chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
-    elif type_name == TYPE_ASSISTANT:
-        chat_window.tag_configure(
-            label_tag,
-            foreground="#FFB86C",  # Soft orange
-            justify=SYSTEM_ALIGNMENT)
-        chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
-    elif type_name == TYPE_USER:
-        chat_window.tag_configure(
-            label_tag,
-            foreground="#9580FF",  # Soft purple
-            justify=USER_ALIGNMENT)
-        chat_window.tag_configure(message_tag, justify=USER_ALIGNMENT)
 
     # Automatically scroll to the bottom
     chat_window.see(tk.END)
@@ -393,33 +376,45 @@ def get_sender_name(type_name):
     return type_name.capitalize() if type_name != TYPE_USER else "You"
 
 
-def batch_insert_messages(messages):
-    """Efficiently insert multiple messages into the chat window."""
-    # Pre-configure tags
-    chat_window.tag_configure(get_label_tag(TYPE_ASSISTANT),
-                              foreground=PRIMARY_COLOR_VARIANT,
-                              justify=SYSTEM_ALIGNMENT)
-    chat_window.tag_configure(get_message_tag(TYPE_ASSISTANT),
-                              justify=SYSTEM_ALIGNMENT)
-
-    chat_window.tag_configure(get_label_tag(TYPE_USER),
-                              foreground=SECONDARY_COLOR,
-                              justify=USER_ALIGNMENT)
-    chat_window.tag_configure(get_message_tag(TYPE_USER),
-                              justify=USER_ALIGNMENT)
-
-    chat_window.tag_configure(get_label_tag(TYPE_SYSTEM),
-                              foreground=PRIMARY_COLOR,
-                              justify=SYSTEM_ALIGNMENT)
+def configure_chat_tags(chat_window):
+    """Configure the chat window tags with appropriate colors and alignments."""
+    # System message styling
+    chat_window.tag_configure(
+        get_label_tag(TYPE_SYSTEM),
+        foreground="#8BE9FD",  # Light cyan
+        justify=SYSTEM_ALIGNMENT)
     chat_window.tag_configure(get_message_tag(TYPE_SYSTEM),
                               justify=SYSTEM_ALIGNMENT)
 
+    # Assistant message styling
+    chat_window.tag_configure(
+        get_label_tag(TYPE_ASSISTANT),
+        foreground="#FFB86C",  # Soft orange
+        justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure(get_message_tag(TYPE_ASSISTANT),
+                              justify=SYSTEM_ALIGNMENT)
+
+    # User message styling
+    chat_window.tag_configure(
+        get_label_tag(TYPE_USER),
+        foreground="#9580FF",  # Soft purple
+        justify=USER_ALIGNMENT)
+    chat_window.tag_configure(get_message_tag(TYPE_USER),
+                              justify=USER_ALIGNMENT)
+
+    # Internal message styling
     chat_window.tag_configure(get_label_tag(TYPE_INTERNAL),
                               foreground="grey",
                               justify=SYSTEM_ALIGNMENT)
     chat_window.tag_configure(get_message_tag(TYPE_INTERNAL),
                               foreground="grey",
                               justify=SYSTEM_ALIGNMENT)
+
+
+def batch_insert_messages(messages):
+    """Efficiently insert multiple messages into the chat window."""
+    # Pre-configure tags
+    configure_chat_tags(chat_window)
 
     # Build content in memory
     content = []

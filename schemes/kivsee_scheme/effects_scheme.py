@@ -167,7 +167,7 @@ class EffectConfig(BaseModel):
         "End time of the effect in milliseconds. The end of a bar is the begining of the next bar, use the miliseconds from the list of bars you provided in the prompt."
     )
     segments: str = Field(
-        default_factory=list,
+        ...,
         description=
         "Specifies the segments of LEDs to which the effect will be applied. This allows targeting specific subsets of LEDs for more variety in the animation. For example, 'b1' might represent every 4th LED. The default segment is 'all', which means the effect will apply to all LEDs of the element.",
         enum=["centric", "updown", "arc", "ind", "b1", "b2", "random", "all"])
