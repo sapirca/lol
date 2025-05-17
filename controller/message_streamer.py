@@ -16,9 +16,6 @@ TAG_ASSISTANT = "assistant"
 # General system messages (status updates, confirmations)
 TAG_SYSTEM = "system"
 
-# System output messages (responses to user actions)
-TAG_SYSTEM_OUTPUT = "system_output"
-
 # Internal system messages (debug info, not visible by default)
 TAG_SYSTEM_INTERNAL = "system_internal"
 
@@ -188,8 +185,7 @@ class MessageStreamer:
         new_messages = []
         for i in range(self.last_checked_index, len(self.messages)):
             msg = self.messages[i]
-            if msg['visible']:  # Only return visible messages
-                new_messages.append(
-                    (msg['tag'], msg['content'], msg['context']))
+            new_messages.append(
+                (msg['tag'], msg['content'], msg['context'], msg['visible']))
         self.last_checked_index = len(self.messages)
         return new_messages

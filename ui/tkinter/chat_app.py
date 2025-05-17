@@ -19,7 +19,6 @@ from controller.message_streamer import (
     TAG_USER_INPUT,
     TAG_ASSISTANT,
     TAG_SYSTEM,
-    TAG_SYSTEM_OUTPUT,
     TAG_SYSTEM_INTERNAL,
     TAG_ACTION_RESULTS,
 )
@@ -87,13 +86,14 @@ def initialize_logic_controller(a_snapshot):  # Updated function name
     controller = LogicPlusPlus(snapshot_path)
 
 
-def append_message_to_window(sender, message, context):
+def append_message_to_window(sender, message, context, visible):
     """Adds a message to the chat window."""
     timestamp = datetime.now().strftime(TIME_FORMAT)
-    append_message_to_window_w_timestamp(timestamp, sender, message, context)
+    append_message_to_window_w_timestamp(timestamp, sender, message, context,
+                                         visible)
 
 
-def build_message_title(timestamp, sender, context):
+def build_message_title(timestamp, sender, context, visible):
     """Builds a standardized message title."""
     title = f"[{timestamp}]"
     if context:
@@ -103,17 +103,19 @@ def build_message_title(timestamp, sender, context):
     return title
 
 
-def append_message_to_window_w_timestamp(timestamp, sender, message, context):
+def append_message_to_window_w_timestamp(timestamp, sender, message, context,
+                                         visible):
     """Adds a message to the chat window with proper formatting and clickable links."""
-    # Convert sender to type
-    if sender.lower() == "you":
+    if not visible:
+        type_name = TYPE_INTERNAL
+    elif sender.lower() == "you":
         type_name = TYPE_USER
     elif sender.lower() == "assistant":
         type_name = TYPE_ASSISTANT
     elif sender.lower() == "system":
         type_name = TYPE_SYSTEM
     else:
-        type_name = TYPE_INTERNAL
+        type_name = TYPE_SYSTEM
 
     label_tag = get_label_tag(type_name)
     message_tag = get_message_tag(type_name)
@@ -122,7 +124,7 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context):
     original_state = chat_window.cget("state")
     chat_window.config(state=tk.NORMAL)
 
-    title = build_message_title(timestamp, sender, context)
+    title = build_message_title(timestamp, sender, context, visible)
     chat_window.insert(tk.END, title, label_tag)
 
     def open_file_in_editor(event, file_path):
@@ -230,24 +232,24 @@ def refresh():
     # Get any new messages that were added
     new_messages = controller.msgs.get_new_messages()
     # Update UI with new messages
-    for tag, message, context in new_messages:
+    for tag, message, context, visible in new_messages:
         # Determine message type based on tag
         if tag == TAG_USER_INPUT:
             type_name = TYPE_USER
-        elif tag == TAG_ASSISTANT:
+        elif tag == TAG_ASSISTANT or tag == TAG_ACTION_RESULTS:
             type_name = TYPE_ASSISTANT
         elif tag == TAG_SYSTEM_INTERNAL:
             type_name = TYPE_INTERNAL
-        elif tag == TAG_SYSTEM_OUTPUT:
+        elif tag == TAG_SYSTEM:
             type_name = TYPE_SYSTEM
         else:
-            type_name = TYPE_SYSTEM
+            type_name = TYPE_INTERNAL
 
         # Schedule message display
         sender_name = get_sender_name(type_name)
         root.after(0,
-                   lambda s=sender_name, m=message, c=context:
-                   append_message_to_window(s, m, c))
+                   lambda s=sender_name, m=message, c=context, v=visible:
+                   append_message_to_window(s, m, c, v))
 
 
 def send_message(event=None):
@@ -314,7 +316,7 @@ def run_backend_communication(user_message):
 
 def update_chat_window(tag, sender, message):
     """Updates the chat window with a new message."""
-    append_message_to_window(sender, message, context=False)
+    append_message_to_window(sender, message, context=False, visible=True)
     chat_window.see(tk.END)  # Make sure to scroll to bottom after each message
 
 
@@ -435,7 +437,7 @@ def batch_insert_messages(messages):
         message_tag = get_message_tag(type_name)
         sender = get_sender_name(type_name)
 
-        title = build_message_title(timestamp, sender, context)
+        title = build_message_title(timestamp, sender, context, visible)
         content.append((title, label_tag))
         content.append((f"{message}\n\n", message_tag))
 

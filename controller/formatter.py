@@ -80,11 +80,13 @@ class Formatter:
             # Log error but continue without song info
             print(f"Error getting song info: {e}")
 
-        # Add message history
-        for message in self.message_streamer.messages:
-            if message['context']:
-                role = self._determine_role(message['tag'])
-                messages.append({"role": role, "content": message['content']})
+            # Save the whole prompt to a file
+        with open("prompt_with_memory_and_song.md", "w") as file:
+            for message in messages:
+                # file.write(f"{message['role']}: {message['content']}\n")
+                file.write(f"\n{'='*80}\n")
+                file.write(f"Role: {message['role']}\n\n")
+                file.write(f"{message['content']}\n")
 
         # Add the latest animation sequence
         latest_sequence = self.animation_manager.get_latest_sequence()
@@ -96,13 +98,11 @@ class Formatter:
                 f"# Animation Sequence:\n Make sure to maintain a consistent animation, only change the part of animation that the user asked for. In case of doubt, ask the user for clarification. The latest animation sequence is:\n {latest_sequence}"
             })
 
-        # Save the whole prompt to a file
-        with open("prompt_before_sending.md", "w") as file:
-            for message in messages:
-                # file.write(f"{message['role']}: {message['content']}\n")
-                file.write(f"\n{'='*80}\n")
-                file.write(f"Role: {message['role']}\n\n")
-                file.write(f"{message['content']}\n")
+            # Add message history
+        for message in self.message_streamer.messages:
+            if message['context']:
+                role = self._determine_role(message['tag'])
+                messages.append({"role": role, "content": message['content']})
 
         return messages
 

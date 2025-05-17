@@ -65,8 +65,11 @@ class UpdateAnimationAction(Action):
 
         output = {
             "status": "success",
-            "message": f"Animation sequence added to step {step_number}.\n",
-            "requires_confirmation": False
+            "message": f"Animation sequence added to step {step_number}.",
+            "requires_confirmation": False,
+            "data": {
+                "step_number": step_number,
+            }
         }
 
         # Auto-render if configured
@@ -137,22 +140,18 @@ class AddToMemoryAction(Action):
         try:
             key = params_dict["key"]
             value = params_dict["value"]
-            # Don't write to memory yet, wait for user confirmation
+
+            self.memory_manager.write_to_memory(key, value)
+
             return {
                 "status": "success",
-                "message":
-                f"Ready to add memory:\n key: {key}\nvalue: {value}. Do you want to save this to memory? (y/n)",
-                "requires_confirmation": True,
-                "data": {
-                    "key": key,
-                    "value": value,
-                    "action": "add_to_memory"
-                }
+                "message": f"Memory saved: {{{key}: {value}}}",
+                "requires_confirmation": False,
             }
         except Exception as e:
             return {
                 "status": "error",
-                "message": f"Error preparing memory addition: {str(e)}",
+                "message": f"Error adding to memory: {str(e)}",
                 "requires_confirmation": False
             }
 
@@ -177,10 +176,6 @@ class InformUserAction(Action):
                 "status": "success",
                 "message": params_dict["message"],
                 "requires_confirmation": False,
-                "data": {
-                    "message": params_dict["message"],
-                    "message_type": params_dict["message_type"]
-                }
             }
         except Exception as e:
             return {
@@ -210,10 +205,7 @@ class AskUserAction(Action):
                 "status": "success",
                 "message": params_dict["message"],
                 "requires_confirmation": True,  # Always requires user response
-                "data": {
-                    "message": params_dict["message"],
-                    "message_type": params_dict["message_type"]
-                }
+                "message_type": params_dict["message_type"]
             }
         except Exception as e:
             return {
@@ -253,7 +245,11 @@ class ActionRegistry:
             }
 
         result = action.execute(params)
+
+        # Store pending confirmation if needed
         if result.get("requires_confirmation", False):
-            self._pending_confirmation = (action, result.get("temp_path"))
+            self._pending_confirmation = (action, params)
+        else:
+            self._pending_confirmation = None
 
         return result

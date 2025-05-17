@@ -12,7 +12,6 @@ from controller.message_streamer import (
     TAG_USER_INPUT,
     TAG_ASSISTANT,
     TAG_SYSTEM,
-    TAG_SYSTEM_OUTPUT,
     TAG_SYSTEM_INTERNAL,
     TAG_ACTION_RESULTS,
 )
@@ -261,11 +260,10 @@ class LogicPlusPlus:
         """Internal communication method that contains the original communicate logic."""
         if self._pending_memory:
             result = self.handle_memory_approval(user_input)
-            self.msgs.add_visible(TAG_SYSTEM_OUTPUT, result, context=False)
+            self.msgs.add_visible(TAG_SYSTEM, result, context=False)
             return
 
         backend = self.select_backend()
-
         messages = self.formatter.build_messages()
 
         try:
@@ -295,9 +293,10 @@ class LogicPlusPlus:
             error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
             self.msgs.add_visible(TAG_SYSTEM, error_msg, context=True)
         else:
-            message = f"The result of the action {model_response.action.name} is:\n"
-            message += f"{result['message']}\n"
-            self.msgs.add_visible(TAG_SYSTEM, message, context=False)
+            # Add the action result to the chat
+            self.msgs.add_visible(TAG_ASSISTANT,
+                                  result.get("message", ""),
+                                  context=False)
             full_result = f"Action executed: {json.dumps(result, indent=2)}"
             self.msgs.add_invisible(TAG_SYSTEM_INTERNAL,
                                     full_result,
@@ -313,36 +312,6 @@ class LogicPlusPlus:
                 self.msgs.add_visible(TAG_SYSTEM,
                                       "Auto-continuing with action result",
                                       context=False)
-
-    def handle_memory_approval(self, user_input):
-        """Handle user approval for memory operations."""
-        # Add user input first
-        # self.msgs.add_visible(TAG_USER_INPUT, user_input, context=False)
-
-        output = ""
-        if user_input.lower() in ["y", "yes"]:
-            try:
-                key = self._pending_memory["key"]
-                value = self._pending_memory["value"]
-                self.memory_manager.write_to_memory(key, value)
-                output += f"Memory saved with key: {key}\n"
-                self.logger.info(
-                    f"User approved and memory saved with key: {key}")
-                self._pending_memory = None
-            except Exception as e:
-                self.logger.error(f"Error saving memory: {e}")
-                output += f"Error saving memory: {e}\n"
-            return output
-
-        elif user_input.lower() in ["n", "no"]:
-            self._pending_memory = None
-            self.logger.info("Memory addition discarded by user.")
-            output += "Memory addition discarded.\n"
-            return output
-
-        self.logger.warning(
-            "Invalid response received during approval process.")
-        return "Invalid response. Please reply with 'y' or 'n'.\n"
 
     def render(self):
         """Render the current animation sequence."""

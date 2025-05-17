@@ -12,7 +12,7 @@ class MemoryManager:
         :param framework_name: Name of the framework to manage memory for
         """
         self.memory_file_path = os.path.join(MEMORY_BASE_PATH, framework_name,
-                                             "memory.json")
+                                             "my_memory.json")
         os.makedirs(os.path.dirname(self.memory_file_path), exist_ok=True)
         self.memory = {}
         self._load_memory()
