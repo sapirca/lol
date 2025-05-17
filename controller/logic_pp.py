@@ -25,7 +25,7 @@ from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
 from controller.actions import (ActionRegistry, UpdateAnimationAction,
                                 GetAnimationAction, AddToMemoryAction,
-                                InformUserAction, AskUserAction)
+                                AskUserAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading

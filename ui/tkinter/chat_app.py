@@ -443,6 +443,33 @@ def batch_insert_messages(messages):
     chat_window.see(tk.END)
 
 
+def initialize_untitled_chat():
+    """Initialize a new untitled chat session with consistent welcome messages."""
+    global controller, active_chat_snapshot
+    controller = LogicPlusPlus()
+    active_chat_snapshot = "untitled"
+
+    chat_window.config(state=tk.NORMAL)
+    chat_window.delete("1.0", tk.END)
+
+    # Welcome message
+    message = "Welcome to a new chat session!"
+    update_chat_window(get_label_tag(TYPE_SYSTEM),
+                       get_sender_name(TYPE_SYSTEM), message)
+
+    # System info
+    print_system_info()
+
+    chat_window.config(state=tk.DISABLED)
+    update_active_chat_label("untitled")
+    update_animation_data()
+
+
+def _load_untitled_chat():
+    """Load a new untitled chat session."""
+    initialize_untitled_chat()
+
+
 def _load_chat(a_snapshot):
     """Load chat content and alert if the current chat is unsaved."""
     global controller, active_chat_snapshot
@@ -456,7 +483,8 @@ def _load_chat(a_snapshot):
 
         # Initialize the new controller
         if a_snapshot == "untitled":
-            controller = LogicPlusPlus()
+            initialize_untitled_chat()
+            return
         else:
             snapshot_path = os.path.abspath(
                 os.path.join(SNAPSHOTS_DIR, a_snapshot))
@@ -473,10 +501,6 @@ def _load_chat(a_snapshot):
 
         if chat_history:
             batch_insert_messages(chat_history)
-        elif a_snapshot == "untitled":
-            message = "Welcome to a new chat session!"
-            update_chat_window(get_label_tag(TYPE_SYSTEM),
-                               get_sender_name(TYPE_SYSTEM), message)
         else:
             message = "No chat history found in snapshot."
             update_chat_window(get_label_tag(TYPE_SYSTEM),
@@ -486,6 +510,10 @@ def _load_chat(a_snapshot):
         update_active_chat_label(a_snapshot)
         update_animation_data()
 
+        controller.msgs.clear_control_flags()
+        update_chat_window(get_label_tag(TYPE_INTERNAL),
+                           get_sender_name(TYPE_INTERNAL),
+                           "Any control flags are disregarded.")
     except Exception as e:
         error_msg = f"Error loading snapshot {a_snapshot}: {str(e)}"
         update_chat_window(get_label_tag(TYPE_SYSTEM),
@@ -494,10 +522,6 @@ def _load_chat(a_snapshot):
                                  fg="red")
 
     finally:
-        controller.msgs.clear_control_flags()
-        update_chat_window(get_label_tag(TYPE_INTERNAL),
-                           get_sender_name(TYPE_INTERNAL),
-                           "Any control flags are disregarded.")
         chat_window.config(state=tk.DISABLED)
         enable_ui()  # Always re-enable the UI
 
@@ -516,25 +540,6 @@ def save_and_load_untitled_chat():
         show_save_popup("untitled")
     else:
         _load_untitled_chat()
-
-
-def _load_untitled_chat():
-    global controller, active_chat_snapshot
-    controller = LogicPlusPlus()
-    active_chat_snapshot = "untitled"
-
-    chat_window.config(state=tk.NORMAL)
-    chat_window.delete("1.0", tk.END)
-
-    print_system_info()
-
-    # current_time = datetime.now().strftime(TIME_FORMAT)
-    # append_message_to_window("System", "Welcome to a new chat session!")
-    chat_window.config(state=tk.DISABLED)
-    print(f"Untitled chat session ensured")
-    active_chat_snapshot = "untitled"
-    update_active_chat_label("untitled")
-    update_animation_data()
 
 
 def format_button_text(text, max_width):
