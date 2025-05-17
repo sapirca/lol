@@ -7,7 +7,15 @@ import xml.etree.ElementTree as ET
 from controller.interpreter import Interpreter
 from controller.formatter import Formatter
 from constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
-from controller.message_streamer import MessageStreamer
+from controller.message_streamer import (
+    MessageStreamer,
+    TAG_USER_INPUT,
+    TAG_ASSISTANT,
+    TAG_SYSTEM,
+    TAG_SYSTEM_OUTPUT,
+    TAG_SYSTEM_INTERNAL,
+    TAG_ACTION_RESULTS,
+)
 import logging
 import os
 from datetime import datetime
@@ -33,6 +41,8 @@ class LogicPlusPlus:
         self.temp_animation_path = None
         self._pending_memory = None
         self.msgs = MessageStreamer()
+        self.msgs.clear_control_flags(
+        )  # Ensure control flags are cleared on initialization
         self.song_provider = SongProvider()
         self.backends = {}
         self._is_processing = False
@@ -293,61 +303,60 @@ class LogicPlusPlus:
         """Thread-safe communication with the backend."""
         with self._processing_lock:
             if self._is_processing:
-                return [("system",
-                         "Still processing previous request. Please wait.")]
+                self.msgs.add_visible(
+                    "system",
+                    "Still processing previous request. Please wait.",
+                    context=False)
+                return
 
             self._is_processing = True
             try:
-                return self._communicate_internal(user_input)
+                self._communicate_internal(user_input)
             finally:
                 self._is_processing = False
 
     def _communicate_internal(self, user_input):
         """Internal communication method that contains the original communicate logic."""
-        system_responses = []
         if self.wait_for_save_approval:
-            self.msgs.add_visible("user_input", user_input, context=False)
+            self.msgs.add_visible(TAG_USER_INPUT, user_input, context=False)
             result = self.handle_user_approval(user_input)
-            self.msgs.add_visible("system_output", result, context=False)
-            system_responses.append(("system", result))
-            return system_responses
+            self.msgs.add_visible(TAG_SYSTEM_OUTPUT, result, context=False)
+            return
 
         backend = self.select_backend()
         initial_prompt_report = self.process_init_prompt()
         if (initial_prompt_report):
-            system_responses.append(("system", initial_prompt_report))
+            self.msgs.add_visible(TAG_SYSTEM,
+                                  initial_prompt_report,
+                                  context=False)
 
-        self.msgs.add_visible("user_input", user_input, context=True)
+        self.msgs.add_visible(TAG_USER_INPUT, user_input, context=True)
 
         messages = self.formatter.build_messages()
         auto_continue = False
+        auto_continue_value = None
         try:
             model_response = backend.generate_response(messages)
 
         except Exception as e:
             error_msg = f"Error: {str(e)}"
-            self.msgs.add_visible("system", error_msg, context=False)
-            system_responses.append(("system", error_msg))
-            return system_responses
+            self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
+            return
 
         # Display the LLM's reasoning about the chosen action and overall strategy
-        self.msgs.add_visible("assistant",
+        self.msgs.add_visible(TAG_ASSISTANT,
                               "Reasoning:\n" + model_response.reasoning,
                               context=True)
-        system_responses.append(("assistant", model_response.reasoning))
 
         # Show the action plan if provided
         if model_response.actions_plan:
-            message = f"Actions plan:\n"
-            message += f"{model_response.actions_plan}\n"
-            self.msgs.add_visible("assistant", message, context=True)
-            system_responses.append(("assistant", message))
+            message = f"Actions plan:\n{model_response.actions_plan}\n"
+            self.msgs.add_visible(TAG_ASSISTANT, message, context=True)
 
         if not model_response.action:
             message = f"No action to execute.\n"
-            self.msgs.add_visible("system", message, context=True)
-            system_responses.append(("system", message))
-            return system_responses
+            self.msgs.add_visible(TAG_SYSTEM, message, context=True)
+            return
 
         if model_response.action.name == "update_animation":
             message = f"I will execute the action {model_response.action.name}. The animation will be saved to temporary file.\n"
@@ -355,8 +364,7 @@ class LogicPlusPlus:
             message = f"I will execute the action {model_response.action.name} with the following parameters:\n"
             message += f"{model_response.action.params}\n"
 
-        self.msgs.add_visible("assistant", message, context=True)
-        system_responses.append(("assistant", message))
+        self.msgs.add_visible(TAG_ASSISTANT, message, context=True)
 
         # Execute single action for this turn and handle its result
         result = self.action_registry.execute_action(
@@ -364,8 +372,7 @@ class LogicPlusPlus:
 
         if result["status"] == "error":
             error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
-            self.msgs.add_visible("system", error_msg, context=False)
-            system_responses.append(("system", error_msg))
+            self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
             # Add error result to context
             action_result = {
                 "action": model_response.action.name,
@@ -376,18 +383,18 @@ class LogicPlusPlus:
             # Handle successful action execution and prepare response
             self.wait_for_save_approval = result.get("requires_confirmation",
                                                      False)
+            if self.wait_for_save_approval:
+                self.msgs.set_control_flag("wait_for_approval", True)
 
             # For update_animation action, display the message directly to preserve the temp path format
             if model_response.action.name == "update_animation":
-                self.msgs.add_visible("assistant",
+                self.msgs.add_visible(TAG_ASSISTANT,
                                       result['message'],
                                       context=True)
-                system_responses.append(("assistant", result['message']))
             else:
                 message = f"The result of the action {model_response.action.name} is:\n"
                 message += f"{result['message']}\n"
-                self.msgs.add_visible("assistant", message, context=True)
-                system_responses.append(("assistant", message))
+                self.msgs.add_visible(TAG_ASSISTANT, message, context=True)
 
             action_result = {
                 "action": model_response.action.name,
@@ -397,14 +404,12 @@ class LogicPlusPlus:
             if "data" in result:
                 action_result["data"] = result["data"]
                 data_msg = f"Action data {model_response.action.name}, returned value: {json.dumps(result['data'], indent=2)}"
-                self.msgs.add_visible("assistant", data_msg, context=True)
-                system_responses.append(("assistant", data_msg))
+                self.msgs.add_visible(TAG_ASSISTANT, data_msg, context=True)
 
             if model_response.action.name == "update_animation" and "temp_path" in result:
                 self.temp_animation_path = result["temp_path"]
                 message = f"Do you want me to save a snapshot to the sequence manager? (y/n)\n"
-                self.msgs.add_visible("system", message, context=True)
-                system_responses.append(("system", message))
+                self.msgs.add_visible(TAG_SYSTEM, message, context=True)
 
             # Check if immediate response is needed for this action type
             params_dict = model_response.action.params.model_dump() if hasattr(
@@ -413,61 +418,19 @@ class LogicPlusPlus:
 
             if params_dict.get("immediate_response", False):
                 auto_continue = True
-                self.msgs.add_visible("system",
+                auto_continue_value = results_str
+                self.msgs.add_visible(TAG_SYSTEM,
                                       "Auto-continuing with action result",
                                       context=True)
-                system_responses.append(
-                    ("system", "Auto-continuing with action result"))
 
         # Store action result in context for next LLM turn
         results_str = json.dumps(action_result, indent=2)
-        self.msgs.add_visible("action_results",
+        self.msgs.add_visible(TAG_ACTION_RESULTS,
                               f"Action Result:\n{results_str}",
                               context=True)
 
         if auto_continue:
-            system_responses.append(("auto_continue", results_str))
-
-        return system_responses
-
-    # def act_on_response(self, model_response, printable_response):
-    #     output = ""
-
-    #     try:
-    #         if model_response:
-    #             # Use `exclude_none=True` to remove null fields from the animation JSON
-    #             animation_str = json.dumps(
-    #                 model_response,
-    #                 indent=4,
-    #                 default=lambda o: o.model_dump(exclude_none=True))
-
-    #             # Save the animation sequence to a temporary file
-    #             self.temp_animation_path = self.animation_manager.save_tmp_animation(
-    #                 animation_str)
-    #             self.logger.info(
-    #                 f"Generated {self.temp_animation_path} for the user's observation."
-    #             )
-
-    #             output += f"Animation sequence generated and saved to:\n"
-    #             output += f"{self.temp_animation_path}\n"
-    #             output += "Do you want me to save a snapshot to the sequence manager? (y/n)\n"
-    #             self.wait_for_save_approval = True
-
-    #             # Auto-render the animation for preview if auto_render is enabled in the config
-    #             if self.config.get("auto_render", False):
-    #                 animation_dict = json.loads(animation_str)
-    #                 render_result = self.render_preview(animation_dict)
-    #                 if "Error" in render_result:
-    #                     output += f"{render_result}\nAnimation was not rendered for preview.\n"
-    #                 else:
-    #                     output += f"{render_result}\n"
-
-    #     except Exception as e:
-    #         self.logger.error(
-    #             f"Error processing response and rendering animation: {e}")
-    #         output += f"Error processing response and rendering animation: {e}\n"
-
-    #     return output
+            self.msgs.set_control_flag("auto_continue", auto_continue_value)
 
     def handle_user_approval(self, user_input):
         output = ""

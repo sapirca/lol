@@ -15,10 +15,24 @@ import asyncio
 from queue import Queue
 from tkinter import filedialog
 import concurrent.futures
+from controller.message_streamer import (
+    TAG_USER_INPUT,
+    TAG_ASSISTANT,
+    TAG_SYSTEM,
+    TAG_SYSTEM_OUTPUT,
+    TAG_SYSTEM_INTERNAL,
+    TAG_ACTION_RESULTS,
+)
 
 # Alignment flags
 USER_ALIGNMENT = "left"
 SYSTEM_ALIGNMENT = "left"
+
+# Message type constants
+TYPE_USER = "user"
+TYPE_ASSISTANT = "assistant"
+TYPE_SYSTEM = "system"
+TYPE_INTERNAL = "internal"
 
 # CHAT_FONT = "Helvetica"
 CHAT_FONT = "Verdana"
@@ -98,7 +112,7 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context):
     original_state = chat_window.cget("state")
     chat_window.config(state=tk.NORMAL)
 
-    title = build_message_title(timestamp, sender, context=context)
+    title = build_message_title(timestamp, sender, context)
     chat_window.insert(tk.END, title, label_tag)
 
     def open_file_in_editor(event, file_path):
@@ -230,35 +244,67 @@ def send_message(event=None):
 def run_backend_communication(user_message):
     """Runs the backend communication in a separate thread."""
     try:
-        replies = controller.communicate(user_message)
+        # Send message to backend
+        controller.communicate(user_message)
 
-        auto_continue = False
-        auto_continue_value = None
+        # Get any new messages that were added
+        new_messages = controller.msgs.get_new_messages()
 
-        for tag, system_reply in replies:
-            if tag == 'auto_continue':
-                auto_continue = True
-                auto_continue_value = system_reply
+        # Get any control flags
+        control_flags = controller.msgs.get_and_clear_control_flags()
+
+        # Update UI with new messages
+        for tag, message in new_messages:
+            if tag == TAG_SYSTEM_OUTPUT:  # Special case for system output
+                root.after(0,
+                           lambda t=tag, m=message: update_chat_window(
+                               get_label_tag(TYPE_SYSTEM),
+                               get_sender_name(TYPE_SYSTEM), m))
+            elif not any(
+                    message.get('visible', True) for message in controller.
+                    msgs.messages[-5:]):  # Check recent messages visibility
+                root.after(0,
+                           lambda t=tag, m=message: update_chat_window(
+                               get_label_tag(TYPE_INTERNAL),
+                               get_sender_name(TYPE_INTERNAL), m))
             else:
-                # Update UI immediately for each message
-                root.after(
-                    0, lambda t=tag, m=system_reply: update_chat_window(t, m))
-                # Update animation data immediately after each message
-                root.after(0, update_animation_data)
+                if tag == TAG_USER_INPUT:
+                    type_name = TYPE_USER
+                elif tag == TAG_ASSISTANT:
+                    type_name = TYPE_ASSISTANT
+                elif tag == TAG_SYSTEM_INTERNAL:
+                    type_name = TYPE_INTERNAL
+                else:
+                    type_name = TYPE_SYSTEM
+                root.after(0,
+                           lambda t=type_name, m=message: update_chat_window(
+                               get_label_tag(t), get_sender_name(t), m))
 
-        if auto_continue:
+        # Handle control flags
+        if control_flags.get("auto_continue"):
+            auto_continue_value = control_flags["auto_continue"]
             root.after(0, lambda: handle_auto_continue(auto_continue_value))
+        elif control_flags.get("wait_for_approval"):
+            # UI is already showing the approval message from messages
+            pass
         else:
+            # If no special flags, just enable the UI
             root.after(0, enable_ui)
 
+        # Update animation data after processing all messages
+        root.after(0, update_animation_data)
+
     except Exception as e:
-        root.after(0, lambda: update_chat_window('system', f"Error: {str(e)}"))
+        root.after(
+            0, lambda: update_chat_window(get_label_tag(TYPE_SYSTEM),
+                                          get_sender_name(TYPE_SYSTEM),
+                                          f"Error: {str(e)}"))
         root.after(0, enable_ui)
 
 
-def update_chat_window(tag, message):
+def update_chat_window(tag, sender, message):
     """Updates the chat window with a new message."""
-    append_message_to_window(tag.capitalize(), message, context=False)
+    append_message_to_window(sender, message, context=False)
     chat_window.see(tk.END)  # Make sure to scroll to bottom after each message
 
 
@@ -273,7 +319,9 @@ def enable_ui():
 
 def handle_auto_continue(auto_continue_value):
     """Handles auto-continue functionality."""
-    update_chat_window('system', "Automatically continuing conversation...")
+    update_chat_window(get_label_tag(TYPE_SYSTEM),
+                       get_sender_name(TYPE_SYSTEM),
+                       "Automatically continuing conversation...")
     # Schedule the next backend communication
     thread_pool.submit(run_backend_communication, auto_continue_value)
 
@@ -318,50 +366,64 @@ SECONDARY_COLOR_VARIANT = "#F06292"  # Example: Pink 300
 ERROR_COLOR = "#CF6679"
 
 
+def get_label_tag(type_name):
+    """Get the label tag for a given type."""
+    return f"{type_name}_label"
+
+
+def get_message_tag(type_name):
+    """Get the message tag for a given type."""
+    return f"{type_name}_message"
+
+
+def get_sender_name(type_name):
+    """Get the sender name for a given type."""
+    return type_name.capitalize() if type_name != TYPE_USER else "You"
+
+
 def batch_insert_messages(messages):
     """Efficiently insert multiple messages into the chat window."""
     # Pre-configure tags
-
-    chat_window.tag_configure("assistant_label",
+    chat_window.tag_configure(get_label_tag(TYPE_ASSISTANT),
                               foreground=PRIMARY_COLOR_VARIANT,
                               justify=SYSTEM_ALIGNMENT)
-    chat_window.tag_configure("assistant_message", justify=SYSTEM_ALIGNMENT)
-    chat_window.tag_configure("user_label",
+    chat_window.tag_configure(get_message_tag(TYPE_ASSISTANT),
+                              justify=SYSTEM_ALIGNMENT)
+
+    chat_window.tag_configure(get_label_tag(TYPE_USER),
                               foreground=SECONDARY_COLOR,
                               justify=USER_ALIGNMENT)
-    chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
+    chat_window.tag_configure(get_message_tag(TYPE_USER),
+                              justify=USER_ALIGNMENT)
 
-    chat_window.tag_configure("system_label",
+    chat_window.tag_configure(get_label_tag(TYPE_SYSTEM),
                               foreground=PRIMARY_COLOR,
                               justify=SYSTEM_ALIGNMENT)
-    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure(get_message_tag(TYPE_SYSTEM),
+                              justify=SYSTEM_ALIGNMENT)
 
-    chat_window.tag_configure("system_invisible_label",
+    chat_window.tag_configure(get_label_tag(TYPE_INTERNAL),
                               foreground="grey",
                               justify=SYSTEM_ALIGNMENT)
-    chat_window.tag_configure("system_invisible_message",
+    chat_window.tag_configure(get_message_tag(TYPE_INTERNAL),
                               foreground="grey",
                               justify=SYSTEM_ALIGNMENT)
 
     # Build content in memory
     content = []
     for timestamp, message, tag, visible, context in messages:
-        if tag == 'user_input':
-            label_tag = "user_label"
-            message_tag = "user_message"
-            sender = "You"
-        elif tag == 'assistant':
-            label_tag = "assistant_label"
-            message_tag = "assistant_message"
-            sender = "Assistant"
+        if tag == TAG_USER_INPUT:
+            type_name = TYPE_USER
+        elif tag == TAG_ASSISTANT:
+            type_name = TYPE_ASSISTANT
         elif not visible:
-            label_tag = "system_invisible_label"
-            message_tag = "system_invisible_message"
-            sender = "System Internal"
+            type_name = TYPE_INTERNAL
         else:
-            label_tag = "system_label"
-            message_tag = "system_message"
-            sender = "System"
+            type_name = TYPE_SYSTEM
+
+        label_tag = get_label_tag(type_name)
+        message_tag = get_message_tag(type_name)
+        sender = get_sender_name(type_name)
 
         title = build_message_title(timestamp, sender, context)
         content.append((title, label_tag))
@@ -406,10 +468,12 @@ def _load_chat(a_snapshot):
             batch_insert_messages(chat_history)
         elif a_snapshot == "untitled":
             message = "Welcome to a new chat session!"
-            update_chat_window('system', message)
+            update_chat_window(get_label_tag(TYPE_SYSTEM),
+                               get_sender_name(TYPE_SYSTEM), message)
         else:
             message = "No chat history found in snapshot."
-            update_chat_window("System", message)
+            update_chat_window(get_label_tag(TYPE_SYSTEM),
+                               get_sender_name(TYPE_SYSTEM), message)
 
         print_system_info()
         update_active_chat_label(a_snapshot)
@@ -417,20 +481,25 @@ def _load_chat(a_snapshot):
 
     except Exception as e:
         error_msg = f"Error loading snapshot {a_snapshot}: {str(e)}"
-        update_chat_window("System", error_msg)
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM), error_msg)
         save_status_label.config(text=f"Error loading chat: {str(e)}",
                                  fg="red")
 
     finally:
+        controller.msgs.clear_control_flags()
+        update_chat_window(get_label_tag(TYPE_INTERNAL),
+                           get_sender_name(TYPE_INTERNAL),
+                           "Any control flags are disregarded.")
         chat_window.config(state=tk.DISABLED)
         enable_ui()  # Always re-enable the UI
 
 
 def print_system_info():
-    # current_time = datetime.now().strftime(TIME_FORMAT)
     backend_name = controller.selected_backend or "Unknown Backend"
     message = f"Active Backend is: {backend_name}"
-    update_chat_window("System", message)
+    update_chat_window(get_label_tag(TYPE_SYSTEM),
+                       get_sender_name(TYPE_SYSTEM), message)
 
 
 def save_and_load_untitled_chat():
@@ -743,9 +812,12 @@ def handle_stop():
     chat_window.config(state=tk.NORMAL)
     if controller:
         response = controller.stop()
-        append_message_to_window("System", response)
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM), response)
     else:
-        append_message_to_window("System", "Controller not initialized.")
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM),
+                           "Controller not initialized.")
     chat_window.config(state=original_state)
 
 
@@ -754,9 +826,12 @@ def handle_render():
     chat_window.config(state=tk.NORMAL)
     if controller:
         response = controller.render()
-        append_message_to_window("System", response)
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM), response)
     else:
-        append_message_to_window("System", "Controller not initialized.")
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM),
+                           "Controller not initialized.")
     chat_window.config(state=original_state)
 
 
