@@ -100,9 +100,9 @@ class AnimationManager:
     def load_sequences(self, animations):
         self.sequence_manager.load_sequences(animations)
 
-    def add_sequence(self, step_number, animation_sequence):
-        return self.sequence_manager.add_sequence(step_number,
-                                                  animation_sequence)
+    def add_sequence(self, sequence):
+        """Add a sequence using the sequence manager and return the step number."""
+        return self.sequence_manager.add_sequence(sequence)
 
     def save_all_animations(self, snapshot_dir, animation_suffix):
         """Save all animations to the specified directory."""

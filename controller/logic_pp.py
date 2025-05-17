@@ -362,27 +362,25 @@ class LogicPlusPlus:
         output = ""
         if user_input.lower() in ["y", "yes"]:
             if self.temp_animation_path:  # Ensure there's an animation path to process
-                step_number = len(
-                    self.animation_manager.sequence_manager.steps) + 1
                 try:
                     with open(self.temp_animation_path, "r") as temp_file:
                         animation_sequence = temp_file.read()
 
                     # Save the animation sequence to the message streamer
-                    # This is distinct from the 'preview' message if the user approves saving
                     self.message_streamer.add_message("animation_update",
                                                       animation_sequence,
                                                       visible=False,
                                                       context=False)
 
-                    # Add the animation to the sequence manager
-                    seq_message = self.animation_manager.add_sequence(
-                        step_number, animation_sequence)
+                    # Add the animation to the sequence manager and get the step number
+                    step_number = self.animation_manager.add_sequence(
+                        animation_sequence)
 
-                    self.message_streamer.add_message("animation_update",
-                                                      seq_message,
-                                                      visible=False,
-                                                      context=False)
+                    self.message_streamer.add_message(
+                        "animation_update",
+                        f"Animation added as step {step_number}",
+                        visible=False,
+                        context=False)
 
                     output += f"Animation sequence added to the sequence manager as step {step_number}.\n"
                     self.logger.info(

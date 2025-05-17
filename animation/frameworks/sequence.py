@@ -6,12 +6,12 @@ from constants import ANIMATION_OUT_TEMP_DIR
 
 class Sequence(ABC):
 
-    def add_sequence(self, step_number, sequence):
-        """Add a new sequence to the manager and log the update."""
-        # TODO(sapir) this is a bag!!! It does not append in the right order ???
-        step = {"step": step_number, "sequence": sequence}
+    def add_sequence(self, sequence):
+        """Add a new sequence to the manager and return the next step number."""
+        next_step_number = self.get_next_step_number()
+        step = {"step": next_step_number, "sequence": sequence}
         self.steps.append(step)
-        return f"Animation updated for step {step_number}"
+        return next_step_number
 
     def get_latest_sequence(self):
         """Return the latest sequence available."""
@@ -31,6 +31,12 @@ class Sequence(ABC):
         self.steps = []
         for i, sequence in enumerate(sequences):
             self.steps.append({"step": i, "sequence": sequence})
+
+    def get_next_step_number(self):
+        """Calculate the next step number based on the current sequences."""
+        if self.steps:
+            return max(step["step"] for step in self.steps) + 1
+        return 1
 
     @abstractmethod
     def get_suffix(self):
