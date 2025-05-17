@@ -38,12 +38,6 @@ class Sequence(ABC):
         """Load sequences from a list."""
         self.sequences = sequences.copy()
 
-    def get_next_step_number(self):
-        """Calculate the next step number based on the current sequences."""
-        if self.steps:
-            return max(step["step"] for step in self.steps) + 1
-        return 1
-
     @abstractmethod
     def get_suffix(self):
         """Return the animation suffix for the sequence."""

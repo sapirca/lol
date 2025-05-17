@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 import json
 import logging
+from animation.animation_manager import AnimationManager
 from configs.config_kivsee import config as basic_config
 from memory.memory_manager import MemoryManager
 
@@ -30,10 +31,16 @@ class Action(ABC):
 
 class UpdateAnimationAction(Action):
 
-    def __init__(self, animation_manager):
+    def __init__(self, animation_manager: AnimationManager):
         super().__init__()
         self.animation_manager = animation_manager
         self.temp_animation_path = None
+
+    def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert params to dictionary if it's a Pydantic model"""
+        if hasattr(params, 'model_dump'):
+            return params.model_dump(exclude_unset=True, exclude_none=True)
+        return params
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -61,27 +68,19 @@ class UpdateAnimationAction(Action):
         self.temp_animation_path = self.animation_manager.save_tmp_animation(
             animation_str)
 
-        # Get the current step number
-        current_step = len(self.animation_manager.sequence_manager.steps)
-        next_step = current_step + 1
-
         output = {
             "status": "success",
             "message":
             f"Animation sequence generated and saved to:\n{self.temp_animation_path}\n",
             "requires_confirmation": True,
             "temp_path": self.temp_animation_path,
-            # "data": {
-            #     "next_step_number": next_step,
-            #     "current_steps_count": current_step
-            # }
         }
 
         # Auto-render if configured
         if basic_config.get("auto_render", False):
-            animation_dict = json.loads(animation_str)
             output["message"] += "Rendering animation preview..."
-            render_result = self.render_preview(animation_dict)
+            render_result = self.render_preview(
+                params_dict["animation_sequence"])
             output["message"] += f"\n{render_result}"
 
         return output

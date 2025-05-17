@@ -320,6 +320,7 @@ class LogicPlusPlus:
         auto_continue = False
         try:
             model_response = backend.generate_response(messages)
+
         except Exception as e:
             error_msg = f"Error: {str(e)}"
             self.message_streamer.add_message("system",
@@ -598,20 +599,18 @@ class LogicPlusPlus:
     def render(self):
         """Render the current animation sequence."""
         try:
-            latest_sequence = self.animation_manager.get_latest_sequence()
+            latest_sequence, latest_step = self.animation_manager.get_latest_sequence_with_step(
+            )
             if not latest_sequence:
                 self.logger.warning(
                     "No animation sequence available to render.")
                 return "No animation sequence available to render."
 
-            # Get the current step number
-            current_step = len(self.animation_manager.sequence_manager.steps)
-
             animation_json = json.loads(latest_sequence)
             self.animation_manager.render(animation_json)
             self.logger.info(
-                f"Animation step {current_step} rendered successfully.")
-            return f"Animation step {current_step} rendered successfully."
+                f"Animation step {latest_step} rendered successfully.")
+            return f"Animation step {latest_step} rendered successfully."
         except Exception as e:
             self.logger.error(f"Error rendering animation: {e}")
             return f"Error rendering animation: {e}"
