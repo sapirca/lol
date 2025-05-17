@@ -9,6 +9,10 @@ secrets.py
 outputs/
 tests/output/
 
+# ingore periodic snapshots
+ui/tkinter/snapshots/periodic_snapshot.json
+
+
 # Environment variables
 .env
 

@@ -9,6 +9,7 @@ from constants import ANIMATION_OUT_TEMP_DIR, XLIGHTS_ANIMATION_SUFFIX, XLIGHTS_
 class XlightsSequence(Sequence):
 
     def __init__(self, skeleton_file):
+        super().__init__()
         self.skeleton_file = skeleton_file
         self.sequence_data = None
         self.steps = []

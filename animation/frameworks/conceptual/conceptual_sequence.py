@@ -7,6 +7,7 @@ from constants import ANIMATION_OUT_TEMP_DIR, CONCEPTUAL_ANIMATION_SUFFIX, CONCE
 class ConceptualSequence(Sequence):
 
     def __init__(self, sequence_path):
+        super().__init__()
         self.sequence_path = sequence_path
         self.sequence_data = None
         self.steps = []

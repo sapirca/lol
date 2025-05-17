@@ -182,6 +182,13 @@ class EffectConfig(BaseModel):
 
 # >>>>>>>>>>>>>>>>>>>>>>>>
 class EffectProto(BaseModel):
+    """
+    Represents a single effect in the animation sequence.
+    IMPORTANT: Each effect configuration must have EXACTLY ONE effect type set (const_color, rainbow, brightness, etc.).
+    Setting multiple effects in a single effect configuration will cause errors.
+    If you need multiple effects, create separate effect configurations for each one.
+    """
+
     effect_number: int = Field(
         ...,
         description=
@@ -211,27 +218,34 @@ class EffectProto(BaseModel):
 
     const_color: typing.Optional[ConstColorEffectConfig] = Field(
         default=None,
-        description="The LEDs will display a single, constant color.")
+        description=
+        "[IMPORTANT: Only set ONE effect type per effect config] The LEDs will display a single, constant color."
+    )
     rainbow: typing.Optional[RainbowEffectConfig] = Field(
         default=None,
         description=
-        "The LEDs will cycle through a spectrum of colors, creating a rainbow effect."
+        "[IMPORTANT: Only set ONE effect type per effect config] The LEDs will cycle through a spectrum of colors, creating a rainbow effect."
     )
     brightness: typing.Optional[BrightnessEffectConfig] = Field(
         default=None,
-        description="Adjusts the overall brightness of the LEDs.")
+        description=
+        "[IMPORTANT: Only set ONE effect type per effect config] Adjusts the overall brightness of the LEDs."
+    )
     hue: typing.Optional[HueEffectConfig] = Field(
         default=None,
-        description="Cycles through different hues (colors) on the LEDs.")
+        description=
+        "[IMPORTANT: Only set ONE effect type per effect config] Cycles through different hues (colors) on the LEDs."
+    )
     saturation: typing.Optional[SaturationEffectConfig] = Field(
         default=None,
         description=
-        "Adjusts the purity of the colors displayed on the LEDs. Below 0.8 is less saturated, pastel appearance."
+        "[IMPORTANT: Only set ONE effect type per effect config] Adjusts the purity of the colors displayed on the LEDs. Below 0.8 is less saturated, pastel appearance."
     )
     snake: typing.Optional[SnakeEffectConfig] = Field(
         default=None,
         description=
-        "A segment of lit LEDs will move along the strip, resembling a snake.")
+        "[IMPORTANT: Only set ONE effect type per effect config] A segment of lit LEDs will move along the strip, resembling a snake."
+    )
     # segment: typing.Optional[SegmentEffectConfig] = Field(
     #     default=None,
     #     description=
@@ -247,6 +261,7 @@ class EffectProto(BaseModel):
     #     description=
     #     "The LEDs will alternate between two specified colors at a defined period."
     # )
+
     effect_summary: str = Field(
         default="",
         description=
@@ -262,14 +277,12 @@ class EffectProto(BaseModel):
             self.hue,
             self.saturation,
             self.snake,
-            # self.segment,
-            # self.glitter,
-            # self.alternate,
         ]
         effects_set = sum(1 for effect in effects if effect is not None)
         if effects_set != 1:
             raise ValueError(
-                f"Exactly one effect type must be set. got: {effects}")
+                f"Exactly one effect type must be set. Found {effects_set} effects: {[e.__class__.__name__ for e in effects if e is not None]}"
+            )
         return self
 
 

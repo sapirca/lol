@@ -116,7 +116,6 @@ message EffectConfig {
 }
 
 message EffectProto {
-
     EffectConfig effect_config = 1; // p2p: {"description": "General configuration for the effect."}
     
     oneof effect {
@@ -126,9 +125,6 @@ message EffectProto {
         HueEffectConfig hue = 5;                  // p2p: {"description": "Hue effect."}
         SaturationEffectConfig saturation = 6;     // p2p: {"description": "Saturation effect."}
         SnakeEffectConfig snake = 7;              // p2p: {"description": "Snake effect."}
-        SegmentEffectConfig segment = 8;          // p2p: {"description": "Segment effect."}
-        GlitterEffectConfig glitter = 9;          // p2p: {"description": "Glitter effect."}
-        AlternateEffectConfig alternate = 10;     // p2p: {"description": "Alternate effect."}
     }
 }
 

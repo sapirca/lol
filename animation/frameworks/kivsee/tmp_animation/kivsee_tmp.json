@@ -1,38 +1,260 @@
 {
-    "instruction": "Create a light show animation for the Aladdin song with orange color effects synchronized to the lyrics and beats.",
-    "reasoning": "I've redesigned the animation to prominently feature orange colors throughout the light show, while still maintaining synchronization with the song's progression and emotional journey. The orange color palette represents the warm desert setting of Aladdin and creates a vibrant, magical atmosphere.\n\nFor this animation, I've used various shades of orange (from yellow-orange to deep orange-red) as the primary colors, with occasional complementary colors to create contrast at key moments. I've maintained the dynamic effects that respond to the song's narrative elements but shifted the color scheme to emphasize orange tones.\n\nThe animation still follows the song's structure, with effects timed to match specific lyrics and musical moments. I've used brightness variations, snake effects, and pulsing patterns to create visual interest while keeping orange as the dominant color theme throughout the show.",
+    "instruction": "Create a highly creative animation for Aladdin with diverse segmentations, interesting patterns, and dynamic brightness effects",
+    "reasoning": "This animation uses a wide variety of segment types, complex brightness patterns, and visually engaging color transitions to create a dynamic light show that's precisely synchronized with the Aladdin song's beat structure and lyrical moments.",
     "animation": {
         "effects": [
             {
                 "effect_number": 1,
-                "effect_group": "time_frame_0_22822",
-                "beat_and_bar": "Bar 0-3: beats 0-24",
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 0-1",
                 "elements": [
                     "ring7",
-                    "ring8",
                     "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 575,
+                    "end_time": 2429,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.75,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Pulsing purple on odd rings with centric segment"
+            },
+            {
+                "effect_number": 2,
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 0-1",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 575,
+                    "end_time": 2429,
+                    "segments": "centric"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Brightness pulse on odd rings"
+            },
+            {
+                "effect_number": 3,
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 1-2",
+                "elements": [
+                    "ring8",
                     "ring10",
-                    "ring11",
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 0,
-                    "end_time": 22822,
-                    "segments": "all"
+                    "start_time": 2429,
+                    "end_time": 4283,
+                    "segments": "updown"
                 },
                 "const_color": {
                     "color": {
                         "hue": 0.08,
-                        "sat": 0.9,
-                        "val": 0.8
+                        "sat": 1.0,
+                        "val": 1.0
                     }
                 },
-                "effect_summary": "Warm orange glow on all rings to establish desert atmosphere"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Pulsing orange on even rings with updown segment"
             },
             {
-                "effect_number": 2,
-                "effect_group": "time_frame_0_22822",
-                "beat_and_bar": "Bar 0-3: beats 0-24",
+                "effect_number": 4,
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 1-2",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 2429,
+                    "end_time": 4283,
+                    "segments": "updown"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Brightness pulse on even rings"
+            },
+            {
+                "effect_number": 5,
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 2-3",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 4283,
+                    "end_time": 6137,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.9,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Pulsing pink on outer rings with b1 segment"
+            },
+            {
+                "effect_number": 6,
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 2-3",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 4283,
+                    "end_time": 6137,
+                    "segments": "b1"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Brightness pulse on outer rings"
+            },
+            {
+                "effect_number": 7,
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 3-4",
+                "elements": [
+                    "ring9",
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 6137,
+                    "end_time": 7991,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.5,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Pulsing aqua on center rings with b2 segment"
+            },
+            {
+                "effect_number": 8,
+                "effect_group": "",
+                "beat_and_bar": "Bar 0: beats 3-4",
+                "elements": [
+                    "ring9",
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 6137,
+                    "end_time": 7991,
+                    "segments": "b2"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Brightness pulse on center rings"
+            },
+            {
+                "effect_number": 9,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 4-5",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -42,204 +264,196 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 0,
-                    "end_time": 22822,
-                    "segments": "all"
+                    "start_time": 7991,
+                    "end_time": 9845,
+                    "segments": "arc"
                 },
+                "const_color": null,
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.0
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 1.0
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rainbow effect on all rings with arc segment"
+            },
+            {
+                "effect_number": 10,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 4-5",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 7991,
+                    "end_time": 9845,
+                    "segments": "arc"
+                },
+                "const_color": null,
+                "rainbow": null,
                 "brightness": {
                     "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
                         "sin": {
                             "min": 0.4,
                             "max": 1.0,
                             "phase": 0.0,
-                            "repeats": 6.0
-                        }
+                            "repeats": 2.0
+                        },
+                        "steps": null
                     }
                 },
-                "effect_summary": "Gentle orange pulsing brightness effect"
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Pulsing brightness on all rings"
             },
             {
-                "effect_number": 3,
-                "effect_group": "time_frame_22822_30238",
-                "beat_and_bar": "Bar 3-4: beats 24-32",
+                "effect_number": 11,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 5-6",
                 "elements": [
                     "ring7",
-                    "ring8",
                     "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
+                    "ring11"
                 ],
                 "effect_config": {
-                    "start_time": 22822,
-                    "end_time": 30238,
-                    "segments": "all"
+                    "start_time": 9845,
+                    "end_time": 11699,
+                    "segments": "random"
                 },
-                "rainbow": {
-                    "hue_start": {
-                        "const_value": {
-                            "value": 0.05
-                        }
-                    },
-                    "hue_end": {
-                        "const_value": {
-                            "value": 0.12
-                        }
-                    }
-                },
-                "effect_summary": "Yellow-orange to deep orange gradient across rings preparing for lyrics"
-            },
-            {
-                "effect_number": 4,
-                "effect_group": "time_frame_22822_30238",
-                "beat_and_bar": "Bar 3-4: beats 24-32",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 22822,
-                    "end_time": 30238,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.5,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 4.0
-                        }
-                    }
-                },
-                "effect_summary": "Pulsing brightness for the orange gradient"
-            },
-            {
-                "effect_number": 5,
-                "effect_group": "time_frame_30238_33019",
-                "beat_and_bar": "Bar 4: beats 31.5-33.5",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 30238,
-                    "end_time": 33019,
-                    "segments": "all"
-                },
-                "snake": {
-                    "head": {
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
                         "linear": {
                             "start": 0.0,
-                            "end": 1.0
-                        }
-                    },
-                    "tail_length": {
-                        "const_value": {
-                            "value": 0.3
-                        }
-                    },
-                    "cyclic": false
-                },
-                "effect_summary": "East wind effect - orange snake moving left to right"
-            },
-            {
-                "effect_number": 6,
-                "effect_group": "time_frame_30238_33019",
-                "beat_and_bar": "Bar 4: beats 31.5-33.5",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 30238,
-                    "end_time": 33019,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.07,
-                        "sat": 1.0,
-                        "val": 0.9
+                            "end": 0.08
+                        },
+                        "sin": null,
+                        "steps": null
                     }
                 },
-                "effect_summary": "Orange color for the east wind snake"
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Red-orange hue shift on odd rings with random segment"
             },
             {
-                "effect_number": 7,
-                "effect_group": "time_frame_33019_35800",
-                "beat_and_bar": "Bar 4-5: beats 33.5-35.5",
+                "effect_number": 12,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 5-6",
                 "elements": [
                     "ring7",
-                    "ring8",
                     "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
+                    "ring11"
                 ],
                 "effect_config": {
-                    "start_time": 33019,
-                    "end_time": 35800,
-                    "segments": "all"
-                },
-                "snake": {
-                    "head": {
-                        "linear": {
-                            "start": 1.0,
-                            "end": 0.0
-                        }
-                    },
-                    "tail_length": {
-                        "const_value": {
-                            "value": 0.3
-                        }
-                    },
-                    "cyclic": false
-                },
-                "effect_summary": "West sun effect - bright orange snake moving right to left"
-            },
-            {
-                "effect_number": 8,
-                "effect_group": "time_frame_33019_35800",
-                "beat_and_bar": "Bar 4-5: beats 33.5-35.5",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 33019,
-                    "end_time": 35800,
-                    "segments": "all"
+                    "start_time": 9845,
+                    "end_time": 11699,
+                    "segments": "random"
                 },
                 "const_color": {
                     "color": {
-                        "hue": 0.05,
+                        "hue": 0.0,
                         "sat": 1.0,
                         "val": 1.0
                     }
                 },
-                "effect_summary": "Bright orange color for the west sun snake"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Constant red base color on odd rings"
             },
             {
-                "effect_number": 9,
-                "effect_group": "time_frame_35800_37654",
-                "beat_and_bar": "Bar 5: beats 35.5-37.5",
+                "effect_number": 13,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 6-7",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 11699,
+                    "end_time": 13553,
+                    "segments": "ind"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.67,
+                            "end": 0.75
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Blue-purple hue shift on even rings with ind segment"
+            },
+            {
+                "effect_number": 14,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 6-7",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 11699,
+                    "end_time": 13553,
+                    "segments": "ind"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.67,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Constant blue base color on even rings"
+            },
+            {
+                "effect_number": 15,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 7-8",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -249,193 +463,649 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 35800,
-                    "end_time": 37654,
+                    "start_time": 13553,
+                    "end_time": 15407,
+                    "segments": "centric"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.17,
+                            "end": 0.33
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Yellow-green hue shift on all rings with centric segment"
+            },
+            {
+                "effect_number": 16,
+                "effect_group": "",
+                "beat_and_bar": "Bar 1: beats 7-8",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 13553,
+                    "end_time": 15407,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.17,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Constant yellow base color on all rings"
+            },
+            {
+                "effect_number": 17,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 8-9",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 15407,
+                    "end_time": 18188,
                     "segments": "all"
                 },
                 "const_color": {
                     "color": {
-                        "hue": 0.1,
-                        "sat": 0.9,
-                        "val": 0.9
+                        "hue": 0.75,
+                        "sat": 1.0,
+                        "val": 1.0
                     }
                 },
-                "effect_summary": "Sand in glass effect - golden orange with brightness pulsing"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Purple snake on outer rings with rapid brightness pulsing"
             },
             {
-                "effect_number": 10,
-                "effect_group": "time_frame_35800_37654",
-                "beat_and_bar": "Bar 5: beats 35.5-37.5",
+                "effect_number": 18,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 8-9",
                 "elements": [
                     "ring7",
                     "ring8",
-                    "ring9",
-                    "ring10",
                     "ring11",
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 35800,
-                    "end_time": 37654,
+                    "start_time": 15407,
+                    "end_time": 18188,
                     "segments": "all"
                 },
+                "const_color": null,
+                "rainbow": null,
                 "brightness": {
                     "mult_factor": {
-                        "linear": {
-                            "start": 1.0,
-                            "end": 0.4
-                        }
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.2,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        },
+                        "steps": null
                     }
                 },
-                "effect_summary": "Fading brightness for sand falling effect"
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rapid brightness pulsing on outer rings"
             },
             {
-                "effect_number": 11,
-                "effect_group": "time_frame_37654_38581",
-                "beat_and_bar": "Bar 5: beats 37.5-38.5",
+                "effect_number": 19,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 8-10",
                 "elements": [
                     "ring7",
                     "ring8",
-                    "ring9",
-                    "ring10",
                     "ring11",
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 37654,
-                    "end_time": 38581,
-                    "segments": "b1"
+                    "start_time": 15407,
+                    "end_time": 18188,
+                    "segments": "all"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": {
+                    "head": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "cyclic": false
+                },
+                "effect_summary": "Purple snake on outer rings"
+            },
+            {
+                "effect_number": 20,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 9-10",
+                "elements": [
+                    "ring9",
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 17270,
+                    "end_time": 19115,
+                    "segments": "all"
                 },
                 "const_color": {
                     "color": {
                         "hue": 0.08,
-                        "sat": 0.7,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "Glass is right - sparkle effect with bright orange"
-            },
-            {
-                "effect_number": 12,
-                "effect_group": "time_frame_37654_38581",
-                "beat_and_bar": "Bar 5: beats 37.5-38.5",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 37654,
-                    "end_time": 38581,
-                    "segments": "b1"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.7,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 4.0
-                        }
-                    }
-                },
-                "effect_summary": "Sparkling brightness effect"
-            },
-            {
-                "effect_number": 13,
-                "effect_group": "time_frame_39508_41362",
-                "beat_and_bar": "Bar 5-6: beats 39-40",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 39508,
-                    "end_time": 41362,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.06,
                         "sat": 1.0,
                         "val": 1.0
                     }
                 },
-                "effect_summary": "Come on - bright orange pulse across all rings"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Orange snake on center rings with rapid brightness pulsing"
             },
             {
-                "effect_number": 14,
-                "effect_group": "time_frame_39508_41362",
-                "beat_and_bar": "Bar 5-6: beats 39-40",
+                "effect_number": 21,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 9-10",
                 "elements": [
-                    "ring7",
-                    "ring8",
                     "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
+                    "ring10"
                 ],
                 "effect_config": {
-                    "start_time": 39508,
-                    "end_time": 41362,
+                    "start_time": 17270,
+                    "end_time": 19115,
                     "segments": "all"
                 },
+                "const_color": null,
+                "rainbow": null,
                 "brightness": {
                     "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
                         "sin": {
-                            "min": 0.6,
+                            "min": 0.2,
                             "max": 1.0,
                             "phase": 0.0,
-                            "repeats": 2.0
-                        }
+                            "repeats": 4.0
+                        },
+                        "steps": null
                     }
                 },
-                "effect_summary": "Pulsing brightness for 'come on'"
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rapid brightness pulsing on center rings"
             },
             {
-                "effect_number": 15,
-                "effect_group": "time_frame_41362_41826",
-                "beat_and_bar": "Bar 6: beats 40-40.5",
+                "effect_number": 22,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 9-11",
                 "elements": [
-                    "ring7",
-                    "ring8",
                     "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
+                    "ring10"
                 ],
                 "effect_config": {
-                    "start_time": 41362,
-                    "end_time": 41826,
+                    "start_time": 17270,
+                    "end_time": 19115,
                     "segments": "all"
                 },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
                 "snake": {
                     "head": {
+                        "const_value": null,
                         "linear": {
                             "start": 0.0,
                             "end": 1.0
-                        }
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "cyclic": false
+                },
+                "effect_summary": "Orange snake on center rings"
+            },
+            {
+                "effect_number": 23,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 10-11",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 19115,
+                    "end_time": 20969,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.9,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Pink snake on all rings with b1 segment"
+            },
+            {
+                "effect_number": 24,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 10-11",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 19115,
+                    "end_time": 20969,
+                    "segments": "b1"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.1,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Triple-pulse brightness on all rings"
+            },
+            {
+                "effect_number": 25,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 10-12",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 19115,
+                    "end_time": 20969,
+                    "segments": "b1"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": {
+                    "head": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "cyclic": false
+                },
+                "effect_summary": "Pink snake on all rings"
+            },
+            {
+                "effect_number": 26,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 11-12",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 20969,
+                    "end_time": 22823,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.5,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Aqua snake on all rings with b2 segment"
+            },
+            {
+                "effect_number": 27,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 11-12",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 20969,
+                    "end_time": 22823,
+                    "segments": "b2"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.1,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Triple-pulse brightness on all rings"
+            },
+            {
+                "effect_number": 28,
+                "effect_group": "",
+                "beat_and_bar": "Bar 2: beats 11-13",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 20969,
+                    "end_time": 22823,
+                    "segments": "b2"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": {
+                    "head": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "cyclic": false
+                },
+                "effect_summary": "Aqua snake on all rings"
+            },
+            {
+                "effect_number": 29,
+                "effect_group": "",
+                "beat_and_bar": "Bar 3: beats 12-16",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 22823,
+                    "end_time": 30239,
+                    "segments": "ind"
+                },
+                "const_color": null,
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "hue_end": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 1.0,
+                            "end": 2.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rainbow effect on all rings with ind segment"
+            },
+            {
+                "effect_number": 30,
+                "effect_group": "",
+                "beat_and_bar": "Bar 3: beats 12-16",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 22823,
+                    "end_time": 30239,
+                    "segments": "ind"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Complex brightness pattern on all rings"
+            },
+            {
+                "effect_number": 31,
+                "effect_group": "",
+                "beat_and_bar": "Bar 4-5: Wind from the east lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 31166,
+                    "end_time": 33656,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.45,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Blue-green color flow from left to right with b1 segment"
+            },
+            {
+                "effect_number": 32,
+                "effect_group": "",
+                "beat_and_bar": "Bar 4-5: Wind from the east lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 31166,
+                    "end_time": 33656,
+                    "segments": "b1"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": {
+                    "head": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
                     },
                     "tail_length": {
                         "const_value": {
                             "value": 0.5
-                        }
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
                     },
                     "cyclic": false
                 },
-                "effect_summary": "Down - quick downward motion in orange"
+                "effect_summary": "Snake motion from left to right"
             },
             {
-                "effect_number": 16,
-                "effect_group": "time_frame_41362_41826",
-                "beat_and_bar": "Bar 6: beats 40-40.5",
+                "effect_number": 33,
+                "effect_group": "",
+                "beat_and_bar": "Bar 5-6: Sun from the west lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -445,69 +1115,28 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 41362,
-                    "end_time": 41826,
-                    "segments": "all"
+                    "start_time": 33656,
+                    "end_time": 36146,
+                    "segments": "b2"
                 },
                 "const_color": {
                     "color": {
-                        "hue": 0.05,
+                        "hue": 0.12,
                         "sat": 1.0,
                         "val": 1.0
                     }
                 },
-                "effect_summary": "Orange color for downward motion"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Orange-yellow color flow from right to left with b2 segment"
             },
             {
-                "effect_number": 17,
-                "effect_group": "time_frame_41826_42289",
-                "beat_and_bar": "Bar 6: beats 40.5-41.5",
-                "elements": [
-                    "ring7",
-                    "ring9",
-                    "ring11"
-                ],
-                "effect_config": {
-                    "start_time": 41826,
-                    "end_time": 42289,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.04,
-                        "sat": 1.0,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "Stop on by - alternating rings with bright orange"
-            },
-            {
-                "effect_number": 18,
-                "effect_group": "time_frame_41826_42289",
-                "beat_and_bar": "Bar 6: beats 40.5-41.5",
-                "elements": [
-                    "ring8",
-                    "ring10",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 41826,
-                    "end_time": 42289,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.09,
-                        "sat": 1.0,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "Stop on by - alternating rings with deeper orange"
-            },
-            {
-                "effect_number": 19,
-                "effect_group": "time_frame_42289_43216",
-                "beat_and_bar": "Bar 6: beats 41.5-42.5",
+                "effect_number": 34,
+                "effect_group": "",
+                "beat_and_bar": "Bar 5-6: Sun from the west lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -517,23 +1146,41 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 42289,
-                    "end_time": 43216,
-                    "segments": "all"
+                    "start_time": 33656,
+                    "end_time": 36146,
+                    "segments": "b2"
                 },
-                "const_color": {
-                    "color": {
-                        "hue": 0.07,
-                        "sat": 1.0,
-                        "val": 1.0
-                    }
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": {
+                    "head": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.5
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "cyclic": false
                 },
-                "effect_summary": "Hop a carpet - bouncing effect with orange"
+                "effect_summary": "Snake motion from right to left"
             },
             {
-                "effect_number": 20,
-                "effect_group": "time_frame_42289_43216",
-                "beat_and_bar": "Bar 6: beats 41.5-42.5",
+                "effect_number": 35,
+                "effect_group": "",
+                "beat_and_bar": "Bar 6-7: Sand in the glass lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -543,26 +1190,65 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 42289,
-                    "end_time": 43216,
-                    "segments": "all"
+                    "start_time": 36146,
+                    "end_time": 38636,
+                    "segments": "random"
                 },
+                "const_color": {
+                    "color": {
+                        "hue": 0.14,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Shimmering gold effect on all rings with random segment"
+            },
+            {
+                "effect_number": 36,
+                "effect_group": "",
+                "beat_and_bar": "Bar 6-7: Sand in the glass lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 36146,
+                    "end_time": 38636,
+                    "segments": "random"
+                },
+                "const_color": null,
+                "rainbow": null,
                 "brightness": {
                     "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
                         "sin": {
                             "min": 0.4,
                             "max": 1.0,
                             "phase": 0.0,
-                            "repeats": 2.0
-                        }
+                            "repeats": 12.0
+                        },
+                        "steps": null
                     }
                 },
-                "effect_summary": "Bouncing brightness effect for carpet"
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rapid brightness fluctuations on all rings"
             },
             {
-                "effect_number": 21,
-                "effect_group": "time_frame_43216_44143",
-                "beat_and_bar": "Bar 6: beats 42.5-43",
+                "effect_number": 37,
+                "effect_group": "",
+                "beat_and_bar": "Bar 7: Come on down lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -572,504 +1258,72 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 43216,
-                    "end_time": 44143,
-                    "segments": "all"
+                    "start_time": 39509,
+                    "end_time": 41363,
+                    "segments": "centric"
                 },
+                "const_color": {
+                    "color": {
+                        "hue": 0.78,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Downward flowing purple effect with centric segment"
+            },
+            {
+                "effect_number": 38,
+                "effect_group": "",
+                "beat_and_bar": "Bar 7: Come on down lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 39509,
+                    "end_time": 41363,
+                    "segments": "centric"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
                 "snake": {
                     "head": {
+                        "const_value": null,
                         "linear": {
-                            "start": 1.0,
-                            "end": 0.0
-                        }
+                            "start": 0.0,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
                     },
                     "tail_length": {
                         "const_value": {
                             "value": 0.4
-                        }
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
                     },
                     "cyclic": false
                 },
-                "effect_summary": "And fly - upward motion with bright orange"
-            },
-            {
-                "effect_number": 22,
-                "effect_group": "time_frame_43216_44143",
-                "beat_and_bar": "Bar 6: beats 42.5-43",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 43216,
-                    "end_time": 44143,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.06,
-                        "sat": 0.9,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "Orange color for upward flying motion"
-            },
-            {
-                "effect_number": 23,
-                "effect_group": "time_frame_44143_46924",
-                "beat_and_bar": "Bar 6-7: beats 43.5-46",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 44143,
-                    "end_time": 46924,
-                    "segments": "all"
-                },
-                "rainbow": {
-                    "hue_start": {
-                        "linear": {
-                            "start": 0.03,
-                            "end": 0.08
-                        }
-                    },
-                    "hue_end": {
-                        "linear": {
-                            "start": 0.08,
-                            "end": 0.13
-                        }
-                    }
-                },
-                "effect_summary": "To another Arabian night - magical orange gradient effect"
-            },
-            {
-                "effect_number": 24,
-                "effect_group": "time_frame_44143_46924",
-                "beat_and_bar": "Bar 6-7: beats 43.5-46",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 44143,
-                    "end_time": 46924,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.7,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 3.0
-                        }
-                    }
-                },
-                "effect_summary": "Pulsing brightness for orange gradient effect"
-            },
-            {
-                "effect_number": 25,
-                "effect_group": "time_frame_46924_48778",
-                "beat_and_bar": "Bar 7: beats 46-48",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 46924,
-                    "end_time": 48778,
-                    "segments": "all"
-                },
-                "rainbow": {
-                    "hue_start": {
-                        "const_value": {
-                            "value": 0.04
-                        }
-                    },
-                    "hue_end": {
-                        "const_value": {
-                            "value": 0.1
-                        }
-                    }
-                },
-                "effect_summary": "Ahuuuuuuu - mystical orange to amber gradient"
-            },
-            {
-                "effect_number": 26,
-                "effect_group": "time_frame_46924_48778",
-                "beat_and_bar": "Bar 7: beats 46-48",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 46924,
-                    "end_time": 48778,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "linear": {
-                            "start": 0.5,
-                            "end": 1.0
-                        }
-                    }
-                },
-                "effect_summary": "Increasing brightness for mystical effect"
-            },
-            {
-                "effect_number": 27,
-                "effect_group": "time_frame_48778_50632",
-                "beat_and_bar": "Bar 7-8: beats 48.5-50",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 48778,
-                    "end_time": 50632,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.05,
-                        "sat": 1.0,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "Boom - bright orange flash across all rings"
-            },
-            {
-                "effect_number": 28,
-                "effect_group": "time_frame_48778_50632",
-                "beat_and_bar": "Bar 7-8: beats 48.5-50",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 48778,
-                    "end_time": 50632,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "linear": {
-                            "start": 1.0,
-                            "end": 0.3
-                        }
-                    }
-                },
-                "effect_summary": "Fading brightness for boom effect"
-            },
-            {
-                "effect_number": 29,
-                "effect_group": "time_frame_50632_53413",
-                "beat_and_bar": "Bar 8: beats 50-53",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 50632,
-                    "end_time": 53413,
-                    "segments": "all"
-                },
-                "rainbow": {
-                    "hue_start": {
-                        "linear": {
-                            "start": 0.03,
-                            "end": 0.08
-                        }
-                    },
-                    "hue_end": {
-                        "linear": {
-                            "start": 0.08,
-                            "end": 0.13
-                        }
-                    }
-                },
-                "effect_summary": "Arabian nights - sweeping orange gradient effect"
-            },
-            {
-                "effect_number": 30,
-                "effect_group": "time_frame_50632_53413",
-                "beat_and_bar": "Bar 8: beats 50-53",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 50632,
-                    "end_time": 53413,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.6,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 3.0
-                        }
-                    }
-                },
-                "effect_summary": "Pulsing brightness for Arabian nights"
-            },
-            {
-                "effect_number": 31,
-                "effect_group": "time_frame_53413_57121",
-                "beat_and_bar": "Bar 8-9: beats 53-57",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 53413,
-                    "end_time": 57121,
-                    "segments": "all"
-                },
-                "rainbow": {
-                    "hue_start": {
-                        "const_value": {
-                            "value": 0.1
-                        }
-                    },
-                    "hue_end": {
-                        "const_value": {
-                            "value": 0.05
-                        }
-                    }
-                },
-                "effect_summary": "Like Arabian days - warm golden orange colors"
-            },
-            {
-                "effect_number": 32,
-                "effect_group": "time_frame_53413_57121",
-                "beat_and_bar": "Bar 8-9: beats 53-57",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 53413,
-                    "end_time": 57121,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.7,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 4.0
-                        }
-                    }
-                },
-                "effect_summary": "Pulsing brightness for Arabian days"
-            },
-            {
-                "effect_number": 33,
-                "effect_group": "time_frame_57121_59902",
-                "beat_and_bar": "Bar 9: beats 57-59",
-                "elements": [
-                    "ring7",
-                    "ring9",
-                    "ring11"
-                ],
-                "effect_config": {
-                    "start_time": 57121,
-                    "end_time": 59902,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.05,
-                        "sat": 1.0,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "More often than not - alternating rings with bright orange"
-            },
-            {
-                "effect_number": 34,
-                "effect_group": "time_frame_57121_59902",
-                "beat_and_bar": "Bar 9: beats 57-59",
-                "elements": [
-                    "ring7",
-                    "ring9",
-                    "ring11"
-                ],
-                "effect_config": {
-                    "start_time": 57121,
-                    "end_time": 59902,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.6,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 2.0
-                        }
-                    }
-                },
-                "effect_summary": "Pulsing brightness for orange rings"
-            },
-            {
-                "effect_number": 35,
-                "effect_group": "time_frame_57121_59902",
-                "beat_and_bar": "Bar 9: beats 57-59",
-                "elements": [
-                    "ring8",
-                    "ring10",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 57121,
-                    "end_time": 59902,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.02,
-                        "sat": 1.0,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "More often than not - alternating rings with deeper orange-red"
-            },
-            {
-                "effect_number": 36,
-                "effect_group": "time_frame_57121_59902",
-                "beat_and_bar": "Bar 9: beats 57-59",
-                "elements": [
-                    "ring8",
-                    "ring10",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 57121,
-                    "end_time": 59902,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.6,
-                            "max": 1.0,
-                            "phase": 0.5,
-                            "repeats": 2.0
-                        }
-                    }
-                },
-                "effect_summary": "Pulsing brightness for orange-red rings with phase offset"
-            },
-            {
-                "effect_number": 37,
-                "effect_group": "time_frame_59902_64537",
-                "beat_and_bar": "Bar 9-10: beats 59-64",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 59902,
-                    "end_time": 64537,
-                    "segments": "all"
-                },
-                "const_color": {
-                    "color": {
-                        "hue": 0.03,
-                        "sat": 1.0,
-                        "val": 1.0
-                    }
-                },
-                "effect_summary": "Are hotter than hot - intense orange-red pulsing"
-            },
-            {
-                "effect_number": 38,
-                "effect_group": "time_frame_59902_64537",
-                "beat_and_bar": "Bar 9-10: beats 59-64",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 59902,
-                    "end_time": 64537,
-                    "segments": "all"
-                },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.5,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 5.0
-                        }
-                    }
-                },
-                "effect_summary": "Pulsing brightness for 'hotter than hot'"
+                "effect_summary": "Downward flowing snake effect"
             },
             {
                 "effect_number": 39,
-                "effect_group": "time_frame_64537_66391",
-                "beat_and_bar": "Bar 10: beats 64-66",
+                "effect_group": "",
+                "beat_and_bar": "Bar 7-8: Hop a carpet and fly lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1079,23 +1333,28 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 64537,
-                    "end_time": 66391,
-                    "segments": "all"
+                    "start_time": 41363,
+                    "end_time": 43217,
+                    "segments": "updown"
                 },
                 "const_color": {
                     "color": {
-                        "hue": 0.05,
+                        "hue": 0.6,
                         "sat": 1.0,
                         "val": 1.0
                     }
                 },
-                "effect_summary": "Boom - bright orange flash across all rings"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Upward flowing blue effect with updown segment"
             },
             {
                 "effect_number": 40,
-                "effect_group": "time_frame_64537_66391",
-                "beat_and_bar": "Bar 10: beats 64-66",
+                "effect_group": "",
+                "beat_and_bar": "Bar 7-8: Hop a carpet and fly lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1105,24 +1364,32 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 64537,
-                    "end_time": 66391,
-                    "segments": "all"
+                    "start_time": 41363,
+                    "end_time": 43217,
+                    "segments": "updown"
                 },
+                "const_color": null,
+                "rainbow": null,
                 "brightness": {
                     "mult_factor": {
+                        "const_value": null,
                         "linear": {
-                            "start": 1.0,
-                            "end": 0.3
-                        }
+                            "start": 0.5,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
                     }
                 },
-                "effect_summary": "Fading brightness for boom effect"
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Upward flowing snake effect with increasing brightness"
             },
             {
                 "effect_number": 41,
-                "effect_group": "time_frame_66391_69172",
-                "beat_and_bar": "Bar 10-11: beats 66-69",
+                "effect_group": "",
+                "beat_and_bar": "Bar 7-8: Hop a carpet and fly lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1132,30 +1399,41 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 66391,
-                    "end_time": 69172,
-                    "segments": "all"
+                    "start_time": 41363,
+                    "end_time": 43217,
+                    "segments": "updown"
                 },
-                "rainbow": {
-                    "hue_start": {
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": {
+                    "head": {
+                        "const_value": null,
                         "linear": {
-                            "start": 0.03,
-                            "end": 0.08
-                        }
+                            "start": 1.0,
+                            "end": 0.0
+                        },
+                        "sin": null,
+                        "steps": null
                     },
-                    "hue_end": {
-                        "linear": {
-                            "start": 0.08,
-                            "end": 0.13
-                        }
-                    }
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "cyclic": false
                 },
-                "effect_summary": "Arabian nights - sweeping orange gradient effect"
+                "effect_summary": "Upward flowing snake effect"
             },
             {
                 "effect_number": 42,
-                "effect_group": "time_frame_66391_69172",
-                "beat_and_bar": "Bar 10-11: beats 66-69",
+                "effect_group": "",
+                "beat_and_bar": "Bar 8: To another Arabian night lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1165,26 +1443,39 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 66391,
-                    "end_time": 69172,
-                    "segments": "all"
+                    "start_time": 43217,
+                    "end_time": 46000,
+                    "segments": "arc"
                 },
-                "brightness": {
-                    "mult_factor": {
-                        "sin": {
-                            "min": 0.6,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": 3.0
-                        }
+                "const_color": null,
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.0
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 1.0
+                        },
+                        "linear": null,
+                        "sin": null,
+                        "steps": null
                     }
                 },
-                "effect_summary": "Pulsing brightness for Arabian nights"
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Expanding rainbow effect with arc segment"
             },
             {
                 "effect_number": 43,
-                "effect_group": "time_frame_70099_73807",
-                "beat_and_bar": "Bar 11: beats 70-73",
+                "effect_group": "",
+                "beat_and_bar": "Bar 8: To another Arabian night lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1194,23 +1485,443 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 70099,
-                    "end_time": 73807,
+                    "start_time": 43217,
+                    "end_time": 46000,
+                    "segments": "arc"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.4,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Pulsing brightness with rainbow"
+            },
+            {
+                "effect_number": 44,
+                "effect_group": "",
+                "beat_and_bar": "Bar 9: Ahuuuuuuu lyric",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 46000,
+                    "end_time": 48000,
+                    "segments": "b1"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.7,
+                            "end": 0.6
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Dramatic purple-blue hue shift on all rings with b1 and b2 segments alternating"
+            },
+            {
+                "effect_number": 45,
+                "effect_group": "",
+                "beat_and_bar": "Bar 9: Ahuuuuuuu lyric",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 46000,
+                    "end_time": 48000,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base purple color on odd rings"
+            },
+            {
+                "effect_number": 46,
+                "effect_group": "",
+                "beat_and_bar": "Bar 9: Ahuuuuuuu lyric",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 46000,
+                    "end_time": 48000,
+                    "segments": "b2"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.6,
+                            "end": 0.7
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Dramatic blue-purple hue shift on even rings"
+            },
+            {
+                "effect_number": 47,
+                "effect_group": "",
+                "beat_and_bar": "Bar 9: Ahuuuuuuu lyric",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 46000,
+                    "end_time": 48000,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.6,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base blue color on even rings"
+            },
+            {
+                "effect_number": 48,
+                "effect_group": "",
+                "beat_and_bar": "Bar 9: Ahuuuuuuu lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 46000,
+                    "end_time": 48000,
                     "segments": "all"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.4,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rising brightness on all rings"
+            },
+            {
+                "effect_number": 49,
+                "effect_group": "",
+                "beat_and_bar": "Bar 9-10: Boom and psychedelic",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 48500,
+                    "end_time": 50000,
+                    "segments": "random"
+                },
+                "const_color": null,
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.5,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        },
+                        "steps": null
+                    },
+                    "hue_end": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.5,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 2.0
+                        },
+                        "steps": null
+                    }
+                },
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Explosive rainbow pattern on all rings with random segment"
+            },
+            {
+                "effect_number": 50,
+                "effect_group": "",
+                "beat_and_bar": "Bar 9-10: Boom and psychedelic",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 48500,
+                    "end_time": 50000,
+                    "segments": "random"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.2,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rapid brightness fluctuations on all rings"
+            },
+            {
+                "effect_number": 51,
+                "effect_group": "",
+                "beat_and_bar": "Bar 10-11: Arabian nights lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 50000,
+                    "end_time": 53000,
+                    "segments": "arc"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.08
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Flowing red-orange pattern on all rings with arc segment"
+            },
+            {
+                "effect_number": 52,
+                "effect_group": "",
+                "beat_and_bar": "Bar 10-11: Arabian nights lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 50000,
+                    "end_time": 53000,
+                    "segments": "arc"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base red color on all rings"
+            },
+            {
+                "effect_number": 53,
+                "effect_group": "",
+                "beat_and_bar": "Bar 10-11: Arabian nights lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 50000,
+                    "end_time": 53000,
+                    "segments": "arc"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.4,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Synchronized brightness pulsing on all rings"
+            },
+            {
+                "effect_number": 54,
+                "effect_group": "",
+                "beat_and_bar": "Bar 11-12: Like Arabian days lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 53000,
+                    "end_time": 57000,
+                    "segments": "centric"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.08,
+                            "end": 0.16
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Flowing yellow-orange pattern on all rings with centric segment"
+            },
+            {
+                "effect_number": 55,
+                "effect_group": "",
+                "beat_and_bar": "Bar 11-12: Like Arabian days lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 53000,
+                    "end_time": 57000,
+                    "segments": "centric"
                 },
                 "const_color": {
                     "color": {
                         "hue": 0.08,
-                        "sat": 0.9,
-                        "val": 0.8
+                        "sat": 1.0,
+                        "val": 1.0
                     }
                 },
-                "effect_summary": "'neath Arabian moons - deep orange with sparkles"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base orange color on all rings"
             },
             {
-                "effect_number": 44,
-                "effect_group": "time_frame_70099_73807",
-                "beat_and_bar": "Bar 11: beats 70-73",
+                "effect_number": 56,
+                "effect_group": "",
+                "beat_and_bar": "Bar 11-12: Like Arabian days lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1220,23 +1931,90 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 70099,
-                    "end_time": 73807,
+                    "start_time": 53000,
+                    "end_time": 57000,
+                    "segments": "centric"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.4,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Synchronized brightness pulsing on all rings"
+            },
+            {
+                "effect_number": 57,
+                "effect_group": "",
+                "beat_and_bar": "Bar 12-13: More often than not lyric",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 57000,
+                    "end_time": 59000,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Alternating red and orange on odd and even rings with b1/b2 segments"
+            },
+            {
+                "effect_number": 58,
+                "effect_group": "",
+                "beat_and_bar": "Bar 12-13: More often than not lyric",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 57000,
+                    "end_time": 59000,
                     "segments": "b2"
                 },
                 "const_color": {
                     "color": {
-                        "hue": 0.06,
-                        "sat": 0.1,
+                        "hue": 0.08,
+                        "sat": 1.0,
                         "val": 1.0
                     }
                 },
-                "effect_summary": "Moon sparkles effect"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Alternating orange color on even rings"
             },
             {
-                "effect_number": 45,
-                "effect_group": "time_frame_70099_73807",
-                "beat_and_bar": "Bar 11: beats 70-73",
+                "effect_number": 59,
+                "effect_group": "",
+                "beat_and_bar": "Bar 12-13: More often than not lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1246,26 +2024,327 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 70099,
-                    "end_time": 73807,
-                    "segments": "b2"
+                    "start_time": 57000,
+                    "end_time": 59000,
+                    "segments": "all"
                 },
+                "const_color": null,
+                "rainbow": null,
                 "brightness": {
                     "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Synchronized brightness pulsing on all rings"
+            },
+            {
+                "effect_number": 60,
+                "effect_group": "",
+                "beat_and_bar": "Bar 13-14: Are hotter than hot lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 59000,
+                    "end_time": 64000,
+                    "segments": "updown"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.17,
+                            "phase": 0.0,
+                            "repeats": 5.0
+                        },
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Intense red-yellow gradient on all rings with updown segment"
+            },
+            {
+                "effect_number": 61,
+                "effect_group": "",
+                "beat_and_bar": "Bar 13-14: Are hotter than hot lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 59000,
+                    "end_time": 64000,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base red color on all rings"
+            },
+            {
+                "effect_number": 62,
+                "effect_group": "",
+                "beat_and_bar": "Bar 13-14: Are hotter than hot lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 59000,
+                    "end_time": 64000,
+                    "segments": "updown"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 10.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Increasing brightness pulsing on all rings"
+            },
+            {
+                "effect_number": 63,
+                "effect_group": "",
+                "beat_and_bar": "Bar 14-15: Boom and psychedelic",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 64000,
+                    "end_time": 66000,
+                    "segments": "random"
+                },
+                "const_color": null,
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.5,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        },
+                        "steps": null
+                    },
+                    "hue_end": {
+                        "const_value": null,
+                        "linear": null,
                         "sin": {
                             "min": 0.5,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 2.0
+                        },
+                        "steps": null
+                    }
+                },
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Explosive rainbow pattern on all rings with random segment"
+            },
+            {
+                "effect_number": 64,
+                "effect_group": "",
+                "beat_and_bar": "Bar 14-15: Boom and psychedelic",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 64000,
+                    "end_time": 66000,
+                    "segments": "random"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.2,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Rapid brightness fluctuations on all rings"
+            },
+            {
+                "effect_number": 65,
+                "effect_group": "",
+                "beat_and_bar": "Bar 15-16: Arabian nights lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 66000,
+                    "end_time": 69000,
+                    "segments": "arc"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.7,
+                            "end": 0.6
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Deep purple-blue pattern on all rings with arc segment"
+            },
+            {
+                "effect_number": 66,
+                "effect_group": "",
+                "beat_and_bar": "Bar 15-16: Arabian nights lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 66000,
+                    "end_time": 69000,
+                    "segments": "arc"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base purple color on all rings"
+            },
+            {
+                "effect_number": 67,
+                "effect_group": "",
+                "beat_and_bar": "Bar 15-16: Arabian nights lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 66000,
+                    "end_time": 69000,
+                    "segments": "arc"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.4,
                             "max": 1.0,
                             "phase": 0.0,
                             "repeats": 6.0
-                        }
+                        },
+                        "steps": null
                     }
                 },
-                "effect_summary": "Sparkling brightness for moon effect"
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Gentle brightness pulsing on all rings"
             },
             {
-                "effect_number": 46,
-                "effect_group": "time_frame_73807_75661",
-                "beat_and_bar": "Bar 11-12: beats 73-75",
+                "effect_number": 68,
+                "effect_group": "",
+                "beat_and_bar": "Bar 16-17: 'Neath Arabian moons lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1275,23 +2354,63 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 73807,
-                    "end_time": 75661,
-                    "segments": "all"
+                    "start_time": 70000,
+                    "end_time": 73000,
+                    "segments": "centric"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.6,
+                            "end": 0.65
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Shimmering blue-white pattern on all rings with centric segment"
+            },
+            {
+                "effect_number": 69,
+                "effect_group": "",
+                "beat_and_bar": "Bar 16-17: 'Neath Arabian moons lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 70000,
+                    "end_time": 73000,
+                    "segments": "centric"
                 },
                 "const_color": {
                     "color": {
-                        "hue": 0.02,
-                        "sat": 1.0,
-                        "val": 0.9
+                        "hue": 0.6,
+                        "sat": 0.9,
+                        "val": 1.0
                     }
                 },
-                "effect_summary": "A fool off his guard - warning orange-red pulse"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base blue color on all rings"
             },
             {
-                "effect_number": 47,
-                "effect_group": "time_frame_73807_75661",
-                "beat_and_bar": "Bar 11-12: beats 73-75",
+                "effect_number": 70,
+                "effect_group": "",
+                "beat_and_bar": "Bar 16-17: 'Neath Arabian moons lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1301,86 +2420,90 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 73807,
-                    "end_time": 75661,
-                    "segments": "all"
+                    "start_time": 70000,
+                    "end_time": 73000,
+                    "segments": "centric"
                 },
-                "brightness": {
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": {
                     "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
                         "sin": {
-                            "min": 0.5,
+                            "min": 0.8,
                             "max": 1.0,
                             "phase": 0.0,
-                            "repeats": 2.0
-                        }
+                            "repeats": 6.0
+                        },
+                        "steps": null
                     }
                 },
-                "effect_summary": "Pulsing brightness for warning effect"
+                "snake": null,
+                "effect_summary": "Gentle brightness pulsing on all rings"
             },
             {
-                "effect_number": 48,
-                "effect_group": "time_frame_75661_81223",
-                "beat_and_bar": "Bar 12-end: beats 75-87",
+                "effect_number": 71,
+                "effect_group": "",
+                "beat_and_bar": "Bar 17-18: A fool off his guard lyric",
                 "elements": [
                     "ring7",
-                    "ring8",
                     "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
+                    "ring11"
                 ],
                 "effect_config": {
-                    "start_time": 75661,
-                    "end_time": 81223,
-                    "segments": "all"
-                },
-                "snake": {
-                    "head": {
-                        "linear": {
-                            "start": 0.0,
-                            "end": 1.0
-                        }
-                    },
-                    "tail_length": {
-                        "linear": {
-                            "start": 0.3,
-                            "end": 0.1
-                        }
-                    },
-                    "cyclic": false
-                },
-                "effect_summary": "Could fall and fall hard - downward orange-red snake effect"
-            },
-            {
-                "effect_number": 49,
-                "effect_group": "time_frame_75661_81223",
-                "beat_and_bar": "Bar 12-end: beats 75-87",
-                "elements": [
-                    "ring7",
-                    "ring8",
-                    "ring9",
-                    "ring10",
-                    "ring11",
-                    "ring12"
-                ],
-                "effect_config": {
-                    "start_time": 75661,
-                    "end_time": 81223,
-                    "segments": "all"
+                    "start_time": 73000,
+                    "end_time": 75000,
+                    "segments": "b1"
                 },
                 "const_color": {
                     "color": {
-                        "hue": 0.03,
+                        "hue": 0.0,
                         "sat": 1.0,
                         "val": 1.0
                     }
                 },
-                "effect_summary": "Orange-red color for falling effect"
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Alternating red and purple on odd and even rings with b1/b2 segments"
             },
             {
-                "effect_number": 50,
-                "effect_group": "time_frame_75661_81223",
-                "beat_and_bar": "Bar 12-end: beats 75-87",
+                "effect_number": 72,
+                "effect_group": "",
+                "beat_and_bar": "Bar 17-18: A fool off his guard lyric",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 73000,
+                    "end_time": 75000,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.75,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Alternating purple color on even rings"
+            },
+            {
+                "effect_number": 73,
+                "effect_group": "",
+                "beat_and_bar": "Bar 17-18: A fool off his guard lyric",
                 "elements": [
                     "ring7",
                     "ring8",
@@ -1390,23 +2513,249 @@
                     "ring12"
                 ],
                 "effect_config": {
-                    "start_time": 75661,
-                    "end_time": 81223,
+                    "start_time": 73000,
+                    "end_time": 75000,
                     "segments": "all"
                 },
+                "const_color": null,
+                "rainbow": null,
                 "brightness": {
                     "mult_factor": {
-                        "linear": {
-                            "start": 1.0,
-                            "end": 0.3
-                        }
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.3,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        },
+                        "steps": null
                     }
                 },
-                "effect_summary": "Fading brightness for falling effect"
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Synchronized brightness pulsing on all rings"
+            },
+            {
+                "effect_number": 74,
+                "effect_group": "",
+                "beat_and_bar": "Bar 18-19: Could fall and fall hard lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 75000,
+                    "end_time": 81000,
+                    "segments": "all"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.08
+                        },
+                        "sin": null,
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Dramatic downward flowing red-orange pattern with snake motion"
+            },
+            {
+                "effect_number": 75,
+                "effect_group": "",
+                "beat_and_bar": "Bar 18-19: Could fall and fall hard lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 75000,
+                    "end_time": 81000,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base red color on all rings"
+            },
+            {
+                "effect_number": 76,
+                "effect_group": "",
+                "beat_and_bar": "Bar 18-19: Could fall and fall hard lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 75000,
+                    "end_time": 81000,
+                    "segments": "all"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": {
+                    "head": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "tail_length": {
+                        "const_value": null,
+                        "linear": {
+                            "start": 0.3,
+                            "end": 0.7
+                        },
+                        "sin": null,
+                        "steps": null
+                    },
+                    "cyclic": false
+                },
+                "effect_summary": "Downward flowing snake effect"
+            },
+            {
+                "effect_number": 77,
+                "effect_group": "",
+                "beat_and_bar": "Bar 19-20: Out there on the dunes lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 81000,
+                    "end_time": 85000,
+                    "segments": "updown"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": null,
+                "hue": {
+                    "offset_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.08,
+                            "max": 0.15,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        },
+                        "steps": null
+                    }
+                },
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Golden-yellow sand dune effect with updown segment"
+            },
+            {
+                "effect_number": 78,
+                "effect_group": "",
+                "beat_and_bar": "Bar 19-20: Out there on the dunes lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 81000,
+                    "end_time": 85000,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "rainbow": null,
+                "brightness": null,
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Base golden color on all rings"
+            },
+            {
+                "effect_number": 79,
+                "effect_group": "",
+                "beat_and_bar": "Bar 19-20: Out there on the dunes lyric",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 81000,
+                    "end_time": 85000,
+                    "segments": "updown"
+                },
+                "const_color": null,
+                "rainbow": null,
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": null,
+                        "linear": null,
+                        "sin": {
+                            "min": 0.4,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        },
+                        "steps": null
+                    }
+                },
+                "hue": null,
+                "saturation": null,
+                "snake": null,
+                "effect_summary": "Gentle brightness waves on all rings"
             }
         ],
-        "duration_ms": 81223,
+        "duration_ms": 82000,
         "num_repeats": 1
     },
-    "name": "aladdin_arabian_nights_orange"
+    "name": "aladdin"
 }

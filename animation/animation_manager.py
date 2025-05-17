@@ -94,6 +94,14 @@ class AnimationManager:
             return None
         return f"{latest_sequence}"
 
+    def get_latest_sequence_with_step(self):
+        """Returns the latest sequence and its step number."""
+        result = self.sequence_manager.get_latest_sequence_with_step()
+        if not result:
+            return None
+        sequence, step = result
+        return f"{sequence}", step
+
     def get_all_sequences(self):
         return self.sequence_manager.get_all_sequences()
 
