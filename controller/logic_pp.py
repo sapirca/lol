@@ -52,7 +52,6 @@ class LogicPlusPlus:
         if snapshot_dir is not None:
             try:
                 self._load_from_snapshot(snapshot_dir)
-                self.initial_prompt_added = True
             except Exception as e:
                 self.logger.error(
                     f"Failed to load snapshot from {snapshot_dir}: {e}")
@@ -60,7 +59,6 @@ class LogicPlusPlus:
                     f"Failed to load snapshot from {snapshot_dir}: {e}")
         else:
             # Default initialization if no snapshot is provided
-            self.initial_prompt_added = False
             self.config = basic_config
             self.selected_framework = self.config.get("framework", None)
             self.animation_manager = AnimationManager(self.selected_framework,
@@ -236,63 +234,6 @@ class LogicPlusPlus:
 
         return random.choice(list(self.backends.values()))
 
-    def build_prompt(self, intro_prompt, general_knowledge):
-        prompt_parts = []
-        if intro_prompt:
-            prompt_parts.append(intro_prompt)
-        if general_knowledge:
-            prompt_parts.append("\n### General Knowledge\n")
-            prompt_parts.append(general_knowledge)
-        return "\n".join(prompt_parts)
-
-    def process_init_prompt(self):
-        latest_sequence = None
-        if not self.initial_prompt_added:
-
-            # # Provide song structure
-            # song_name = self.config.get("song_name")
-            # song_info = self.song_provider.get_song_structure(
-            #     song_name) if song_name else ""
-            # print(f" >>> Song name: {song_name}")
-
-            # Provide general knowledge
-            timing_knowledge = self.animation_manager.get_general_knowledge()
-
-            # Build the initial prompt
-            initial_prompt = self.build_prompt(intro_prompt, timing_knowledge)
-
-            self.msgs.add_invisible("initial_prompt_context",
-                                    initial_prompt,
-                                    context=True)
-
-            # # Add memory to the initial prompt
-            # memory = self.memory_manager.get_memory()
-            # if (memory):
-            #     self.msgs.add_message("system",
-            #                                       f"Memory: {memory}",
-            #                                       visible=False,
-            #                                       context=True)
-
-            # Do not add the last animation
-            # latest_sequence = self.animation_manager.get_latest_sequence()
-            # if (latest_sequence):
-            #     self.msgs.add_message("initial_animation",
-            #                                       latest_sequence,
-            #                                       visible=False,
-            #                                       context=True)
-
-            self.initial_prompt_added = True
-
-            initial_prompt_report = (
-                f"Included initial prompt. Sent to {self.selected_backend}. {self.selected_framework} framework.\n"
-            )
-
-            # self.msgs.add_visible("system",
-            #                       initial_prompt_report,
-            #                       context=False)
-
-            return initial_prompt_report
-
     def is_processing(self):
         """Check if the backend is currently processing a request."""
         return self._is_processing
@@ -313,28 +254,22 @@ class LogicPlusPlus:
             finally:
                 self._is_processing = False
 
+    def add_user_input_to_chat(self, user_input):
+        self.msgs.add_visible(TAG_USER_INPUT, user_input, context=True)
+
     def _communicate_internal(self, user_input):
         """Internal communication method that contains the original communicate logic."""
         if self._pending_memory:
-            # Don't add user input again since it will be added by the memory handler
             result = self.handle_memory_approval(user_input)
             self.msgs.add_visible(TAG_SYSTEM_OUTPUT, result, context=False)
             return
 
         backend = self.select_backend()
-        initial_prompt_report = self.process_init_prompt()
-        if (initial_prompt_report):
-            self.msgs.add_invisible(TAG_SYSTEM_INTERNAL,
-                                    initial_prompt_report,
-                                    context=False)
-
-        self.msgs.add_visible(TAG_USER_INPUT, user_input, context=True)
 
         messages = self.formatter.build_messages()
 
         try:
             model_response = backend.generate_response(messages)
-
         except Exception as e:
             error_msg = f"Error: {str(e)}"
             self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
@@ -347,7 +282,6 @@ class LogicPlusPlus:
             response_message += "\n\nActions plan:\n" + model_response.actions_plan
         if model_response.action:
             response_message += "\n\nI will execute action:\n" + model_response.action.name
-            # response_message += "\n\nAction parameters:\n" + model_response.action.params
         else:
             response_message += "\n\nNo action to execute.\n"
 
@@ -383,7 +317,7 @@ class LogicPlusPlus:
     def handle_memory_approval(self, user_input):
         """Handle user approval for memory operations."""
         # Add user input first
-        self.msgs.add_visible(TAG_USER_INPUT, user_input, context=False)
+        # self.msgs.add_visible(TAG_USER_INPUT, user_input, context=False)
 
         output = ""
         if user_input.lower() in ["y", "yes"]:

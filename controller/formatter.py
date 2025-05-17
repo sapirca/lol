@@ -4,6 +4,7 @@ from animation.animation_manager import AnimationManager
 from memory.memory_manager import MemoryManager
 from music.song_provider import SongProvider
 from typing import Optional, Dict, Any
+from prompts.main_prompt import intro_prompt
 
 
 class Formatter:
@@ -37,10 +38,31 @@ class Formatter:
         """
         messages = []
 
+        # Build prompt content
+
+        prompt_content = []
+        if intro_prompt:
+            prompt_content.append("# Your Task\n")
+            prompt_content.append(intro_prompt)
+
+        # TODO(Sapir): Rename to get_timing_knowledge
+        timing_knowledge = self.animation_manager.get_general_knowledge()
+        if timing_knowledge:
+            prompt_content.append("## Timing Knowledge\n")
+            prompt_content.append(timing_knowledge)
+
+        messages.append({
+            "role": "system",
+            "content": "\n".join(prompt_content)
+        })
+
         # Add memory info
         memory = self.memory_manager.get_memory()
         if memory:
-            messages.append({"role": "system", "content": f"Memory: {memory}"})
+            messages.append({
+                "role": "system",
+                "content": f"# Your Memory: {memory}"
+            })
 
         # Add song info if available
         try:
@@ -52,7 +74,7 @@ class Formatter:
                         "role":
                         "system",
                         "content":
-                        f"Song: {song_name}\nSong Info: {song_info}"
+                        f"# The Song Structure:\n {song_info}"
                     })
         except Exception as e:
             # Log error but continue without song info
@@ -64,16 +86,20 @@ class Formatter:
                 role = self._determine_role(message['tag'])
                 messages.append({"role": role, "content": message['content']})
 
-        # TODO : Do not add the latest animation? Reconsider later
-        # latest_sequence = self.animation_manager.get_latest_sequence()
-        # if latest_sequence:
-        #     messages.append({
-        #         "role":
-        #         "system",
-        #         "content":
-        #         f"Animation Sequence: \n{latest_sequence}"
-        #     })
+        # Add the latest animation sequence
+        latest_sequence = self.animation_manager.get_latest_sequence()
+        if latest_sequence:
+            messages.append({
+                "role":
+                "system",
+                "content":
+                f"# Animation Sequence:\n Make sure to maintain a consistent animation, only change the part of animation that the user asked for. In case of doubt, ask the user for clarification. The latest animation sequence is:\n {latest_sequence}"
+            })
 
+        # Save the whole prompt to a file
+        with open("prompt_before_sending.md", "w") as file:
+            for message in messages:
+                file.write(f"{message['role']}: {message['content']}\n")
         return messages
 
     def _determine_role(self, tag):

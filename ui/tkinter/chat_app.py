@@ -235,11 +235,27 @@ def send_message(event=None):
                            foreground="black",
                            background="grey")
         user_input.unbind("<Return>")  # Disable Enter key
-        # update_chat_window(get_label_tag(TYPE_INTERNAL),
-        #                    get_sender_name(TYPE_INTERNAL), user_message)
+        controller.add_user_input_to_chat(user_message)
+
+        refresh()
 
         # Use the thread pool to run the backend communication
         thread_pool.submit(run_backend_communication, user_message)
+
+
+def refresh():
+    new_messages = controller.msgs.get_new_messages()
+    for tag, message in new_messages:
+        if tag == TAG_USER_INPUT:
+            type_name = TYPE_USER
+        elif tag == TAG_ASSISTANT:
+            type_name = TYPE_ASSISTANT
+        elif tag == TAG_SYSTEM_INTERNAL:
+            type_name = TYPE_INTERNAL
+        else:
+            type_name = TYPE_SYSTEM
+        update_chat_window(get_label_tag(type_name),
+                           get_sender_name(type_name), message)
 
 
 def run_backend_communication(user_message):

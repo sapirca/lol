@@ -44,7 +44,7 @@ class SongProvider:
 
         content = ""
         try:
-            content += f"## {song_name.capitalize()} Song Details\n\n"  # Capitalize for better display
+            content += f"## {song_name.capitalize()} Song\n"  # Capitalize for better display
 
             # Construct paths dynamically for any allowed song
             bars_file_path = os.path.join(SONGS_BASE_PATH, song_name,
@@ -68,8 +68,8 @@ class SongProvider:
 
             # Read info file
             with open(info_file_path, 'r') as file:
-                content += "### Important Song Parts\n"
-                content += "These are important parts in the song where you should consider making animation changes:\n"
+                content += "### Lyrics\n"
+                content += "These are the lyrics of the song:\n"
                 content += file.read() + "\n"
 
             return content
