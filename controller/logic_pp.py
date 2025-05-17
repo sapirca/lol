@@ -32,7 +32,7 @@ class LogicPlusPlus:
         self.wait_for_save_approval = False
         self.temp_animation_path = None
         self._pending_memory = None
-        self.message_streamer = MessageStreamer()
+        self.msgs = MessageStreamer()
         self.song_provider = SongProvider()
         self.backends = {}
         self._is_processing = False
@@ -56,7 +56,7 @@ class LogicPlusPlus:
             self.config = basic_config
             self.selected_framework = self.config.get("framework", None)
             self.animation_manager = AnimationManager(self.selected_framework,
-                                                      self.message_streamer)
+                                                      self.msgs)
 
         # Get the framework's schema and create the main schema
         framework_schema = self.animation_manager.get_response_object()
@@ -70,9 +70,9 @@ class LogicPlusPlus:
         self.selected_backend = self.config.get("selected_backend", None)
         self.response_manager = Interpreter(self.animation_manager,
                                             config=self.config)
-        self.formatter = Formatter(self.message_streamer,
-                                   self.animation_manager, self.memory_manager,
-                                   self.song_provider, self.config)
+        self.formatter = Formatter(self.msgs, self.animation_manager,
+                                   self.memory_manager, self.song_provider,
+                                   self.config)
 
         self._register_actions()
 
@@ -91,7 +91,7 @@ class LogicPlusPlus:
         if not shutdown_snapshot_dir:
             timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
             shutdown_snapshot_dir = os.path.join(
-                self.message_streamer.snapshots_dir,
+                self.msgs.snapshots_dir,
                 f"{timestamp}_{self.selected_framework}_{self.selected_backend}"
             )
             os.makedirs(shutdown_snapshot_dir, exist_ok=True)
@@ -111,22 +111,38 @@ class LogicPlusPlus:
         messages_json_file = os.path.join(shutdown_snapshot_dir,
                                           MESSAGE_SNAPSHOT_FILE)
         with open(messages_json_file, "w") as file:
-            json.dump(self.message_streamer.messages, file,
+            json.dump(self.msgs.messages, file,
                       indent=4)  # Save only the messages data
 
         # Save memory
         self.memory_manager.shutdown()
 
-        # Finalize the message_streamer
-        self.message_streamer.finalize()
+        # Finalize the msgs
+        self.msgs.finalize()
 
         return (f"Snapshot saved: {shutdown_snapshot_dir}.")
 
     def get_visible_chat(self):
         """Retrieve all visible chat messages from the message_streamer, including their tags/labels."""
         return [(message['timestamp'], message['content'], message['tag'])
-                for message in self.message_streamer.messages
+                for message in self.msgs.messages
                 if message['visible'] and 'timestamp' in message]
+
+    def get_chat_history(self):
+        """Retrieve all chat messages, including invisible ones, with visibility and context flags."""
+        chat_history = []
+        for message in self.msgs.messages:
+            if message['visible']:
+                chat_history.append(
+                    (message['timestamp'], message['content'], message['tag'],
+                     message['visible'], message['context']))
+            else:
+                content_trimmed = message['content'][:30] + "..."
+                chat_history.append(
+                    (message['timestamp'],
+                     f"{message['tag']} {content_trimmed}", message['tag'],
+                     message['visible'], message['context']))
+        return chat_history
 
     def _load_from_snapshot(self, snapshot_dir):
         if not os.path.exists(snapshot_dir):
@@ -149,7 +165,7 @@ class LogicPlusPlus:
         messages_snapshot_file = os.path.join(snapshot_dir,
                                               MESSAGE_SNAPSHOT_FILE)
         try:
-            self.message_streamer.load(messages_snapshot_file)
+            self.msgs.load(messages_snapshot_file)
         except Exception as e:
             self.logger.error(f"Error loading messages: {e}")
             raise ValueError(f"Error loading messages: {e}")
@@ -166,7 +182,7 @@ class LogicPlusPlus:
         # Load animations
         self.selected_framework = self.config.get("framework", None)
         self.animation_manager = AnimationManager(self.selected_framework,
-                                                  self.message_streamer)
+                                                  self.msgs)
         try:
             animations = []
             for animation_file in sorted(os.listdir(animations_dir)):
@@ -237,15 +253,14 @@ class LogicPlusPlus:
             # Build the initial prompt
             initial_prompt = self.build_prompt(intro_prompt, timing_knowledge)
 
-            self.message_streamer.add_message("initial_prompt_context",
-                                              initial_prompt,
-                                              visible=False,
-                                              context=True)
+            self.msgs.add_invisible("initial_prompt_context",
+                                    initial_prompt,
+                                    context=True)
 
             # # Add memory to the initial prompt
             # memory = self.memory_manager.get_memory()
-            # if memory:
-            #     self.message_streamer.add_message("system",
+            # if (memory):
+            #     self.msgs.add_message("system",
             #                                       f"Memory: {memory}",
             #                                       visible=False,
             #                                       context=True)
@@ -253,7 +268,7 @@ class LogicPlusPlus:
             # Do not add the last animation
             # latest_sequence = self.animation_manager.get_latest_sequence()
             # if (latest_sequence):
-            #     self.message_streamer.add_message("initial_animation",
+            #     self.msgs.add_message("initial_animation",
             #                                       latest_sequence,
             #                                       visible=False,
             #                                       context=True)
@@ -264,10 +279,9 @@ class LogicPlusPlus:
                 f"Included initial prompt. Sent to {self.selected_backend}. {self.selected_framework} framework.\n"
             )
 
-            self.message_streamer.add_message("system",
-                                              initial_prompt_report,
-                                              visible=True,
-                                              context=False)
+            # self.msgs.add_visible("system",
+            #                       initial_prompt_report,
+            #                       context=False)
 
             return initial_prompt_report
 
@@ -292,17 +306,9 @@ class LogicPlusPlus:
         """Internal communication method that contains the original communicate logic."""
         system_responses = []
         if self.wait_for_save_approval:
-            # Handle confirmation for pending action
-            self.message_streamer.add_message("user_input",
-                                              user_input,
-                                              visible=True,
-                                              context=False)
+            self.msgs.add_visible("user_input", user_input, context=False)
             result = self.handle_user_approval(user_input)
-
-            self.message_streamer.add_message("system_output",
-                                              result,
-                                              visible=True,
-                                              context=False)
+            self.msgs.add_visible("system_output", result, context=False)
             system_responses.append(("system", result))
             return system_responses
 
@@ -311,10 +317,7 @@ class LogicPlusPlus:
         if (initial_prompt_report):
             system_responses.append(("system", initial_prompt_report))
 
-        self.message_streamer.add_message("user_input",
-                                          user_input,
-                                          visible=True,
-                                          context=True)
+        self.msgs.add_visible("user_input", user_input, context=True)
 
         messages = self.formatter.build_messages()
         auto_continue = False
@@ -323,37 +326,26 @@ class LogicPlusPlus:
 
         except Exception as e:
             error_msg = f"Error: {str(e)}"
-            self.message_streamer.add_message("system",
-                                              error_msg,
-                                              visible=True,
-                                              context=False)
+            self.msgs.add_visible("system", error_msg, context=False)
             system_responses.append(("system", error_msg))
             return system_responses
 
         # Display the LLM's reasoning about the chosen action and overall strategy
-        self.message_streamer.add_message("assistant",
-                                          "Reasoning:\n" +
-                                          model_response.reasoning,
-                                          visible=True,
-                                          context=True)
+        self.msgs.add_visible("assistant",
+                              "Reasoning:\n" + model_response.reasoning,
+                              context=True)
         system_responses.append(("assistant", model_response.reasoning))
 
         # Show the action plan if provided
         if model_response.actions_plan:
             message = f"Actions plan:\n"
             message += f"{model_response.actions_plan}\n"
-            self.message_streamer.add_message("assistant",
-                                              message,
-                                              visible=True,
-                                              context=True)
+            self.msgs.add_visible("assistant", message, context=True)
             system_responses.append(("assistant", message))
 
         if not model_response.action:
             message = f"No action to execute.\n"
-            self.message_streamer.add_message("system",
-                                              message,
-                                              visible=True,
-                                              context=True)
+            self.msgs.add_visible("system", message, context=True)
             system_responses.append(("system", message))
             return system_responses
 
@@ -363,10 +355,7 @@ class LogicPlusPlus:
             message = f"I will execute the action {model_response.action.name} with the following parameters:\n"
             message += f"{model_response.action.params}\n"
 
-        self.message_streamer.add_message("assistant",
-                                          message,
-                                          visible=True,
-                                          context=True)
+        self.msgs.add_visible("assistant", message, context=True)
         system_responses.append(("assistant", message))
 
         # Execute single action for this turn and handle its result
@@ -375,10 +364,7 @@ class LogicPlusPlus:
 
         if result["status"] == "error":
             error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
-            self.message_streamer.add_message("system",
-                                              error_msg,
-                                              visible=True,
-                                              context=False)
+            self.msgs.add_visible("system", error_msg, context=False)
             system_responses.append(("system", error_msg))
             # Add error result to context
             action_result = {
@@ -393,18 +379,14 @@ class LogicPlusPlus:
 
             # For update_animation action, display the message directly to preserve the temp path format
             if model_response.action.name == "update_animation":
-                self.message_streamer.add_message("assistant",
-                                                  result['message'],
-                                                  visible=True,
-                                                  context=True)
+                self.msgs.add_visible("assistant",
+                                      result['message'],
+                                      context=True)
                 system_responses.append(("assistant", result['message']))
             else:
                 message = f"The result of the action {model_response.action.name} is:\n"
                 message += f"{result['message']}\n"
-                self.message_streamer.add_message("assistant",
-                                                  message,
-                                                  visible=True,
-                                                  context=True)
+                self.msgs.add_visible("assistant", message, context=True)
                 system_responses.append(("assistant", message))
 
             action_result = {
@@ -415,19 +397,13 @@ class LogicPlusPlus:
             if "data" in result:
                 action_result["data"] = result["data"]
                 data_msg = f"Action data {model_response.action.name}, returned value: {json.dumps(result['data'], indent=2)}"
-                self.message_streamer.add_message("assistant",
-                                                  data_msg,
-                                                  visible=True,
-                                                  context=True)
+                self.msgs.add_visible("assistant", data_msg, context=True)
                 system_responses.append(("assistant", data_msg))
 
             if model_response.action.name == "update_animation" and "temp_path" in result:
                 self.temp_animation_path = result["temp_path"]
                 message = f"Do you want me to save a snapshot to the sequence manager? (y/n)\n"
-                self.message_streamer.add_message("system",
-                                                  message,
-                                                  visible=True,
-                                                  context=True)
+                self.msgs.add_visible("system", message, context=True)
                 system_responses.append(("system", message))
 
             # Check if immediate response is needed for this action type
@@ -437,20 +413,17 @@ class LogicPlusPlus:
 
             if params_dict.get("immediate_response", False):
                 auto_continue = True
-                self.message_streamer.add_message(
-                    "system",
-                    "Auto-continuing with action result",
-                    visible=True,
-                    context=True)
+                self.msgs.add_visible("system",
+                                      "Auto-continuing with action result",
+                                      context=True)
                 system_responses.append(
                     ("system", "Auto-continuing with action result"))
 
         # Store action result in context for next LLM turn
         results_str = json.dumps(action_result, indent=2)
-        self.message_streamer.add_message("action_results",
-                                          f"Action Result:\n{results_str}",
-                                          visible=True,
-                                          context=True)
+        self.msgs.add_visible("action_results",
+                              f"Action Result:\n{results_str}",
+                              context=True)
 
         if auto_continue:
             system_responses.append(("auto_continue", results_str))
@@ -504,21 +477,8 @@ class LogicPlusPlus:
                     with open(self.temp_animation_path, "r") as temp_file:
                         animation_sequence = temp_file.read()
 
-                    # Save the animation sequence to the message streamer
-                    self.message_streamer.add_message("animation_update",
-                                                      animation_sequence,
-                                                      visible=False,
-                                                      context=False)
-
-                    # Add the animation to the sequence manager and get the step number
                     step_number = self.animation_manager.add_sequence(
                         animation_sequence)
-
-                    self.message_streamer.add_message(
-                        "animation_update",
-                        f"Animation added as step {step_number}",
-                        visible=False,
-                        context=False)
 
                     output += f"Animation sequence added to the sequence manager as step {step_number}.\n"
                     self.logger.info(
@@ -625,4 +585,4 @@ class LogicPlusPlus:
                 return "No renderer available to stop."
         except Exception as e:
             self.logger.error(f"Error stopping animation rendering: {e}")
-            return f"Error stopping animation rendering: {e}"
+            return f"Error stopping animation: {e}"

@@ -34,8 +34,8 @@ class MessageStreamer:
         self.snapshot_interval = snapshot_interval
         self._start_periodic_snapshot()
 
-    def add_message(self, tag, content, visible, context):
-        """Add a message to the log with specific tags and flags."""
+    def _add_message(self, tag, content, visible, context):
+        """Internal method to add a message to the log."""
         words = count_words(content)
         tokens_estimation = estimate_tokens(words)
         timestamp = datetime.now().strftime(TIME_FORMAT)
@@ -48,6 +48,14 @@ class MessageStreamer:
             "tokens_estimation": tokens_estimation,
             "timestamp": timestamp
         })
+
+    def add_visible(self, tag, content, context):
+        """Add a visible message to the log."""
+        self._add_message(tag, content, visible=True, context=context)
+
+    def add_invisible(self, tag, content, context):
+        """Add an invisible message to the log."""
+        self._add_message(tag, content, visible=False, context=context)
 
     def add_log(self, content):
         """Add a system log with predefined tags and flags."""

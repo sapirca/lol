@@ -73,12 +73,23 @@ def initialize_logic_controller(a_snapshot):  # Updated function name
     controller = LogicPlusPlus(snapshot_path)
 
 
-def append_message_to_window(sender, message):
+def append_message_to_window(sender, message, context):
+    """Adds a message to the chat window."""
     timestamp = datetime.now().strftime(TIME_FORMAT)
-    append_message_to_window_w_timestamp(timestamp, sender, message)
+    append_message_to_window_w_timestamp(timestamp, sender, message, context)
 
 
-def append_message_to_window_w_timestamp(timestamp, sender, message):
+def build_message_title(timestamp, sender, context):
+    """Builds a standardized message title."""
+    title = f"[{timestamp}]"
+    if context:
+        title += " | + LLM"
+    title += f" | {sender}"
+    title += ":\n"
+    return title
+
+
+def append_message_to_window_w_timestamp(timestamp, sender, message, context):
     """Adds a message to the chat window with proper formatting and clickable links."""
     label_tag = f"{sender.lower()}_label"
     message_tag = f"{sender.lower()}_message"
@@ -87,7 +98,8 @@ def append_message_to_window_w_timestamp(timestamp, sender, message):
     original_state = chat_window.cget("state")
     chat_window.config(state=tk.NORMAL)
 
-    chat_window.insert(tk.END, f"[{timestamp}] {sender}:\n", label_tag)
+    title = build_message_title(timestamp, sender, context=context)
+    chat_window.insert(tk.END, title, label_tag)
 
     def open_file_in_editor(event, file_path):
         """Opens the file in the default editor based on the platform."""
@@ -175,8 +187,8 @@ def update_active_chat_label(button_name):
         text=f"{backend_info} | {framework_info} | {button_name}")
 
     # Update status with step number
-    step_number = len(controller.message_streamer.messages
-                      ) if controller and controller.message_streamer else 0
+    step_number = len(
+        controller.msgs.messages) if controller and controller.msgs else 0
     if button_name == "untitled":
         save_status_label.config(
             text=f"Started new chat session (msg no {step_number})")
@@ -209,7 +221,7 @@ def send_message(event=None):
                            foreground="black",
                            background="grey")
         user_input.unbind("<Return>")  # Disable Enter key
-        append_message_to_window("You", user_message)
+        append_message_to_window("You", user_message, context=True)
 
         # Use the thread pool to run the backend communication
         thread_pool.submit(run_backend_communication, user_message)
@@ -246,7 +258,7 @@ def run_backend_communication(user_message):
 
 def update_chat_window(tag, message):
     """Updates the chat window with a new message."""
-    append_message_to_window(tag.capitalize(), message)
+    append_message_to_window(tag.capitalize(), message, context=False)
     chat_window.see(tk.END)  # Make sure to scroll to bottom after each message
 
 
@@ -297,25 +309,43 @@ def save_chat():
         save_status_label.config(text="No active chat to save", fg="red")
 
 
+PRIMARY_COLOR = "#BBDEFB"  # Example: Blue 100 (lighter blue)
+PRIMARY_COLOR_VARIANT = "#64B5F6"  # Example: Blue 300
+SECONDARY_COLOR = "#F48FB1"  # Example: Pink 200 (lighter pink)
+SECONDARY_COLOR_VARIANT = "#F06292"  # Example: Pink 300
+
+# Error color
+ERROR_COLOR = "#CF6679"
+
+
 def batch_insert_messages(messages):
     """Efficiently insert multiple messages into the chat window."""
     # Pre-configure tags
-    chat_window.tag_configure("system_label",
-                              foreground="lime",
-                              justify=SYSTEM_ALIGNMENT)
-    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+
     chat_window.tag_configure("assistant_label",
-                              foreground="yellow",
+                              foreground=PRIMARY_COLOR_VARIANT,
                               justify=SYSTEM_ALIGNMENT)
     chat_window.tag_configure("assistant_message", justify=SYSTEM_ALIGNMENT)
     chat_window.tag_configure("user_label",
-                              foreground="hot pink",
+                              foreground=SECONDARY_COLOR,
                               justify=USER_ALIGNMENT)
     chat_window.tag_configure("user_message", justify=USER_ALIGNMENT)
 
+    chat_window.tag_configure("system_label",
+                              foreground=PRIMARY_COLOR,
+                              justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("system_message", justify=SYSTEM_ALIGNMENT)
+
+    chat_window.tag_configure("system_invisible_label",
+                              foreground="grey",
+                              justify=SYSTEM_ALIGNMENT)
+    chat_window.tag_configure("system_invisible_message",
+                              foreground="grey",
+                              justify=SYSTEM_ALIGNMENT)
+
     # Build content in memory
     content = []
-    for timestamp, message, tag in messages:
+    for timestamp, message, tag, visible, context in messages:
         if tag == 'user_input':
             label_tag = "user_label"
             message_tag = "user_message"
@@ -324,12 +354,17 @@ def batch_insert_messages(messages):
             label_tag = "assistant_label"
             message_tag = "assistant_message"
             sender = "Assistant"
+        elif not visible:
+            label_tag = "system_invisible_label"
+            message_tag = "system_invisible_message"
+            sender = "System Internal"
         else:
             label_tag = "system_label"
             message_tag = "system_message"
             sender = "System"
 
-        content.append((f"[{timestamp}] {sender}:\n", label_tag))
+        title = build_message_title(timestamp, sender, context)
+        content.append((title, label_tag))
         content.append((f"{message}\n\n", message_tag))
 
     # Insert all content at once
@@ -361,7 +396,7 @@ def _load_chat(a_snapshot):
         active_chat_snapshot = a_snapshot
 
         # Load chat history
-        chat_history = controller.get_visible_chat()
+        chat_history = controller.get_chat_history()
 
         # Update chat window in one go
         chat_window.config(state=tk.NORMAL)
@@ -371,18 +406,10 @@ def _load_chat(a_snapshot):
             batch_insert_messages(chat_history)
         elif a_snapshot == "untitled":
             message = "Welcome to a new chat session!"
-            controller.message_streamer.add_message("system_output",
-                                                    message,
-                                                    visible=True,
-                                                    context=False)
-            append_message_to_window("System", message)
+            update_chat_window('system', message)
         else:
             message = "No chat history found in snapshot."
-            controller.message_streamer.add_message("system_output",
-                                                    message,
-                                                    visible=True,
-                                                    context=False)
-            append_message_to_window("System", message)
+            update_chat_window("System", message)
 
         print_system_info()
         update_active_chat_label(a_snapshot)
@@ -390,12 +417,7 @@ def _load_chat(a_snapshot):
 
     except Exception as e:
         error_msg = f"Error loading snapshot {a_snapshot}: {str(e)}"
-        if controller:
-            controller.message_streamer.add_message("system_output",
-                                                    error_msg,
-                                                    visible=True,
-                                                    context=False)
-        append_message_to_window("System", error_msg)
+        update_chat_window("System", error_msg)
         save_status_label.config(text=f"Error loading chat: {str(e)}",
                                  fg="red")
 
@@ -408,17 +430,13 @@ def print_system_info():
     # current_time = datetime.now().strftime(TIME_FORMAT)
     backend_name = controller.selected_backend or "Unknown Backend"
     message = f"Active Backend is: {backend_name}"
-    controller.message_streamer.add_message("system_output",
-                                            message,
-                                            visible=True,
-                                            context=False)
-    append_message_to_window("System", message)
+    update_chat_window("System", message)
 
 
 def save_and_load_untitled_chat():
     """Ensure an untitled chat session exists without resetting."""
     global controller, active_chat_snapshot
-    if controller and controller.message_streamer.messages:
+    if controller and controller.msgs.messages:
         show_save_popup("untitled")
     else:
         _load_untitled_chat()
@@ -595,7 +613,7 @@ def save_and_load_chat_content(target_snapshot):
     send_button.config(state=tk.DISABLED)
     user_input.config(state=tk.DISABLED)
 
-    if controller and controller.message_streamer.messages:
+    if controller and controller.msgs.messages:
         show_save_popup(target_snapshot)
     else:
         _load_chat(target_snapshot)
