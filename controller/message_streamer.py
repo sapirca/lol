@@ -189,6 +189,7 @@ class MessageStreamer:
         for i in range(self.last_checked_index, len(self.messages)):
             msg = self.messages[i]
             if msg['visible']:  # Only return visible messages
-                new_messages.append((msg['tag'], msg['content']))
+                new_messages.append(
+                    (msg['tag'], msg['content'], msg['context']))
         self.last_checked_index = len(self.messages)
         return new_messages

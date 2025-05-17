@@ -141,7 +141,7 @@ class AddToMemoryAction(Action):
             return {
                 "status": "success",
                 "message":
-                f"Ready to add memory with key: {key} and value: {value}. Do you want to save this to memory? (y/n)",
+                f"Ready to add memory:\n key: {key}\nvalue: {value}. Do you want to save this to memory? (y/n)",
                 "requires_confirmation": True,
                 "data": {
                     "key": key,

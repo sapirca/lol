@@ -99,7 +99,11 @@ class Formatter:
         # Save the whole prompt to a file
         with open("prompt_before_sending.md", "w") as file:
             for message in messages:
-                file.write(f"{message['role']}: {message['content']}\n")
+                # file.write(f"{message['role']}: {message['content']}\n")
+                file.write(f"\n{'='*80}\n")
+                file.write(f"Role: {message['role']}\n\n")
+                file.write(f"{message['content']}\n")
+
         return messages
 
     def _determine_role(self, tag):

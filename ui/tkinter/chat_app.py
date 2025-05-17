@@ -105,8 +105,18 @@ def build_message_title(timestamp, sender, context):
 
 def append_message_to_window_w_timestamp(timestamp, sender, message, context):
     """Adds a message to the chat window with proper formatting and clickable links."""
-    label_tag = f"{sender.lower()}_label"
-    message_tag = f"{sender.lower()}_message"
+    # Convert sender to type
+    if sender.lower() == "you":
+        type_name = TYPE_USER
+    elif sender.lower() == "assistant":
+        type_name = TYPE_ASSISTANT
+    elif sender.lower() == "system":
+        type_name = TYPE_SYSTEM
+    else:
+        type_name = TYPE_INTERNAL
+
+    label_tag = get_label_tag(type_name)
+    message_tag = get_message_tag(type_name)
 
     # Ensure chat_window is writable
     original_state = chat_window.cget("state")
@@ -165,19 +175,19 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context):
     chat_window.insert(tk.END, "\n\n")
 
     # Style the labels
-    if sender.lower() == "system":
+    if type_name == TYPE_SYSTEM:
         chat_window.tag_configure(
             label_tag,
             foreground="#8BE9FD",  # Light cyan (keeping this)
             justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
-    elif sender.lower() == "assistant":
+    elif type_name == TYPE_ASSISTANT:
         chat_window.tag_configure(
             label_tag,
             foreground="#FFB86C",  # Soft orange
             justify=SYSTEM_ALIGNMENT)
         chat_window.tag_configure(message_tag, justify=SYSTEM_ALIGNMENT)
-    elif sender.lower() == "you":
+    elif type_name == TYPE_USER:
         chat_window.tag_configure(
             label_tag,
             foreground="#9580FF",  # Soft purple
@@ -215,6 +225,31 @@ def update_active_chat_label(button_name):
     set_active_chat_button(button)
 
 
+def refresh():
+    """Refresh the chat window with new messages and save the current state."""
+    # Get any new messages that were added
+    new_messages = controller.msgs.get_new_messages()
+    # Update UI with new messages
+    for tag, message, context in new_messages:
+        # Determine message type based on tag
+        if tag == TAG_USER_INPUT:
+            type_name = TYPE_USER
+        elif tag == TAG_ASSISTANT:
+            type_name = TYPE_ASSISTANT
+        elif tag == TAG_SYSTEM_INTERNAL:
+            type_name = TYPE_INTERNAL
+        elif tag == TAG_SYSTEM_OUTPUT:
+            type_name = TYPE_SYSTEM
+        else:
+            type_name = TYPE_SYSTEM
+
+        # Schedule message display
+        sender_name = get_sender_name(type_name)
+        root.after(0,
+                   lambda s=sender_name, m=message, c=context:
+                   append_message_to_window(s, m, c))
+
+
 def send_message(event=None):
     """Handles sending a message by the user and calling the backend in a separate thread."""
     global controller
@@ -234,6 +269,7 @@ def send_message(event=None):
                            text="Waiting...",
                            foreground="black",
                            background="grey")
+
         user_input.unbind("<Return>")  # Disable Enter key
         controller.add_user_input_to_chat(user_message)
 
@@ -243,59 +279,16 @@ def send_message(event=None):
         thread_pool.submit(run_backend_communication, user_message)
 
 
-def refresh():
-    new_messages = controller.msgs.get_new_messages()
-    for tag, message in new_messages:
-        if tag == TAG_USER_INPUT:
-            type_name = TYPE_USER
-        elif tag == TAG_ASSISTANT:
-            type_name = TYPE_ASSISTANT
-        elif tag == TAG_SYSTEM_INTERNAL:
-            type_name = TYPE_INTERNAL
-        else:
-            type_name = TYPE_SYSTEM
-        update_chat_window(get_label_tag(type_name),
-                           get_sender_name(type_name), message)
-
-
 def run_backend_communication(user_message):
     """Runs the backend communication in a separate thread."""
     try:
         # Send message to backend
         controller.communicate(user_message)
 
-        # Get any new messages that were added
-        new_messages = controller.msgs.get_new_messages()
+        refresh()
 
         # Get any control flags
         control_flags = controller.msgs.get_and_clear_control_flags()
-
-        # Update UI with new messages
-        for tag, message in new_messages:
-            if tag == TAG_SYSTEM_OUTPUT:  # Special case for system output
-                root.after(0,
-                           lambda t=tag, m=message: update_chat_window(
-                               get_label_tag(TYPE_SYSTEM),
-                               get_sender_name(TYPE_SYSTEM), m))
-            elif not any(
-                    message.get('visible', True) for message in controller.
-                    msgs.messages[-5:]):  # Check recent messages visibility
-                root.after(0,
-                           lambda t=tag, m=message: update_chat_window(
-                               get_label_tag(TYPE_INTERNAL),
-                               get_sender_name(TYPE_INTERNAL), m))
-            else:
-                if tag == TAG_USER_INPUT:
-                    type_name = TYPE_USER
-                elif tag == TAG_ASSISTANT:
-                    type_name = TYPE_ASSISTANT
-                elif tag == TAG_SYSTEM_INTERNAL:
-                    type_name = TYPE_INTERNAL
-                else:
-                    type_name = TYPE_SYSTEM
-                root.after(0,
-                           lambda t=type_name, m=message: update_chat_window(
-                               get_label_tag(t), get_sender_name(t), m))
 
         # Handle control flags
         if control_flags.get("auto_continue"):
