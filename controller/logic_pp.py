@@ -89,7 +89,6 @@ class LogicPlusPlus:
             "get_animation", GetAnimationAction(self.animation_manager))
         self.action_registry.register_action(
             "add_to_memory", AddToMemoryAction(self.memory_manager))
-        self.action_registry.register_action("inform_user", InformUserAction())
         self.action_registry.register_action("ask_user", AskUserAction())
 
     def shutdown(self, shutdown_snapshot_dir=None):
@@ -276,8 +275,8 @@ class LogicPlusPlus:
         # Combine reasoning and action plan into a single message
         response_message = ""
         response_message += "Reasoning:\n" + model_response.reasoning
-        if model_response.actions_plan:
-            response_message += "\n\nActions plan:\n" + model_response.actions_plan
+        # if model_response.actions_plan:
+        #     response_message += "\n\nActions plan:\n" + model_response.actions_plan
         if model_response.action:
             response_message += "\n\nI will execute action:\n" + model_response.action.name
         else:

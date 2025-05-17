@@ -156,35 +156,6 @@ class AddToMemoryAction(Action):
             }
 
 
-class InformUserAction(Action):
-
-    def __init__(self):
-        super().__init__()
-
-    def validate_params(self, params: Dict[str, Any]) -> bool:
-        params_dict = self._get_params_dict(params)
-        return ("message" in params_dict
-                and isinstance(params_dict["message"], str)
-                and "message_type" in params_dict
-                and params_dict["message_type"]
-                in ["information", "answer", "error"])
-
-    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
-        try:
-            params_dict = self._get_params_dict(params)
-            return {
-                "status": "success",
-                "message": params_dict["message"],
-                "requires_confirmation": False,
-            }
-        except Exception as e:
-            return {
-                "status": "error",
-                "message": f"Error processing inform user action: {str(e)}",
-                "requires_confirmation": False
-            }
-
-
 class AskUserAction(Action):
 
     def __init__(self):
