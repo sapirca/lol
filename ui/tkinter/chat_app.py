@@ -250,9 +250,7 @@ def send_message(event=None):
 
     if user_message:
         chat_window.config(state=tk.NORMAL)
-        send_button.configure(state=tk.DISABLED,
-                              text="Waiting...",
-                              style="Waiting.TButton")
+        send_button.configure(state=tk.DISABLED, text="Waiting...")
 
         user_input.unbind("<Return>")  # Disable Enter key
         controller.add_user_input_to_chat(user_message)
@@ -306,7 +304,7 @@ def enable_ui():
     """Re-enables the UI elements."""
     chat_window.config(state=tk.DISABLED)
     chat_window.see(tk.END)
-    send_button.configure(state=tk.NORMAL, text="Send", style="Normal.TButton")
+    send_button.configure(state=tk.NORMAL, text="Send")
     user_input.config(state=tk.NORMAL)  # Re-enable the text input
     user_input.bind("<Return>", handle_keypress)
 
@@ -930,10 +928,7 @@ input_frame = tk.Frame(chat_frame,
                        height=10)  # Adjusted height to allow more space
 input_frame.pack(padx=10, pady=10, fill=tk.BOTH)
 
-send_button = ttk.Button(input_frame,
-                         text="Send",
-                         command=send_message,
-                         style="Normal.TButton")
+send_button = tk.Button(input_frame, text="Send", command=send_message)
 send_button.pack(side=tk.RIGHT, padx=5, pady=5)
 
 # Create a text widget for user input

@@ -5,18 +5,29 @@ import logging
 from animation.animation_manager import AnimationManager
 from configs.config_kivsee import config as basic_config
 from memory.memory_manager import MemoryManager
+from controller.message_streamer import TAG_SYSTEM_INTERNAL
 
 
 class Action(ABC):
 
-    def __init__(self):
+    def __init__(self, message_streamer):
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.message_streamer = message_streamer
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Convert params to dictionary if it's a Pydantic model"""
         if hasattr(params, 'model_dump'):
             return params.model_dump()
         return params
+
+    def _log_action_result(self, action_name: str, result: Dict[str, Any]):
+        """Log action result to message streamer"""
+        status = result.get("status", "unknown")
+        message = result.get("message", "")
+        log_message = f"Action '{action_name}' completed with status: {status}\nDetails: {message}"
+        self.message_streamer.add_invisible(TAG_SYSTEM_INTERNAL,
+                                            log_message,
+                                            context=False)
 
     @abstractmethod
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -31,8 +42,8 @@ class Action(ABC):
 
 class UpdateAnimationAction(Action):
 
-    def __init__(self, animation_manager: AnimationManager):
-        super().__init__()
+    def __init__(self, animation_manager: AnimationManager, message_streamer):
+        super().__init__(message_streamer)
         self.animation_manager = animation_manager
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -60,32 +71,47 @@ class UpdateAnimationAction(Action):
         params_dict = self._get_params_dict(params)
         animation_str = json.dumps(params_dict["animation_sequence"], indent=4)
 
-        # Directly add the animation to the sequence manager
-        step_number = self.animation_manager.add_sequence(animation_str)
+        try:
+            # Directly add the animation to the sequence manager
+            step_number = self.animation_manager.add_sequence(animation_str)
 
-        output = {
-            "status": "success",
-            "message": f"Animation sequence added to step {step_number}.",
-            "requires_confirmation": False,
-            "data": {
-                "step_number": step_number,
+            result = {
+                "status": "success",
+                "message": f"Animation sequence added to step {step_number}.",
+                "requires_confirmation": False,
+                "data": {
+                    "step_number": step_number,
+                    "animation_sequence": params_dict["animation_sequence"]
+                }
             }
-        }
 
-        # Auto-render if configured
-        if basic_config.get("auto_render", False):
-            output["message"] += "Rendering animation preview..."
-            render_result = self.render_preview(
-                params_dict["animation_sequence"])
-            output["message"] += f"\n{render_result}"
+            # Auto-render if configured
+            if basic_config.get("auto_render", False):
+                render_result = self.render_preview(
+                    params_dict["animation_sequence"])
+                result[
+                    "message"] += f"\nRendering animation preview...\n{render_result}"
 
-        return output
+            self._log_action_result("update_animation", result)
+            return result
+
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error adding animation sequence: {str(e)}",
+                "requires_confirmation": False,
+                "data": {
+                    "error": str(e)
+                }
+            }
+            self._log_action_result("update_animation", error_result)
+            return error_result
 
 
 class GetAnimationAction(Action):
 
-    def __init__(self, animation_manager):
-        super().__init__()
+    def __init__(self, animation_manager, message_streamer):
+        super().__init__(message_streamer)
         self.animation_manager = animation_manager
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -100,7 +126,7 @@ class GetAnimationAction(Action):
             animation = self.animation_manager.sequence_manager.steps.get(
                 step_number, None)
             if animation:
-                return {
+                result = {
                     "status": "success",
                     "message": f"Retrieved animation for step {step_number}",
                     "requires_confirmation": False,
@@ -110,23 +136,33 @@ class GetAnimationAction(Action):
                     }
                 }
             else:
-                return {
+                result = {
                     "status": "error",
                     "message": f"No animation found for step {step_number}",
-                    "requires_confirmation": False
+                    "requires_confirmation": False,
+                    "data": {
+                        "error": f"No animation found for step {step_number}"
+                    }
                 }
+            self._log_action_result("get_animation", result)
+            return result
         except Exception as e:
-            return {
+            error_result = {
                 "status": "error",
                 "message": f"Error retrieving animation: {str(e)}",
-                "requires_confirmation": False
+                "requires_confirmation": False,
+                "data": {
+                    "error": str(e)
+                }
             }
+            self._log_action_result("get_animation", error_result)
+            return error_result
 
 
 class AddToMemoryAction(Action):
 
-    def __init__(self, memory_manager: MemoryManager):
-        super().__init__()
+    def __init__(self, memory_manager: MemoryManager, message_streamer):
+        super().__init__(message_streamer)
         self.memory_manager = memory_manager
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -143,20 +179,31 @@ class AddToMemoryAction(Action):
 
             self.memory_manager.write_to_memory(key, value)
 
-            return {
+            result = {
                 "status": "success",
                 "message": f"Memory saved:\n {{\"{key}\": \"{value}\"}}",
                 "requires_confirmation": False,
+                "data": {
+                    "key": key,
+                    "value": value
+                }
             }
+            self._log_action_result("add_to_memory", result)
+            return result
         except Exception as e:
-            return {
+            error_result = {
                 "status": "error",
                 "message": f"Error adding to memory: {str(e)}",
-                "requires_confirmation": False
+                "requires_confirmation": False,
+                "data": {
+                    "error": str(e)
+                }
             }
+            self._log_action_result("add_to_memory", error_result)
+            return error_result
 
 
-class AskUserAction(Action):
+class ClarificationAction(Action):
 
     def __init__(self):
         super().__init__()
@@ -164,10 +211,7 @@ class AskUserAction(Action):
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
         return ("message" in params_dict
-                and isinstance(params_dict["message"], str)
-                and "message_type" in params_dict
-                and params_dict["message_type"]
-                in ["clarification", "question", "memory_suggestion"])
+                and isinstance(params_dict["message"], str))
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         try:
@@ -176,14 +220,92 @@ class AskUserAction(Action):
                 "status": "success",
                 "message": params_dict["message"],
                 "requires_confirmation": True,  # Always requires user response
-                "message_type": params_dict["message_type"]
+                "message_type": "clarification"
             }
         except Exception as e:
             return {
                 "status": "error",
-                "message": f"Error processing ask user action: {str(e)}",
+                "message": f"Error processing clarification action: {str(e)}",
                 "requires_confirmation": False
             }
+
+
+class QuestionAction(Action):
+
+    def __init__(self, message_streamer):
+        super().__init__(message_streamer)
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("message" in params_dict
+                and isinstance(params_dict["message"], str))
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            is_clarification = params_dict.get("is_clarification", False)
+
+            result = {
+                "status": "success",
+                "message": params_dict["message"],
+                "requires_confirmation": True,  # Always requires user response
+                "message_type": "question",
+                "data": {
+                    "is_clarification": is_clarification,
+                    "question": params_dict["message"]
+                }
+            }
+            self._log_action_result("question", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error processing question action: {str(e)}",
+                "requires_confirmation": False,
+                "data": {
+                    "error": str(e)
+                }
+            }
+            self._log_action_result("question", error_result)
+            return error_result
+
+
+class MemorySuggestionAction(Action):
+
+    def __init__(self, message_streamer):
+        super().__init__(message_streamer)
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("message" in params_dict
+                and isinstance(params_dict["message"], str))
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            result = {
+                "status": "success",
+                "message": params_dict["message"],
+                "requires_confirmation": True,  # Always requires user response
+                "message_type": "memory_suggestion",
+                "data": {
+                    "suggestion": params_dict["message"]
+                }
+            }
+            self._log_action_result("memory_suggestion", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message":
+                f"Error processing memory suggestion action: {str(e)}",
+                "requires_confirmation": False,
+                "data": {
+                    "error": str(e)
+                }
+            }
+            self._log_action_result("memory_suggestion", error_result)
+            return error_result
 
 
 class ActionRegistry:

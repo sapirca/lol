@@ -25,7 +25,7 @@ from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
 from controller.actions import (ActionRegistry, UpdateAnimationAction,
                                 GetAnimationAction, AddToMemoryAction,
-                                AskUserAction)
+                                QuestionAction, MemorySuggestionAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -84,12 +84,17 @@ class LogicPlusPlus:
     def _register_actions(self):
         """Register all available actions"""
         self.action_registry.register_action(
-            "update_animation", UpdateAnimationAction(self.animation_manager))
+            "update_animation",
+            UpdateAnimationAction(self.animation_manager, self.msgs))
         self.action_registry.register_action(
-            "get_animation", GetAnimationAction(self.animation_manager))
+            "get_animation",
+            GetAnimationAction(self.animation_manager, self.msgs))
         self.action_registry.register_action(
-            "add_to_memory", AddToMemoryAction(self.memory_manager))
-        self.action_registry.register_action("ask_user", AskUserAction())
+            "add_to_memory", AddToMemoryAction(self.memory_manager, self.msgs))
+        self.action_registry.register_action("question",
+                                             QuestionAction(self.msgs))
+        self.action_registry.register_action("memory_suggestion",
+                                             MemorySuggestionAction(self.msgs))
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
@@ -257,10 +262,10 @@ class LogicPlusPlus:
 
     def _communicate_internal(self, user_input):
         """Internal communication method that contains the original communicate logic."""
-        if self._pending_memory:
-            result = self.handle_memory_approval(user_input)
-            self.msgs.add_visible(TAG_SYSTEM, result, context=False)
-            return
+        # if self._pending_memory:
+        #     result = self.handle_memory_approval(user_input)
+        #     self.msgs.add_visible(TAG_SYSTEM, result, context=False)
+        #     return
 
         backend = self.select_backend()
         messages = self.formatter.build_messages()
@@ -275,8 +280,6 @@ class LogicPlusPlus:
         # Combine reasoning and action plan into a single message
         response_message = ""
         response_message += "Reasoning:\n" + model_response.reasoning
-        # if model_response.actions_plan:
-        #     response_message += "\n\nActions plan:\n" + model_response.actions_plan
         if model_response.action:
             response_message += "\n\nI will execute action:\n" + model_response.action.name
         else:
@@ -292,25 +295,27 @@ class LogicPlusPlus:
             error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
             self.msgs.add_visible(TAG_SYSTEM, error_msg, context=True)
         else:
-            # Add the action result to the chat
             self.msgs.add_visible(TAG_ASSISTANT,
-                                  result.get("message", ""),
+                                  result.get("message",
+                                             "... no message. Debug."),
                                   context=False)
-            full_result = f"Action executed: {json.dumps(result, indent=2)}"
-            self.msgs.add_invisible(TAG_SYSTEM_INTERNAL,
-                                    full_result,
+
+        # If there's data in the result, send it back to LLM for processing
+        if "data" in result:
+            self.msgs.add_invisible(TAG_ACTION_RESULTS,
+                                    json.dumps(result["data"], indent=2),
                                     context=True)
+        # Check if immediate response is needed for this action type
+        params_dict = model_response.action.params.model_dump() if hasattr(
+            model_response.action.params,
+            'model_dump') else model_response.action.params
 
-            # Check if immediate response is needed for this action type
-            params_dict = model_response.action.params.model_dump() if hasattr(
-                model_response.action.params,
-                'model_dump') else model_response.action.params
-
-            if params_dict.get("immediate_response", False):
-                self.msgs.set_control_flag("auto_continue", full_result)
-                self.msgs.add_visible(TAG_SYSTEM,
-                                      "Auto-continuing with action result",
-                                      context=False)
+        if params_dict.get("immediate_response", False):
+            self.msgs.set_control_flag("auto_continue",
+                                       json.dumps(result, indent=2))
+            self.msgs.add_visible(TAG_SYSTEM,
+                                  "Auto-continuing with action result",
+                                  context=False)
 
     def render(self):
         """Render the current animation sequence."""
