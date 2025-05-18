@@ -80,7 +80,21 @@ class LogicPlusPlus:
                                    self.config)
 
         self._register_actions()
-
+        
+        # Update the intro prompt with dynamic action documentation
+        global intro_prompt
+        # Get all dynamic documentation
+        actions_documentation = self.action_registry.get_actions_documentation()
+        result_format_doc = self.action_registry.get_result_format_documentation()
+        response_format_doc = self.action_registry.get_response_format_documentation()
+        
+        # Format both prompts with dynamic documentation
+        intro_prompt = intro_prompt.format(
+            actions_doc=actions_documentation,
+            result_format_doc=result_format_doc,
+            response_format_doc=response_format_doc
+        )
+        
     def _register_actions(self):
         """Register all available actions"""
         self.action_registry.register_action(
