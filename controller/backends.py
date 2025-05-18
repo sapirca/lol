@@ -116,10 +116,12 @@ class GPTBackend(LLMBackend):
 class ClaudeBackend(LLMBackend):
     """Implementation of LLMBackend for Claude models."""
 
+    # model="claude-3-7-sonnet-latest",
+
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
-                 model="claude-3-7-sonnet-latest",
+                 model="claude-3-5-haiku", #Claude 3.5 Haiku
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
@@ -190,10 +192,11 @@ class ClaudeBackend(LLMBackend):
 class GeminiBackend(LLMBackend):
     """Implementation of LLMBackend for Gemini models."""
 
+    # model="models/gemini-1.5-pro-latest",  
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
-                 model="models/gemini-1.5-pro-latest",
+                 model="models/gemini-2.5-flash-preview-04-17",
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
