@@ -6,6 +6,7 @@ from animation.animation_manager import AnimationManager
 from configs.config_kivsee import config as basic_config
 from memory.memory_manager import MemoryManager
 from controller.message_streamer import TAG_SYSTEM_INTERNAL
+from schemes.main_schema import MainSchema
 
 
 class Action(ABC):
@@ -472,14 +473,21 @@ class ActionRegistry:
     def get_response_format_documentation(self) -> str:
         """Generate documentation for the response format."""
         lines = [
-            "Your responses must follow this exact structure:", "```python",
-            "{",
-            "    \"reasoning\": str,  # Explain why you chose this action",
-            "    \"action\": {",
-            "        \"name\": str,  # The name of the action to execute",
-            "        \"params\": dict  # The parameters for the action",
-            "    },",
-            "    \"user_instruction\": str  # The original user instruction",
-            "}", "```", ""
+            "Your responses must follow this exact structure:", "```python"
         ]
+
+        # Get the schema fields and their descriptions
+        schema_fields = MainSchema.__fields__
+
+        # Build the schema documentation
+        lines.append("{")
+        for field_name, field in schema_fields.items():
+            description = field.field_info.description or ""
+            field_type = field.type_.__name__ if hasattr(
+                field.type_, "__name__") else str(field.type_)
+            lines.append(f'    "{field_name}": {field_type},  # {description}')
+        lines.append("}")
+        lines.append("```")
+        lines.append("")
+
         return "\n".join(lines)
