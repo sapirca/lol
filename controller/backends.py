@@ -23,14 +23,13 @@ class LLMBackend:
                  name,
                  response_schema_obj: BaseModel,
                  model,
+                 mak_tokens,
                  config=None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
         self.model = model
-        # self.max_tokens = self.config.get("max_tokens", 4096)
-        # self.max_tokens = self.config.get("max_tokens", 8192)
-        self.max_tokens = self.config.get("max_tokens", 64000)
+        self.max_tokens = mak_tokens
 
         self.temperature = self.config.get("temperature", 0.5)
         self.response_schema_obj = response_schema_obj
@@ -60,10 +59,12 @@ class GPTBackend(LLMBackend):
                  name,
                  response_schema_obj: BaseModel,
                  model="gpt-4o-2024-08-06",
+                 mak_tokens=16384,
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
+                         mak_tokens=mak_tokens,
                          config=config)
 
         try:
@@ -119,11 +120,13 @@ class ClaudeBackend(LLMBackend):
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
-                 model="claude-3-7-sonnet-latest",
+                 model="claude-3-5-sonnet-latest",
+                 mak_tokens=64000,
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
+                         mak_tokens=mak_tokens,
                          config=config)
 
         try:
@@ -194,10 +197,12 @@ class GeminiBackend(LLMBackend):
                  name,
                  response_schema_obj: BaseModel,
                  model="models/gemini-1.5-pro-latest",
+                 mak_tokens=64000,
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
+                         mak_tokens=mak_tokens,
                          config=config)
 
         try:
