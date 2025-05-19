@@ -1,0 +1,42 @@
+1.933399	2.428998	Cymbals
+5.652287	6.136993	Cymbals
+7.990991	9.844988	increasing violin sound
+9.844988	11.698986	up and down violin sound
+11.698986	13.552984	decreasing violin sound
+13.552984	14.905589	vanishing sound
+14.905589	15.404051	intro sound
+15.404051	20.938236	mellow begining of storytelling
+20.928037	21.432456	decreasing sound
+21.432456	22.309214	silent
+22.309214	22.822972	intro fading in sound
+22.836037	28.413341	verse2- gradually increasing intensity of storytelling 
+28.413341	28.832397	peak sound
+28.832397	29.598225	fadeout
+29.739884	30.216514	intro-wind
+30.216514	31.602378	 winds sounds - right
+31.602378	32.128100	intro-wind-2
+32.107818	33.019959	wind sounds - left
+33.421675	33.946958	1- talking about sand
+34.313762	34.873957	2 - talking about glass
+35.191801	35.864204	3- is right
+36.727955	37.630987	fading in lyrics
+37.630987	38.602346	part 1
+38.602346	39.508951	part 2
+39.508951	40.453426	part 3
+40.471753	41.362949	part 4
+41.362949	45.098458	increasing animation before the drop
+45.499565	45.987536	crazy boom
+45.987536	46.949428	pre
+46.932420	49.243783	Chorus
+49.243783	50.650109	 tiny part
+50.650109	52.495342	Chorus - same
+53.413959	54.340933	part 1
+54.340933	55.267932	part 2
+55.267932	56.206693	part - hotter than hot - colors
+56.206693	57.121929	part 4
+57.117889	59.846032	pre chorus - increasing again
+59.886577	60.407253	crazy ecstatic boom, must animate
+60.407253	64.537920	Chorus - s2nd
+72.885285	75.968913	singing slowly fading out 
+75.968913	76.657781	stupid sound like licking
+76.959571	77.405695	stupid sound 2 - lik yo yo decreasing
