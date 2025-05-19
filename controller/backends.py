@@ -1,9 +1,10 @@
 import logging
+from abc import ABC, abstractmethod
 
 import anthropic
 import instructor
 import openai
-import tiktoken
+import tiktoken  # Kept for potential fallback or other uses, but not for primary token logging
 from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 from pydantic import BaseModel, ValidationError
 from instructor.exceptions import InstructorRetryException
@@ -13,23 +14,24 @@ MAX_RETRIES = 3
 INSTRACTOR_RETRIES = 3
 
 
-class LLMBackend:
+class LLMBackend(ABC):  # Inherit from ABC for abstract methods
     """
     Base class for LLM backends.
-    Each backend should inherit from this class and implement the generate_response method.
+    Each backend should inherit from this class and implement the abstract methods.
     """
 
-    def __init__(self,
-                 name,
-                 response_schema_obj: BaseModel,
-                 model,
-                 mak_tokens,
-                 config=None):
+    def __init__(
+            self,
+            name,
+            response_schema_obj: BaseModel,
+            model,
+            max_tokens,  # Renamed to max_tokens for consistency
+            config=None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
         self.model = model
-        self.max_tokens = mak_tokens
+        self.max_tokens = max_tokens  # Use max_tokens
 
         self.temperature = self.config.get("temperature", 0.5)
         self.response_schema_obj = response_schema_obj
@@ -38,18 +40,66 @@ class LLMBackend:
 
         self.logger.info(f"Using {name} model: {self.model}")
 
+    @abstractmethod
+    def _make_api_call(self, messages):
+        """
+        Abstract method to perform the specific API call for the backend.
+        Should return the raw API response object.
+        """
+        pass
+
+    @abstractmethod
+    def _get_token_counts(self, response):
+        """
+        Abstract method to extract prompt and completion token counts from the raw API response.
+        Should return a tuple (prompt_tokens, completion_tokens).
+        """
+        pass
+
     def generate_response(self, messages) -> BaseModel:
-        raise NotImplementedError("Subclasses must implement this method.")
+        """
+        Generates a response from the LLM, handling retries and validation.
+        Logs token usage by calling _get_token_counts.
+        """
+        current_messages = list(
+            messages)  # Create a mutable copy for appending error messages
 
-    def log_tokens(self, messages, response):
-        prompt_tokens = self.token_count(messages)
-        response_tokens = self.token_count([{"content": response}])
-        self.logger.info(
-            f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {response_tokens}"
-        )
+        for attempt in range(MAX_RETRIES):
+            try:
+                # Perform the API call specific to the backend
+                response = self._make_api_call(current_messages)
 
-    def token_count(self, messages):
-        return sum(len(message["content"].split()) for message in messages)
+                # Extract and log token usage
+                prompt_tokens, completion_tokens = self._get_token_counts(
+                    response)
+                if prompt_tokens is not None and completion_tokens is not None:
+                    self.logger.info(
+                        f"[{self.name}] Tokens sent: {prompt_tokens}, Tokens received: {completion_tokens}"
+                    )
+                else:
+                    self.logger.warning(
+                        f"[{self.name}] Could not retrieve token usage information from response."
+                    )
+
+                return response
+            except (ValidationError, InstructorRetryException) as e:
+                self.logger.warning(
+                    f"\n\nValidation failed on attempt {attempt + 1}: {e}")
+                # Append error message to messages for re-attempt
+                error_message = f"The previous response did not match the expected schema. Error: {e}"
+                current_messages.append({
+                    "role":
+                    "system",  # Using 'system' role for error messages, adjust if 'user' is preferred by LLM
+                    "content": error_message
+                })
+            except Exception as e:
+                self.logger.error(
+                    f"Error communicating with {self.name} API on attempt {attempt + 1}: {e}"
+                )
+                raise
+
+        raise RuntimeError(
+            f"Max retries exceeded for {self.name} response generation.")
 
 
 class GPTBackend(LLMBackend):
@@ -59,12 +109,12 @@ class GPTBackend(LLMBackend):
                  name,
                  response_schema_obj: BaseModel,
                  model="gpt-4o",
-                 mak_tokens=16384,
+                 max_tokens=16384,
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
-                         mak_tokens=mak_tokens,
+                         max_tokens=max_tokens,
                          config=config)
 
         try:
@@ -74,62 +124,47 @@ class GPTBackend(LLMBackend):
             self.logger.error(f"Error initializing OpenAI client: {e}")
             raise
 
-    def generate_response(self, messages) -> BaseModel:
-        for attempt in range(MAX_RETRIES):
-            try:
-                response = self.client.chat.completions.create(
-                    model=self.model,
-                    messages=messages,
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    response_model=self.response_schema_obj,
-                    max_retries=INSTRACTOR_RETRIES,
-                )
-                return response
-            except (ValidationError, InstructorRetryException) as e:
-                self.logger.warning(
-                    f"\n\nValidation failed on attempt {attempt + 1}: {e}")
-                error_message = f"The previous response did not match the expected schema. Error: {e}"
-                messages = messages + [{
-                    "role": "system",
-                    "content": error_message
-                }]
-            except Exception as e:
-                self.logger.error(
-                    f"Error communicating with GPT API on attempt {attempt + 1}: {e}"
-                )
-                raise
+    def _make_api_call(self, messages):
+        """
+        Performs the OpenAI API call.
+        """
+        return self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
+            response_model=self.response_schema_obj,
+            max_retries=INSTRACTOR_RETRIES,
+        )
 
-        raise RuntimeError("Max retries exceeded for GPT response generation.")
-
-    def token_count(self, messages):
-        try:
-            encoding = tiktoken.encoding_for_model(self.model)
-            return sum(
-                len(encoding.encode(message["content"]))
-                for message in messages)
-        except Exception as e:
-            message = f"Error counting tokens with fallback method: {e}"
-            self.logger.warning(message)
-            return message
+    def _get_token_counts(self, response):
+        """
+        Extracts token counts from GPT API response.
+        """
+        if hasattr(response, 'usage') and response.usage:
+            return response.usage.prompt_tokens, response.usage.completion_tokens
+        return None, None
 
 
 class ClaudeBackend(LLMBackend):
     """Implementation of LLMBackend for Claude models."""
 
-    # model="claude-3-7-sonnet-latest",
+    # model = "claude-3-7-latest",
+    # max_tokens = 64000,
 
-    def __init__(
-            self,
-            name,
-            response_schema_obj: BaseModel,
-            model="claude-3-5-haiku",  #Claude 3.5 Haiku
-            mak_tokens=64000,
-            config=None):
+    # model="claude-3-5-haiku-latest",
+    # max_tokens=8192,
+
+    def __init__(self,
+                 name,
+                 response_schema_obj: BaseModel,
+                 model="claude-3-5-haiku-latest",
+                 max_tokens=8192,
+                 config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
-                         mak_tokens=mak_tokens,
+                         max_tokens=max_tokens,
                          config=config)
 
         try:
@@ -139,7 +174,10 @@ class ClaudeBackend(LLMBackend):
             self.logger.error(f"Error initializing Anthropic client: {e}")
             raise
 
-    def generate_response(self, messages) -> BaseModel:
+    def _make_api_call(self, messages):
+        """
+        Performs the Claude API call, handling system messages.
+        """
         system_messages = [
             m["content"] for m in messages if m["role"] == "system"
         ]
@@ -151,107 +189,73 @@ class ClaudeBackend(LLMBackend):
         if system_messages:
             system_prompt = "\n".join(system_messages)
             if chat_messages:
+                # Prepend system prompt to the first user message
                 chat_messages[0][
                     "content"] = f"{system_prompt}\n{chat_messages[0]['content']}"
             else:
+                # If only system messages, make them a user message for the API
                 chat_messages = [{"role": "user", "content": system_prompt}]
 
-        for attempt in range(MAX_RETRIES):
-            try:
-                response = self.client.messages.create(
-                    model=self.model,
-                    messages=chat_messages,
-                    max_tokens=self.max_tokens,
-                    temperature=self.temperature,
-                    response_model=self.response_schema_obj,
-                    max_retries=INSTRACTOR_RETRIES,
-                )
-                return response
-            except ValidationError as e:
-                self.logger.warning(
-                    f"Validation failed on attempt {attempt + 1}: {e}")
-                error_message = f"The previous response did not match the expected schema. Error: {e}"
-                chat_messages = chat_messages + [{
-                    "role": "user",
-                    "content": error_message
-                }]
-            except Exception as e:
-                self.logger.error(
-                    f"Error communicating with Claude API on attempt {attempt + 1}: {e}"
-                )
-                raise
+        return self.client.messages.create(
+            model=self.model,
+            messages=chat_messages,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
+            response_model=self.response_schema_obj,
+            max_retries=INSTRACTOR_RETRIES,
+        )
 
-        raise RuntimeError(
-            "Max retries exceeded for Claude response generation.")
-
-    def token_count(self, messages):
-        try:
-            return super().token_count(messages)
-        except Exception as e:
-            message = f"Error counting tokens with fallback method: {e}"
-            self.logger.warning(message)
-            return message
+    def _get_token_counts(self, response):
+        """
+        Extracts token counts from Claude API response.
+        """
+        if hasattr(response, 'usage') and response.usage:
+            return response.usage.input_tokens, response.usage.output_tokens
+        return None, None
 
 
 class GeminiBackend(LLMBackend):
     """Implementation of LLMBackend for Gemini models."""
 
     # model="models/gemini-1.5-pro-latest",
-    #  model="models/gemini-2.5-flash-preview-04-17",
+    # max_tokens=64000,
+    # model="models/gemini-2.5-preview-latest",
+
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
-                 mak_tokens=64000,
-                 model="models/gemini-1.5-pro-latest",
+                 model="models/gemini-1.5-flash-latest",
+                 max_tokens=4096,
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
-                         mak_tokens=mak_tokens,
+                         max_tokens=max_tokens,
                          config=config)
 
         try:
-            genai.configure(
-                api_key=GEMINI_API_KEY)  # Moved API key configuration here.
-
+            genai.configure(api_key=GEMINI_API_KEY)
             self.client = instructor.from_gemini(
-                client=genai.GenerativeModel(model_name=model, ),
+                client=genai.GenerativeModel(model_name=model),
                 mode=instructor.Mode.GEMINI_JSON,
             )
-
         except Exception as e:
             self.logger.error(f"Error initializing Gemini client: {e}")
             raise
 
-    def generate_response(self, messages) -> BaseModel:
-        for attempt in range(MAX_RETRIES):
-            try:
-                response = self.client.messages.create(
-                    messages=messages,
-                    response_model=self.response_schema_obj,
-                    max_retries=INSTRACTOR_RETRIES)
-                return response
-            except ValidationError as e:
-                self.logger.warning(
-                    f"Validation failed on attempt {attempt + 1}: {e}")
-                error_message = f"The previous response did not match the expected schema. Error: {e}"
-                messages = messages + [{
-                    "role": "user",
-                    "content": error_message
-                }]
-            except Exception as e:
-                self.logger.error(
-                    f"Error communicating with Gemini API on attempt {attempt + 1}: {e}"
-                )
-                raise
+    def _make_api_call(self, messages):
+        """
+        Performs the Gemini API call.
+        """
+        return self.client.messages.create(
+            messages=messages,
+            response_model=self.response_schema_obj,
+            max_retries=INSTRACTOR_RETRIES)
 
-        raise RuntimeError(
-            "Max retries exceeded for Gemini response generation.")
-
-    def token_count(self, messages):
-        try:
-            return super().token_count(messages)
-        except Exception as e:
-            message = f"Error counting tokens with fallback method: {e}"
-            self.logger.warning(message)
-            return message
+    def _get_token_counts(self, response):
+        """
+        Extracts token counts from Gemini API response.
+        """
+        if hasattr(response, 'usage_metadata') and response.usage_metadata:
+            return response.usage_metadata.prompt_token_count, response.usage_metadata.candidates_token_count
+        return None, None
