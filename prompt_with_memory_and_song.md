@@ -101,12 +101,8 @@ Action Results:
 Your responses must follow this exact structure:
 ```python
 {
-    "reasoning": str,  # Explain why you chose this action
-    "action": {
-        "name": str,  # The name of the action to execute
-        "params": dict  # The parameters for the action
-    },
-    "user_instruction": str  # The original user instruction
+    "reasoning": str,  # A brief explanation of the reasoning behind the chosen action and the overall plan. High level plan of the animation journey. Be concise and to the point. Explain which of your available actions you will execute. Make sure you revise your previous plan in the reasoning fields.
+    "action": Union,  # The single action to be executed in this turn. This field now supports both direct JSON objects and stringified JSON objects. If a string is provided, it will be parsed as JSON.
 }
 ```
 
@@ -242,168 +238,159 @@ beat 85	79.36990150637313
 beat 86	80.29690034762457
 beat 87	81.22389918887602
 
+### Key Points
+A list of aladdin key points and their corresponding start time in milliseconds:
+Aligning animation changes to the keypoints begining and ending can enhance the visual experience and create higher quality animations.
+User the labels as a guide to create the animation.
+1.933399	2.428998	Cymbals
+5.652287	6.136993	Cymbals
+7.990991	9.844988	increasing violin sound
+9.844988	11.698986	up and down violin sound
+11.698986	13.552984	decreasing violin sound
+13.552984	14.905589	vanishing sound
+14.905589	15.404051	intro sound
+15.404051	20.938236	mellow begining of storytelling
+20.928037	21.432456	decreasing sound
+21.432456	22.309214	silent
+22.309214	22.822972	intro fading in sound
+22.836037	28.413341	verse2- gradually increasing intensity of storytelling 
+28.413341	28.832397	peak sound
+28.832397	29.598225	fadeout
+29.739884	30.216514	intro-wind
+30.216514	31.602378	 winds sounds - right
+31.602378	32.128100	intro-wind-2
+32.107818	33.019959	wind sounds - left
+33.421675	33.946958	1- talking about sand
+34.313762	34.873957	2 - talking about glass
+35.191801	35.864204	3- is right
+36.727955	37.630987	fading in lyrics
+37.630987	38.602346	part 1
+38.602346	39.508951	part 2
+39.508951	40.453426	part 3
+40.471753	41.362949	part 4
+41.362949	45.098458	increasing animation before the drop
+45.499565	45.987536	crazy boom
+45.987536	46.949428	pre
+46.932420	49.243783	Chorus
+49.243783	50.650109	 tiny part
+50.650109	52.495342	Chorus - same
+53.413959	54.340933	part 1
+54.340933	55.267932	part 2
+55.267932	56.206693	part - hotter than hot - colors
+56.206693	57.121929	part 4
+57.117889	59.846032	pre chorus - increasing again
+59.886577	60.407253	crazy ecstatic boom, must animate
+60.407253	64.537920	Chorus - s2nd
+72.885285	75.968913	singing slowly fading out 
+75.968913	76.657781	stupid sound like licking
+76.959571	77.405695	stupid sound 2 - lik yo yo decreasing
+
+
 ### Lyrics
-These are the lyrics of the song:
-<<<<<<< HEAD
-Here is a list of all the comments in the file, along with the relevant beats they appear above:
+The lyrics of the song, with the first number indicating the start time in milliseconds and the second number indicating the end time:
+Aligning animation changes to the lyrics begining and ending can enhance the visual experience and create higher quality animations.
+15.140220	15.140220	Oh I
+15.427265	15.427265	Come
+15.849390	15.849390	from
+16.333980	16.333980	a land
+16.761181	16.761181	from
+17.183306	17.183306	a
+17.329642	17.774281	far
+17.774281	18.157008	away
+18.187978	18.187978	place
+18.888691	18.888691	where a
+19.198250	19.198250	caravan
+19.963703	19.963703	camels
+20.968975	21.680345	roam
+22.280310	22.280310	where it's
+22.822972	22.822972	flat
+23.310614	23.310614	and
+23.749971	23.749971	immense
+24.319452	24.319452	and
+24.676970	24.676970	the heat
+25.167306	25.167306	is
+25.603969	25.603969	intenese
+26.154680	26.154680	it's
+26.530968	26.530968	barbbaric
+27.457966	27.457966	but hey..
+28.107964	28.107964	it's
+28.347868	29.295478	home
+29.719863	30.238963	when the
+30.238963	30.625999	wind
+30.625999	31.553208	from the east
+31.553208	32.092961	and the sun 
+32.297785	33.019959	from the west
+33.421675	33.946958	and the sand
+34.313762	35.191801	in the glass
+35.191801	35.859622	is right
+36.727955	37.649315	come on
+37.649315	38.011283	down
+38.011283	38.606928	stop on 
+38.602346	39.115516	by
+39.124680	39.508951	hop a
+39.508951	40.022729	carpet
+40.018147	40.432664	and
+40.435950	40.940908	fly
+40.940908	41.362949	to
+41.362949	42.302277	another
+42.302277	43.216947	arabian
+43.216947	45.070394	nights
+45.424350	46.921857	arbian
+46.921857	49.109123	nights
+49.199881	49.675020	like
+49.704481	50.632937	arabian
+50.632937	52.487006	days
+52.866559	53.392345	more
+53.404206	53.803579	often
+53.803579	54.293782	than
+54.293782	54.791945	not
+54.987651	55.254524	are
+55.254524	55.767955	hotter
+55.767955	56.184441	than
+56.184441	56.674156	hot
+56.671915	57.959926	in a lot of good
+57.959926	59.902926	ways
+59.902926	60.423602	boom
+60.423602	61.756924	arabian
+61.763624	63.674323	nights
+63.674323	64.179102	'neat
+64.357718	65.204072	arabian
+65.464919	67.318917	moons
+67.783204	69.165008	a fool off his
+69.165008	69.804092	gaurd
+69.804092	71.047715	could fall and fall
+71.026912	71.953911	hard
+71.953911	72.901634	out there on
+72.901634	75.688270	the dunes
 
-1. ** Comment:** `// 31.5 - 33.5 when the wind's from the east`
-  ** Beats:** 31.5 - 33.5
 
-2. ** Comment:** `// 33.5 - 35.5 and the sun's from the west`
-  ** Beats:** 33.5 - 35.5
+### Drums Pattern
+The drum pattern of the song repeats cyclically throughout its duration. It is represented using relative beats as labels, such as 0.5, 1.5, etc., which correspond to fractions of a beat based on the BPM (beats per minute). For instance, if a beat lasts 2 seconds, 0.25 beats would equal 0.5 seconds.
+The pattern spans 0 to 3.75 beats (4 beats in total) and aligns with every 4th beat. Two cycles of the pattern are provided as an example. Aligning animation changes to the drum pattern can enhance the visual experience and create higher quality animations.
+0.575871	0.575871	0 
+1.038852	1.038852	0.5
+1.263821	1.263821	0.75
+1.501822	1.501822	1
+1.965498	2.196760	1.5
+2.428998	2.428998	2
+2.892464	2.892464	2.5
+3.124996	3.124996	2.75
+3.355637	3.355637	3
+3.590058	3.590058	3.25
+3.818809	3.818809	3.5
+4.051340	4.051340	3.75
+4.282995	4.282995	0
+4.745154	4.745154	0.5
+4.975795	4.975795	0.75
+5.208946	5.208946	1
+5.669608	5.905920	1.5
+6.136122	6.136122	2
+6.601624	6.601624	2.5
+6.832265	6.832265	2.75
+7.064797	7.064797	3
+7.295437	7.295437	3.25
+7.527969	7.527969	3.5
+7.758610	7.758610	3.75
 
-3. ** Comment:** `// 35.5 - 37.5 and the sand in the glass is right`
-  ** Beats:** 35.5 - 37.5
-
-4. ** Comment:** `// glass`
-  ** Beats:** 36.5 - 38.5
-
-5. ** Comment:** `// is right`
-  ** Beats:** 37.5 - 38.5
-
-6. ** Comment:** `// 39 - 40 come on`
-  ** Beats:** 39 - 40
-
-7. ** Comment:** `// 40 - 40.5 down`
-  ** Beats:** 40 - 40.5
-
-8. ** Comment:** `// 40.5 - 41.5 stop on by`
-  ** Beats:** 40.5 - 41.5
-
-9. ** Comment:** `// 41.5 - 42.5 hop a carpet`
-  ** Beats:** 41.5 - 42.5
-
-10. ** Comment:** `// 42.5 - 43 and fly`
-  ** Beats:** 42.5 - 43
-
-11. ** Comment:** `// 43.5 - 46 to another Arabian night`
-  ** Beats:** 43.5 - 46
-
-12. ** Comment:** `// 46 - 48 Ahuuuuuuuu`
-  ** Beats:** 46 - 48
-
-13. ** Comment:** `// boom`
-  ** Beats:** 48.5 - 50
-
-14. ** Comment:** `// boom fade out and psychedelic`
-  ** Beats:** 49 - 50
-
-15. ** Comment:** `// 50 - 53 - Arabian nights`
-  ** Beats:** 50 - 53
-
-16. ** Comment:** `// 53 - 57 - like Arabian days`
-  ** Beats:** 53 - 57
-
-17. ** Comment:** `// more often than not`
-  ** Beats:** 57 - 59
-
-18. ** Comment:** `// are hotter than hot`
-  ** Beats:** 59 - 64
-
-19. ** Comment:** `// in a lot of good ways`
-  ** Beats:** 60 - 64
-
-20. ** Comment:** `// boom`
-  ** Beats:** 64 - 66
-
-21. ** Comment:** `// boom fade out and psychedelic`
-  ** Beats:** 64.5 - 66
-
-22. ** Comment:** `// Arabian nights`
-  ** Beats:** 66 - 69
-
-23. ** Comment:** `// 'neath Arabian moons`
-  ** Beats:** 70 - 73
-
-24. ** Comment:** `// A fool off his guard`
-  ** Beats:** 73 - 75
-
-25. ** Comment:** `// could fall and fall hard`
-  ** Beats:** 75 - 87
-
-26. ** Comment:** `// out there on the dunes`
-  ** Beats:** 81 - 85
-=======
-Okay, here is the list with the numbers removed from the `//` preceding each lyrics line:
-
-1. ** Lyrics:** `// when the wind's from the east`
-  ** Beats:** 31.5 - 33.5
-
-2. ** Lyrics:** `// and the sun's from the west`
-  ** Beats:** 33.5 - 35.5
-
-3. ** Lyrics:** `// and the sand in the glass is right`
-  ** Beats:** 35.5 - 37.5
-
-4. ** Lyrics:** `// glass`
-  ** Beats:** 36.5 - 38.5
-
-5. ** Lyrics:** `// is right`
-  ** Beats:** 37.5 - 38.5
-
-6. ** Lyrics:** `// come on`
-  ** Beats:** 39 - 40
-
-7. ** Lyrics:** `// down`
-  ** Beats:** 40 - 40.5
-
-8. ** Lyrics:** `// stop on by`
-  ** Beats:** 40.5 - 41.5
-
-9. ** Lyrics:** `// hop a carpet`
-  ** Beats:** 41.5 - 42.5
-
-10. ** Lyrics:** `// and fly`
-  ** Beats:** 42.5 - 43
-
-11. ** Lyrics:** `// to another Arabian night`
-  ** Beats:** 43.5 - 46
-
-12. ** Lyrics:** `// Ahuuuuuuuu`
-  ** Beats:** 46 - 48
-
-13. ** Lyrics:** `// boom`
-  ** Beats:** 48.5 - 50
-
-14. ** Lyrics:** `// boom fade out and psychedelic`
-  ** Beats:** 49 - 50
-
-15. ** Lyrics:** `// - Arabian nights`
-  ** Beats:** 50 - 53
-
-16. ** Lyrics:** `// - like Arabian days`
-  ** Beats:** 53 - 57
-
-17. ** Lyrics:** `// more often than not`
-  ** Beats:** 57 - 59
-
-18. ** Lyrics:** `// are hotter than hot`
-  ** Beats:** 59 - 64
-
-19. ** Lyrics:** `// in a lot of good ways`
-  ** Beats:** 60 - 64
-
-20. ** Lyrics:** `// boom`
-  ** Beats:** 64 - 66
-
-21. ** Lyrics:** `// boom fade out and psychedelic`
-  ** Beats:** 64.5 - 66
-
-22. ** Lyrics:** `// Arabian nights`
-  ** Beats:** 66 - 69
-
-23. ** Lyrics:** `// 'neath Arabian moons`
-  ** Beats:** 70 - 73
-
-24. ** Lyrics:** `// A fool off his guard`
-  ** Beats:** 73 - 75
-
-25. ** Lyrics:** `// could fall and fall hard`
-  ** Beats:** 75 - 87
-
-26. ** Lyrics:** `// out there on the dunes`
-  ** Beats:** 81 - 85
->>>>>>> 7dab0ae63abdc3309bba0690d06acf3536958550
 
 

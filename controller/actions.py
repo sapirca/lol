@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union, List
 import json
 import logging
 from animation.animation_manager import AnimationManager
@@ -477,15 +477,44 @@ class ActionRegistry:
         ]
 
         # Get the schema fields and their descriptions
-        schema_fields = MainSchema.__fields__
+        schema_fields = MainSchema.__fields__  # Assuming MainSchema is a Pydantic BaseModel
+
+        # Helper function to get a readable type name
+        def get_type_name(
+                field_annotation) -> str:  # Renamed parameter for clarity
+            if hasattr(field_annotation, '__name__'):
+                return field_annotation.__name__
+            elif hasattr(field_annotation,
+                         '__origin__'):  # Handles Union, List, Dict, etc.
+                if field_annotation.__origin__ is typing.Union:
+                    # For Union types (e.g., str | None), get names of all constituent types
+                    args = field_annotation.__args__
+                    # Filter out NoneType for cleaner representation if it's optional
+                    type_names = [
+                        get_type_name(arg) for arg in args
+                        if arg is not type(None)
+                    ]
+                    if len(type_names) == 1 and type(
+                            None) in args:  # Optional[Type]
+                        return f"Optional[{type_names[0]}]"
+                    return " | ".join(type_names)
+                else:
+                    # For generic types like List[str], Dict[str, int]
+                    origin_name = get_type_name(field_annotation.__origin__)
+                    args_names = [
+                        get_type_name(arg) for arg in field_annotation.__args__
+                    ]
+                    return f"{origin_name}[{', '.join(args_names)}]"
+            return str(field_annotation)  # Fallback for any other complex type
 
         # Build the schema documentation
         lines.append("{")
         for field_name, field in schema_fields.items():
-            description = field.field_info.description or ""
-            field_type = field.type_.__name__ if hasattr(
-                field.type_, "__name__") else str(field.type_)
-            lines.append(f'    "{field_name}": {field_type},  # {description}')
+            description = field.description or ""
+            # Access the type annotation using .annotation
+            field_type_str = get_type_name(field.annotation)
+            lines.append(
+                f'    "{field_name}": {field_type_str},  # {description}')
         lines.append("}")
         lines.append("```")
         lines.append("")
