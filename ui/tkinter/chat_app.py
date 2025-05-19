@@ -228,6 +228,10 @@ def refresh():
         else:
             type_name = TYPE_INTERNAL
 
+        if type_name == TYPE_INTERNAL and not controller.config.get(
+                "print_internal_messages", False):
+            continue
+
         # Schedule message display
         sender_name = get_sender_name(type_name)
         root.after(0,
@@ -424,6 +428,10 @@ def batch_insert_messages(messages):
             type_name = TYPE_INTERNAL
         else:
             type_name = TYPE_SYSTEM
+
+        if type_name == TYPE_INTERNAL and not controller.config.get(
+                "print_internal_messages", False):
+            continue
 
         label_tag = get_label_tag(type_name)
         message_tag = get_message_tag(type_name)

@@ -67,8 +67,8 @@ class UpdateAnimationAction(Action):
         self._purpose = "Create or update an animation sequence. This action will add the animation to the sequence manager."
         self._requires_confirmation = True
         self._returns = {
-            "step_number":
-            "The step number that will be assigned if confirmed",
+            # "step_number":
+            # "The step number that will be assigned if confirmed",
         }
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -99,16 +99,16 @@ class UpdateAnimationAction(Action):
         try:
             # Directly add the animation to the sequence manager
             result_message = self.animation_manager.add_sequence(animation_str)
-            current_steps_count = len(
-                self.animation_manager.sequence_manager.steps)
+            # current_steps_count = len(
+            #     self.animation_manager.sequence_manager.steps)
 
             result = {
                 "status": "success",
                 "message": result_message,
                 "requires_confirmation": False,
-                "data": {
-                    "step_number": current_steps_count
-                }
+                # "data": {
+                #     "step_number": current_steps_count
+                # }
             }
 
             # Auto-render if configured

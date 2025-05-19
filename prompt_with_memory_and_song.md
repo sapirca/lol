@@ -23,8 +23,6 @@ Available Actions:
 1. update_animation
    - Purpose: Create or update an animation sequence. This action will add the animation to the sequence manager.
    - Requires confirmation: Yes
-   - Returns:
-     - step_number: The step number that will be assigned if confirmed
 
 2. get_animation
    - Purpose: Retrieve an existing animation sequence by step number
