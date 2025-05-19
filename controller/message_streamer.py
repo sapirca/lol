@@ -5,6 +5,23 @@ import threading
 from constants import TIME_FORMAT, LOG_INTERVAL_IN_SECONDS, MESSAGE_SNAPSHOT_FILE
 from constants import SNAPSHOTS_DIR
 
+# Message tags for different types of messages in the system
+
+# User input messages sent to the LLM
+TAG_USER_INPUT = "user_input"
+
+# Assistant/LLM responses and reasoning
+TAG_ASSISTANT = "assistant"
+
+# General system messages (status updates, confirmations)
+TAG_SYSTEM = "system"
+
+# Internal system messages (debug info, not visible by default)
+TAG_SYSTEM_INTERNAL = "system_internal"
+
+# Action result messages (outcomes of executed actions)
+TAG_ACTION_RESULTS = "action_results"
+
 
 def count_words(text):
     """Utility function to count words in a given text."""
@@ -27,7 +44,8 @@ class MessageStreamer:
         os.makedirs(self.snapshots_dir, exist_ok=True)
 
         self.messages = []  # Unified log storage for all messages
-        # self.msgs_full_path = os.path.join(self.snapshots_dir, MESSAGE_SNAPSHOT_FILE)
+        self.last_checked_index = 0  # Track last checked message index
+        self.control_flags = {}  # Store control flags like auto_continue
 
         self.periodic_snapshot = os.path.join(self.snapshots_dir,
                                               "periodic_snapshot.json")
@@ -104,11 +122,17 @@ class MessageStreamer:
         # with open(self.msgs_full_path, "w") as file:
         #     json.dump(self.messages, file, indent=4)
 
+    def clear_control_flags(self):
+        """Clear all control flags."""
+        self.control_flags.clear()
+
     def load(self, file_name):
         """Load logs from a specified file."""
         if os.path.exists(file_name):
             with open(file_name, "r") as file:
                 self.messages = json.load(file)
+            self.last_checked_index = 0  # Reset the last checked index
+            self.clear_control_flags()  # Clear any existing control flags
         else:
             raise FileNotFoundError(f"Log file '{file_name}' does not exist.")
 
@@ -145,3 +169,23 @@ class MessageStreamer:
                 json.dump(self.messages, file, indent=4)
         except Exception as e:
             self.add_log(f"Error during periodic snapshot: {e}")
+
+    def set_control_flag(self, flag_name, value):
+        """Set a control flag with a value."""
+        self.control_flags[flag_name] = value
+
+    def get_and_clear_control_flags(self):
+        """Get all control flags and clear them."""
+        flags = self.control_flags.copy()
+        self.control_flags.clear()
+        return flags
+
+    def get_new_messages(self):
+        """Get new messages since last check and update the last checked index."""
+        new_messages = []
+        for i in range(self.last_checked_index, len(self.messages)):
+            msg = self.messages[i]
+            new_messages.append(
+                (msg['tag'], msg['content'], msg['context'], msg['visible']))
+        self.last_checked_index = len(self.messages)
+        return new_messages

@@ -1,13 +1,19 @@
 import random
 from controller.backends import GPTBackend, ClaudeBackend, LLMBackend, GeminiBackend
 from memory.memory_manager import MemoryManager
-from prompts.main_prompt import intro_prompt
 from music.song_provider import SongProvider
 import xml.etree.ElementTree as ET
 from controller.interpreter import Interpreter
 from controller.formatter import Formatter
 from constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
-from controller.message_streamer import MessageStreamer
+from controller.message_streamer import (
+    MessageStreamer,
+    TAG_USER_INPUT,
+    TAG_ASSISTANT,
+    TAG_SYSTEM,
+    TAG_SYSTEM_INTERNAL,
+    TAG_ACTION_RESULTS,
+)
 import logging
 import os
 from datetime import datetime
@@ -18,7 +24,7 @@ from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
 from controller.actions import (ActionRegistry, UpdateAnimationAction,
                                 GetAnimationAction, AddToMemoryAction,
-                                InformUserAction, AskUserAction)
+                                QuestionAction, MemorySuggestionAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -29,10 +35,10 @@ class LogicPlusPlus:
     def __init__(self, snapshot_dir=None):
         """Initialize the LogicPlusPlus, optionally loading from a snapshot."""
         self.logger = logging.getLogger("LogicPlusPPlusLogger")
-        self.wait_for_save_approval = False
-        self.temp_animation_path = None
         self._pending_memory = None
         self.msgs = MessageStreamer()
+        self.msgs.clear_control_flags(
+        )  # Ensure control flags are cleared on initialization
         self.song_provider = SongProvider()
         self.backends = {}
         self._is_processing = False
@@ -44,7 +50,6 @@ class LogicPlusPlus:
         if snapshot_dir is not None:
             try:
                 self._load_from_snapshot(snapshot_dir)
-                self.initial_prompt_added = True
             except Exception as e:
                 self.logger.error(
                     f"Failed to load snapshot from {snapshot_dir}: {e}")
@@ -52,7 +57,6 @@ class LogicPlusPlus:
                     f"Failed to load snapshot from {snapshot_dir}: {e}")
         else:
             # Default initialization if no snapshot is provided
-            self.initial_prompt_added = False
             self.config = basic_config
             self.selected_framework = self.config.get("framework", None)
             self.animation_manager = AnimationManager(self.selected_framework,
@@ -70,22 +74,29 @@ class LogicPlusPlus:
         self.selected_backend = self.config.get("selected_backend", None)
         self.response_manager = Interpreter(self.animation_manager,
                                             config=self.config)
-        self.formatter = Formatter(self.msgs, self.animation_manager,
-                                   self.memory_manager, self.song_provider,
-                                   self.config)
-
+        
         self._register_actions()
 
+        self.formatter = Formatter(self.msgs, self.animation_manager,
+                                   self.memory_manager, self.song_provider,
+                                   self.action_registry, self.config)
+
+        
+        
     def _register_actions(self):
         """Register all available actions"""
         self.action_registry.register_action(
-            "update_animation", UpdateAnimationAction(self.animation_manager))
+            "update_animation",
+            UpdateAnimationAction(self.animation_manager, self.msgs))
         self.action_registry.register_action(
-            "get_animation", GetAnimationAction(self.animation_manager))
+            "get_animation",
+            GetAnimationAction(self.animation_manager, self.msgs))
         self.action_registry.register_action(
-            "add_to_memory", AddToMemoryAction(self.memory_manager))
-        self.action_registry.register_action("inform_user", InformUserAction())
-        self.action_registry.register_action("ask_user", AskUserAction())
+            "add_to_memory", AddToMemoryAction(self.memory_manager, self.msgs))
+        self.action_registry.register_action("question",
+                                             QuestionAction(self.msgs))
+        self.action_registry.register_action("memory_suggestion",
+                                             MemorySuggestionAction(self.msgs))
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
@@ -228,63 +239,6 @@ class LogicPlusPlus:
 
         return random.choice(list(self.backends.values()))
 
-    def build_prompt(self, intro_prompt, general_knowledge):
-        prompt_parts = []
-        if intro_prompt:
-            prompt_parts.append(intro_prompt)
-        if general_knowledge:
-            prompt_parts.append("\n### General Knowledge\n")
-            prompt_parts.append(general_knowledge)
-        return "\n".join(prompt_parts)
-
-    def process_init_prompt(self):
-        latest_sequence = None
-        if not self.initial_prompt_added:
-
-            # # Provide song structure
-            # song_name = self.config.get("song_name")
-            # song_info = self.song_provider.get_song_structure(
-            #     song_name) if song_name else ""
-            # print(f" >>> Song name: {song_name}")
-
-            # Provide general knowledge
-            timing_knowledge = self.animation_manager.get_general_knowledge()
-
-            # Build the initial prompt
-            initial_prompt = self.build_prompt(intro_prompt, timing_knowledge)
-
-            self.msgs.add_invisible("initial_prompt_context",
-                                    initial_prompt,
-                                    context=True)
-
-            # # Add memory to the initial prompt
-            # memory = self.memory_manager.get_memory()
-            # if (memory):
-            #     self.msgs.add_message("system",
-            #                                       f"Memory: {memory}",
-            #                                       visible=False,
-            #                                       context=True)
-
-            # Do not add the last animation
-            # latest_sequence = self.animation_manager.get_latest_sequence()
-            # if (latest_sequence):
-            #     self.msgs.add_message("initial_animation",
-            #                                       latest_sequence,
-            #                                       visible=False,
-            #                                       context=True)
-
-            self.initial_prompt_added = True
-
-            initial_prompt_report = (
-                f"Included initial prompt. Sent to {self.selected_backend}. {self.selected_framework} framework.\n"
-            )
-
-            # self.msgs.add_visible("system",
-            #                       initial_prompt_report,
-            #                       context=False)
-
-            return initial_prompt_report
-
     def is_processing(self):
         """Check if the backend is currently processing a request."""
         return self._is_processing
@@ -293,70 +247,47 @@ class LogicPlusPlus:
         """Thread-safe communication with the backend."""
         with self._processing_lock:
             if self._is_processing:
-                return [("system",
-                         "Still processing previous request. Please wait.")]
+                self.msgs.add_visible(
+                    "system",
+                    "Still processing previous request. Please wait.",
+                    context=False)
+                return
 
             self._is_processing = True
             try:
-                return self._communicate_internal(user_input)
+                self._communicate_internal(user_input)
             finally:
                 self._is_processing = False
 
+    def add_user_input_to_chat(self, user_input):
+        self.msgs.add_visible(TAG_USER_INPUT, user_input, context=True)
+
     def _communicate_internal(self, user_input):
         """Internal communication method that contains the original communicate logic."""
-        system_responses = []
-        if self.wait_for_save_approval:
-            self.msgs.add_visible("user_input", user_input, context=False)
-            result = self.handle_user_approval(user_input)
-            self.msgs.add_visible("system_output", result, context=False)
-            system_responses.append(("system", result))
-            return system_responses
+        # if self._pending_memory:
+        #     result = self.handle_memory_approval(user_input)
+        #     self.msgs.add_visible(TAG_SYSTEM, result, context=False)
+        #     return
 
         backend = self.select_backend()
-        initial_prompt_report = self.process_init_prompt()
-        if (initial_prompt_report):
-            system_responses.append(("system", initial_prompt_report))
-
-        self.msgs.add_visible("user_input", user_input, context=True)
-
         messages = self.formatter.build_messages()
-        auto_continue = False
+
         try:
             model_response = backend.generate_response(messages)
-
         except Exception as e:
             error_msg = f"Error: {str(e)}"
-            self.msgs.add_visible("system", error_msg, context=False)
-            system_responses.append(("system", error_msg))
-            return system_responses
+            self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
+            return
 
-        # Display the LLM's reasoning about the chosen action and overall strategy
-        self.msgs.add_visible("assistant",
-                              "Reasoning:\n" + model_response.reasoning,
-                              context=True)
-        system_responses.append(("assistant", model_response.reasoning))
-
-        # Show the action plan if provided
-        if model_response.actions_plan:
-            message = f"Actions plan:\n"
-            message += f"{model_response.actions_plan}\n"
-            self.msgs.add_visible("assistant", message, context=True)
-            system_responses.append(("assistant", message))
-
-        if not model_response.action:
-            message = f"No action to execute.\n"
-            self.msgs.add_visible("system", message, context=True)
-            system_responses.append(("system", message))
-            return system_responses
-
-        if model_response.action.name == "update_animation":
-            message = f"I will execute the action {model_response.action.name}. The animation will be saved to temporary file.\n"
+        # Combine reasoning and action plan into a single message
+        response_message = ""
+        response_message += "Reasoning:\n" + model_response.reasoning
+        if model_response.action:
+            response_message += "\n\nI will execute action:\n" + model_response.action.name
         else:
-            message = f"I will execute the action {model_response.action.name} with the following parameters:\n"
-            message += f"{model_response.action.params}\n"
+            response_message += "\n\nNo action to execute.\n"
 
-        self.msgs.add_visible("assistant", message, context=True)
-        system_responses.append(("assistant", message))
+        self.msgs.add_visible(TAG_ASSISTANT, response_message, context=True)
 
         # Execute single action for this turn and handle its result
         result = self.action_registry.execute_action(
@@ -364,197 +295,29 @@ class LogicPlusPlus:
 
         if result["status"] == "error":
             error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
-            self.msgs.add_visible("system", error_msg, context=False)
-            system_responses.append(("system", error_msg))
-            # Add error result to context
-            action_result = {
-                "action": model_response.action.name,
-                "status": "error",
-                "error": result["message"]
-            }
+            self.msgs.add_visible(TAG_SYSTEM, error_msg, context=True)
         else:
-            # Handle successful action execution and prepare response
-            self.wait_for_save_approval = result.get("requires_confirmation",
-                                                     False)
+            self.msgs.add_visible(TAG_ASSISTANT,
+                                  result.get("message",
+                                             "... no message. Debug."),
+                                  context=False)
 
-            # For update_animation action, display the message directly to preserve the temp path format
-            if model_response.action.name == "update_animation":
-                self.msgs.add_visible("assistant",
-                                      result['message'],
-                                      context=True)
-                system_responses.append(("assistant", result['message']))
-            else:
-                message = f"The result of the action {model_response.action.name} is:\n"
-                message += f"{result['message']}\n"
-                self.msgs.add_visible("assistant", message, context=True)
-                system_responses.append(("assistant", message))
+        # If there's data in the result, send it back to LLM for processing
+        if "data" in result:
+            self.msgs.add_invisible(TAG_ACTION_RESULTS,
+                                    json.dumps(result["data"], indent=2),
+                                    context=True)
+        # Check if immediate response is needed for this action type
+        params_dict = model_response.action.params.model_dump() if hasattr(
+            model_response.action.params,
+            'model_dump') else model_response.action.params
 
-            action_result = {
-                "action": model_response.action.name,
-                "status": "success",
-                "message": result["message"]
-            }
-            if "data" in result:
-                action_result["data"] = result["data"]
-                data_msg = f"Action data {model_response.action.name}, returned value: {json.dumps(result['data'], indent=2)}"
-                self.msgs.add_visible("assistant", data_msg, context=True)
-                system_responses.append(("assistant", data_msg))
-
-            if model_response.action.name == "update_animation" and "temp_path" in result:
-                self.temp_animation_path = result["temp_path"]
-                message = f"Do you want me to save a snapshot to the sequence manager? (y/n)\n"
-                self.msgs.add_visible("system", message, context=True)
-                system_responses.append(("system", message))
-
-            # Check if immediate response is needed for this action type
-            params_dict = model_response.action.params.model_dump() if hasattr(
-                model_response.action.params,
-                'model_dump') else model_response.action.params
-
-            if params_dict.get("immediate_response", False):
-                auto_continue = True
-                self.msgs.add_visible("system",
-                                      "Auto-continuing with action result",
-                                      context=True)
-                system_responses.append(
-                    ("system", "Auto-continuing with action result"))
-
-        # Store action result in context for next LLM turn
-        results_str = json.dumps(action_result, indent=2)
-        self.msgs.add_visible("action_results",
-                              f"Action Result:\n{results_str}",
-                              context=True)
-
-        if auto_continue:
-            system_responses.append(("auto_continue", results_str))
-
-        return system_responses
-
-    # def act_on_response(self, model_response, printable_response):
-    #     output = ""
-
-    #     try:
-    #         if model_response:
-    #             # Use `exclude_none=True` to remove null fields from the animation JSON
-    #             animation_str = json.dumps(
-    #                 model_response,
-    #                 indent=4,
-    #                 default=lambda o: o.model_dump(exclude_none=True))
-
-    #             # Save the animation sequence to a temporary file
-    #             self.temp_animation_path = self.animation_manager.save_tmp_animation(
-    #                 animation_str)
-    #             self.logger.info(
-    #                 f"Generated {self.temp_animation_path} for the user's observation."
-    #             )
-
-    #             output += f"Animation sequence generated and saved to:\n"
-    #             output += f"{self.temp_animation_path}\n"
-    #             output += "Do you want me to save a snapshot to the sequence manager? (y/n)\n"
-    #             self.wait_for_save_approval = True
-
-    #             # Auto-render the animation for preview if auto_render is enabled in the config
-    #             if self.config.get("auto_render", False):
-    #                 animation_dict = json.loads(animation_str)
-    #                 render_result = self.render_preview(animation_dict)
-    #                 if "Error" in render_result:
-    #                     output += f"{render_result}\nAnimation was not rendered for preview.\n"
-    #                 else:
-    #                     output += f"{render_result}\n"
-
-    #     except Exception as e:
-    #         self.logger.error(
-    #             f"Error processing response and rendering animation: {e}")
-    #         output += f"Error processing response and rendering animation: {e}\n"
-
-    #     return output
-
-    def handle_user_approval(self, user_input):
-        output = ""
-        if user_input.lower() in ["y", "yes"]:
-            if self.temp_animation_path:  # Ensure there's an animation path to process
-                try:
-                    with open(self.temp_animation_path, "r") as temp_file:
-                        animation_sequence = temp_file.read()
-
-                    step_number = self.animation_manager.add_sequence(
-                        animation_sequence)
-
-                    output += f"Animation sequence added to the sequence manager as step {step_number}.\n"
-                    self.logger.info(
-                        "User approved and animation saved to sequence manager."
-                    )
-
-                except Exception as e:
-                    self.logger.error(
-                        f"Error saving animation from temp file to sequence manager: {e}"
-                    )
-                    output += f"Error saving animation: {e}\n"
-
-                self.temp_animation_path = None
-
-            elif self._pending_memory:  # Handle memory approval
-                try:
-                    key = self._pending_memory["key"]
-                    value = self._pending_memory["value"]
-                    self.memory_manager.write_to_memory(key, value)
-                    output += f"Memory saved with key: {key}\n"
-                    self.logger.info(
-                        f"User approved and memory saved with key: {key}")
-                    self._pending_memory = None
-                except Exception as e:
-                    self.logger.error(f"Error saving memory: {e}")
-                    output += f"Error saving memory: {e}\n"
-            else:
-                output += "No pending action to approve. Should not happen. Please report this bug.\n"
-                self.logger.warning(
-                    "User approved, but no pending action was found.")
-
-            self.wait_for_save_approval = False
-            self.logger.info("User approval received.")
-            return output
-
-        elif user_input.lower() in ["n", "no"]:
-            if self.temp_animation_path:  # Handle animation rejection
-                self.animation_manager.delete_temp_file(
-                    self.temp_animation_path)
-                self.temp_animation_path = None
-                self.logger.info("Animation discarded by user.")
-                output += "Animation discarded.\n"
-            elif self._pending_memory:  # Handle memory rejection
-                self._pending_memory = None
-                self.logger.info("Memory addition discarded by user.")
-                output += "Memory addition discarded.\n"
-            else:
-                output += "Action discarded (no pending action to discard).\n"
-                self.logger.warning(
-                    "User discarded, but no pending action was found.")
-
-            self.wait_for_save_approval = False
-            return output
-
-        self.logger.warning(
-            "Invalid response received during approval process.")
-        return "Invalid response. Please reply with 'y' or 'n'.\n"
-
-    def delete_temp_file(self, file_path):
-        absolute_path = os.path.abspath(file_path)
-        try:
-            if os.path.exists(absolute_path):
-                os.remove(absolute_path)
-                if not os.path.exists(absolute_path):
-                    self.logger.info(
-                        f"Temp file {absolute_path} was successfully deleted.")
-                else:
-                    self.logger.error(
-                        f"Error: Temp file {absolute_path} still exists after deletion attempt."
-                    )
-            else:
-                self.logger.warning(
-                    f"Temp file {absolute_path} does not exist.")
-        except Exception as e:
-            self.logger.error(
-                f"An error occurred while deleting {absolute_path}: {e}")
+        if params_dict.get("immediate_response", False):
+            self.msgs.set_control_flag("auto_continue",
+                                       json.dumps(result, indent=2))
+            self.msgs.add_visible(TAG_SYSTEM,
+                                  "Auto-continuing with action result",
+                                  context=False)
 
     def render(self):
         """Render the current animation sequence."""
