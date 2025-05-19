@@ -24,7 +24,8 @@ from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
 from controller.actions import (ActionRegistry, UpdateAnimationAction,
                                 GetAnimationAction, AddToMemoryAction,
-                                QuestionAction, MemorySuggestionAction)
+                                QuestionAction, MemorySuggestionAction,
+                                AnswerUserAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -74,15 +75,13 @@ class LogicPlusPlus:
         self.selected_backend = self.config.get("selected_backend", None)
         self.response_manager = Interpreter(self.animation_manager,
                                             config=self.config)
-        
+
         self._register_actions()
 
         self.formatter = Formatter(self.msgs, self.animation_manager,
                                    self.memory_manager, self.song_provider,
                                    self.action_registry, self.config)
 
-        
-        
     def _register_actions(self):
         """Register all available actions"""
         self.action_registry.register_action(
@@ -97,6 +96,8 @@ class LogicPlusPlus:
                                              QuestionAction(self.msgs))
         self.action_registry.register_action("memory_suggestion",
                                              MemorySuggestionAction(self.msgs))
+        self.action_registry.register_action("answer_user",
+                                             AnswerUserAction(self.msgs))
 
     def shutdown(self, shutdown_snapshot_dir=None):
         if not shutdown_snapshot_dir:
@@ -281,11 +282,12 @@ class LogicPlusPlus:
 
         # Combine reasoning and action plan into a single message
         response_message = ""
-        response_message += "Reasoning:\n" + model_response.reasoning
-        if model_response.action:
-            response_message += "\n\nI will execute action:\n" + model_response.action.name
-        else:
-            response_message += "\n\nNo action to execute.\n"
+        action_tag = f"[Action: \"{model_response.action.name}\"]: "
+        response_message += action_tag + model_response.reasoning
+        # if model_response.action:
+        #     response_message += "\n\nI will execute action:\n" + model_response.action.name
+        # else:
+        #     response_message += "\n\nNo action to execute.\n"
 
         self.msgs.add_visible(TAG_ASSISTANT, response_message, context=True)
 
@@ -298,9 +300,8 @@ class LogicPlusPlus:
             self.msgs.add_visible(TAG_SYSTEM, error_msg, context=True)
         else:
             self.msgs.add_visible(TAG_ASSISTANT,
-                                  result.get("message",
-                                             "... no message. Debug."),
-                                  context=False)
+                                  result.get("message", "No message? Debug!"),
+                                  context=True)
 
         # If there's data in the result, send it back to LLM for processing
         if "data" in result:

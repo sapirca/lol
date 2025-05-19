@@ -67,8 +67,8 @@ class UpdateAnimationAction(Action):
         self._purpose = "Create or update an animation sequence. This action will add the animation to the sequence manager."
         self._requires_confirmation = True
         self._returns = {
-            "step_number": "The step number that will be assigned if confirmed",
-            "status_message": "The status message returned by the sequence manager"
+            "step_number":
+            "The step number that will be assigned if confirmed",
         }
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -99,14 +99,14 @@ class UpdateAnimationAction(Action):
         try:
             # Directly add the animation to the sequence manager
             result_message = self.animation_manager.add_sequence(animation_str)
-            current_steps_count = len(self.animation_manager.sequence_manager.steps)
+            current_steps_count = len(
+                self.animation_manager.sequence_manager.steps)
 
             result = {
                 "status": "success",
-                "message": f"Animation sequence added to step {step_number}.",
+                "message": result_message,
                 "requires_confirmation": False,
                 "data": {
-                    "status_message":  result_message,
                     "step_number": current_steps_count
                 }
             }
@@ -263,8 +263,8 @@ class QuestionAction(Action):
         self._purpose = "Ask a question to the user"
         self._requires_confirmation = True
         self._returns = {
-            "question": "The question that was asked",
-            "is_clarification": "Whether this is a clarification question"
+            # "question": "The question that was asked",
+            # "is_clarification": "Whether this is a clarification question"
         }
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -275,17 +275,17 @@ class QuestionAction(Action):
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         try:
             params_dict = self._get_params_dict(params)
-            is_clarification = params_dict.get("is_clarification", False)
+            # is_clarification = params_dict.get("is_clarification", False)
 
             result = {
                 "status": "success",
                 "message": params_dict["message"],
                 "requires_confirmation": True,  # Always requires user response
-                "message_type": "question",
-                "data": {
-                    "question": params_dict["message"],
-                    "is_clarification": is_clarification
-                }
+                # "message_type": "question",
+                # "data": {
+                #     "question": params_dict["message"],
+                #     "is_clarification": is_clarification
+                # }
             }
             self._log_action_result("question", result)
             return result
@@ -305,9 +305,7 @@ class MemorySuggestionAction(Action):
         super().__init__(message_streamer)
         self._purpose = "Suggest information to be stored in memory"
         self._requires_confirmation = True
-        self._returns = {
-            "suggestion": "The suggested information to store"
-        }
+        self._returns = {"suggestion": "The suggested information to store"}
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -322,19 +320,54 @@ class MemorySuggestionAction(Action):
                 "message": params_dict["message"],
                 "requires_confirmation": True,  # Always requires user response
                 "message_type": "memory_suggestion",
-                "data": {
-                    "suggestion": params_dict["message"]
-                }
+                # "data": {
+                #     "suggestion": params_dict["message"]
+                # }
             }
             self._log_action_result("memory_suggestion", result)
             return result
         except Exception as e:
             error_result = {
                 "status": "error",
-                "message": f"Error processing memory suggestion action: {str(e)}",
+                "message":
+                f"Error processing memory suggestion action: {str(e)}",
                 "requires_confirmation": False
             }
             self._log_action_result("memory_suggestion", error_result)
+            return error_result
+
+
+class AnswerUserAction(Action):
+    """Action for directly answering user questions without requiring further actions."""
+
+    def __init__(self, message_streamer):
+        super().__init__(message_streamer)
+        self._purpose = "Answer a user's question directly without requiring further actions"
+        self._requires_confirmation = False
+        self._returns = {}
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("message" in params_dict
+                and isinstance(params_dict["message"], str))
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            result = {
+                "status": "success",
+                "message": params_dict["message"],
+                "requires_confirmation": False,
+            }
+            self._log_action_result("answer_user", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error processing answer action: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("answer_user", error_result)
             return error_result
 
 
@@ -350,7 +383,8 @@ class ActionRegistry:
     def get_action(self, name: str) -> Optional[Action]:
         return self._actions.get(name)
 
-    def execute_action(self, name: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_action(self, name: str, params: Dict[str,
+                                                     Any]) -> Dict[str, Any]:
         action = self.get_action(name)
         if not action:
             return {
@@ -380,11 +414,11 @@ class ActionRegistry:
     def get_actions_documentation(self) -> str:
         """Generate documentation for all registered actions."""
         lines = ["Available Actions:", ""]
-        
+
         for i, (name, action) in enumerate(self._actions.items(), 1):
             lines.append(f"{i}. {name}")
             lines.append(f"   - Purpose: {action.purpose}")
-            
+
             # Get parameter schema from the action's class
             params_schema = None
             for base in action.__class__.__bases__:
@@ -392,24 +426,28 @@ class ActionRegistry:
                     params_schema = base.__annotations__.get('params', None)
                     if params_schema:
                         break
-            
+
             if params_schema:
                 lines.append("   - Parameters:")
                 lines.append("     ```python")
                 lines.append(f"     {params_schema.__name__}:")
                 for field_name, field in params_schema.__fields__.items():
-                    lines.append(f"       {field_name}: {field.type_.__name__}  # {field.field_info.description}")
+                    lines.append(
+                        f"       {field_name}: {field.type_.__name__}  # {field.field_info.description}"
+                    )
                 lines.append("     ```")
-            
-            lines.append(f"   - Requires confirmation: {'Yes' if action.requires_confirmation else 'No'}")
-            
+
+            lines.append(
+                f"   - Requires confirmation: {'Yes' if action.requires_confirmation else 'No'}"
+            )
+
             if action.returns:
                 lines.append("   - Returns:")
                 for return_name, return_desc in action.returns.items():
                     lines.append(f"     - {return_name}: {return_desc}")
-            
+
             lines.append("")
-        
+
         return "\n".join(lines)
 
     def get_result_format_documentation(self) -> str:
@@ -418,16 +456,13 @@ class ActionRegistry:
             "Action Results:",
             "- After each action is executed, its result will be included in your next context",
             "- Results include both success and error information",
-            "- Results format:",
-            "  ```python",
-            "  {",
+            "- Results format:", "  ```python", "  {",
             "    \"action\": str,  # Name of the executed action",
             "    \"status\": Literal[\"success\", \"error\"],  # Result status",
             "    \"message\": str,  # Human-readable message",
             "    \"requires_confirmation\": bool,  # Whether user confirmation is needed",
             "    \"data\": Optional[Dict[str, Any]]  # Action-specific return data (only on success)",
-            "  }",
-            "  ```",
+            "  }", "  ```",
             "- Use these results to make informed decisions in your next response",
             "- For actions requiring confirmation, wait for user confirmation before proceeding",
             ""
@@ -437,8 +472,7 @@ class ActionRegistry:
     def get_response_format_documentation(self) -> str:
         """Generate documentation for the response format."""
         lines = [
-            "Your responses must follow this exact structure:",
-            "```python",
+            "Your responses must follow this exact structure:", "```python",
             "{",
             "    \"reasoning\": str,  # Explain why you chose this action",
             "    \"action\": {",
@@ -446,8 +480,6 @@ class ActionRegistry:
             "        \"params\": dict  # The parameters for the action",
             "    },",
             "    \"user_instruction\": str  # The original user instruction",
-            "}",
-            "```",
-            ""
+            "}", "```", ""
         ]
         return "\n".join(lines)

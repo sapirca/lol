@@ -58,7 +58,7 @@ class GPTBackend(LLMBackend):
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
-                 model="gpt-4o-2024-08-06",
+                 model="gpt-4o",
                  mak_tokens=16384,
                  config=None):
         super().__init__(name=name,
@@ -109,9 +109,9 @@ class GPTBackend(LLMBackend):
                 len(encoding.encode(message["content"]))
                 for message in messages)
         except Exception as e:
-            self.logger.warning(
-                f"Error counting tokens with tiktoken. Using word split: {e}")
-            return super().token_count(messages)
+            message = f"Error counting tokens with fallback method: {e}"
+            self.logger.warning(message)
+            return message
 
 
 class ClaudeBackend(LLMBackend):
@@ -119,16 +119,13 @@ class ClaudeBackend(LLMBackend):
 
     # model="claude-3-7-sonnet-latest",
 
-    def __init__(self,
-                 name,
-                 response_schema_obj: BaseModel,
-<<<<<<< HEAD
-                 model="claude-3-5-sonnet-latest",
-                 mak_tokens=64000,
-=======
-                 model="claude-3-5-haiku", #Claude 3.5 Haiku
->>>>>>> 7f57227e01d3affcf150c1b5a80172441532a592
-                 config=None):
+    def __init__(
+            self,
+            name,
+            response_schema_obj: BaseModel,
+            model="claude-3-5-haiku",  #Claude 3.5 Haiku
+            mak_tokens=64000,
+            config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
                          model=model,
@@ -191,24 +188,21 @@ class ClaudeBackend(LLMBackend):
         try:
             return super().token_count(messages)
         except Exception as e:
-            self.logger.warning(
-                f"Error counting tokens with fallback method: {e}")
-            return super().token_count(messages)
+            message = f"Error counting tokens with fallback method: {e}"
+            self.logger.warning(message)
+            return message
 
 
 class GeminiBackend(LLMBackend):
     """Implementation of LLMBackend for Gemini models."""
 
-    # model="models/gemini-1.5-pro-latest",  
+    # model="models/gemini-1.5-pro-latest",
+    #  model="models/gemini-2.5-flash-preview-04-17",
     def __init__(self,
                  name,
                  response_schema_obj: BaseModel,
-<<<<<<< HEAD
-                 model="models/gemini-1.5-pro-latest",
                  mak_tokens=64000,
-=======
-                 model="models/gemini-2.5-flash-preview-04-17",
->>>>>>> 7f57227e01d3affcf150c1b5a80172441532a592
+                 model="models/gemini-1.5-pro-latest",
                  config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
@@ -258,6 +252,6 @@ class GeminiBackend(LLMBackend):
         try:
             return super().token_count(messages)
         except Exception as e:
-            self.logger.warning(
-                f"Error counting tokens with fallback method: {e}")
-            return super().token_count(messages)
+            message = f"Error counting tokens with fallback method: {e}"
+            self.logger.warning(message)
+            return message

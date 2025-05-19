@@ -25,7 +25,6 @@ Available Actions:
    - Requires confirmation: Yes
    - Returns:
      - step_number: The step number that will be assigned if confirmed
-     - status_message: The status message returned by the sequence manager
 
 2. get_animation
    - Purpose: Retrieve an existing animation sequence by step number
@@ -44,15 +43,16 @@ Available Actions:
 4. question
    - Purpose: Ask a question to the user
    - Requires confirmation: Yes
-   - Returns:
-     - question: The question that was asked
-     - is_clarification: Whether this is a clarification question
 
 5. memory_suggestion
    - Purpose: Suggest information to be stored in memory
    - Requires confirmation: Yes
    - Returns:
      - suggestion: The suggested information to store
+
+6. answer_user
+   - Purpose: Answer a user's question directly without requiring further actions
+   - Requires confirmation: No
 
 
 Guidelines for Animation Creation:
