@@ -65,6 +65,12 @@ class MemorySuggestionParams(BaseModel):
         "Always False for memory suggestion as it requires user response")
 
 
+class AnswerUserParams(BaseModel):
+    message: str = Field(description="The answer to the user's question")
+    immediate_response: Literal[False] = Field(
+        description="Always False for answer_user as it's a direct response")
+
+
 # Action models with specific parameter types
 class UpdateAnimationAction(BaseModel, Generic[T]):
     name: Literal["update_animation"]
@@ -91,11 +97,16 @@ class MemorySuggestionAction(BaseModel):
     params: MemorySuggestionParams
 
 
+class AnswerUserAction(BaseModel):
+    name: Literal["answer_user"]
+    params: AnswerUserParams
+
+
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
-                                        QuestionAction,
-                                        MemorySuggestionAction],
+                                        QuestionAction, MemorySuggestionAction,
+                                        AnswerUserAction],
                                   Field(discriminator='name')]
 
 
