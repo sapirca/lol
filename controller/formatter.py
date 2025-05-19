@@ -1,4 +1,5 @@
 from animation.frameworks.xlights.xlights_sequence import XlightsSequence
+from controller.actions import ActionRegistry
 from controller.message_streamer import MessageStreamer
 from animation.animation_manager import AnimationManager
 from memory.memory_manager import MemoryManager
@@ -14,6 +15,7 @@ class Formatter:
                  animation_manager: AnimationManager,
                  memory_manager: MemoryManager,
                  song_provider: SongProvider,
+                 action_registry: ActionRegistry,
                  config: Optional[Dict[str, Any]] = None):
         """
         Initializes the Formatter class.
@@ -29,6 +31,23 @@ class Formatter:
         self.memory_manager = memory_manager
         self.song_provider = song_provider
         self.config = config or {}
+        self.action_registry = action_registry
+
+        # Get all dynamic documentation
+        actions_documentation = self.action_registry.get_actions_documentation()
+        result_format_doc = self.action_registry.get_result_format_documentation()
+        response_format_doc = self.action_registry.get_response_format_documentation()
+        
+        # Format both prompts with dynamic documentation
+        self.formatted_intro_prompt = intro_prompt.format(
+            actions_doc=actions_documentation,
+            result_format_doc=result_format_doc,
+            response_format_doc=response_format_doc
+        )
+
+        print(self.formatted_intro_prompt)
+
+        
 
     def build_messages(self):
         """
@@ -41,9 +60,9 @@ class Formatter:
         # Build prompt content
 
         prompt_content = []
-        if intro_prompt:
-            prompt_content.append("# Your Task\n")
-            prompt_content.append(intro_prompt)
+        if self.formatted_intro_prompt:
+            prompt_content.append("# Your Task:")
+            prompt_content.append(self.formatted_intro_prompt)
 
         # TODO(Sapir): Rename to get_timing_knowledge
         timing_knowledge = self.animation_manager.get_general_knowledge()

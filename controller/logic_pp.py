@@ -1,7 +1,6 @@
 import random
 from controller.backends import GPTBackend, ClaudeBackend, LLMBackend, GeminiBackend
 from memory.memory_manager import MemoryManager
-from prompts.main_prompt import intro_prompt
 from music.song_provider import SongProvider
 import xml.etree.ElementTree as ET
 from controller.interpreter import Interpreter
@@ -75,12 +74,15 @@ class LogicPlusPlus:
         self.selected_backend = self.config.get("selected_backend", None)
         self.response_manager = Interpreter(self.animation_manager,
                                             config=self.config)
-        self.formatter = Formatter(self.msgs, self.animation_manager,
-                                   self.memory_manager, self.song_provider,
-                                   self.config)
-
+        
         self._register_actions()
 
+        self.formatter = Formatter(self.msgs, self.animation_manager,
+                                   self.memory_manager, self.song_provider,
+                                   self.action_registry, self.config)
+
+        
+        
     def _register_actions(self):
         """Register all available actions"""
         self.action_registry.register_action(

@@ -9,10 +9,29 @@ from controller.message_streamer import TAG_SYSTEM_INTERNAL
 
 
 class Action(ABC):
+    """Base class for all actions in the system."""
 
     def __init__(self, message_streamer):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.message_streamer = message_streamer
+        self._purpose = "No purpose specified"
+        self._requires_confirmation = False
+        self._returns = {}
+
+    @property
+    def purpose(self) -> str:
+        """Get the purpose of this action."""
+        return self._purpose
+
+    @property
+    def requires_confirmation(self) -> bool:
+        """Get whether this action requires confirmation."""
+        return self._requires_confirmation
+
+    @property
+    def returns(self) -> Dict[str, str]:
+        """Get the return values of this action."""
+        return self._returns
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Convert params to dictionary if it's a Pydantic model"""
@@ -45,6 +64,12 @@ class UpdateAnimationAction(Action):
     def __init__(self, animation_manager: AnimationManager, message_streamer):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
+        self._purpose = "Create or update an animation sequence. This action will add the animation to the sequence manager."
+        self._requires_confirmation = True
+        self._returns = {
+            "step_number": "The step number that will be assigned if confirmed",
+            "status_message": "The status message returned by the sequence manager"
+        }
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Convert params to dictionary if it's a Pydantic model"""
@@ -73,15 +98,16 @@ class UpdateAnimationAction(Action):
 
         try:
             # Directly add the animation to the sequence manager
-            step_number = self.animation_manager.add_sequence(animation_str)
+            result_message = self.animation_manager.add_sequence(animation_str)
+            current_steps_count = len(self.animation_manager.sequence_manager.steps)
 
             result = {
                 "status": "success",
                 "message": f"Animation sequence added to step {step_number}.",
                 "requires_confirmation": False,
                 "data": {
-                    "step_number": step_number,
-                    "animation_sequence": params_dict["animation_sequence"]
+                    "status_message":  result_message,
+                    "step_number": current_steps_count
                 }
             }
 
@@ -99,10 +125,7 @@ class UpdateAnimationAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error adding animation sequence: {str(e)}",
-                "requires_confirmation": False,
-                "data": {
-                    "error": str(e)
-                }
+                "requires_confirmation": False
             }
             self._log_action_result("update_animation", error_result)
             return error_result
@@ -113,6 +136,12 @@ class GetAnimationAction(Action):
     def __init__(self, animation_manager, message_streamer):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
+        self._purpose = "Retrieve an existing animation sequence by step number"
+        self._requires_confirmation = False
+        self._returns = {
+            "step_number": "The requested step number",
+            "animation": "The animation sequence data"
+        }
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -139,10 +168,7 @@ class GetAnimationAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No animation found for step {step_number}",
-                    "requires_confirmation": False,
-                    "data": {
-                        "error": f"No animation found for step {step_number}"
-                    }
+                    "requires_confirmation": False
                 }
             self._log_action_result("get_animation", result)
             return result
@@ -150,10 +176,7 @@ class GetAnimationAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving animation: {str(e)}",
-                "requires_confirmation": False,
-                "data": {
-                    "error": str(e)
-                }
+                "requires_confirmation": False
             }
             self._log_action_result("get_animation", error_result)
             return error_result
@@ -164,6 +187,12 @@ class AddToMemoryAction(Action):
     def __init__(self, memory_manager: MemoryManager, message_streamer):
         super().__init__(message_streamer)
         self.memory_manager = memory_manager
+        self._purpose = "Add information to the system's memory"
+        self._requires_confirmation = False
+        self._returns = {
+            "key": "The key under which the value was stored",
+            "value": "The value that was stored"
+        }
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -194,10 +223,7 @@ class AddToMemoryAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error adding to memory: {str(e)}",
-                "requires_confirmation": False,
-                "data": {
-                    "error": str(e)
-                }
+                "requires_confirmation": False
             }
             self._log_action_result("add_to_memory", error_result)
             return error_result
@@ -234,6 +260,12 @@ class QuestionAction(Action):
 
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
+        self._purpose = "Ask a question to the user"
+        self._requires_confirmation = True
+        self._returns = {
+            "question": "The question that was asked",
+            "is_clarification": "Whether this is a clarification question"
+        }
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -251,8 +283,8 @@ class QuestionAction(Action):
                 "requires_confirmation": True,  # Always requires user response
                 "message_type": "question",
                 "data": {
-                    "is_clarification": is_clarification,
-                    "question": params_dict["message"]
+                    "question": params_dict["message"],
+                    "is_clarification": is_clarification
                 }
             }
             self._log_action_result("question", result)
@@ -261,10 +293,7 @@ class QuestionAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error processing question action: {str(e)}",
-                "requires_confirmation": False,
-                "data": {
-                    "error": str(e)
-                }
+                "requires_confirmation": False
             }
             self._log_action_result("question", error_result)
             return error_result
@@ -274,6 +303,11 @@ class MemorySuggestionAction(Action):
 
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
+        self._purpose = "Suggest information to be stored in memory"
+        self._requires_confirmation = True
+        self._returns = {
+            "suggestion": "The suggested information to store"
+        }
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -297,12 +331,8 @@ class MemorySuggestionAction(Action):
         except Exception as e:
             error_result = {
                 "status": "error",
-                "message":
-                f"Error processing memory suggestion action: {str(e)}",
-                "requires_confirmation": False,
-                "data": {
-                    "error": str(e)
-                }
+                "message": f"Error processing memory suggestion action: {str(e)}",
+                "requires_confirmation": False
             }
             self._log_action_result("memory_suggestion", error_result)
             return error_result
@@ -320,8 +350,7 @@ class ActionRegistry:
     def get_action(self, name: str) -> Optional[Action]:
         return self._actions.get(name)
 
-    def execute_action(self, name: str, params: Dict[str,
-                                                     Any]) -> Dict[str, Any]:
+    def execute_action(self, name: str, params: Dict[str, Any]) -> Dict[str, Any]:
         action = self.get_action(name)
         if not action:
             return {
@@ -338,7 +367,6 @@ class ActionRegistry:
             }
 
         result = action.execute(params)
-
         result['name'] = name
 
         # Store pending confirmation if needed
@@ -348,3 +376,78 @@ class ActionRegistry:
             self._pending_confirmation = None
 
         return result
+
+    def get_actions_documentation(self) -> str:
+        """Generate documentation for all registered actions."""
+        lines = ["Available Actions:", ""]
+        
+        for i, (name, action) in enumerate(self._actions.items(), 1):
+            lines.append(f"{i}. {name}")
+            lines.append(f"   - Purpose: {action.purpose}")
+            
+            # Get parameter schema from the action's class
+            params_schema = None
+            for base in action.__class__.__bases__:
+                if hasattr(base, '__annotations__'):
+                    params_schema = base.__annotations__.get('params', None)
+                    if params_schema:
+                        break
+            
+            if params_schema:
+                lines.append("   - Parameters:")
+                lines.append("     ```python")
+                lines.append(f"     {params_schema.__name__}:")
+                for field_name, field in params_schema.__fields__.items():
+                    lines.append(f"       {field_name}: {field.type_.__name__}  # {field.field_info.description}")
+                lines.append("     ```")
+            
+            lines.append(f"   - Requires confirmation: {'Yes' if action.requires_confirmation else 'No'}")
+            
+            if action.returns:
+                lines.append("   - Returns:")
+                for return_name, return_desc in action.returns.items():
+                    lines.append(f"     - {return_name}: {return_desc}")
+            
+            lines.append("")
+        
+        return "\n".join(lines)
+
+    def get_result_format_documentation(self) -> str:
+        """Generate documentation for the action result format."""
+        lines = [
+            "Action Results:",
+            "- After each action is executed, its result will be included in your next context",
+            "- Results include both success and error information",
+            "- Results format:",
+            "  ```python",
+            "  {",
+            "    \"action\": str,  # Name of the executed action",
+            "    \"status\": Literal[\"success\", \"error\"],  # Result status",
+            "    \"message\": str,  # Human-readable message",
+            "    \"requires_confirmation\": bool,  # Whether user confirmation is needed",
+            "    \"data\": Optional[Dict[str, Any]]  # Action-specific return data (only on success)",
+            "  }",
+            "  ```",
+            "- Use these results to make informed decisions in your next response",
+            "- For actions requiring confirmation, wait for user confirmation before proceeding",
+            ""
+        ]
+        return "\n".join(lines)
+
+    def get_response_format_documentation(self) -> str:
+        """Generate documentation for the response format."""
+        lines = [
+            "Your responses must follow this exact structure:",
+            "```python",
+            "{",
+            "    \"reasoning\": str,  # Explain why you chose this action",
+            "    \"action\": {",
+            "        \"name\": str,  # The name of the action to execute",
+            "        \"params\": dict  # The parameters for the action",
+            "    },",
+            "    \"user_instruction\": str  # The original user instruction",
+            "}",
+            "```",
+            ""
+        ]
+        return "\n".join(lines)

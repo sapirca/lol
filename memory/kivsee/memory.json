@@ -1,36 +1,4 @@
 {
-  "animation_principles": [
-    {
-      "id": "beat_based_animation",
-      "description": "A reallllly good idea for animations is to sync with the beat of the music",
-    },
-    {
-      "id": "something_must_be_lighten",
-      "description": "Something must be lighten, like some element or part of an element, use dark scene very sparsly, only when it's really needed in the song, like building tension",
-      "principle": "Lighten something, use dark scene very sparsly",
-    },
-    {
-      "id": "efficient_animation",
-      "description": "A good animation is one that is efficient and doesn't use many effedcts on the SAME element, because it has hardware limitations, so instead you can animate different elements each time and it add interests to the viewer and still be efficient",
-    },
-    {
-      "id": "words_to_colors",
-      "description": "nice animation can be to convert words to colors, like when he lyrics says 'sky', use blues plattes, when it says 'sand', use yellows, etc.",
-    },
-    {
-      "id": "smooth_transitions",
-      "description": "Achieve fluid visual flow by ensuring discernible similarity between consecutive effects.",
-      "principle": "Intentional connection or shared attribute between elements for seamless flow.",
-    },
-    {
-      "id": "appealing_animation_timing",
-      "description": "Synchronize visual effects precisely with specific moments in music/audio to enhance impact.",
-      "principle": "Visual rhythm should complement and amplify auditory rhythm.",
-    },
-    {
-      "id": "brightness_pulsing_sine_function",
-      "description": "Use the Sine function for dynamic, cyclical brightness effects with precise timing and repetition.",
-      "principle": "Leverage mathematical functions for programmatic control over visual properties.",
-    }
-  ]
+    "favorite_color": "purple",
+    "color_preference": "hue shift of purple and orange"
 }
