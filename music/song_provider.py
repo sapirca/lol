@@ -51,8 +51,14 @@ class SongProvider:
                                           f"{song_name}_bars.txt")
             beats_file_path = os.path.join(SONGS_BASE_PATH, song_name,
                                            f"{song_name}_beats.txt")
-            info_file_path = os.path.join(SONGS_BASE_PATH, song_name,
-                                          f"{song_name}_info.txt")
+            # info_file_path = os.path.join(SONGS_BASE_PATH, song_name,
+            #                               f"{song_name}_info.txt")
+            key_points_file_path = os.path.join(SONGS_BASE_PATH, song_name,
+                                                f"{song_name}_key_points.txt")
+            lyrics_file_path = os.path.join(SONGS_BASE_PATH, song_name,
+                                            f"{song_name}_lyrics.txt")
+            drums_pattern_file_path = os.path.join(SONGS_BASE_PATH, song_name,
+                                                   f"{song_name}_pattern.txt")
 
             # Read bars file
             with open(bars_file_path, 'r') as file:
@@ -67,10 +73,36 @@ class SongProvider:
                 content += file.read() + "\n\n"
 
             # Read info file
-            with open(info_file_path, 'r') as file:
+            # with open(info_file_path, 'r') as file:
+            #     content += "### Lyrics\n"
+            #     content += "These are the lyrics of the song:\n"
+            #     content += file.read() + "\n"
+
+            with open(key_points_file_path, 'r') as file:
+                content += "### Key Points\n"
+                content += f"A list of {song_name} key points and their corresponding start time in milliseconds:\n"
+                content += "Aligning animation changes to the keypoints begining and ending can enhance the visual experience and create higher quality animations.\n"
+                content += "User the labels as a guide to create the animation.\n"
+                content += file.read() + "\n\n"
+
+            with open(lyrics_file_path, 'r') as file:
                 content += "### Lyrics\n"
-                content += "These are the lyrics of the song:\n"
-                content += file.read() + "\n"
+                content += "The lyrics of the song, with the first number indicating the start time in milliseconds and the second number indicating the end time:\n"
+                content += "Aligning animation changes to the lyrics begining and ending can enhance the visual experience and create higher quality animations.\n"
+                content += file.read() + "\n\n"
+
+            with open(drums_pattern_file_path, 'r') as file:
+                content += "### Drums Pattern\n"
+                content += (
+                    "The drum pattern of the song repeats cyclically throughout its duration. "
+                    "It is represented using relative beats as labels, such as 0.5, 1.5, etc., "
+                    "which correspond to fractions of a beat based on the BPM (beats per minute). "
+                    "For instance, if a beat lasts 2 seconds, 0.25 beats would equal 0.5 seconds.\n"
+                    "The pattern spans 0 to 3.75 beats (4 beats in total) and aligns with every 4th beat. "
+                    "Two cycles of the pattern are provided as an example. "
+                    "Aligning animation changes to the drum pattern can enhance the visual experience and create higher quality animations.\n"
+                )
+                content += file.read() + "\n\n"
 
             return content
         except FileNotFoundError as e:
