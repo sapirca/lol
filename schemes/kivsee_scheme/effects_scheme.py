@@ -194,15 +194,15 @@ class EffectProto(BaseModel):
         description=
         "The position of the effect in the animation sequence, starting from 1. This is used to reference the effect if needed. For example, the first effect is 1, the second is 2, and so on. The user can specify the effect number in the request, and this field will help identify the corresponding effect."
     )
-    effect_group: str = Field(
+    title: str = Field(
         default="",
         description=
-        "The group time frame to which this effect belongs. This is used to categorize the effect and can be used for grouping similar effects together. More specically, all effects that rendered during the same time frame. e.g \"effect_group\": \"time_frame_0_89000\", \"effect_group\": \"time_frame_1190_1290\","
+        "A title for the effect. This is used to identify the effect and can be used for grouping similar effects together."
     )
     beat_and_bar: str = Field(
         ...,
         description=
-        "Specifies the beat and bar this effect is applied to. Make sure to write the beat number and bar number. e.g., 'Bar 2: 11th beat'."
+        "if relevant, write the beat and bar this effect is applied to. e.g., 'Bar 2: 11th beat'."
     )
 
     elements: typing.List[typing.Literal[
@@ -287,10 +287,6 @@ class EffectProto(BaseModel):
 
 
 class AnimationProto(BaseModel):
-    """
-     TODO sapir how to split it per element?
-    """
-
     effects: typing.List[EffectProto] = Field(
         default_factory=list, description="List of effects in the animation.")
     duration_ms: int = Field(
@@ -310,16 +306,16 @@ class KivseeSchema(BaseModel):
     Represents the full animation response, with the song name and reasoning.
     """
 
-    instruction: str = Field(
-        default="",
-        description=
-        "The user instruction that the was given to the model to generate this animation response."
-    )
-    reasoning: str = Field(
-        default="",
-        description=
-        "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
-    )
+    # instruction: str = Field(
+    #     default="",
+    #     description=
+    #     "The user instruction that the was given to the model to generate this animation response."
+    # )
+    # reasoning: str = Field(
+    #     default="",
+    #     description=
+    #     "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
+    # )
     animation: AnimationProto = Field(default_factory=AnimationProto,
                                       description="The whole animation.")
     name: str = Field(

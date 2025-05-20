@@ -4,6 +4,7 @@ config = {
     "song_name": "aladdin",  #  "nikki", "sandstorm", "req", "overthinker"
     "auto_render": True,
     "print_internal_messages": False,
+    "show_all_animations": False,
 }
 
 # "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude

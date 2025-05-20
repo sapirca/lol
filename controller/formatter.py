@@ -34,20 +34,20 @@ class Formatter:
         self.action_registry = action_registry
 
         # Get all dynamic documentation
-        actions_documentation = self.action_registry.get_actions_documentation()
-        result_format_doc = self.action_registry.get_result_format_documentation()
-        response_format_doc = self.action_registry.get_response_format_documentation()
-        
+        actions_documentation = self.action_registry.get_actions_documentation(
+        )
+        result_format_doc = self.action_registry.get_result_format_documentation(
+        )
+        response_format_doc = self.action_registry.get_response_format_documentation(
+        )
+
         # Format both prompts with dynamic documentation
         self.formatted_intro_prompt = intro_prompt.format(
             actions_doc=actions_documentation,
             result_format_doc=result_format_doc,
-            response_format_doc=response_format_doc
-        )
+            response_format_doc=response_format_doc)
 
         print(self.formatted_intro_prompt)
-
-        
 
     def build_messages(self):
         """
@@ -83,7 +83,21 @@ class Formatter:
                 "content": f"# Your Memory: {memory}"
             })
 
-        # Add song info if available
+        # Add message history
+        for message in self.message_streamer.messages:
+            if message['context']:
+                role = self._determine_role(message['tag'])
+                messages.append({"role": role, "content": message['content']})
+
+        # Save the whole prompt to a file
+        with open("prompt_with_all_messages.md", "w") as file:
+            for message in messages:
+                file.write(f"\n{'='*80}\n")
+                file.write(f"Role: {message['role']}\n\n")
+                file.write(f"{message['content']}\n")
+
+
+# Add song info if available
         try:
             song_name = self.config.get("song_name")
             if song_name:
@@ -99,29 +113,28 @@ class Formatter:
             # Log error but continue without song info
             print(f"Error getting song info: {e}")
 
-            # Save the whole prompt to a file
-        with open("prompt_with_memory_and_song.md", "w") as file:
-            for message in messages:
-                # file.write(f"{message['role']}: {message['content']}\n")
-                file.write(f"\n{'='*80}\n")
-                file.write(f"Role: {message['role']}\n\n")
-                file.write(f"{message['content']}\n")
-
-        # Add the latest animation sequence
-        latest_sequence = self.animation_manager.get_latest_sequence()
-        if latest_sequence:
-            messages.append({
-                "role":
-                "system",
-                "content":
-                f"# Animation Sequence:\n Make sure to maintain a consistent animation, only change the part of animation that the user asked for. In case of doubt, ask the user for clarification. The latest animation sequence is:\n {latest_sequence}"
-            })
-
-            # Add message history
-        for message in self.message_streamer.messages:
-            if message['context']:
-                role = self._determine_role(message['tag'])
-                messages.append({"role": role, "content": message['content']})
+        # Add animation sequences based on config
+        show_all = self.config.get("show_all_animations", False)
+        if show_all:
+            all_sequences = self.animation_manager.get_all_sequences()
+            if all_sequences:
+                sequences_content = "# All Animation Sequences that you've generated so far, ordered by the time they were generated."
+                " You should maintain a consistent animation, only change the part of animation that the user asked for. In case of doubt, ask the user for clarification.\n"
+                for i, sequence in enumerate(all_sequences, 1):
+                    sequences_content += f"\n## Sequence {i}:\n{sequence}\n"
+                messages.append({
+                    "role": "system",
+                    "content": sequences_content
+                })
+        else:
+            latest_sequence = self.animation_manager.get_latest_sequence()
+            if latest_sequence:
+                messages.append({
+                    "role":
+                    "system",
+                    "content":
+                    f"# Latest Animation Sequence:\n Make sure to maintain a consistent animation, only change the part of animation that the user asked for. In case of doubt, ask the user for clarification.\n{latest_sequence}"
+                })
 
         return messages
 

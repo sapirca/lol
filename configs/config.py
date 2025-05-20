@@ -1,6 +1,8 @@
 config = {
     "selected_backend": "GPT",  # "DeepSeek",  #DeepSeek #GPT #Gemini #Claude
     "framework": "kivsee",  #kivsee #xlights #conceptual
+    "show_all_animations":
+    False,  # True to show all animations, False to show only the last one
 }
 
 # config = {
