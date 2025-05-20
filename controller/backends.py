@@ -9,6 +9,7 @@ from lol_secrets import OPENAI_API_KEY, CLAUDE_API_KEY, GEMINI_API_KEY
 from pydantic import BaseModel, ValidationError
 from instructor.exceptions import InstructorRetryException
 import google.generativeai as genai
+from constants import MODEL_CONFIGS
 
 MAX_RETRIES = 3
 INSTRACTOR_RETRIES = 3
@@ -20,25 +21,15 @@ class LLMBackend(ABC):  # Inherit from ABC for abstract methods
     Each backend should inherit from this class and implement the abstract methods.
     """
 
-    def __init__(
-            self,
-            name,
-            response_schema_obj: BaseModel,
-            model,
-            max_tokens,  # Renamed to max_tokens for consistency
-            config=None):
+    def __init__(self, name, response_schema_obj: BaseModel, config=None):
         self.name = name
         self.logger = logging.getLogger(name)
         self.config = config or {}
-        self.model = model
-        self.max_tokens = max_tokens  # Use max_tokens
 
         self.temperature = self.config.get("temperature", 0.5)
         self.response_schema_obj = response_schema_obj
         self.intstructor_response = self.config.get("instructor_response",
                                                     False)
-
-        self.logger.info(f"Using {name} model: {self.model}")
 
     @abstractmethod
     def _make_api_call(self, messages):
@@ -105,17 +96,17 @@ class LLMBackend(ABC):  # Inherit from ABC for abstract methods
 class GPTBackend(LLMBackend):
     """Implementation of LLMBackend for GPT models."""
 
-    def __init__(self,
-                 name,
-                 response_schema_obj: BaseModel,
-                 model="gpt-4o",
-                 max_tokens=16384,
-                 config=None):
+    def __init__(self, name, response_schema_obj: BaseModel, config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
-                         model=model,
-                         max_tokens=max_tokens,
                          config=config)
+
+        # Get model config from config or use default
+        model_config = self.config.get("model_config", MODEL_CONFIGS["GPT"])
+        self.model = model_config["model_name"]
+        self.max_tokens = model_config["max_tokens"]
+
+        self.logger.info(f"Using {name} model: {self.model}")
 
         try:
             self.client = instructor.from_openai(
@@ -149,23 +140,17 @@ class GPTBackend(LLMBackend):
 class ClaudeBackend(LLMBackend):
     """Implementation of LLMBackend for Claude models."""
 
-    # model = "claude-3-7-latest",
-    # max_tokens = 64000,
-
-    # model="claude-3-5-haiku-latest",
-    # max_tokens=8192,
-
-    def __init__(self,
-                 name,
-                 response_schema_obj: BaseModel,
-                 model="claude-3-5-haiku-latest",
-                 max_tokens=8192,
-                 config=None):
+    def __init__(self, name, response_schema_obj: BaseModel, config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
-                         model=model,
-                         max_tokens=max_tokens,
                          config=config)
+
+        # Get model config from config or use default
+        model_config = self.config.get("model_config", MODEL_CONFIGS["Claude"])
+        self.model = model_config["model_name"]
+        self.max_tokens = model_config["max_tokens"]
+
+        self.logger.info(f"Using {name} model: {self.model}")
 
         try:
             self.client = instructor.from_anthropic(
@@ -217,26 +202,22 @@ class ClaudeBackend(LLMBackend):
 class GeminiBackend(LLMBackend):
     """Implementation of LLMBackend for Gemini models."""
 
-    # model="models/gemini-1.5-pro-latest",
-    # max_tokens=64000,
-    # model="models/gemini-2.5-preview-latest",
-
-    def __init__(self,
-                 name,
-                 response_schema_obj: BaseModel,
-                 model="models/gemini-1.5-flash-latest",
-                 max_tokens=4096,
-                 config=None):
+    def __init__(self, name, response_schema_obj: BaseModel, config=None):
         super().__init__(name=name,
                          response_schema_obj=response_schema_obj,
-                         model=model,
-                         max_tokens=max_tokens,
                          config=config)
+
+        # Get model config from config or use default
+        model_config = self.config.get("model_config", MODEL_CONFIGS["Gemini"])
+        self.model = model_config["model_name"]
+        self.max_tokens = model_config["max_tokens"]
+
+        self.logger.info(f"Using {name} model: {self.model}")
 
         try:
             genai.configure(api_key=GEMINI_API_KEY)
             self.client = instructor.from_gemini(
-                client=genai.GenerativeModel(model_name=model),
+                client=genai.GenerativeModel(model_name=self.model),
                 mode=instructor.Mode.GEMINI_JSON,
             )
         except Exception as e:

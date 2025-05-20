@@ -136,4 +136,4 @@ Role: system
 ================================================================================
 Role: user
 
-Generate an animation where the rings change colors, synchronized precisely with the start and end times of each lyric word provided in the list.
+Generate an animation where the rings change colors, synchronized precisely with the start and end times of each lyric word provided in the list. I want you to use pink and green, and pastel color (saturation)

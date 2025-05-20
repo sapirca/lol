@@ -225,7 +225,7 @@ class Render:
                 key: value
                 for key, value in effect.items() if key not in {
                     "effect_number",
-                    "effect_group",
+                    "title",
                     "beat_and_bar",
                     "effect_summary",
                     "reasoning",

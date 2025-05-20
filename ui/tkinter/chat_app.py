@@ -191,9 +191,19 @@ def update_active_chat_label(button_name):
     button = button_mapping[button_name]
     # Ensure controller is initialized before accessing its attributes
     backend_info = controller.selected_backend if controller else "N/A"
+
     framework_info = controller.selected_framework if controller else "N/A"
+    # start with captial letter
+    framework_info = framework_info.capitalize()
+    # Get model info from config if available
+    model_info = ""
+    if controller and controller.config and "model_config" in controller.config:
+        model_name = controller.config["model_config"]["model_name"]
+        max_tokens = controller.config["model_config"]["max_tokens"]
+        model_info = f" | {model_name} ({max_tokens} max tokens)"
+
     active_chat_label.config(
-        text=f"{backend_info} | {framework_info} | {button_name}")
+        text=f"{framework_info}{model_info} | {button_name}")
 
     # Update status with step number
     step_number = len(
