@@ -99,14 +99,19 @@ class LogicPlusPlus:
         self.action_registry.register_action("answer_user",
                                              AnswerUserAction(self.msgs))
 
-    def shutdown(self, shutdown_snapshot_dir=None):
-        if not shutdown_snapshot_dir:
+    def shutdown(self, requested_shutdown_snapshot_dir=None):
+        if not requested_shutdown_snapshot_dir:
             timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
             shutdown_snapshot_dir = os.path.join(
                 self.msgs.snapshots_dir,
                 f"{timestamp}_{self.selected_framework}_{self.selected_backend}"
             )
             os.makedirs(shutdown_snapshot_dir, exist_ok=True)
+        else:
+            shutdown_snapshot_dir = os.path.join(
+                self.msgs.snapshots_dir, requested_shutdown_snapshot_dir)
+            if not os.path.exists(shutdown_snapshot_dir):
+                os.makedirs(shutdown_snapshot_dir, exist_ok=True)
 
         # Save configuration
         snapshot_config_file = os.path.join(shutdown_snapshot_dir, CONFIG_FILE)

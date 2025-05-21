@@ -346,16 +346,99 @@ def save_chat():
     global controller, active_chat_snapshot
     if controller:
         try:
-            save_message = controller.shutdown()
-            save_status_label.config(text=save_message, fg="light gray")
-            # Clear the chat window after saving
-            chat_window.config(state=tk.NORMAL)
-            chat_window.delete("1.0", tk.END)
-            chat_window.config(state=tk.DISABLED)
-            # Clear the controller and active snapshot
-            controller = None
-            active_chat_snapshot = None
-            populate_snapshot_list()  # Refresh the snapshot list
+            # Create popup window for naming
+            save_popup = tk.Toplevel(root)
+            save_popup.title("Save Chat")
+            save_popup.geometry("400x200")
+            save_popup.transient(root)  # Make it modal
+            save_popup.grab_set()  # Make it modal
+
+            # Add label and entry for name
+            name_label = tk.Label(save_popup, text="Enter snapshot name:")
+            name_label.pack(pady=10)
+
+            name_entry = tk.Entry(save_popup, width=40)
+            name_entry.pack(pady=5)
+            # Pre-fill the entry with active chat name if not untitled
+            if active_chat_snapshot and active_chat_snapshot != "untitled":
+                name_entry.insert(0, active_chat_snapshot)
+            name_entry.focus_set()  # Set focus to entry
+
+            # Add buttons frame
+            button_frame = tk.Frame(save_popup)
+            button_frame.pack(pady=20)
+
+            def on_save():
+                global controller, active_chat_snapshot
+                snapshot_name = name_entry.get().strip()
+                save_popup.destroy()
+                if snapshot_name:
+                    # verify that the name is legit, without spaces or special characters
+                    if not re.match(r"^[a-zA-Z0-9_-]+$", snapshot_name):
+                        save_status_label.config(text="Invalid name", fg="red")
+                        return
+                    save_message = controller.shutdown(snapshot_name)
+                else:
+                    save_message = "No name provided. "
+                    save_message += controller.shutdown()
+                save_status_label.config(text=save_message, fg="light gray")
+                # Store controller reference before clearing
+                # Clear the chat window after saving
+                chat_window.config(state=tk.NORMAL)
+                chat_window.delete("1.0", tk.END)
+                chat_window.config(state=tk.DISABLED)
+                # Clear the controller and active snapshot
+                controller = None
+                active_chat_snapshot = None
+                populate_snapshot_list()  # Refresh the snapshot list
+
+            def on_override():
+                global controller, active_chat_snapshot
+                save_popup.destroy()
+                if active_chat_snapshot and active_chat_snapshot != "untitled":
+                    print(
+                        f"Overriding existing snapshot: {active_chat_snapshot}"
+                    )
+                    save_message = controller.shutdown(active_chat_snapshot)
+
+                else:
+                    save_message = "saved a new snapshot: "
+                    save_message += controller.shutdown()
+
+                save_status_label.config(text=f"Overriding: {save_message}",
+                                         fg="light gray")
+                # Clear the chat window after saving
+                chat_window.config(state=tk.NORMAL)
+                chat_window.delete("1.0", tk.END)
+                chat_window.config(state=tk.DISABLED)
+                # Clear the controller and active snapshot
+                controller = None
+                active_chat_snapshot = None
+                populate_snapshot_list()  # Refresh the snapshot list
+
+            def on_cancel():
+                save_popup.destroy()
+
+            # Add buttons
+            save_button = tk.Button(button_frame, text="Save", command=on_save)
+            save_button.pack(side=tk.LEFT, padx=5)
+
+            override_button = tk.Button(button_frame,
+                                        text="Override",
+                                        command=on_override)
+            override_button.pack(side=tk.LEFT, padx=5)
+
+            cancel_button = tk.Button(button_frame,
+                                      text="Cancel",
+                                      command=on_cancel)
+            cancel_button.pack(side=tk.LEFT, padx=5)
+
+            # Handle window close button
+            save_popup.protocol("WM_DELETE_WINDOW", on_cancel)
+
+            # Bind Enter key to save
+            save_popup.bind("<Return>", lambda e: on_save())
+
         except Exception as e:
             save_status_label.config(text=f"Failed to save chat: {str(e)}",
                                      fg="red")
