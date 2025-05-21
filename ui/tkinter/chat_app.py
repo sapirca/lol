@@ -364,6 +364,28 @@ def save_chat():
                 name_entry.insert(0, active_chat_snapshot)
             name_entry.focus_set()  # Set focus to entry
 
+            # Add checkbox frame
+            checkbox_frame = tk.Frame(save_popup)
+            checkbox_frame.pack(pady=5)
+
+            # Create checkbox with dynamic text
+            checkbox_var = tk.BooleanVar()
+            checkbox_text = "Use default name" if active_chat_snapshot == "untitled" else "Override current chat"
+            checkbox = tk.Checkbutton(checkbox_frame,
+                                      text=checkbox_text,
+                                      variable=checkbox_var)
+            checkbox.pack(side=tk.LEFT)
+
+            def on_checkbox_change():
+                if checkbox_var.get():
+                    name_entry.config(state=tk.DISABLED)
+                    name_entry.delete(0, tk.END)
+                    name_entry.insert(0, active_chat_snapshot)
+                else:
+                    name_entry.config(state=tk.NORMAL)
+
+            checkbox.config(command=on_checkbox_change)
+
             # Add buttons frame
             button_frame = tk.Frame(save_popup)
             button_frame.pack(pady=20)
@@ -392,41 +414,12 @@ def save_chat():
                 active_chat_snapshot = None
                 populate_snapshot_list()  # Refresh the snapshot list
 
-            def on_override():
-                global controller, active_chat_snapshot
-                save_popup.destroy()
-                if active_chat_snapshot and active_chat_snapshot != "untitled":
-                    print(
-                        f"Overriding existing snapshot: {active_chat_snapshot}"
-                    )
-                    save_message = controller.shutdown(active_chat_snapshot)
-
-                else:
-                    save_message = "saved a new snapshot: "
-                    save_message += controller.shutdown()
-
-                save_status_label.config(text=f"Overriding: {save_message}",
-                                         fg="light gray")
-                # Clear the chat window after saving
-                chat_window.config(state=tk.NORMAL)
-                chat_window.delete("1.0", tk.END)
-                chat_window.config(state=tk.DISABLED)
-                # Clear the controller and active snapshot
-                controller = None
-                active_chat_snapshot = None
-                populate_snapshot_list()  # Refresh the snapshot list
-
             def on_cancel():
                 save_popup.destroy()
 
             # Add buttons
             save_button = tk.Button(button_frame, text="Save", command=on_save)
             save_button.pack(side=tk.LEFT, padx=5)
-
-            override_button = tk.Button(button_frame,
-                                        text="Override",
-                                        command=on_override)
-            override_button.pack(side=tk.LEFT, padx=5)
 
             cancel_button = tk.Button(button_frame,
                                       text="Cancel",
