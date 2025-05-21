@@ -378,9 +378,12 @@ def save_chat():
 
             def on_checkbox_change():
                 if checkbox_var.get():
+                    if active_chat_snapshot == "untitled":
+                        name_entry.delete(0, tk.END)
+                    else:
+                        name_entry.delete(0, tk.END)
+                        name_entry.insert(0, active_chat_snapshot)
                     name_entry.config(state=tk.DISABLED)
-                    name_entry.delete(0, tk.END)
-                    name_entry.insert(0, active_chat_snapshot)
                 else:
                     name_entry.config(state=tk.NORMAL)
 
@@ -393,6 +396,9 @@ def save_chat():
             def on_save():
                 global controller, active_chat_snapshot
                 snapshot_name = name_entry.get().strip()
+                # if checkbox is checked, use the default name
+                if checkbox_var.get():
+                    snapshot_name = None
                 save_popup.destroy()
                 if snapshot_name:
                     # verify that the name is legit, without spaces or special characters
