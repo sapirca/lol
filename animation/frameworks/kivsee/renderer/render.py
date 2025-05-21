@@ -197,6 +197,7 @@ class Render:
         This method generates a 'slim' version of each effect by removing
         metadata fields not needed by the rendering engine and then organizing
         these slim effects into a dictionary where keys are element names.
+        Each EffectProto will have exactly one effect type (either color or other effect).
         """
         animation_details = input_data.get("animation", {})
         effects = animation_details.get("effects", [])
@@ -219,9 +220,8 @@ class Render:
         print(f"Preprocessing {len(effects)} effects...")
 
         for effect in effects:
-            # Create a slim version of the effect, excluding metadata fields that are
-            # for internal use or metadata and not part of the actual effect payload.
-            slim_effect = {
+            # Create base slim effect with common fields
+            base_slim_effect = {
                 key: value
                 for key, value in effect.items() if key not in {
                     "effect_number",
@@ -235,7 +235,7 @@ class Render:
 
             # Add offset to the start_time and end_time of the effect if enabled
             if ADD_OFFSET:
-                slim_config = slim_effect.get("effect_config", {})
+                slim_config = base_slim_effect.get("effect_config", {})
                 slim_config["start_time"] = slim_config.get("start_time",
                                                             0) + offset
                 slim_config["end_time"] = slim_config.get("end_time",
@@ -248,30 +248,40 @@ class Render:
                 print(
                     f"Effect {effect.get('effect_number', 'N/A')} has no specific elements, applying to all: {all_elements}"
                 )
-                elements_to_apply = all_elements
-            else:
-                elements_to_apply = effect_elements
+                effect_elements = all_elements
 
-            # Assign the slim effect to each of its target elements
-            for element_name in elements_to_apply:
-                if element_name not in animations_per_element:
-                    # Initialize the structure for a new element if it hasn't been seen yet
-                    animations_per_element[element_name] = {
-                        "effects": [],
+            # Create separate EffectProtos for each effect type
+            split_effects = []
+
+            # Handle all effects in the same way
+            for effect_type in [
+                    "const_color", "rainbow", "brightness", "hue",
+                    "saturation", "snake"
+            ]:
+                if effect.get(effect_type):
+                    split_effect = {
+                        "effect_config": base_slim_effect["effect_config"],
+                        effect_type: effect[effect_type]
+                    }
+                    split_effects.append(split_effect)
+
+            # Add effects to each element
+            for element in effect_elements:
+                if element not in animations_per_element:
+                    animations_per_element[element] = {
                         "duration_ms": duration_ms,
                         "num_repeats": num_repeats,
+                        "effects": []
                     }
-                # Append the slim effect to the specific element's effects list
-                animations_per_element[element_name]["effects"].append(
-                    slim_effect)
 
-        # The final output structure, ready for 'store_animation'
-        output_data = {
+                # Add all split effects
+                animations_per_element[element]["effects"].extend(
+                    split_effects)
+
+        return {
             "name": animation_name,
             "animation_data_per_element": animations_per_element
         }
-        print("Preprocessing complete. Generated per-element animation data.")
-        return output_data
 
 
 def main():
