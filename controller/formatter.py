@@ -138,6 +138,39 @@ class Formatter:
 
         return messages
 
+    def build_summarization_messages(self):
+        """
+        Constructs a list of messages for the LLM to summarize the conversation.
+        Only includes messages with context=True and adds a summarization prompt.
+
+        :return: List of formatted message dictionaries for the LLM.
+        """
+        messages = []
+
+        # Add summarization prompt
+        summarization_prompt = {
+            "role":
+            "system",
+            "content":
+            """Please analyze the conversation and provide a concise summary that includes:
+1. The main topics and key decisions discussed
+2. Important context or requirements mentioned
+3. A list of all animation sequences that were created, with brief descriptions of what each one does
+4. Any pending tasks or unresolved questions
+
+Focus on preserving the most important information while reducing the overall token count.
+IMPORTANT: Do not include any animation code in your response. Only describe the animations in natural language."""
+        }
+        messages.append(summarization_prompt)
+
+        # Add message history (only context=True messages)
+        for message in self.message_streamer.messages:
+            if message['context']:
+                role = self._determine_role(message['tag'])
+                messages.append({"role": role, "content": message['content']})
+
+        return messages
+
     def _determine_role(self, tag):
         """
         Determines the role based on the message tag.

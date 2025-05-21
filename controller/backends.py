@@ -32,7 +32,7 @@ class LLMBackend(ABC):  # Inherit from ABC for abstract methods
                                                     False)
 
     @abstractmethod
-    def _make_api_call(self, messages):
+    def _make_api_call(self, messages, response_schema):
         """
         Abstract method to perform the specific API call for the backend.
         Should return the raw API response object.
@@ -47,10 +47,14 @@ class LLMBackend(ABC):  # Inherit from ABC for abstract methods
         """
         pass
 
-    def generate_response(self, messages) -> BaseModel:
+    def generate_response(self, messages, response_schema=None) -> BaseModel:
         """
         Generates a response from the LLM, handling retries and validation.
         Logs token usage by calling _get_token_counts.
+
+        Args:
+            messages: List of messages to send to the LLM
+            response_schema: Optional schema to use for response validation. If None, uses self.response_schema_obj
         """
         current_messages = list(
             messages)  # Create a mutable copy for appending error messages
@@ -58,7 +62,9 @@ class LLMBackend(ABC):  # Inherit from ABC for abstract methods
         for attempt in range(MAX_RETRIES):
             try:
                 # Perform the API call specific to the backend
-                response = self._make_api_call(current_messages)
+                response = self._make_api_call(
+                    current_messages, response_schema
+                    or self.response_schema_obj)
 
                 # Extract and log token usage
                 prompt_tokens, completion_tokens = self._get_token_counts(
@@ -78,10 +84,8 @@ class LLMBackend(ABC):  # Inherit from ABC for abstract methods
                     f"\n\nValidation failed on attempt {attempt + 1}: {e}")
                 # Append error message to messages for re-attempt
                 error_message = f"The previous response did not match the expected schema. Error: {e}"
-                # error_message += f"\n\n{response}"
                 current_messages.append({
-                    "role":
-                    "system",  # Using 'system' role for error messages, adjust if 'user' is preferred by LLM
+                    "role": "system",
                     "content": error_message
                 })
             except Exception as e:
@@ -116,7 +120,7 @@ class GPTBackend(LLMBackend):
             self.logger.error(f"Error initializing OpenAI client: {e}")
             raise
 
-    def _make_api_call(self, messages):
+    def _make_api_call(self, messages, response_schema):
         """
         Performs the OpenAI API call.
         """
@@ -125,7 +129,7 @@ class GPTBackend(LLMBackend):
             messages=messages,
             max_tokens=self.max_tokens,
             temperature=self.temperature,
-            response_model=self.response_schema_obj,
+            response_model=response_schema,
             max_retries=INSTRACTOR_RETRIES,
         )
 
@@ -160,7 +164,7 @@ class ClaudeBackend(LLMBackend):
             self.logger.error(f"Error initializing Anthropic client: {e}")
             raise
 
-    def _make_api_call(self, messages):
+    def _make_api_call(self, messages, response_schema):
         """
         Performs the Claude API call, handling system messages.
         """
@@ -187,7 +191,7 @@ class ClaudeBackend(LLMBackend):
             messages=chat_messages,
             max_tokens=self.max_tokens,
             temperature=self.temperature,
-            response_model=self.response_schema_obj,
+            response_model=response_schema,
             max_retries=INSTRACTOR_RETRIES,
         )
 
@@ -225,14 +229,13 @@ class GeminiBackend(LLMBackend):
             self.logger.error(f"Error initializing Gemini client: {e}")
             raise
 
-    def _make_api_call(self, messages):
+    def _make_api_call(self, messages, response_schema):
         """
         Performs the Gemini API call.
         """
-        return self.client.messages.create(
-            messages=messages,
-            response_model=self.response_schema_obj,
-            max_retries=INSTRACTOR_RETRIES)
+        return self.client.messages.create(messages=messages,
+                                           response_model=response_schema,
+                                           max_retries=INSTRACTOR_RETRIES)
 
     def _get_token_counts(self, response):
         """

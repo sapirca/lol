@@ -29,6 +29,7 @@ from controller.actions import (ActionRegistry, UpdateAnimationAction,
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
+from schemes.system_schema import SummarizationResponse
 
 
 class LogicPlusPlus:
@@ -375,3 +376,40 @@ class LogicPlusPlus:
         if latest_sequence:
             # Add the latest sequence to the new controller
             self.animation_manager.add_sequence(latest_sequence)
+
+    def reduce_tokens(self):
+        """Summarize the conversation and create a new message streamer with the summary."""
+        try:
+            # Build the summarization prompt using the formatter
+            messages = self.formatter.build_summarization_messages()
+
+            # Get the backend and generate summary
+            backend = self.select_backend()
+            try:
+                model_response = backend.generate_response(
+                    messages, SummarizationResponse)
+                summary = f"{model_response.summary}\n\nAnimation Summary:\n{model_response.animation_summary}"
+                if model_response.pending_tasks:
+                    summary += "\n\nPending Tasks:\n" + "\n".join(
+                        f"- {task}" for task in model_response.pending_tasks)
+
+                # Create a new message streamer only after getting the summary
+                new_msgs = MessageStreamer()
+
+                # Add the summary to the new message streamer
+                new_msgs.add_visible(TAG_SYSTEM,
+                                     "Conversation Summary:",
+                                     context=True)
+                new_msgs.add_visible(TAG_ASSISTANT, summary, context=True)
+
+                # Replace the old message streamer with the new one
+                self.msgs = new_msgs
+
+                return "Successfully reduced tokens by summarizing the conversation."
+            except Exception as e:
+                self.logger.error(f"Error generating summary: {e}")
+                return f"Error generating summary: {str(e)}"
+
+        except Exception as e:
+            self.logger.error(f"Error reducing tokens: {e}")
+            return f"Error reducing tokens: {str(e)}"

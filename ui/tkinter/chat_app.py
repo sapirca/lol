@@ -200,7 +200,7 @@ def update_active_chat_label(button_name):
     if controller and controller.config and "model_config" in controller.config:
         model_name = controller.config["model_config"]["model_name"]
         max_tokens = controller.config["model_config"]["max_tokens"]
-        model_info = f" | {model_name} ({max_tokens} max tokens)"
+        model_info = f" | {model_name[:10]} ({max_tokens})"
 
     active_chat_label.config(
         text=f"{framework_info}{model_info} | {button_name}")
@@ -410,14 +410,34 @@ def save_chat():
                     save_message = "No name provided. "
                     save_message += controller.shutdown()
                 save_status_label.config(text=save_message, fg="light gray")
+
                 # Store controller reference before clearing
+                old_controller = controller
+
                 # Clear the chat window after saving
                 chat_window.config(state=tk.NORMAL)
                 chat_window.delete("1.0", tk.END)
                 chat_window.config(state=tk.DISABLED)
+
                 # Clear the controller and active snapshot
                 controller = None
                 active_chat_snapshot = None
+
+                # Load the newly saved chat
+                if snapshot_name:
+                    _load_chat(snapshot_name)
+                else:
+                    # If no name provided, use the timestamp from the save message
+                    # Extract timestamp from save message (format: "Snapshot saved: timestamp_framework_backend")
+                    match = re.search(r"Snapshot saved: (\d{6}_\d{6}_\w+_\w+)",
+                                      save_message)
+                    if match:
+                        snapshot_name = match.group(1)
+                        _load_chat(snapshot_name)
+                    else:
+                        # Fallback to untitled if we can't extract the name
+                        _load_untitled_chat()
+
                 populate_snapshot_list()  # Refresh the snapshot list
 
             def on_cancel():
@@ -891,6 +911,54 @@ def restart_with_latest_sequence():
         enable_ui()
 
 
+def reduce_tokens():
+    """Reduce tokens by summarizing the conversation."""
+    global controller
+
+    if not controller:
+        save_status_label.config(text="No active chat to reduce tokens",
+                                 fg="red")
+        return
+
+    try:
+        # Disable UI while processing
+        send_button.config(state=tk.DISABLED)
+        user_input.config(state=tk.DISABLED)
+        reduce_tokens_button.config(state=tk.DISABLED)
+
+        # Call controller to reduce tokens
+        result = controller.reduce_tokens()
+
+        # Clear and update chat window
+        chat_window.config(state=tk.NORMAL)
+        chat_window.delete("1.0", tk.END)
+
+        # Get the new chat history
+        chat_history = controller.get_chat_history()
+
+        # Update chat window with new history
+        if chat_history:
+            batch_insert_messages(chat_history)
+        else:
+            message = "No chat history found after token reduction."
+            update_chat_window(get_label_tag(TYPE_SYSTEM),
+                               get_sender_name(TYPE_SYSTEM), message)
+
+        # Update status
+        save_status_label.config(text=result, fg="light gray")
+
+    except Exception as e:
+        error_msg = f"Error reducing tokens: {str(e)}"
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM), error_msg)
+        save_status_label.config(text=f"Error reducing tokens: {str(e)}",
+                                 fg="red")
+    finally:
+        chat_window.config(state=tk.DISABLED)
+        enable_ui()
+        reduce_tokens_button.config(state=tk.NORMAL)
+
+
 # Create the main window
 root = tk.Tk()
 root.title("Chat App")
@@ -955,14 +1023,22 @@ buttons_frame = tk.Frame(top_bar, bg="#2c2c2c")
 buttons_frame.pack(side=tk.RIGHT)
 
 # Add a save button for snapshots
-save_button = tk.Button(buttons_frame, text="Save", command=save_chat)
+save_button = tk.Button(buttons_frame, text="Save", command=save_chat, width=6)
 save_button.pack(side=tk.RIGHT, padx=5)
 
 # Add restart with latest sequence button
 restart_button = tk.Button(buttons_frame,
-                           text="Restart with latest seq",
-                           command=lambda: restart_with_latest_sequence())
+                           text="Restart+",
+                           command=lambda: restart_with_latest_sequence(),
+                           width=6)
 restart_button.pack(side=tk.RIGHT, padx=5)
+
+# Add reduce tokens button
+reduce_tokens_button = tk.Button(buttons_frame,
+                                 text="Summarize",
+                                 command=lambda: reduce_tokens(),
+                                 width=6)
+reduce_tokens_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a header frame for the animation panel
 animation_header = tk.Frame(animation_frame, bg="#2c2c2c")

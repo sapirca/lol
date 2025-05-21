@@ -165,12 +165,12 @@
       "rainbow": {
         "hue_start": {
           "const_value": {
-            "value": 0.7
+            "value": 0.8
           }
         },
         "hue_end": {
           "const_value": {
-            "value": 0.1
+            "value": 0.05
           }
         }
       }
@@ -235,12 +235,12 @@
       "rainbow": {
         "hue_start": {
           "const_value": {
-            "value": 0.7
+            "value": 0.8
           }
         },
         "hue_end": {
           "const_value": {
-            "value": 0.1
+            "value": 0.05
           }
         }
       }
@@ -366,12 +366,12 @@
       "rainbow": {
         "hue_start": {
           "const_value": {
-            "value": 0.7
+            "value": 0.8
           }
         },
         "hue_end": {
           "const_value": {
-            "value": 0.1
+            "value": 0.05
           }
         }
       }
@@ -457,12 +457,12 @@
       "rainbow": {
         "hue_start": {
           "const_value": {
-            "value": 0.7
+            "value": 0.8
           }
         },
         "hue_end": {
           "const_value": {
-            "value": 0.1
+            "value": 0.05
           }
         }
       }

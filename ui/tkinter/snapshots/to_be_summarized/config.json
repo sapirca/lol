@@ -1,0 +1,7 @@
+{
+    "selected_backend": "Claude",
+    "framework": "kivsee",
+    "song_name": "aladdin",
+    "auto_render": true,
+    "print_internal_messages": false
+}

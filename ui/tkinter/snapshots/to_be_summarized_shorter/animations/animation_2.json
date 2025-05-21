@@ -1,0 +1,343 @@
+{
+    "animation": {
+        "effects": [
+            {
+                "effect_number": 1,
+                "title": "Intro Fade-In",
+                "beat_and_bar": "Bar 0: Beat 0",
+                "elements": [
+                    "ring7",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1501,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.75,
+                        "sat": 0.8,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.2,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Soft purple fade-in on outer rings"
+            },
+            {
+                "effect_number": 2,
+                "title": "Middle Ring Pulse",
+                "beat_and_bar": "Bar 0: Beat 1",
+                "elements": [
+                    "ring8",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 1501,
+                    "end_time": 2428,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.08,
+                        "sat": 0.7,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.4,
+                            "max": 0.9,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Pastel orange pulse on middle rings"
+            },
+            {
+                "effect_number": 3,
+                "title": "First Cymbal Flash",
+                "beat_and_bar": "Bar 0: Beat 1-2 (Cymbal)",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 1933,
+                    "end_time": 2428,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 0.2,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.7,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Bright silver-white flash on all rings for first cymbal crash"
+            },
+            {
+                "effect_number": 4,
+                "title": "Inner Ring Snake",
+                "beat_and_bar": "Bar 0: Beat 2",
+                "elements": [
+                    "ring9",
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 2428,
+                    "end_time": 3355,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.78,
+                        "sat": 0.75,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Soft purple snake effect on inner rings"
+            },
+            {
+                "effect_number": 5,
+                "title": "Centric Expansion",
+                "beat_and_bar": "Bar 0: Beat 3",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 3355,
+                    "end_time": 4282,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 0.7,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.3,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Pastel orange centric pattern on all rings"
+            },
+            {
+                "effect_number": 6,
+                "title": "Outer Ring Pattern",
+                "beat_and_bar": "Bar 0: Beat 4",
+                "elements": [
+                    "ring7",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 4282,
+                    "end_time": 5209,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.72,
+                        "sat": 0.8,
+                        "val": 1.0
+                    }
+                },
+                "hue": {
+                    "offset_factor": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.05
+                        }
+                    }
+                },
+                "effect_summary": "Soft purple b1 segment pattern on outer rings"
+            },
+            {
+                "effect_number": 7,
+                "title": "Middle Ring Wave",
+                "beat_and_bar": "Bar 0: Beat 5",
+                "elements": [
+                    "ring8",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 5209,
+                    "end_time": 6136,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 0.7,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.5,
+                            "max": 0.9,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Pastel orange updown pattern on middle rings"
+            },
+            {
+                "effect_number": 8,
+                "title": "Second Cymbal Flash",
+                "beat_and_bar": "Bar 0: Beat 5-6 (Cymbal)",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 5652,
+                    "end_time": 6136,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 0.2,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.7,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Bright silver-white flash on all rings for second cymbal crash"
+            },
+            {
+                "effect_number": 9,
+                "title": "Inner Ring Arcs",
+                "beat_and_bar": "Bar 0: Beat 6",
+                "elements": [
+                    "ring9",
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 6136,
+                    "end_time": 7063,
+                    "segments": "arc"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.76,
+                        "sat": 0.75,
+                        "val": 1.0
+                    }
+                },
+                "saturation": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.7,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Soft purple arc pattern on inner rings"
+            },
+            {
+                "effect_number": 10,
+                "title": "Full Rainbow Finale",
+                "beat_and_bar": "Bar 0: Beat 7",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 7063,
+                    "end_time": 7990,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.5,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Soft purple-orange rainbow effect on all rings"
+            }
+        ],
+        "duration_ms": 7990,
+        "num_repeats": 1
+    },
+    "name": "aladdin_first_bar"
+}
