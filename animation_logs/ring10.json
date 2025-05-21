@@ -194,7 +194,7 @@
       "effect_config": {
         "start_time": 9844,
         "end_time": 10771,
-        "segments": "arc"
+        "segments": "all"
       },
       "const_color": {
         "color": {
@@ -208,15 +208,20 @@
       "effect_config": {
         "start_time": 9844,
         "end_time": 10771,
-        "segments": "arc"
+        "segments": "all"
       },
-      "brightness": {
-        "mult_factor": {
+      "snake": {
+        "head": {
           "sin": {
-            "min": 0.5,
-            "max": 0.9,
+            "min": 0.2,
+            "max": 0.8,
             "phase": 0.0,
             "repeats": 2.0
+          }
+        },
+        "tail_length": {
+          "const_value": {
+            "value": 0.4
           }
         }
       }
@@ -225,7 +230,7 @@
       "effect_config": {
         "start_time": 10771,
         "end_time": 11698,
-        "segments": "centric"
+        "segments": "all"
       },
       "rainbow": {
         "hue_start": {
@@ -244,14 +249,22 @@
       "effect_config": {
         "start_time": 10771,
         "end_time": 11698,
-        "segments": "centric"
+        "segments": "all"
       },
-      "brightness": {
-        "mult_factor": {
+      "snake": {
+        "head": {
           "sin": {
-            "min": 0.6,
-            "max": 0.9,
+            "min": 0.3,
+            "max": 0.7,
             "phase": 0.25,
+            "repeats": 2.0
+          }
+        },
+        "tail_length": {
+          "sin": {
+            "min": 0.3,
+            "max": 0.5,
+            "phase": 0.0,
             "repeats": 2.0
           }
         }

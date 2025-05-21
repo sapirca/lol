@@ -33,8 +33,8 @@ import threading
 
 class LogicPlusPlus:
 
-    def __init__(self, snapshot_dir=None):
-        """Initialize the LogicPlusPlus, optionally loading from a snapshot."""
+    def __init__(self, snapshot_dir=None, restart_config=None):
+        """Initialize the LogicPlusPlus, optionally loading from a snapshot or restarting with latest sequence."""
         self.logger = logging.getLogger("LogicPlusPPlusLogger")
         self._pending_memory = None
         self.msgs = MessageStreamer()
@@ -48,7 +48,10 @@ class LogicPlusPlus:
         # Initialize action registry
         self.action_registry = ActionRegistry()
 
-        if snapshot_dir is not None:
+        if restart_config is not None:
+            # Handle restart with latest sequence
+            self._restart_with_latest_sequence(restart_config)
+        elif snapshot_dir is not None:
             try:
                 self._load_from_snapshot(snapshot_dir)
             except Exception as e:
@@ -355,3 +358,20 @@ class LogicPlusPlus:
         except Exception as e:
             self.logger.error(f"Error stopping animation rendering: {e}")
             return f"Error stopping animation: {e}"
+
+    def _restart_with_latest_sequence(self, old_controller):
+        """Restart with the latest sequence from the old controller."""
+        # Copy config from old controller
+        self.config = old_controller.config.copy()
+        self.selected_framework = self.config.get("framework", None)
+
+        # Initialize new animation manager
+        self.animation_manager = AnimationManager(self.selected_framework,
+                                                  self.msgs)
+
+        # Get latest sequence from old controller
+        latest_sequence = old_controller.animation_manager.get_latest_sequence(
+        )
+        if latest_sequence:
+            # Add the latest sequence to the new controller
+            self.animation_manager.add_sequence(latest_sequence)

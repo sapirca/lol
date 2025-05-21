@@ -189,7 +189,7 @@
       "effect_config": {
         "start_time": 7990,
         "end_time": 8917,
-        "segments": "b2"
+        "segments": "all"
       },
       "const_color": {
         "color": {
@@ -203,13 +203,19 @@
       "effect_config": {
         "start_time": 7990,
         "end_time": 8917,
-        "segments": "b2"
+        "segments": "all"
       },
-      "brightness": {
-        "mult_factor": {
+      "snake": {
+        "head": {
           "linear": {
-            "start": 0.4,
+            "start": 0.0,
             "end": 0.7
+          }
+        },
+        "tail_length": {
+          "linear": {
+            "start": 0.1,
+            "end": 0.4
           }
         }
       }
@@ -218,7 +224,7 @@
       "effect_config": {
         "start_time": 10771,
         "end_time": 11698,
-        "segments": "centric"
+        "segments": "all"
       },
       "rainbow": {
         "hue_start": {
@@ -237,14 +243,22 @@
       "effect_config": {
         "start_time": 10771,
         "end_time": 11698,
-        "segments": "centric"
+        "segments": "all"
       },
-      "brightness": {
-        "mult_factor": {
+      "snake": {
+        "head": {
           "sin": {
-            "min": 0.6,
-            "max": 0.9,
+            "min": 0.3,
+            "max": 0.7,
             "phase": 0.25,
+            "repeats": 2.0
+          }
+        },
+        "tail_length": {
+          "sin": {
+            "min": 0.3,
+            "max": 0.5,
+            "phase": 0.0,
             "repeats": 2.0
           }
         }
@@ -270,11 +284,17 @@
         "end_time": 12625,
         "segments": "all"
       },
-      "brightness": {
-        "mult_factor": {
+      "snake": {
+        "head": {
           "linear": {
-            "start": 0.8,
-            "end": 0.4
+            "start": 0.7,
+            "end": 1.0
+          }
+        },
+        "tail_length": {
+          "linear": {
+            "start": 0.5,
+            "end": 0.1
           }
         }
       }

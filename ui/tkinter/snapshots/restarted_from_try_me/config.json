@@ -1,0 +1,12 @@
+{
+    "selected_backend": "Claude",
+    "framework": "kivsee",
+    "song_name": "aladdin",
+    "auto_render": true,
+    "print_internal_messages": false,
+    "show_all_animations": false,
+    "model_config": {
+        "model_name": "claude-3-7-sonnet-latest",
+        "max_tokens": 64000
+    }
+}

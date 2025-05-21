@@ -844,6 +844,53 @@ def update_animation_data():
         animation_window.config(state=tk.DISABLED)
 
 
+def restart_with_latest_sequence():
+    """Restart the chat with the latest sequence from the current controller."""
+    global controller, active_chat_snapshot
+
+    if not controller:
+        save_status_label.config(text="No active chat to restart from",
+                                 fg="red")
+        return
+
+    try:
+        # Store old controller temporarily
+        old_controller = controller
+
+        # Initialize new controller with restart config
+        controller = LogicPlusPlus(restart_config=old_controller)
+        active_chat_snapshot = "untitled"
+
+        # Clear chat window
+        chat_window.config(state=tk.NORMAL)
+        chat_window.delete("1.0", tk.END)
+
+        # Welcome message
+        message = "Welcome to a new chat session with the latest animation sequence!"
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM), message)
+
+        # System info
+        print_system_info()
+
+        chat_window.config(state=tk.DISABLED)
+        update_active_chat_label("untitled")
+        update_animation_data()
+
+        save_status_label.config(
+            text="Successfully restarted with latest sequence",
+            fg="light gray")
+
+    except Exception as e:
+        error_msg = f"Error restarting chat: {str(e)}"
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM), error_msg)
+        save_status_label.config(text=f"Error restarting chat: {str(e)}",
+                                 fg="red")
+    finally:
+        enable_ui()
+
+
 # Create the main window
 root = tk.Tk()
 root.title("Chat App")
@@ -910,6 +957,12 @@ buttons_frame.pack(side=tk.RIGHT)
 # Add a save button for snapshots
 save_button = tk.Button(buttons_frame, text="Save", command=save_chat)
 save_button.pack(side=tk.RIGHT, padx=5)
+
+# Add restart with latest sequence button
+restart_button = tk.Button(buttons_frame,
+                           text="Restart with latest seq",
+                           command=lambda: restart_with_latest_sequence())
+restart_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a header frame for the animation panel
 animation_header = tk.Frame(animation_frame, bg="#2c2c2c")
