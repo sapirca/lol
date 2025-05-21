@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, validator, ValidationError
 from typing import List, Literal, Union, Optional, Dict, Any, Annotated, TypeVar, Generic
 from typing_extensions import TypeAlias
 import json  # Import the json module
+import re  # Import regex module
 
 # Generic type for framework-specific animation schema
 T = TypeVar('T', bound=BaseModel)
@@ -128,7 +129,9 @@ class MainSchema(BaseModel, Generic[T]):
     action: ActionType = Field(
         description="The single action to be executed in this turn. "
         "This field now supports both direct JSON objects and stringified JSON objects. "
-        "If a string is provided, it will be parsed as JSON.")
+        "If a string is provided, it will be parsed as JSON. "
+        "IMPORTANT: Do not include any XML-like tags (e.g., <invoke>, </invoke>) in the response. "
+        "The response should be pure JSON only.")
 
     @validator('action', pre=True)
     def validate_action(cls, v):

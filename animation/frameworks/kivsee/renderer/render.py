@@ -1,6 +1,12 @@
 import json
 import requests
 from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
+import os
+from datetime import datetime
+from pathlib import Path
+from constants import ANIMATION_OUT_TEMP_DIR, SNAPSHOTS_DIR
+
+from schemes.kivsee_scheme.effects_scheme import AnimationProto
 
 # Kivsee-sapir IP 10.0.1.204
 # VNC?
@@ -26,9 +32,37 @@ offset = 575
 
 class Render:
 
-    def __init__(self):
-        # The import for KivseeSequence has been moved to the top of the file.
+    def __init__(self,
+                 sequence_service_url: str = None,
+                 snapshot_dir: str = None):
+        self.sequence_service_url = sequence_service_url if sequence_service_url else SEQUENCE_URL
+        self.log_dir = Path("animation_logs")
+        self.log_dir.mkdir(exist_ok=True)
+        self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.log_file = self.log_dir / f"animation_log_{self.timestamp}.txt"
+        # Initialize sequence manager with snapshot directory if provided
         self.sequence_manager = KivseeSequence()
+
+    def _save_animation_log(self, current_log_path, element_name: str,
+                            animation_payload: dict, response_text: str):
+        """Save animation response to both individual and combined log files."""
+        # Save individual element animation
+        element_file = current_log_path / f"{element_name}.json"
+        with open(element_file, 'w') as f:
+            # f.write(f"\n=== {element_name} Animation ===\n")
+            # f.write(response_text)
+            # f.write("\n")
+            f.write(json.dumps(animation_payload, indent=2))
+            # f.write("\n" + "=" * 50 + "\n")
+
+        # Append to combined log file
+        all_elements_file = current_log_path / f"all_elements.json"
+        with open(all_elements_file, 'a') as f:
+            f.write(f"\n=== {element_name} Animation ===\n")
+            f.write(response_text)
+            f.write("\n")
+            f.write(json.dumps(animation_payload, indent=2))
+            f.write("\n" + "=" * 50 + "\n")
 
     def store_animation(self, preprocessed_animation_data: dict):
         """
@@ -46,19 +80,38 @@ class Render:
                 "No animation data generated for any element. Skipping storage."
             )
             return
-
+        # current_log_path = self.log_dir / f"{self.timestamp}"
+        current_log_path = self.log_dir
+        current_log_path.mkdir(exist_ok=True)
         # Iterate through each element and its specific animation payload
         for element_name, animation_payload in animations_per_element.items():
-            url = f"{SEQUENCE_URL}/triggers/{animation_name}/objects/{element_name}"
-            print(
-                f"Storing animation for element: {element_name} at URL: {url}")
-            print(
-                f"Payload for {element_name}: {json.dumps(animation_payload, indent=2)}"
-            )
-            response = self._put_request(url, animation_payload)
-            print(
-                f"Store animation for {element_name} response: {response.status_code}, {response.text}"
-            )
+            try:
+                # Create AnimationProto for this element
+                # animation_proto = AnimationProto(**animation_payload)
+
+                # Store the animation using the same URL structure as before
+                url = f"{SEQUENCE_URL}/triggers/{animation_name}/objects/{element_name}"
+                print(
+                    f"Storing animation for element: {element_name} at URL: {url}"
+                )
+                # print(
+                #     f"Payload for {element_name}: {json.dumps(animation_payload, indent=2)}"
+                # )
+
+                response = self._put_request(url, animation_payload)
+
+                response_text = f"Store animation for {element_name} response: {response.status_code}, {response.text}"
+                print(response_text)
+                # Save animation response to files
+                self._save_animation_log(current_log_path, element_name,
+                                         animation_payload, response_text)
+
+                print(
+                    f"Successfully stored animation for element: {element_name}"
+                )
+            except Exception as e:
+                print(f"Error storing animation for {element_name}: {str(e)}")
+                continue
 
     def trigger_animation(self,
                           animation_data: dict,
@@ -76,17 +129,13 @@ class Render:
             f"Trigger animation response: {response.status_code}, {response.text}"
         )
 
-    def trigger_song(self, animation_data: dict, playback_offest: int):
+    def trigger_song(self, animation_name: str, playback_offest: int):
         """
         Triggers the song playback associated with the animation.
         """
-        animation_name = animation_data.get("name", "default_animation")
         url = f"{TRIGGER_URL}/song/{animation_name}/play"
         print(f"Trigger song URL: {url}")
         # The payload here should match what the /song/{name}/play endpoint expects.
-        # Assuming it expects the full preprocessed animation data if needed.
-        # If not, a simpler payload like just the name might suffice.
-        # For now, passing the whole preprocessed_animation_data.
         response = self._post_request(url,
                                       {"start_offset_ms": playback_offest})
         print(
@@ -157,7 +206,7 @@ class Render:
 
     def load_and_print_animation(self, playback_offest: int = 0):
         """
-        Loads animation data from a file, preprocesses it, and then renders it.
+        Loads animation data from the default animation file, preprocesses it, and then renders it.
         """
         animation_file_path = self.sequence_manager.get_animation_filename()
         try:
@@ -175,6 +224,38 @@ class Render:
         except Exception as e:
             print(f"An unexpected error occurred while loading animation: {e}")
 
+    def load_from_snapshot(self, snapshot_dir: str, playback_offest: int = 0):
+        """
+        Loads animation data from a snapshot directory's animations folder, preprocesses it, and then renders it.
+        
+        Args:
+            snapshot_dir (str): Path to the snapshot directory containing an 'animations' subdirectory
+            playback_offest (int): Offset in milliseconds for playback timing
+        """
+        # Check for animations directory in snapshot
+        animations_dir = os.path.join(SNAPSHOTS_DIR, snapshot_dir,
+                                      "animations")
+        if not os.path.exists(animations_dir):
+            raise FileNotFoundError(
+                "Animations directory is missing in the snapshot directory.")
+
+        # Load all animation files from the directory
+        animations = []
+        for file in os.listdir(animations_dir):
+            if file.endswith(self.sequence_manager.get_suffix()):
+                with open(os.path.join(animations_dir, file), 'r') as f:
+                    animations.append(json.load(f))
+
+        # Load the sequences into the manager
+        self.sequence_manager.load_sequences(animations)
+
+        # Use the latest animation for rendering
+        animation_data = self.sequence_manager.get_latest_sequence()
+        if not animation_data:
+            raise ValueError("No animations found in the snapshot directory.")
+
+        self.render(animation_data, playback_offest)
+
     def render(self, animation_data: dict, playback_offest: int):
         """
         Orchestrates the preprocessing, storing, and triggering of the animation.
@@ -188,7 +269,8 @@ class Render:
         preprocessed_animation_data = self.preprocess_animation(animation_data)
         self.store_animation(preprocessed_animation_data)
         # self.trigger_animation(preprocessed_animation_data, playback_offest)
-        self.trigger_song(preprocessed_animation_data, playback_offest)
+        # animation_name = animation_data.get("name", "default_animation")
+        self.trigger_song(preprocessed_animation_data['name'], playback_offest)
 
     def preprocess_animation(self, input_data: dict) -> dict:
         """
