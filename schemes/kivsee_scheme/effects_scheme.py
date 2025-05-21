@@ -88,11 +88,21 @@ class FloatFunction(BaseModel):
 
 class HSV(BaseModel):
     hue: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=1.0,
         description=
         "Hue value between 0.0 to 1.0. Where 0.0 is red, 0.33 is green, 0.67 is blue, and 1.0 is red."
     )
-    sat: float = Field(description="Saturation value.")
-    val: float = Field(description="Value (brightness) value.")
+    sat: float = Field(default=1.0,
+                       ge=0.0,
+                       le=1.0,
+                       description="Saturation value between 0.0 and 1.0.")
+    val: float = Field(
+        default=1.0,
+        ge=0.0,
+        le=1.0,
+        description="Value (brightness) value between 0.0 and 1.0.")
 
 
 class ConstColorEffectConfig(BaseModel):

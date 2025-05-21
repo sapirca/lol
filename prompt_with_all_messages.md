@@ -57,9 +57,8 @@ Guidelines for Animation Creation:
 1. Sync animations with musical beats and sections
 2. Use color and brightness to reflect the music's emotional intent
 3. Each beat frame is rendered independently (no state carries over)
-4. Effects are applied in order: coloring → brightness → motion
-5. Default brightness is 1.0 when not specified
-6. Use saturated colors (sat > 0.8) for better visibility
+4. Default brightness is 1.0 when not specified
+5. Use saturated colors (sat > 0.8) for better visibility
 
 Element Options:
 - Individual rings: "ring1" through "ring12"
@@ -136,4 +135,4 @@ Role: system
 ================================================================================
 Role: user
 
-Generate an animation where the rings change colors, synchronized precisely with the start and end times of each lyric word provided in the list. I want you to use pink and green, and pastel color (saturation)
+Generate an animation with interesting effects, use variety of the different efects, synchronized precisely with the start and end times of beats in the first bar

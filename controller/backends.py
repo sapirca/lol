@@ -12,7 +12,7 @@ import google.generativeai as genai
 from constants import MODEL_CONFIGS
 
 MAX_RETRIES = 3
-INSTRACTOR_RETRIES = 3
+INSTRACTOR_RETRIES = 0
 
 
 class LLMBackend(ABC):  # Inherit from ABC for abstract methods
@@ -78,6 +78,7 @@ class LLMBackend(ABC):  # Inherit from ABC for abstract methods
                     f"\n\nValidation failed on attempt {attempt + 1}: {e}")
                 # Append error message to messages for re-attempt
                 error_message = f"The previous response did not match the expected schema. Error: {e}"
+                error_message += f"\n\n{response}"
                 current_messages.append({
                     "role":
                     "system",  # Using 'system' role for error messages, adjust if 'user' is preferred by LLM
