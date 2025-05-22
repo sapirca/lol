@@ -130,7 +130,7 @@ class MainSchema(BaseModel, Generic[T]):
         description="The single action to be executed in this turn. "
         "This field now supports both direct JSON objects and stringified JSON objects. "
         "If a string is provided, it will be parsed as JSON. "
-        "IMPORTANT: Do not include any XML-like tags (e.g., <invoke>, </invoke>) in the response. "
+        "IMPORTANT: Do NOT include any XML-like tags (e.g., <invoke>, </invoke>) in the response. "
         "The response should be pure JSON only.")
 
     @validator('action', pre=True)

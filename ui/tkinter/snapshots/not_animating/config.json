@@ -1,0 +1,12 @@
+{
+    "selected_backend": "Claude",
+    "model_config": {
+        "model_name": "claude-3-5-haiku-latest",
+        "max_tokens": 8192
+    },
+    "framework": "kivsee",
+    "song_name": "aladdin",
+    "auto_render": true,
+    "print_internal_messages": false,
+    "show_all_animations": false
+}
