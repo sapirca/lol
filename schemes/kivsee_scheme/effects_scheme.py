@@ -88,11 +88,21 @@ class FloatFunction(BaseModel):
 
 class HSV(BaseModel):
     hue: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=1.0,
         description=
         "Hue value between 0.0 to 1.0. Where 0.0 is red, 0.33 is green, 0.67 is blue, and 1.0 is red."
     )
-    sat: float = Field(description="Saturation value.")
-    val: float = Field(description="Value (brightness) value.")
+    sat: float = Field(default=1.0,
+                       ge=0.0,
+                       le=1.0,
+                       description="Saturation value between 0.0 and 1.0.")
+    val: float = Field(
+        default=1.0,
+        ge=0.0,
+        le=1.0,
+        description="Value (brightness) value between 0.0 and 1.0.")
 
 
 class ConstColorEffectConfig(BaseModel):
@@ -184,9 +194,8 @@ class EffectConfig(BaseModel):
 class EffectProto(BaseModel):
     """
     Represents a single effect in the animation sequence.
-    IMPORTANT: Each effect configuration must have EXACTLY ONE effect type set (const_color, rainbow, brightness, etc.).
-    Setting multiple effects in a single effect configuration will cause errors.
-    If you need multiple effects, create separate effect configurations for each one.
+    IMPORTANT: Each effect configuration must have EXACTLY ONE color effect type set (const_color or rainbow).
+    Other effects (brightness, hue, etc.) are optional and can be combined.
     """
 
     effect_number: int = Field(
@@ -219,33 +228,28 @@ class EffectProto(BaseModel):
     const_color: typing.Optional[ConstColorEffectConfig] = Field(
         default=None,
         description=
-        "[IMPORTANT: Only set ONE effect type per effect config] The LEDs will display a single, constant color."
+        "[IMPORTANT: Exactly one of const_color or rainbow must be set] The LEDs will display a single, constant color."
     )
     rainbow: typing.Optional[RainbowEffectConfig] = Field(
         default=None,
         description=
-        "[IMPORTANT: Only set ONE effect type per effect config] The LEDs will cycle through a spectrum of colors, creating a rainbow effect."
+        "[IMPORTANT: Exactly one of const_color or rainbow must be set] The LEDs will cycle through a spectrum of colors, creating a rainbow effect."
     )
     brightness: typing.Optional[BrightnessEffectConfig] = Field(
         default=None,
-        description=
-        "[IMPORTANT: Only set ONE effect type per effect config] Adjusts the overall brightness of the LEDs."
-    )
+        description="Adjusts the overall brightness of the LEDs.")
     hue: typing.Optional[HueEffectConfig] = Field(
         default=None,
-        description=
-        "[IMPORTANT: Only set ONE effect type per effect config] Cycles through different hues (colors) on the LEDs."
-    )
+        description="Cycles through different hues (colors) on the LEDs.")
     saturation: typing.Optional[SaturationEffectConfig] = Field(
         default=None,
         description=
-        "[IMPORTANT: Only set ONE effect type per effect config] Adjusts the purity of the colors displayed on the LEDs. Below 0.8 is less saturated, pastel appearance."
+        "Adjusts the purity of the colors displayed on the LEDs. Below 0.8 is less saturated, pastel appearance."
     )
     snake: typing.Optional[SnakeEffectConfig] = Field(
         default=None,
         description=
-        "[IMPORTANT: Only set ONE effect type per effect config] A segment of lit LEDs will move along the strip, resembling a snake."
-    )
+        "A segment of lit LEDs will move along the strip, resembling a snake.")
     # segment: typing.Optional[SegmentEffectConfig] = Field(
     #     default=None,
     #     description=
@@ -270,18 +274,13 @@ class EffectProto(BaseModel):
 
     @model_validator(mode="after")
     def check_one_of_effect(self):
-        effects = [
-            self.const_color,
-            self.rainbow,
-            self.brightness,
-            self.hue,
-            self.saturation,
-            self.snake,
-        ]
-        effects_set = sum(1 for effect in effects if effect is not None)
-        if effects_set != 1:
+        # Check that exactly one color effect is set
+        color_effects = [self.const_color, self.rainbow]
+        color_effects_set = sum(1 for effect in color_effects
+                                if effect is not None)
+        if color_effects_set != 1:
             raise ValueError(
-                f"Exactly one effect type must be set. Found {effects_set} effects: {[e.__class__.__name__ for e in effects if e is not None]}"
+                f"Exactly one color effect (const_color or rainbow) must be set. Found {color_effects_set} color effects: {[e.__class__.__name__ for e in color_effects if e is not None]}"
             )
         return self
 

@@ -60,7 +60,7 @@ MODEL_CONFIGS = {
         "model_name": "claude-3-5-haiku-latest",
         "max_tokens": 8192,
     },
-    "claude-3-7": {
+    "claude-3-7-sonnet": {
         "model_name": "claude-3-7-sonnet-latest",
         "max_tokens": 64000,
     },

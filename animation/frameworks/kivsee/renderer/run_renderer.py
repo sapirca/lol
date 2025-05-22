@@ -3,7 +3,7 @@ from animation.frameworks.kivsee.renderer.render import Render
 
 def main():
     render = Render()
-    render.load_and_print_animation()
+    render.load_from_snapshot(snapshot_dir="try_me")
 
 
 if __name__ == "__main__":

@@ -29,12 +29,13 @@ from controller.actions import (ActionRegistry, UpdateAnimationAction,
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
+from schemes.system_schema import SummarizationResponse
 
 
 class LogicPlusPlus:
 
-    def __init__(self, snapshot_dir=None):
-        """Initialize the LogicPlusPlus, optionally loading from a snapshot."""
+    def __init__(self, snapshot_dir=None, restart_config=None):
+        """Initialize the LogicPlusPlus, optionally loading from a snapshot or restarting with latest sequence."""
         self.logger = logging.getLogger("LogicPlusPPlusLogger")
         self._pending_memory = None
         self.msgs = MessageStreamer()
@@ -48,7 +49,10 @@ class LogicPlusPlus:
         # Initialize action registry
         self.action_registry = ActionRegistry()
 
-        if snapshot_dir is not None:
+        if restart_config is not None:
+            # Handle restart with latest sequence
+            self._restart_with_latest_sequence(restart_config)
+        elif snapshot_dir is not None:
             try:
                 self._load_from_snapshot(snapshot_dir)
             except Exception as e:
@@ -99,14 +103,19 @@ class LogicPlusPlus:
         self.action_registry.register_action("answer_user",
                                              AnswerUserAction(self.msgs))
 
-    def shutdown(self, shutdown_snapshot_dir=None):
-        if not shutdown_snapshot_dir:
+    def shutdown(self, requested_shutdown_snapshot_dir=None):
+        if not requested_shutdown_snapshot_dir:
             timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
             shutdown_snapshot_dir = os.path.join(
                 self.msgs.snapshots_dir,
                 f"{timestamp}_{self.selected_framework}_{self.selected_backend}"
             )
             os.makedirs(shutdown_snapshot_dir, exist_ok=True)
+        else:
+            shutdown_snapshot_dir = os.path.join(
+                self.msgs.snapshots_dir, requested_shutdown_snapshot_dir)
+            if not os.path.exists(shutdown_snapshot_dir):
+                os.makedirs(shutdown_snapshot_dir, exist_ok=True)
 
         # Save configuration
         snapshot_config_file = os.path.join(shutdown_snapshot_dir, CONFIG_FILE)
@@ -350,3 +359,57 @@ class LogicPlusPlus:
         except Exception as e:
             self.logger.error(f"Error stopping animation rendering: {e}")
             return f"Error stopping animation: {e}"
+
+    def _restart_with_latest_sequence(self, old_controller):
+        """Restart with the latest sequence from the old controller."""
+        # Copy config from old controller
+        self.config = old_controller.config.copy()
+        self.selected_framework = self.config.get("framework", None)
+
+        # Initialize new animation manager
+        self.animation_manager = AnimationManager(self.selected_framework,
+                                                  self.msgs)
+
+        # Get latest sequence from old controller
+        latest_sequence = old_controller.animation_manager.get_latest_sequence(
+        )
+        if latest_sequence:
+            # Add the latest sequence to the new controller
+            self.animation_manager.add_sequence(latest_sequence)
+
+    def reduce_tokens(self):
+        """Summarize the conversation and create a new message streamer with the summary."""
+        try:
+            # Build the summarization prompt using the formatter
+            messages = self.formatter.build_summarization_messages()
+
+            # Get the backend and generate summary
+            backend = self.select_backend()
+            try:
+                model_response = backend.generate_response(
+                    messages, SummarizationResponse)
+                summary = f"{model_response.summary}\n\nAnimation Summary:\n{model_response.animation_summary}"
+                if model_response.pending_tasks:
+                    summary += "\n\nPending Tasks:\n" + "\n".join(
+                        f"- {task}" for task in model_response.pending_tasks)
+
+                # Create a new message streamer only after getting the summary
+                new_msgs = MessageStreamer()
+
+                # Add the summary to the new message streamer
+                new_msgs.add_visible(TAG_SYSTEM,
+                                     "Conversation Summary:",
+                                     context=True)
+                new_msgs.add_visible(TAG_ASSISTANT, summary, context=True)
+
+                # Replace the old message streamer with the new one
+                self.msgs = new_msgs
+
+                return "Successfully reduced tokens by summarizing the conversation."
+            except Exception as e:
+                self.logger.error(f"Error generating summary: {e}")
+                return f"Error generating summary: {str(e)}"
+
+        except Exception as e:
+            self.logger.error(f"Error reducing tokens: {e}")
+            return f"Error reducing tokens: {str(e)}"

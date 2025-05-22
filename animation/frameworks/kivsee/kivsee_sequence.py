@@ -6,9 +6,8 @@ from constants import ANIMATION_OUT_TEMP_DIR, KIVSEE_ANIMATION_SUFFIX, KIVSEE_TE
 
 class KivseeSequence(Sequence):
 
-    def __init__(self, sequence_path=None):
+    def __init__(self):
         super().__init__()
-        self.sequence_path = sequence_path
         self.sequence_data = None
         self.steps = []
 
