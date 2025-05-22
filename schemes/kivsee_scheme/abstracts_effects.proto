@@ -1,0 +1,291 @@
+syntax = "proto3";
+
+// Defines the package for these Protocol Buffer messages.
+package animation_effects;
+
+// --- Reusable Common Definitions ---
+
+// Represents a duration in milliseconds.
+message Duration {
+  uint32 milliseconds = 1; // Duration value in milliseconds.
+}
+
+// Represents an RGBA color.
+message Color {
+  uint32 r = 1; // Red component (0-255).
+  uint32 g = 2; // Green component (0-255).
+  uint32 b = 3; // Blue component (0-255).
+  uint32 a = 4; // Alpha (transparency) component (0-255).
+}
+
+// Defines common easing functions for animation smoothness.
+enum Easing {
+  EASE_LINEAR = 0;        // Linear progression.
+  EASE_IN_QUAD = 1;       // Accelerates from zero velocity.
+  EASE_OUT_QUAD = 2;      // Decelerates to zero velocity.
+  EASE_IN_OUT_QUAD = 3;   // Accelerates and then decelerates.
+  // Add more easing functions (e.g., EASE_CUBIC, EASE_ELASTIC) as needed.
+}
+
+// Defines directions for motion-based effects.
+enum Direction {
+  DIRECTION_NONE = 0;            // No specific direction.
+  DIRECTION_LEFT_TO_RIGHT = 1;   // Motion from left to right.
+  DIRECTION_RIGHT_TO_LEFT = 2;   // Motion from right to left.
+  DIRECTION_TOP_TO_BOTTOM = 3;   // Motion from top to bottom.
+  DIRECTION_BOTTOM_TO_TOP = 4;   // Motion from bottom to top.
+  DIRECTION_RADIAL_OUT = 5;      // Motion outwards from a center point.
+  DIRECTION_RADIAL_IN = 6;       // Motion inwards towards a center point.
+  DIRECTION_CLOCKWISE = 7;       // Clockwise rotation/swirl.
+  DIRECTION_COUNTER_CLOCKWISE = 8; // Counter-clockwise rotation/swirl.
+  // Add more directions like diagonal, spiral, etc.
+}
+
+// --- Brightness Effects (Without Motion) ---
+
+// Gradually increases an object's brightness.
+message FadeInBrightness {
+  uint32 max_value = 1; // The target maximum brightness (e.g., 0-100 or 0-255).
+  Duration duration = 2; // How long the fade takes.
+}
+
+// Gradually decreases an object's brightness.
+message FadeOutBrightness {
+  uint32 start_value = 1; // The initial brightness value.
+  Duration duration = 2;  // How long the fade takes.
+}
+
+// Rhythmically changes brightness, simulating a breath.
+message PulsateBrightness {
+  uint32 min_brightness = 1;    // Minimum brightness in the cycle.
+  uint32 max_brightness = 2;    // Maximum brightness in the cycle.
+  Duration cycle_duration = 3;  // Duration of one complete pulse cycle (up and down).
+}
+
+// Rapidly alternates between two brightness levels.
+message BlinkBrightness {
+  uint32 on_brightness = 1;   // Brightness when "on".
+  uint32 off_brightness = 2;  // Brightness when "off".
+  Duration on_time = 3;       // Duration the brightness is "on".
+  Duration off_time = 4;      // Duration the brightness is "off".
+  optional uint32 number_of_blinks = 5; // Optional: specific number of blinks. If not set, it might blink indefinitely or for total_duration.
+  optional Duration total_duration = 6; // Optional: total duration for the blinking effect.
+}
+
+// Randomly changes brightness to simulate flickering.
+message RandomBrightnessFlicker {
+  uint32 min_brightness = 1;          // Minimum brightness level.
+  uint32 max_brightness = 2;          // Maximum brightness level.
+  Duration flicker_frequency_interval = 3; // Average interval between brightness changes.
+  double intensity_variance = 4;      // How much the brightness varies from the average (e.g., 0.0 to 1.0).
+}
+
+// Changes brightness in discrete, non-smooth steps.
+message StepBrightness {
+  repeated uint32 brightness_levels = 1; // A sequence of brightness values to step through.
+  Duration hold_duration_per_level = 2; // How long to hold at each brightness level.
+  Duration transition_duration = 3;     // How long to transition between levels (if not instantaneous).
+}
+
+// --- Coloring Effects (Without Motion) ---
+
+// Gradually transitions an object's color to a target color.
+message FadeToColor {
+  Color target_color = 1; // The final color to fade to.
+  Duration duration = 2;  // How long the fade takes.
+  Easing easing = 3;     // The easing function for the fade.
+}
+
+// Transitions an object's color from one color to another.
+message CrossfadeColors {
+  Color color_a = 1; // Starting color.
+  Color color_b = 2; // Ending color.
+  Duration duration = 3; // How long the crossfade takes.
+  Easing easing = 4;    // The easing function for the crossfade.
+}
+
+// Continuously cycles through a predefined list of colors.
+message ColorCycle {
+  repeated Color colors = 1; // A list of colors to cycle through.
+  Duration cycle_duration = 2; // Total duration to complete one full cycle through all colors.
+  optional Duration hold_duration_per_color = 3; // Optional: time to hold each individual color.
+  Easing easing = 4; // Easing for transitions between colors.
+}
+
+// Shifts the hue through the color spectrum (rainbow effect).
+message RainbowColor {
+  uint32 hue_start = 1; // Starting hue in degrees (0-360).
+  uint32 hue_end = 2;   // Ending hue in degrees (0-360). Can wrap around.
+  Duration duration = 3; // Duration for one full sweep through the hue range.
+  Direction direction = 4; // Direction of hue shift (clockwise or counter-clockwise).
+  uint32 saturation = 5; // Saturation level (0-100%) during the effect.
+  uint32 lightness = 6;  // Lightness level (0-100%) during the effect.
+}
+
+// Rhythmically changes between two or more colors.
+message PulsateColor {
+  Color color_a = 1;           // First color in the pulse cycle.
+  Color color_b = 2;           // Second color in the pulse cycle.
+  Duration cycle_duration = 3; // Duration of one complete pulse cycle.
+  Easing easing = 4;           // Easing for the color change.
+}
+
+// Rapidly alternates between two distinct colors.
+message BlinkColor {
+  Color color_a = 1; // First color.
+  Color color_b = 2; // Second color.
+  Duration on_time = 3; // Duration the first color is displayed.
+  Duration off_time = 4; // Duration the second color is displayed.
+  optional uint32 number_of_blinks = 5; // Optional: specific number of blinks.
+  optional Duration total_duration = 6; // Optional: total duration for the blinking effect.
+}
+
+// Adjusts the saturation (vibrancy) of an object's color.
+message SaturationEffect {
+  uint32 target_saturation = 1; // Target saturation level (0-100%).
+  Duration duration = 2;       // How long the saturation change takes.
+  Easing easing = 3;          // Easing for the saturation change.
+}
+
+// Shifts the color along a warm-to-cool spectrum based on Kelvin temperature.
+message TemperatureShift {
+  uint32 start_temperature_kelvin = 1; // Starting color temperature in Kelvin.
+  uint32 end_temperature_kelvin = 2;   // Ending color temperature in Kelvin.
+  Duration duration = 3;              // How long the shift takes.
+  Easing easing = 4;                 // Easing for the temperature shift.
+}
+
+// --- Effects With Motion (Spatial Patterns & Movement) ---
+
+// A band or gradient of brightness/color that sweeps across the object.
+message WaveSweep {
+  Direction direction = 1; // Direction of the wave movement.
+  oneof color_or_brightness { // Choose to animate either color or brightness.
+    struct {
+      Color start_color = 10;
+      Color end_color = 11;
+    } colors = 2;
+    struct {
+      uint32 start_brightness = 12;
+      uint32 end_brightness = 13;
+    } brightnesses = 3;
+  }
+  double speed = 4;          // Speed of the wave movement (e.g., units per second).
+  double width_of_wave = 5;  // The width of the sweeping band/gradient.
+  optional uint32 repeat_count = 6; // Optional: number of times the wave repeats (0 for infinite).
+}
+
+// A segment of color ("snake") that moves along a defined path.
+message SnakeMovement {
+  Color snake_color = 1; // The color of the moving "snake".
+  Color trail_color = 2; // The color left behind by the snake, or could be a fade.
+  double snake_length = 3; // The length of the snake segment.
+  double speed = 4;        // Speed of the snake movement (e.g., units per second).
+
+  // Defines possible paths for the snake.
+  message LinearPath {
+    double start_x = 1;
+    double start_y = 2;
+    double end_x = 3;
+    double end_y = 4;
+  }
+  // Add other path types like SplinePath, CircularPath etc. if needed.
+  oneof path_type {
+    LinearPath linear_path = 5; // The snake moves along a straight line.
+  }
+  optional uint32 repeat_count = 6; // Optional: number of times the snake repeats its path (0 for infinite).
+}
+
+// A circular or expanding wave of brightness or color emanating from a point.
+message RippleEffect {
+  double center_x = 1; // X-coordinate of the ripple's origin.
+  double center_y = 2; // Y-coordinate of the ripple's origin.
+  oneof color_or_brightness { // Choose to animate either color or brightness.
+    Color ripple_color = 10;
+    uint32 ripple_brightness = 11;
+  }
+  double expansion_speed = 3; // How fast the ripple expands outwards (e.g., units per second).
+  Duration fade_duration = 4; // How long it takes for the ripple to fade out.
+  double max_radius = 5;      // The maximum radius the ripple will reach.
+}
+
+// Specific parts or patterns on the object flash on and off.
+message StrobePattern {
+  // Defines the shape of the pattern that strobes.
+  enum PatternShape {
+    PATTERN_SHAPE_SQUARE = 0;
+    PATTERN_SHAPE_CIRCLE = 1;
+    // Add more shapes like TRIANGLE, STAR, etc.
+  }
+  PatternShape shape = 1;     // The shape of the strobing pattern.
+  Color pattern_color = 2;    // The color of the strobing pattern.
+  Duration on_time = 3;       // Duration the pattern is "on".
+  Duration off_time = 4;      // Duration the pattern is "off".
+  optional Duration total_duration = 5; // Optional: total duration for the strobing effect.
+  optional Direction movement_direction = 6; // Optional: if the pattern also moves.
+  optional double movement_speed = 7;       // Optional: speed of pattern movement.
+}
+
+// A brightness or color pattern (like text) that scrolls across the surface.
+message ScrollingPattern {
+  string pattern_data = 1; // The data for the pattern (e.g., text string, or ID for a bitmap pattern).
+  Direction scroll_direction = 2; // Direction of scrolling.
+  double speed = 3;          // Speed of scrolling (e.g., pixels per second).
+  oneof foreground_background_color_or_brightness { // Choose to animate either colors or brightness for foreground/background.
+    struct {
+      Color foreground_color = 10; // Color of the pattern itself.
+      Color background_color = 11; // Color of the background behind the pattern.
+    } colors = 4;
+    struct {
+      uint32 foreground_brightness = 12; // Brightness of the pattern itself.
+      uint32 background_brightness = 13; // Brightness of the background.
+    } brightnesses = 5;
+  }
+}
+
+// Colors or brightness levels appear to swirl or vortex on the object's surface.
+message SwirlEffect {
+  double center_x = 1;     // X-coordinate of the swirl's center.
+  double center_y = 2;     // Y-coordinate of the swirl's center.
+  double speed = 3;        // Speed of the swirl (e.g., degrees per second).
+  Direction direction = 4; // Direction of the swirl (clockwise or counter-clockwise).
+  repeated Color colors = 5; // Colors involved in the swirl pattern.
+}
+
+
+// --- Main Animation Effect Container ---
+
+// This message represents a single animation effect.
+// It uses a 'oneof' field to ensure that only one type of effect is defined at a time.
+message AnimationEffect {
+  oneof effect_type {
+    // Brightness Effects
+    FadeInBrightness fade_in_brightness = 1;
+    FadeOutBrightness fade_out_brightness = 2;
+    PulsateBrightness pulsate_brightness = 3;
+    BlinkBrightness blink_brightness = 4;
+    RandomBrightnessFlicker random_brightness_flicker = 5;
+    StepBrightness step_brightness = 6;
+
+    // Coloring Effects
+    FadeToColor fade_to_color = 7;
+    CrossfadeColors crossfade_colors = 8;
+    ColorCycle color_cycle = 9;
+    RainbowColor rainbow_color = 10;
+    PulsateColor pulsate_color = 11;
+    BlinkColor blink_color = 12;
+    SaturationEffect saturation_effect = 13;
+    TemperatureShift temperature_shift = 14;
+
+    // Effects with Motion
+    WaveSweep wave_sweep = 15;
+    SnakeMovement snake_movement = 16;
+    RippleEffect ripple_effect = 17;
+    StrobePattern strobe_pattern = 18;
+    ScrollingPattern scrolling_pattern = 19;
+    SwirlEffect swirl_effect = 20;
+  }
+  // Optional: common properties that could apply to any animation effect.
+  optional Duration delay_before_start = 21; // Delay before this effect begins.
+  optional uint32 repeat_count = 22; // How many times this entire effect should repeat (0 for infinite).
+}

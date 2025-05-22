@@ -88,11 +88,21 @@ class FloatFunction(BaseModel):
 
 class HSV(BaseModel):
     hue: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=1.0,
         description=
         "Hue value between 0.0 to 1.0. Where 0.0 is red, 0.33 is green, 0.67 is blue, and 1.0 is red."
     )
-    sat: float = Field(description="Saturation value.")
-    val: float = Field(description="Value (brightness) value.")
+    sat: float = Field(default=1.0,
+                       ge=0.0,
+                       le=1.0,
+                       description="Saturation value between 0.0 and 1.0.")
+    val: float = Field(
+        default=1.0,
+        ge=0.0,
+        le=1.0,
+        description="Value (brightness) value between 0.0 and 1.0.")
 
 
 class ConstColorEffectConfig(BaseModel):
@@ -170,7 +180,7 @@ class EffectConfig(BaseModel):
         ...,
         description=
         "Specifies the segments of LEDs to which the effect will be applied. This allows targeting specific subsets of LEDs for more variety in the animation. For example, 'b1' might represent every 4th LED. The default segment is 'all', which means the effect will apply to all LEDs of the element.",
-        enum=["centric", "updown", "arc", "ind", "b1", "b2", "rand", "all"])
+        enum=["centric", "updown", "arc", "ind", "b1", "b2", "random", "all"])
     # repeat_num: float = Field(
     #     description="Number of times to repeat the effect.")
     # repeat_start: float = Field(description="Start time of the repeat.")
