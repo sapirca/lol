@@ -25,7 +25,8 @@ from animation.animation_manager import AnimationManager
 from controller.actions import (ActionRegistry, UpdateAnimationAction,
                                 GetAnimationAction, AddToMemoryAction,
                                 QuestionAction, MemorySuggestionAction,
-                                AnswerUserAction)
+                                AnswerUserAction,
+                                GenerateBeatBasedEffectAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -102,6 +103,9 @@ class LogicPlusPlus:
                                              MemorySuggestionAction(self.msgs))
         self.action_registry.register_action("answer_user",
                                              AnswerUserAction(self.msgs))
+        self.action_registry.register_action(
+            "generate_beat_based_effect",
+            GenerateBeatBasedEffectAction(self.msgs))
 
     def shutdown(self, requested_shutdown_snapshot_dir=None):
         if not requested_shutdown_snapshot_dir:

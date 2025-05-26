@@ -7,6 +7,7 @@ from configs.config_kivsee import config as basic_config
 from memory.memory_manager import MemoryManager
 from controller.message_streamer import TAG_SYSTEM_INTERNAL
 from schemes.main_schema import MainSchema
+from animation.frameworks.kivsee.compound_effects import beat_based_effects as bb_effects
 
 
 class Action(ABC):
@@ -134,7 +135,7 @@ class UpdateAnimationAction(Action):
 
 class GetAnimationAction(Action):
 
-    def __init__(self, animation_manager, message_streamer):
+    def __init__(self, animation_manager: AnimationManager, message_streamer):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
         self._purpose = "Retrieve an existing animation sequence by step number"
@@ -151,10 +152,11 @@ class GetAnimationAction(Action):
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         params_dict = self._get_params_dict(params)
-        step_number = params_dict["step_number"]
+        step_number = int(params_dict["step_number"])
+
         try:
-            animation = self.animation_manager.sequence_manager.steps.get(
-                step_number, None)
+            animation = self.animation_manager.get_sequence_by_step(
+                step_number)
             if animation:
                 result = {
                     "status": "success",
@@ -369,6 +371,97 @@ class AnswerUserAction(Action):
                 "requires_confirmation": False
             }
             self._log_action_result("answer_user", error_result)
+            return error_result
+
+
+class GenerateBeatBasedEffectAction(Action):
+    """Action for retrieving beat-based effects for a song."""
+
+    def __init__(self, message_streamer):
+        super().__init__(message_streamer)
+        self._purpose = "Get beat-based brightness effects for a given time range and BPM"
+        self._requires_confirmation = False
+        self._returns = {
+            "EffectConfig":
+            "The time frame of the relevant effect config",
+            "BrightnessEffectConfig":
+            "This is the data for the BrightnessEffectConfig. This can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow",
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("start_time_ms" in params_dict
+                and isinstance(params_dict["start_time_ms"], int)
+                and params_dict["start_time_ms"] >= 0
+                and "end_time_ms" in params_dict
+                and isinstance(params_dict["end_time_ms"], int)
+                and params_dict["end_time_ms"] > params_dict["start_time_ms"]
+                and "bpm" in params_dict
+                and isinstance(params_dict["bpm"], int)
+                and params_dict["bpm"] > 0)
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            start_time_ms = params_dict["start_time_ms"]
+            end_time_ms = params_dict["end_time_ms"]
+            bpm = params_dict["bpm"]
+            effect_type = params_dict["beat_based_effect_type"]
+
+            # Create effect based on the type
+            effect_config = None
+            if effect_type == "breath":
+                effect_config = bb_effects.create_breath_effect_by_the_beat(
+                    start_time_ms, end_time_ms, bpm)
+            elif effect_type == "soft_pulse":
+                effect_config = bb_effects.create_soft_pulse_effect(
+                    start_time_ms, end_time_ms, 0.5,
+                    bpm)  # Using 0.5 as default intensity
+            elif effect_type == "strobe":
+                effect_config = bb_effects.create_strobe_effect(
+                    start_time_ms, end_time_ms, bpm)
+            elif effect_type == "fade_in_out":
+                effect_config = bb_effects.create_fade_in_out_effect(
+                    start_time_ms, end_time_ms, bpm)
+            elif effect_type == "blink":
+                effect_config = bb_effects.create_blink_effect_by_the_beat(
+                    start_time_ms, end_time_ms, bpm)
+            elif effect_type == "blink_and_fade_out":
+                effect_config = bb_effects.create_blink_and_fade_out_effect_by_the_beat(
+                    start_time_ms, end_time_ms, bpm)
+            elif effect_type == "fade_in_and_disappear":
+                effect_config = bb_effects.create_fade_in_and_disappear_effect_by_the_beat(
+                    start_time_ms, end_time_ms, bpm)
+            else:
+                return {
+                    "status": "error",
+                    "message": f"Unknown effect type: {effect_type}",
+                    "requires_confirmation": False
+                }
+
+            result = {
+                "status": "success",
+                "message":
+                f"Generated a [{effect_type} effect] for time range {start_time_ms}-{end_time_ms}ms at {bpm} BPM",
+                "requires_confirmation": False,
+                "data": {
+                    "EffectConfig": {
+                        "start_time": start_time_ms,
+                        "end_time": end_time_ms
+                    },
+                    "BrightnessEffectConfig": effect_config
+                }
+            }
+            self._log_action_result("get_beat_based_effects", result)
+            return result
+
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error getting beat-based effects: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("get_beat_based_effects", error_result)
             return error_result
 
 

@@ -9,9 +9,11 @@ secrets.py
 outputs/
 tests/output/
 
+animation_logs/*
 # ingore periodic snapshots
+ui/tkinter/snapshots/
 ui/tkinter/snapshots/periodic_snapshot.json
-
+prompts/prompt_with_all_messages.md
 
 # Environment variables
 .env

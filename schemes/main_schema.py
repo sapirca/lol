@@ -24,8 +24,9 @@ class GetAnimationParams(BaseModel):
         description=
         "The step number of the animation to retrieve. If this parameter is missing, unknown to you or invalid (< 0), do not execute this action. Instead, use AskUserAction to ask the user for a valid step number.",
         ge=0)
-    immediate_response: Literal[True] = Field(
-        description="Always True for get_animation as it's a retrieval action")
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False to prevent the LLM from being stuck in infinite loop")
 
 
 class AddToMemoryParams(BaseModel):
@@ -72,6 +73,25 @@ class AnswerUserParams(BaseModel):
         description="Always False for answer_user as it's a direct response")
 
 
+class GenerateBeatBasedEffectParams(BaseModel):
+    """
+    This action generates the data for the BrightnessEffectConfig. The brightness effect is synchronized to the beat, also taking into account the time frame that is specified by the start_time_ms and end_time_ms parameters.
+    This data can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow.
+    """
+    beat_based_effect_type: Literal[
+        "breath", "soft_pulse", "strobe", "fade_in_out", "blink",
+        "blink_and_fade_out", "fade_in_and_disappear"] = Field(
+            description="The type of beat-based effect to retrieve")
+    start_time_ms: int = Field(
+        description="The start time in milliseconds for the effect", ge=0)
+    end_time_ms: int = Field(
+        description="The end time in milliseconds for the effect", ge=0)
+    bpm: int = Field(description="The beats per minute of the song", gt=0)
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False to prevent the LLM from being stuck in infinite loop")
+
+
 # Action models with specific parameter types
 class UpdateAnimationAction(BaseModel, Generic[T]):
     name: Literal["update_animation"]
@@ -103,11 +123,17 @@ class AnswerUserAction(BaseModel):
     params: AnswerUserParams
 
 
+class GenerateBeatBasedEffectAction(BaseModel):
+    name: Literal["generate_beat_based_effect"]
+    params: GenerateBeatBasedEffectParams
+
+
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
                                         QuestionAction, MemorySuggestionAction,
-                                        AnswerUserAction],
+                                        AnswerUserAction,
+                                        GenerateBeatBasedEffectAction],
                                   Field(discriminator='name')]
 
 
@@ -130,7 +156,7 @@ class MainSchema(BaseModel, Generic[T]):
         description="The single action to be executed in this turn. "
         "This field now supports both direct JSON objects and stringified JSON objects. "
         "If a string is provided, it will be parsed as JSON. "
-        "IMPORTANT: Do not include any XML-like tags (e.g., <invoke>, </invoke>) in the response. "
+        "IMPORTANT: Do NOT include any XML-like tags (e.g., <invoke>, </invoke>) in the response. "
         "The response should be pure JSON only.")
 
     @validator('action', pre=True)

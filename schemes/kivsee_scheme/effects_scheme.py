@@ -146,23 +146,25 @@ class SnakeEffectConfig(BaseModel):
 #     end: FloatFunction = Field(...,
 #                                description="Segment end position function.")
 
-# class GlitterEffectConfig(BaseModel):
-#     intensity: FloatFunction = Field(...,
-#                                      description="Glitter intensity function.")
-#     sat_mult_factor: FloatFunction = Field(
-#         ..., description="Saturation multiplier factor for glitter.")
 
-# class AlternateEffectConfig(BaseModel):
-#     numberOfPixels: int = Field(
-#         ..., description="Number of pixels for the alternate effect.")
-#     hue_offset: FloatFunction = Field(
-#         ..., description="Hue offset function for the alternate effect.")
-#     sat_mult: FloatFunction = Field(
-#         ...,
-#         description="Saturation multiplier function for the alternate effect.")
-#     brightness_mult: FloatFunction = Field(
-#         ...,
-#         description="Brightness multiplier function for the alternate effect.")
+class GlitterEffectConfig(BaseModel):
+    intensity: FloatFunction = Field(...,
+                                     description="Glitter intensity function.")
+    sat_mult_factor: FloatFunction = Field(
+        ..., description="Saturation multiplier factor for glitter.")
+
+
+class AlternateEffectConfig(BaseModel):
+    numberOfPixels: int = Field(
+        ..., description="Number of pixels for the alternate effect.")
+    hue_offset: FloatFunction = Field(
+        ..., description="Hue offset function for the alternate effect.")
+    sat_mult: FloatFunction = Field(
+        ...,
+        description="Saturation multiplier function for the alternate effect.")
+    brightness_mult: FloatFunction = Field(
+        ...,
+        description="Brightness multiplier function for the alternate effect.")
 
 
 class EffectConfig(BaseModel):
@@ -255,16 +257,16 @@ class EffectProto(BaseModel):
     #     description=
     #     "Applies an effect to a specific segment of LEDs, identified by its ID."
     # )
-    # glitter: typing.Optional[GlitterEffectConfig] = Field(
-    #     default=None,
-    #     description=
-    #     "Randomly lights up individual LEDs in a specified color, creating a glittery appearance."
-    # )
-    # alternate: typing.Optional[AlternateEffectConfig] = Field(
-    #     default=None,
-    #     description=
-    #     "The LEDs will alternate between two specified colors at a defined period."
-    # )
+    glitter: typing.Optional[GlitterEffectConfig] = Field(
+        default=None,
+        description=
+        "Randomly lights up individual LEDs in a specified color, creating a glittery appearance."
+    )
+    alternate: typing.Optional[AlternateEffectConfig] = Field(
+        default=None,
+        description=
+        "The LEDs will alternate between two specified colors at a defined period."
+    )
 
     effect_summary: str = Field(
         default="",

@@ -102,6 +102,9 @@ class AnimationManager:
         sequence, step = result
         return f"{sequence}", step
 
+    def get_sequence_by_step(self, step_number: int):
+        return self.sequence_manager.get_sequence_with_step(step_number)
+
     def get_all_sequences(self):
         return self.sequence_manager.get_all_sequences()
 
