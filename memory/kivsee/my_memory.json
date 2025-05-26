@@ -1,6 +1,4 @@
 {
-    "appealing_animation_timing": "Synchronize visual effects precisely with specific moments in music/audio to enhance impact.",
-    "appealing_animation": "Appealing animation is one that is synchronized with the music. To beats, to bars, to lyrics, to the keypoint miliseconds in the song. this is a MUST. Always aligned with something.",
     "favorite_color": "purple",
     "color_preference": "hue shift of purple and orange",
     "pastel_preference": "likes pastel colors sometimes",
@@ -18,5 +16,10 @@
     "val_brightness_explanation": "In the HSV color model, the 'val' (value) field in const_color refers to the base brightness level of the color. It determines the overall luminosity of the color, ranging from 0.0 (completely dark/black) to 1.0 (full brightness). Always keep val above 0.8 to ensure visibility.",
     "animation_motion_principle": "Just const color is boring and static, usually it's better to add motion or brightness to create more engaging visual effects.",
     "animation_complexity_principle": "To create more engaging animations, combine const color with additional layers of effects like snake, hue shifts, brightness modulation, and other dynamic elements. Layering multiple effect types adds depth, movement, and visual interest to the animation.",
-    "animation_element_variation_strategy": "Dynamic animation design principle: Strategically illuminate different elements across beats to create visual interest. In high-energy sections, implement frequent and rapid animation changes across multiple elements. For slower, more contemplative moments, transition more gradually and subtly between elements, maintaining a sense of smooth progression."
+    "animation_element_variation_strategy": "Dynamic animation design principle: Strategically illuminate different elements across beats to create visual interest. In high-energy sections, implement frequent and rapid animation changes across multiple elements. For slower, more contemplative moments, transition more gradually and subtly between elements, maintaining a sense of smooth progression.",
+    "layering_segments_technique": "Create visual depth by layering multiple effects with the same time frame but different segment targets. For example, if effect X uses 'segments: all' during [start_time_X, end_time_X], add another effect during the exact same time frame that targets a specific segment type (b1, b2, rand, etc.). The rendering system applies these sequentially, with later effects overriding the specific segments of earlier ones, creating rich visual complexity and interest.",
+    "repeat_float_function_beat_sync_formula": "To sync effects with beats for a specific duration, calculate numberOfTimes as: (duration_seconds/60) \u00d7 BPM. For example, for a 20-second segment in a 120 BPM song: (20/60) \u00d7 120 = 40 repeats.",
+    "beat_calculation_formula": "To determine how many beats occur within a specific duration: (duration_seconds/60) \u00d7 BPM. If duration is in milliseconds, convert first: (duration_ms/1000/60) \u00d7 BPM.",
+    "complete_beat_synchronization_method": "For perfect beat-synced animations, first determine the total number of beats in your animation duration, then set the repeat count to match exactly that number of beats.",
+    "half_function_blinking_technique": "Create precise beat-synchronized blinking by nesting a half function (alternating between brightness 1.0 and 0.0) inside a repeat function with numberOfTimes matching the exact beat count."
 }
