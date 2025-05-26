@@ -38,10 +38,19 @@ class SinFloatFunctionConfig(FloatFunctionTemplate):
 
 
 class StepsFloatFunctionConfig(FloatFunctionTemplate):
-    """Steps function configuration"""
-    num_steps: float = Field(description="Number of steps in the function")
-    diff_per_step: float = Field(description="Difference between each step")
-    first_step_value: float = Field(description="Value of the first step")
+    """Creates a step function that changes value at regular intervals.
+    The function starts at first_step_value and changes by diff_per_step at each step,
+    creating a sequence of constant values over the specified number of steps."""
+    first_step_value: float = Field(
+        description="The starting value of the step function")
+    diff_per_step: float = Field(
+        description=
+        "The change in value between consecutive steps. For example, 0.5 means each step increases by 0.5, while -0.5 means each step decreases by 0.5"
+    )
+    num_steps: float = Field(
+        description=
+        "The total number of constant-value segments in the function. For example, with 6 steps over 3 seconds, each step will last 0.5 seconds and change by diff_per_step"
+    )
 
 
 # Main FloatFunction class that can contain any of the above configurations
@@ -101,11 +110,21 @@ class HalfFloatFunctionConfig(FloatFunctionTemplate):
 
 
 class Comb2FloatFunctionConfig(FloatFunctionTemplate):
-    """Combine 2 functions configuration"""
-    f1: FloatFunction = Field(description="First function to combine")
-    amount1: float = Field(description="Amount of the first function")
-    f2: FloatFunction = Field(description="Second function to combine")
-    amount2: float = Field(description="Amount of the second function")
+    """Combines two float functions with weighted coefficients to create a new function.
+    The output is calculated as: output = amount1 * f1(x) + amount2 * f2(x)
+    This allows for blending or mixing of two different function behaviors."""
+    f1: FloatFunction = Field(
+        description="The first function to be combined in the weighted sum")
+    amount1: float = Field(
+        description=
+        "Weight coefficient for the first function. Determines the contribution of f1 to the final output"
+    )
+    f2: FloatFunction = Field(
+        description="The second function to be combined in the weighted sum")
+    amount2: float = Field(
+        description=
+        "Weight coefficient for the second function. Determines the contribution of f2 to the final output"
+    )
 
 
 # Update forward references - still needed for string literal type hints
