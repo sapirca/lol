@@ -11,7 +11,8 @@ def create_breath_effect_by_the_beat(
 
     repeat_num = duration_ms / beats_per_duration_ms
 
-    repeat_num_by_the_beat = repeat_num / 2
+    # Only keep 2 digits after the decimal point
+    repeat_num_by_the_beat = round(repeat_num / 2, 3)
 
     effect_config = {
         "brightness": {
@@ -35,7 +36,7 @@ def create_blink_effect_by_the_beat(
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
-    repeat_num = duration_ms / beats_per_duration_ms
+    repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
     effect_config = {
         "brightness": {
@@ -70,7 +71,7 @@ def create_blink_and_fade_out_effect_by_the_beat(
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
-    repeat_num = duration_ms / beats_per_duration_ms
+    repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
     effect_config = {
         "brightness": {
@@ -97,7 +98,7 @@ def create_fade_in_and_disappear_effect_by_the_beat(
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
-    repeat_num = duration_ms / beats_per_duration_ms
+    repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
     effect_config = {
         "brightness": {
@@ -127,7 +128,7 @@ def create_soft_pulse_effect(
     repeat_num = duration_ms / beats_per_duration_ms
     intensity_normalized = max(min(intensity, 0.0), 1.0)
     min_intensity = 1.0 - intensity_normalized
-    repeat_num_by_the_beat = repeat_num / 2
+    repeat_num_by_the_beat = round(repeat_num / 2, 3)
     effect_config = {
         "brightness": {
             "mult_factor": {
@@ -149,7 +150,7 @@ def create_strobe_effect(start_time_ms: int, end_time_ms: int,
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
-    repeat_num = duration_ms / beats_per_duration_ms
+    repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
     effect_config = {
         "brightness": {
@@ -202,7 +203,7 @@ def create_fade_in_out_effect(
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
-    repeat_num = duration_ms / beats_per_duration_ms
+    repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
     effect_config = {
         "brightness": {

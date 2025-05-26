@@ -72,7 +72,7 @@ class AnswerUserParams(BaseModel):
         description="Always False for answer_user as it's a direct response")
 
 
-class GetBeatBasedEffectsParams(BaseModel):
+class GenerateBeatBasedEffectParams(BaseModel):
     """
     This action generates the data for the BrightnessEffectConfig. The brightness effect is synchronized to the beat, also taking into account the time frame that is specified by the start_time_ms and end_time_ms parameters.
     This data can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow.
@@ -86,9 +86,9 @@ class GetBeatBasedEffectsParams(BaseModel):
     end_time_ms: int = Field(
         description="The end time in milliseconds for the effect", ge=0)
     bpm: int = Field(description="The beats per minute of the song", gt=0)
-    immediate_response: Literal[True] = Field(
+    immediate_response: Literal[False] = Field(
         description=
-        "Always True for get_beat_based_effects as it's a retrieval action")
+        "Always False to prevent the LLM from being stuck in infinite loop")
 
 
 # Action models with specific parameter types
@@ -122,9 +122,9 @@ class AnswerUserAction(BaseModel):
     params: AnswerUserParams
 
 
-class GetBeatBasedEffectsAction(BaseModel):
-    name: Literal["get_beat_based_effects"]
-    params: GetBeatBasedEffectsParams
+class GenerateBeatBasedEffectAction(BaseModel):
+    name: Literal["generate_beat_based_effect"]
+    params: GenerateBeatBasedEffectParams
 
 
 # Union type for all possible actions
@@ -132,7 +132,7 @@ ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
                                         QuestionAction, MemorySuggestionAction,
                                         AnswerUserAction,
-                                        GetBeatBasedEffectsAction],
+                                        GenerateBeatBasedEffectAction],
                                   Field(discriminator='name')]
 
 

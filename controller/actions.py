@@ -373,7 +373,7 @@ class AnswerUserAction(Action):
             return error_result
 
 
-class GetBeatBasedEffectsAction(Action):
+class GenerateBeatBasedEffectAction(Action):
     """Action for retrieving beat-based effects for a song."""
 
     def __init__(self, message_streamer):
@@ -423,13 +423,13 @@ class GetBeatBasedEffectsAction(Action):
                 effect_config = bb_effects.create_fade_in_out_effect(
                     start_time_ms, end_time_ms, bpm)
             elif effect_type == "blink":
-                effect_config = bb_effects.create_blink_effect(
+                effect_config = bb_effects.create_blink_effect_by_the_beat(
                     start_time_ms, end_time_ms, bpm)
             elif effect_type == "blink_and_fade_out":
-                effect_config = bb_effects.create_blink_and_fade_out_effect(
+                effect_config = bb_effects.create_blink_and_fade_out_effect_by_the_beat(
                     start_time_ms, end_time_ms, bpm)
             elif effect_type == "fade_in_and_disappear":
-                effect_config = bb_effects.create_fade_in_and_disappear_effect(
+                effect_config = bb_effects.create_fade_in_and_disappear_effect_by_the_beat(
                     start_time_ms, end_time_ms, bpm)
             else:
                 return {
