@@ -381,6 +381,8 @@ class GetBeatBasedEffectsAction(Action):
         self._purpose = "Get beat-based brightness effects for a given time range and BPM"
         self._requires_confirmation = False
         self._returns = {
+            "EffectConfig":
+            "The time frame of the relevant effect config",
             "BrightnessEffectConfig":
             "This is the data for the BrightnessEffectConfig. This can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow",
         }
@@ -442,6 +444,10 @@ class GetBeatBasedEffectsAction(Action):
                 f"Generated a [{effect_type} effect] for time range {start_time_ms}-{end_time_ms}ms at {bpm} BPM",
                 "requires_confirmation": False,
                 "data": {
+                    "EffectConfig": {
+                        "start_time": start_time_ms,
+                        "end_time": end_time_ms
+                    },
                     "BrightnessEffectConfig": effect_config
                 }
             }
