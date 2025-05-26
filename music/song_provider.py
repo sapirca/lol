@@ -63,7 +63,7 @@ class SongProvider:
             # Read bars file
             with open(bars_file_path, 'r') as file:
                 content += "### Bars\n"
-                content += "Label | Milliseconds  \n"
+                content += "Label | Seconds  \n"
                 content += f"A list of {song_name} bars and their corresponding start time in milliseconds:\n"
                 content += file.read() + "\n\n"
 
@@ -71,7 +71,7 @@ class SongProvider:
             with open(beats_file_path, 'r') as file:
                 content += "### Beats\n"
                 content += f"A list of {song_name} beats and their corresponding start time in milliseconds:\n"
-                content += "Label | Milliseconds  \n"
+                content += "Label | Seconds  \n"
                 content += file.read() + "\n\n"
 
             # Read info file
@@ -85,14 +85,14 @@ class SongProvider:
                 content += f"A list of {song_name} key points and their corresponding start time in milliseconds:\n"
                 content += "Aligning animation changes to the keypoints begining and ending can enhance the visual experience and create higher quality animations.\n"
                 content += "User the labels as a guide to create the animation.\n"
-                content += "Start milliseconds | End milliseconds | Label\n"
+                content += "Start Seconds | End Seconds | Label\n"
                 content += file.read() + "\n\n"
 
             with open(lyrics_file_path, 'r') as file:
                 content += "### Lyrics\n"
                 content += "The lyrics of the song, with the first number indicating the start time in milliseconds and the second number indicating the end time:\n"
                 content += "Aligning animation changes to the lyrics begining and ending can enhance the visual experience and create higher quality animations.\n"
-                content += "Start milliseconds | End milliseconds | Label\n"
+                content += "Start Seconds | End Seconds | Label\n"
                 content += file.read() + "\n\n"
 
             # with open(drums_pattern_file_path, 'r') as file:
