@@ -90,7 +90,7 @@ class Formatter:
                 messages.append({"role": role, "content": message['content']})
 
         # Save the whole prompt to a file
-        with open("prompt_with_all_messages.md", "w") as file:
+        with open("prompts/prompt_with_all_messages.md", "w") as file:
             for message in messages:
                 file.write(f"\n{'='*80}\n")
                 file.write(f"Role: {message['role']}\n\n")
