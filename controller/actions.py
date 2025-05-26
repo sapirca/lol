@@ -6,6 +6,7 @@ from animation.animation_manager import AnimationManager
 from configs.config_kivsee import config as basic_config
 from memory.memory_manager import MemoryManager
 from controller.message_streamer import TAG_SYSTEM_INTERNAL
+from music.song_provider import SongProvider
 from schemes.main_schema import MainSchema
 from animation.frameworks.kivsee.compound_effects import beat_based_effects as bb_effects
 
@@ -462,6 +463,178 @@ class GenerateBeatBasedEffectAction(Action):
                 "requires_confirmation": False
             }
             self._log_action_result("get_beat_based_effects", error_result)
+            return error_result
+
+
+class RemoveMemoryAction(Action):
+    """Action for removing a memory entry by key."""
+
+    def __init__(self, memory_manager: MemoryManager, message_streamer):
+        super().__init__(message_streamer)
+        self.memory_manager = memory_manager
+        self._purpose = "Remove a memory entry by its key"
+        self._requires_confirmation = False
+        self._returns = {
+            "key": "The key that was removed",
+            "success": "Whether the removal was successful"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return "key" in params_dict and isinstance(params_dict["key"], str)
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            key = params_dict["key"]
+
+            success = self.memory_manager.remove_from_memory(key)
+
+            if success:
+                result = {
+                    "status": "success",
+                    "message":
+                    f"Successfully removed memory entry with key: {key}",
+                    "requires_confirmation": False,
+                    "data": {
+                        "key": key,
+                        "success": True
+                    }
+                }
+            else:
+                result = {
+                    "status": "error",
+                    "message": f"No memory entry found with key: {key}",
+                    "requires_confirmation": False,
+                    "data": {
+                        "key": key,
+                        "success": False
+                    }
+                }
+
+            self._log_action_result("remove_memory", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error removing memory: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("remove_memory", error_result)
+            return error_result
+
+
+class UpdateMemoryAction(Action):
+    """Action for updating an existing memory entry or creating a new one."""
+
+    def __init__(self, memory_manager: MemoryManager, message_streamer):
+        super().__init__(message_streamer)
+        self.memory_manager = memory_manager
+        self._purpose = "Update an existing memory entry or create a new one"
+        self._requires_confirmation = False
+        self._returns = {
+            "key": "The key that was updated",
+            "value": "The new value after update",
+            "was_created": "Whether a new entry was created"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("key" in params_dict and isinstance(params_dict["key"], str)
+                and "value" in params_dict
+                and isinstance(params_dict["value"], str))
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            key = params_dict["key"]
+            value = params_dict["value"]
+
+            # Get existing value if it exists
+            was_created = self.memory_manager.read_from_memory(key) is None
+
+            self.memory_manager.write_to_memory(key, value)
+
+            result = {
+                "status": "success",
+                "message":
+                f"{'Created' if was_created else 'Updated'} memory entry with key: {key}",
+                "requires_confirmation": False,
+                "data": {
+                    "key": key,
+                    "value": value,
+                    "was_created": was_created
+                }
+            }
+
+            self._log_action_result("update_memory", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error updating memory: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("update_memory", error_result)
+            return error_result
+
+
+class GetMusicStructureAction(Action):
+    """Action for retrieving specific aspects of music structure."""
+
+    def __init__(self, song_provider: SongProvider, message_streamer):
+        super().__init__(message_streamer)
+        self.song_provider = song_provider
+        self._purpose = "Get specific aspects of music structure (lyrics, key points, drum pattern, beats/bars)"
+        self._requires_confirmation = False
+        self._returns = {
+            "structure_type": "The type of structure requested",
+            "data": "The requested music structure data"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("structure_type" in params_dict
+                and params_dict["structure_type"]
+                in ["lyrics", "key_points", "drum_pattern", "beats"])
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            structure_type = params_dict["structure_type"]
+            song_name = params_dict["song_name"]
+
+            # Get the appropriate structure data based on type
+            if structure_type == "lyrics":
+                data = self.song_provider.get_lyrics(song_name)
+            elif structure_type == "key_points":
+                data = self.song_provider.get_key_points(song_name)
+            elif structure_type == "drum_pattern":
+                data = self.song_provider.get_drum_pattern(song_name)
+            elif structure_type == "beats":
+                data = self.song_provider.get_beats(song_name)
+            else:
+                raise ValueError(f"Unknown structure type: {structure_type}")
+
+            result = {
+                "status": "success",
+                "message": f"Retrieved {structure_type} structure data",
+                "requires_confirmation": False,
+                "data": {
+                    "structure_type": structure_type,
+                    "data": data
+                }
+            }
+
+            self._log_action_result("get_music_structure", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error getting music structure: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("get_music_structure", error_result)
             return error_result
 
 

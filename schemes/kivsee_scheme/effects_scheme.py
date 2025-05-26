@@ -10,64 +10,61 @@ from pydantic import model_validator
 import typing
 
 
-class ConstValueFloatFunctionConfig(BaseModel):
-    value: float = Field(..., description="Constant float value.")
+# Base template for float function configurations - now empty as per your instruction
+class FloatFunctionTemplate(BaseModel):
+    """Base template for all float function configurations (now empty)"""
+    pass
 
 
-class LinearFloatFunctionConfig(BaseModel):
-    start: float = Field(..., description="Starting float value.")
-    end: float = Field(..., description="Ending float value.")
+# Basic float function configurations (no start_time/end_time here, they are in FloatFunction)
+class ConstValueFloatFunctionConfig(FloatFunctionTemplate):
+    """Constant value function configuration"""
+    value: float = Field(..., description="Constant float value")
 
 
-class SinFloatFunctionConfig(BaseModel):
-    min: float = Field(..., description="Minimum float value.")
-    max: float = Field(..., description="Maximum float value.")
-    phase: float = Field(..., description="Phase offset of the sine wave.")
+class LinearFloatFunctionConfig(FloatFunctionTemplate):
+    """Linear function configuration"""
+    start: float = Field(..., description="Starting float value")
+    end: float = Field(..., description="Ending float value")
+
+
+class SinFloatFunctionConfig(FloatFunctionTemplate):
+    """Sine wave function configuration"""
+    min: float = Field(..., description="Minimum float value")
+    max: float = Field(..., description="Maximum float value")
+    phase: float = Field(..., description="Phase offset of the sine wave")
     repeats: float = Field(
-        ..., description="Number of repetitions of the sine wave.")
+        ..., description="Number of repetitions of the sine wave")
 
 
-class StepsFloatFunctionConfig(BaseModel):
-    num_steps: float = Field(description="Number of steps in the function.")
-    diff_per_step: float = Field(description="Difference between each step.")
-    first_step_value: float = Field(description="Value of the first step.")
+class StepsFloatFunctionConfig(FloatFunctionTemplate):
+    """Steps function configuration"""
+    num_steps: float = Field(description="Number of steps in the function")
+    diff_per_step: float = Field(description="Difference between each step")
+    first_step_value: float = Field(description="Value of the first step")
 
 
-# class RepeatFloatFunctionConfig(BaseModel):
-#     numberOfTimes: float = Field(
-#         description="Number of times to repeat the function.")
-#     funcToRepeat: FloatFunction = Field(description="Function to repeat.")
+# Main FloatFunction class that can contain any of the above configurations
+# It no longer holds start_time and end_time
+class FloatFunction(BaseModel):  # Changed to inherit directly from BaseModel
+    """Main class for float functions that can contain any configuration type"""
+    # Removed start_time and end_time from here
 
-# class HalfFloatFunctionConfig(BaseModel):
-#     f1: "FloatFunction" = Field(default_factory=lambda: FloatFunction(),
-#                                 description="First half function.")
-#     f2: "FloatFunction" = Field(default_factory=lambda: FloatFunction(),
-#                                 description="Second half function.")
-
-# class Comb2FloatFunctionConfig(BaseModel):
-#     f1: "FloatFunction" = Field(default_factory=lambda: FloatFunction(),
-#                                 description="First function to combine.")
-#     amount1: float = Field(description="Amount of the first function.")
-#     f2: "FloatFunction" = Field(default_factory=lambda: FloatFunction(),
-#                                 description="Second function to combine.")
-#     amount2: float = Field(description="Amount of the second function.")
-
-
-class FloatFunction(BaseModel):
     const_value: typing.Optional[ConstValueFloatFunctionConfig] = Field(
-        default=None, description="Constant float function.")
+        default=None, description="Constant float function")
     linear: typing.Optional[LinearFloatFunctionConfig] = Field(
-        default=None, description="Linear float function.")
+        default=None, description="Linear float function")
     sin: typing.Optional[SinFloatFunctionConfig] = Field(
-        default=None, description="Sine wave float function.")
+        default=None, description="Sine wave float function")
     steps: typing.Optional[StepsFloatFunctionConfig] = Field(
-        default=None, description="Steps float function.")
-    # repeat: typing.Optional[RepeatFloatFunctionConfig] = Field(
-    #     description="Repeat float function.")
-    # half: typing.Optional[HalfFloatFunctionConfig] = Field(
-    #     description="Half float function.")
-    # comb2: typing.Optional[Comb2FloatFunctionConfig] = Field(
-    #     description="Combine 2 float functions.")
+        default=None, description="Steps float function")
+    # Using string literals for forward references
+    repeat: typing.Optional['RepeatFloatFunctionConfig'] = Field(
+        default=None, description="Repeat float function")
+    half: typing.Optional['HalfFloatFunctionConfig'] = Field(
+        default=None, description="Half float function")
+    comb2: typing.Optional['Comb2FloatFunctionConfig'] = Field(
+        default=None, description="Combine 2 float functions")
 
     @model_validator(mode="after")
     def check_one_of_effect(self):
@@ -76,14 +73,43 @@ class FloatFunction(BaseModel):
             self.linear,
             self.sin,
             self.steps,
-            # self.repeat,
-            # self.half,
-            # self.comb2,
+            self.repeat,
+            self.half,
+            self.comb2,
         ]
         effects_set = sum(1 for effect in effects if effect is not None)
         if effects_set != 1:
-            raise ValueError(f"all effects are {effects}.")
+            raise ValueError(
+                f"Exactly one float function type must be set. Found {effects_set} types: {[e.__class__.__name__ for e in effects if e is not None]}."
+            )
         return self
+
+
+# Composite float function configurations
+# These still inherit from FloatFunctionTemplate (now empty) and contain FloatFunction
+class RepeatFloatFunctionConfig(FloatFunctionTemplate):
+    """Repeat function configuration"""
+    numberOfTimes: float = Field(
+        description="Number of times to repeat the function")
+    funcToRepeat: FloatFunction = Field(description="Function to repeat")
+
+
+class HalfFloatFunctionConfig(FloatFunctionTemplate):
+    """Half function configuration"""
+    f1: FloatFunction = Field(description="First half function")
+    f2: FloatFunction = Field(description="Second half function")
+
+
+class Comb2FloatFunctionConfig(FloatFunctionTemplate):
+    """Combine 2 functions configuration"""
+    f1: FloatFunction = Field(description="First function to combine")
+    amount1: float = Field(description="Amount of the first function")
+    f2: FloatFunction = Field(description="Second function to combine")
+    amount2: float = Field(description="Amount of the second function")
+
+
+# Update forward references - still needed for string literal type hints
+FloatFunction.model_rebuild()
 
 
 class HSV(BaseModel):
@@ -140,33 +166,6 @@ class SnakeEffectConfig(BaseModel):
                          description="Whether the snake is cyclic.")
 
 
-# class SegmentEffectConfig(BaseModel):
-#     start: FloatFunction = Field(
-#         ..., description="Segment start position function.")
-#     end: FloatFunction = Field(...,
-#                                description="Segment end position function.")
-
-
-class GlitterEffectConfig(BaseModel):
-    intensity: FloatFunction = Field(...,
-                                     description="Glitter intensity function.")
-    sat_mult_factor: FloatFunction = Field(
-        ..., description="Saturation multiplier factor for glitter.")
-
-
-class AlternateEffectConfig(BaseModel):
-    numberOfPixels: int = Field(
-        ..., description="Number of pixels for the alternate effect.")
-    hue_offset: FloatFunction = Field(
-        ..., description="Hue offset function for the alternate effect.")
-    sat_mult: FloatFunction = Field(
-        ...,
-        description="Saturation multiplier function for the alternate effect.")
-    brightness_mult: FloatFunction = Field(
-        ...,
-        description="Brightness multiplier function for the alternate effect.")
-
-
 class EffectConfig(BaseModel):
     start_time: int = Field(
         ...,
@@ -183,13 +182,6 @@ class EffectConfig(BaseModel):
         description=
         "Specifies the segments of LEDs to which the effect will be applied. This allows targeting specific subsets of LEDs for more variety in the animation. For example, 'b1' might represent every 4th LED. The default segment is 'all', which means the effect will apply to all LEDs of the element.",
         enum=["centric", "updown", "arc", "ind", "b1", "b2", "rand", "all"])
-    # repeat_num: float = Field(
-    #     description="Number of times to repeat the effect.")
-    # repeat_start: float = Field(description="Start time of the repeat.")
-    # repeat_end: float = Field(
-    #     description=
-    #     "End time of the repeat. number bewteen 0-1. where 1 is 100% of this time, end_time, and zero is the begining of start_time."
-    # )
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>
@@ -252,21 +244,6 @@ class EffectProto(BaseModel):
         default=None,
         description=
         "A segment of lit LEDs will move along the strip, resembling a snake.")
-    # segment: typing.Optional[SegmentEffectConfig] = Field(
-    #     default=None,
-    #     description=
-    #     "Applies an effect to a specific segment of LEDs, identified by its ID."
-    # )
-    glitter: typing.Optional[GlitterEffectConfig] = Field(
-        default=None,
-        description=
-        "Randomly lights up individual LEDs in a specified color, creating a glittery appearance."
-    )
-    alternate: typing.Optional[AlternateEffectConfig] = Field(
-        default=None,
-        description=
-        "The LEDs will alternate between two specified colors at a defined period."
-    )
 
     effect_summary: str = Field(
         default="",
@@ -307,16 +284,6 @@ class KivseeSchema(BaseModel):
     Represents the full animation response, with the song name and reasoning.
     """
 
-    # instruction: str = Field(
-    #     default="",
-    #     description=
-    #     "The user instruction that the was given to the model to generate this animation response."
-    # )
-    # reasoning: str = Field(
-    #     default="",
-    #     description=
-    #     "A brief explanation of the reasoning behind the animation, or why these changes in the animation were made."
-    # )
     animation: AnimationProto = Field(default_factory=AnimationProto,
                                       description="The whole animation.")
     name: str = Field(

@@ -101,7 +101,9 @@ class Formatter:
         try:
             song_name = self.config.get("song_name")
             if song_name:
-                song_info = self.song_provider.get_song_structure(song_name)
+                # song_info = self.song_provider.get_song_structure(song_name)
+                song_info = self.song_provider.get_bars(
+                    song_name) + self.song_provider.get_beats(song_name)
                 if song_info:
                     messages.append({
                         "role":

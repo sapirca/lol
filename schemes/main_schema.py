@@ -92,6 +92,32 @@ class GenerateBeatBasedEffectParams(BaseModel):
         "Always False to prevent the LLM from being stuck in infinite loop")
 
 
+class RemoveMemoryParams(BaseModel):
+    key: str = Field(description="The key of the memory entry to remove")
+    immediate_response: Literal[False] = Field(
+        description="Always False for remove_memory as it's a direct operation"
+    )
+
+
+class UpdateMemoryParams(BaseModel):
+    key: str = Field(description="The key of the memory entry to update")
+    value: str = Field(description="The new value to set or append")
+    immediate_response: Literal[False] = Field(
+        description="Always False for update_memory as it's a direct operation"
+    )
+
+
+class GetMusicStructureParams(BaseModel):
+    structure_type: Literal[
+        "lyrics", "key_points", "drum_pattern",
+        "beats"] = Field(description="The type of music structure to retrieve")
+    song_name: str = Field(
+        description="The name of the song to get the structure for")
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False for get_music_structure as it's a direct operation")
+
+
 # Action models with specific parameter types
 class UpdateAnimationAction(BaseModel, Generic[T]):
     name: Literal["update_animation"]
@@ -128,12 +154,29 @@ class GenerateBeatBasedEffectAction(BaseModel):
     params: GenerateBeatBasedEffectParams
 
 
+class RemoveMemoryAction(BaseModel):
+    name: Literal["remove_memory"]
+    params: RemoveMemoryParams
+
+
+class UpdateMemoryAction(BaseModel):
+    name: Literal["update_memory"]
+    params: UpdateMemoryParams
+
+
+class GetMusicStructureAction(BaseModel):
+    name: Literal["get_music_structure"]
+    params: GetMusicStructureParams
+
+
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
                                         QuestionAction, MemorySuggestionAction,
                                         AnswerUserAction,
-                                        GenerateBeatBasedEffectAction],
+                                        GenerateBeatBasedEffectAction,
+                                        RemoveMemoryAction, UpdateMemoryAction,
+                                        GetMusicStructureAction],
                                   Field(discriminator='name')]
 
 
