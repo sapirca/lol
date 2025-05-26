@@ -22,11 +22,11 @@ import json
 # from configs.config_conceptual import config as basic_config
 from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
-from controller.actions import (ActionRegistry, UpdateAnimationAction,
-                                GetAnimationAction, AddToMemoryAction,
-                                QuestionAction, MemorySuggestionAction,
-                                AnswerUserAction,
-                                GenerateBeatBasedEffectAction)
+from controller.actions import (
+    ActionRegistry, UpdateAnimationAction, GetAnimationAction,
+    AddToMemoryAction, QuestionAction, MemorySuggestionAction,
+    AnswerUserAction, GenerateBeatBasedEffectAction, RemoveMemoryAction,
+    UpdateMemoryAction, GetMusicStructureAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -106,6 +106,15 @@ class LogicPlusPlus:
         self.action_registry.register_action(
             "generate_beat_based_effect",
             GenerateBeatBasedEffectAction(self.msgs))
+        self.action_registry.register_action(
+            "remove_memory", RemoveMemoryAction(self.memory_manager,
+                                                self.msgs))
+        self.action_registry.register_action(
+            "update_memory", UpdateMemoryAction(self.memory_manager,
+                                                self.msgs))
+        self.action_registry.register_action(
+            "get_music_structure",
+            GetMusicStructureAction(self.song_provider, self.msgs))
 
     def shutdown(self, requested_shutdown_snapshot_dir=None):
         if not requested_shutdown_snapshot_dir:
