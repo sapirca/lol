@@ -4,7 +4,7 @@
     "pastel_preference": "likes pastel colors sometimes",
     "animation_preferences": "likes increasing fade-in effects in animations",
     "animation_style_preferences": "- Create a surprising animation with innovative combinations of effects\n- Use varied segment patterns (b1, b2, random, centric, updown, arc, ind)\n- Implement creative snake effects with different head and tail configurations\n- Incorporate step functions for brightness and hue changes",
-    "beat_based_animation": "A reallllly good idea for animations is to sync with the beat of the music",
+    "beat_based_animation": "A really good idea for animations is to sync with the beat of the music",
     "something_must_be_lighten": "Something must be lighten, like some element or part of an element, use dark scene very sparsly, only when it's really needed in the song, like building tension. Principle: Lighten something, use dark scene very sparsly",
     "efficient_animation": "A good animation is one that is efficient and doesn't use many effedcts on the SAME element, because it has hardware limitations, so instead you can animate different elements each time and it add interests to the viewer and still be efficient",
     "words_to_colors": "Nice animation can be to convert words to colors, like when he lyrics says 'sky', use blues plattes, when it says 'sand', use yellows, etc.",
@@ -21,5 +21,6 @@
     "repeat_float_function_beat_sync_formula": "To sync effects with beats for a specific duration, calculate numberOfTimes as: (duration_seconds/60) \u00d7 BPM. For example, for a 20-second segment in a 120 BPM song: (20/60) \u00d7 120 = 40 repeats.",
     "beat_calculation_formula": "To determine how many beats occur within a specific duration: (duration_seconds/60) \u00d7 BPM. If duration is in milliseconds, convert first: (duration_ms/1000/60) \u00d7 BPM.",
     "complete_beat_synchronization_method": "For perfect beat-synced animations, first determine the total number of beats in your animation duration, then set the repeat count to match exactly that number of beats.",
-    "half_function_blinking_technique": "Create precise beat-synchronized blinking by nesting a half function (alternating between brightness 1.0 and 0.0) inside a repeat function with numberOfTimes matching the exact beat count."
+    "half_function_blinking_technique": "Create precise beat-synchronized blinking by nesting a half function (alternating between brightness 1.0 and 0.0) inside a repeat function with numberOfTimes matching the exact beat count.\nCreate precise beat-synchronized blinking by nesting a half function (alternating between brightness 1.0 and 0.0) inside a repeat function with numberOfTimes matching HALF the exact beat count. This is because each complete cycle of the half function (ON-OFF) spans two beats, so to align the ON state with each beat, use numberOfTimes = total_beats/2.",
+    "sine_wave_visibility_range": "For sine wave functions in brightness effects, use a wider range between min and max values (e.g., 0.3-1.0 instead of 0.8-1.0) to create more noticeable pulsing effects. Narrow ranges like 0.8-1.0 produce subtle changes that are barely visible to viewers."
 }
