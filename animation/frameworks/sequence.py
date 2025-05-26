@@ -20,6 +20,12 @@ class Sequence(ABC):
             return None
         return self.sequences[-1]
 
+    def get_sequence_with_step(self, step_number: int):
+        if (step_number > 0 and step_number <= len(self.sequences)):
+            return self.sequences[step_number - 1]
+        else:
+            raise ValueError(f"Step number {step_number} is out of range")
+
     def get_latest_sequence_with_step(self):
         """Returns tuple of (latest_sequence, current_step) or None if no sequence exists."""
         if not self.sequences:

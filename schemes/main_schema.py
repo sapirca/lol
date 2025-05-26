@@ -24,8 +24,9 @@ class GetAnimationParams(BaseModel):
         description=
         "The step number of the animation to retrieve. If this parameter is missing, unknown to you or invalid (< 0), do not execute this action. Instead, use AskUserAction to ask the user for a valid step number.",
         ge=0)
-    immediate_response: Literal[True] = Field(
-        description="Always True for get_animation as it's a retrieval action")
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False to prevent the LLM from being stuck in infinite loop")
 
 
 class AddToMemoryParams(BaseModel):

@@ -135,7 +135,7 @@ class UpdateAnimationAction(Action):
 
 class GetAnimationAction(Action):
 
-    def __init__(self, animation_manager, message_streamer):
+    def __init__(self, animation_manager: AnimationManager, message_streamer):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
         self._purpose = "Retrieve an existing animation sequence by step number"
@@ -152,10 +152,11 @@ class GetAnimationAction(Action):
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         params_dict = self._get_params_dict(params)
-        step_number = params_dict["step_number"]
+        step_number = int(params_dict["step_number"])
+
         try:
-            animation = self.animation_manager.sequence_manager.steps.get(
-                step_number, None)
+            animation = self.animation_manager.get_sequence_by_step(
+                step_number)
             if animation:
                 result = {
                     "status": "success",
