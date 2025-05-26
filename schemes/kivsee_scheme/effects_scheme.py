@@ -10,6 +10,10 @@ from pydantic import model_validator
 import typing
 
 
+class AbstractFloatFunctionConfig(BaseModel):
+    pass
+
+
 class ConstValueFloatFunctionConfig(BaseModel):
     value: float = Field(..., description="Constant float value.")
 

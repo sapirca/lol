@@ -117,9 +117,9 @@ def create_fade_in_and_disappear_effect_by_the_beat(
     return effect_config
 
 
-def create_soft_pulse_effect(start_time_ms: int, end_time_ms: int,
-                        intensity: float,
-                        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+def create_soft_pulse_effect(
+        start_time_ms: int, end_time_ms: int, intensity: float,
+        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
@@ -131,13 +131,12 @@ def create_soft_pulse_effect(start_time_ms: int, end_time_ms: int,
     effect_config = {
         "brightness": {
             "mult_factor": {
-                        "sin": {
-                            "min": min_intensity,
-                            "max": 1.0,
-                            "phase": 0.0,
-                            "repeats": repeat_num_by_the_beat
-                        }
-                    }
+                "sin": {
+                    "min": min_intensity,
+                    "max": 1.0,
+                    "phase": 0.0,
+                    "repeats": repeat_num_by_the_beat
+                }
             }
         }
     }
@@ -163,17 +162,17 @@ def create_strobe_effect(start_time_ms: int, end_time_ms: int,
                                 "half": {
                                     "f1": {
                                         "half": {
-                                    "f1": {
-                                        "const_value": {
-                                            "value": 1.0
+                                            "f1": {
+                                                "const_value": {
+                                                    "value": 1.0
+                                                }
+                                            },
+                                            "f2": {
+                                                "const_value": {
+                                                    "value": 0.0
+                                                }
+                                            },
                                         }
-                                    },
-                                    "f2": {
-                                        "const_value": {
-                                            "value": 0.0
-                                        }
-                                    },
-                                }   
                                     },
                                     "f2": {
                                         "const_value": {
@@ -183,7 +182,7 @@ def create_strobe_effect(start_time_ms: int, end_time_ms: int,
                                 }
                             },
                             "f2": {
-                               "const_value": {
+                                "const_value": {
                                     "value": 0.0
                                 }
                             },

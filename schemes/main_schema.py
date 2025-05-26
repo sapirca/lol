@@ -72,6 +72,25 @@ class AnswerUserParams(BaseModel):
         description="Always False for answer_user as it's a direct response")
 
 
+class GetBeatBasedEffectsParams(BaseModel):
+    """
+    This action generates the data for the BrightnessEffectConfig. The brightness effect is synchronized to the beat, also taking into account the time frame that is specified by the start_time_ms and end_time_ms parameters.
+    This data can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow.
+    """
+    beat_based_effect_type: Literal[
+        "breath", "soft_pulse", "strobe", "fade_in_out", "blink",
+        "blink_and_fade_out", "fade_in_and_disappear"] = Field(
+            description="The type of beat-based effect to retrieve")
+    start_time_ms: int = Field(
+        description="The start time in milliseconds for the effect", ge=0)
+    end_time_ms: int = Field(
+        description="The end time in milliseconds for the effect", ge=0)
+    bpm: int = Field(description="The beats per minute of the song", gt=0)
+    immediate_response: Literal[True] = Field(
+        description=
+        "Always True for get_beat_based_effects as it's a retrieval action")
+
+
 # Action models with specific parameter types
 class UpdateAnimationAction(BaseModel, Generic[T]):
     name: Literal["update_animation"]
@@ -103,11 +122,17 @@ class AnswerUserAction(BaseModel):
     params: AnswerUserParams
 
 
+class GetBeatBasedEffectsAction(BaseModel):
+    name: Literal["get_beat_based_effects"]
+    params: GetBeatBasedEffectsParams
+
+
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
                                         QuestionAction, MemorySuggestionAction,
-                                        AnswerUserAction],
+                                        AnswerUserAction,
+                                        GetBeatBasedEffectsAction],
                                   Field(discriminator='name')]
 
 
