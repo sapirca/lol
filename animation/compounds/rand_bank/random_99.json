@@ -1,0 +1,912 @@
+{
+  "ring0": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.14366680118451192,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring1": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.18212833964605038,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0.676923076923077
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring2": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.22058987810758884,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 1.353846153846154
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring3": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.25905141656912734,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 2.030769230769231
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring4": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.29751295503066577,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 2.707692307692308
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring5": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.3359744934922042,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 3.384615384615385
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring6": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.3744360319537427,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 4.061538461538462
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring7": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.41289757041528113,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 4.7384615384615385
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring8": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.4513591088768196,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 5.415384615384616
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring9": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.48982064733835806,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 6.092307692307693
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring10": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.5282821857998965,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 6.76923076923077
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring11": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.566743724261435,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 7.446153846153846
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  },
+  "ring12": {
+    "effects": [
+      {
+        "effect_config": {
+          "segments": "all",
+          "start_time": 0,
+          "end_time": 1000
+        },
+        "const_color": {
+          "color": {
+            "hue": 0.6052052627229735,
+            "sat": 1,
+            "val": 1
+          }
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "rand",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 8.123076923076924
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.3
+            }
+          },
+          "cyclic": true
+        }
+      },
+      {
+        "effect_config": {
+          "segments": "updown",
+          "start_time": 0,
+          "end_time": 1000,
+          "repeat_num": 1,
+          "repeat_start": 0,
+          "repeat_end": 1
+        },
+        "snake": {
+          "head": {
+            "steps": {
+              "num_steps": 2,
+              "diff_per_step": 0.5,
+              "first_step_value": 0
+            }
+          },
+          "tailLength": {
+            "constValue": {
+              "value": 0.1
+            }
+          },
+          "cyclic": true
+        }
+      }
+    ],
+    "duration_ms": 1000,
+    "num_repeats": 0
+  }
+}

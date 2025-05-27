@@ -169,6 +169,76 @@ class GetMusicStructureAction(BaseModel):
     params: GetMusicStructureParams
 
 
+class SaveCompoundEffectParams(BaseModel):
+    name: str = Field(description="The name of the compound effect to save")
+    effects: List[Any] = Field(
+        description=
+        "The list of EffectProto objects that make up the compound effect")
+    tags: List[str] = Field(
+        description="The tags to associate with this compound effect")
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False for save_compound_effect as it's a direct operation")
+
+
+class GetCompoundEffectParams(BaseModel):
+    name: str = Field(
+        description="The name of the compound effect to retrieve")
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False for get_compound_effect as it's a direct operation")
+
+
+class GetCompoundEffectsKeysAndTagsParams(BaseModel):
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False for get_compound_effects_keys_and_tags as it's a direct operation"
+    )
+
+
+# Action models with specific parameter types
+class SaveCompoundEffectAction(BaseModel):
+    name: Literal["save_compound_effect"]
+    params: SaveCompoundEffectParams
+
+
+class GetCompoundEffectAction(BaseModel):
+    name: Literal["get_compound_effect"]
+    params: GetCompoundEffectParams
+
+
+class GetCompoundEffectsKeysAndTagsAction(BaseModel):
+    name: Literal["get_compound_effects_keys_and_tags"]
+    params: GetCompoundEffectsKeysAndTagsParams
+
+
+class GetRandomEffectParams(BaseModel):
+    number: int = Field(
+        description="The number of the random effect to retrieve", ge=0)
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False for get_random_effect as it's a direct operation")
+
+
+class DeleteRandomEffectParams(BaseModel):
+    number: int = Field(
+        description="The number of the random effect to delete", ge=0)
+    immediate_response: Literal[False] = Field(
+        description=
+        "Always False for delete_random_effect as it's a direct operation")
+
+
+# Action models with specific parameter types
+class GetRandomEffectAction(BaseModel):
+    name: Literal["get_random_effect"]
+    params: GetRandomEffectParams
+
+
+class DeleteRandomEffectAction(BaseModel):
+    name: Literal["delete_random_effect"]
+    params: DeleteRandomEffectParams
+
+
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
@@ -176,7 +246,12 @@ ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         AnswerUserAction,
                                         GenerateBeatBasedEffectAction,
                                         RemoveMemoryAction, UpdateMemoryAction,
-                                        GetMusicStructureAction],
+                                        GetMusicStructureAction,
+                                        SaveCompoundEffectAction,
+                                        GetCompoundEffectAction,
+                                        GetCompoundEffectsKeysAndTagsAction,
+                                        GetRandomEffectAction,
+                                        DeleteRandomEffectAction],
                                   Field(discriminator='name')]
 
 

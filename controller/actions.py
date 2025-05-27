@@ -638,6 +638,261 @@ class GetMusicStructureAction(Action):
             return error_result
 
 
+class SaveCompoundEffectAction(Action):
+    """Action for saving a compound effect."""
+
+    def __init__(self, compound_effects_manager, message_streamer):
+        super().__init__(message_streamer)
+        self.compound_effects_manager = compound_effects_manager
+        self._purpose = "Save a compound effect with a name and tags"
+        self._requires_confirmation = False
+        self._returns = {
+            "name": "The name of the saved compound effect",
+            "tags": "The tags associated with the compound effect",
+            "success": "Whether the save operation was successful"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return ("name" in params_dict and isinstance(params_dict["name"], str)
+                and "effects" in params_dict
+                and isinstance(params_dict["effects"], list)
+                and "tags" in params_dict
+                and isinstance(params_dict["tags"], list))
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            name = params_dict["name"]
+            effects = params_dict["effects"]
+            tags = params_dict["tags"]
+
+            success = self.compound_effects_manager.save_compound_effect(
+                name, effects, tags)
+
+            result = {
+                "status": "success" if success else "error",
+                "message":
+                f"{'Successfully saved' if success else 'Failed to save'} compound effect '{name}'",
+                "requires_confirmation": False,
+                "data": {
+                    "name": name,
+                    "tags": tags,
+                    "success": success
+                }
+            }
+            self._log_action_result("save_compound_effect", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error saving compound effect: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("save_compound_effect", error_result)
+            return error_result
+
+
+class GetCompoundEffectAction(Action):
+    """Action for retrieving a compound effect by name."""
+
+    def __init__(self, compound_effects_manager, message_streamer):
+        super().__init__(message_streamer)
+        self.compound_effects_manager = compound_effects_manager
+        self._purpose = "Get a compound effect by its name"
+        self._requires_confirmation = False
+        self._returns = {
+            "name": "The name of the compound effect",
+            "effects": "The list of effects in the compound effect",
+            "tags": "The tags associated with the compound effect"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return "name" in params_dict and isinstance(params_dict["name"], str)
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            name = params_dict["name"]
+
+            compound_effect = self.compound_effects_manager.get_compound_effect(
+                name)
+
+            if compound_effect:
+                result = {
+                    "status": "success",
+                    "message": f"Retrieved compound effect '{name}'",
+                    "requires_confirmation": False,
+                    "data": {
+                        "name": compound_effect.name,
+                        "effects": compound_effect.effects,
+                        "tags": compound_effect.tags
+                    }
+                }
+            else:
+                result = {
+                    "status": "error",
+                    "message": f"No compound effect found with name '{name}'",
+                    "requires_confirmation": False
+                }
+
+            self._log_action_result("get_compound_effect", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error retrieving compound effect: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("get_compound_effect", error_result)
+            return error_result
+
+
+class GetCompoundEffectsKeysAndTagsAction(Action):
+    """Action for retrieving all compound effect names and their tags."""
+
+    def __init__(self, compound_effects_manager, message_streamer):
+        super().__init__(message_streamer)
+        self.compound_effects_manager = compound_effects_manager
+        self._purpose = "Get all compound effect names and their associated tags"
+        self._requires_confirmation = False
+        self._returns = {
+            "effects": "Dictionary mapping effect names to their tags"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        return True  # No parameters needed
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            effects = self.compound_effects_manager.get_all_effects_keys_and_tags(
+            )
+
+            result = {
+                "status": "success",
+                "message": f"Retrieved {len(effects)} compound effects",
+                "requires_confirmation": False,
+                "data": {
+                    "effects": effects
+                }
+            }
+            self._log_action_result("get_compound_effects_keys_and_tags",
+                                    result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error retrieving compound effects: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("get_compound_effects_keys_and_tags",
+                                    error_result)
+            return error_result
+
+
+class GetRandomEffectAction(Action):
+    """Action for retrieving a random effect from the random bank."""
+
+    def __init__(self, compound_effects_manager, message_streamer):
+        super().__init__(message_streamer)
+        self.compound_effects_manager = compound_effects_manager
+        self._purpose = "Get a random effect from the random bank by its number"
+        self._requires_confirmation = False
+        self._returns = {
+            "number": "The number of the random effect",
+            "effect": "The random effect data"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return "number" in params_dict and isinstance(params_dict["number"],
+                                                      int)
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            number = params_dict["number"]
+
+            effect = self.compound_effects_manager.get_random_effect(number)
+
+            if effect:
+                result = {
+                    "status": "success",
+                    "message": f"Retrieved random effect {number}",
+                    "requires_confirmation": False,
+                    "data": {
+                        "number": number,
+                        "effect": effect
+                    }
+                }
+            else:
+                result = {
+                    "status": "error",
+                    "message": f"No random effect found with number {number}",
+                    "requires_confirmation": False
+                }
+
+            self._log_action_result("get_random_effect", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error retrieving random effect: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("get_random_effect", error_result)
+            return error_result
+
+
+class DeleteRandomEffectAction(Action):
+    """Action for deleting a random effect from the random bank."""
+
+    def __init__(self, compound_effects_manager, message_streamer):
+        super().__init__(message_streamer)
+        self.compound_effects_manager = compound_effects_manager
+        self._purpose = "Delete a random effect from the random bank by its number"
+        self._requires_confirmation = False
+        self._returns = {
+            "number": "The number of the deleted random effect",
+            "success": "Whether the deletion was successful"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return "number" in params_dict and isinstance(params_dict["number"],
+                                                      int)
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            number = params_dict["number"]
+
+            success = self.compound_effects_manager.delete_random_effect(
+                number)
+
+            result = {
+                "status": "success" if success else "error",
+                "message":
+                f"{'Successfully deleted' if success else 'Failed to delete'} random effect {number}",
+                "requires_confirmation": False,
+                "data": {
+                    "number": number,
+                    "success": success
+                }
+            }
+            self._log_action_result("delete_random_effect", result)
+            return result
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error deleting random effect: {str(e)}",
+                "requires_confirmation": False
+            }
+            self._log_action_result("delete_random_effect", error_result)
+            return error_result
+
+
 class ActionRegistry:
 
     def __init__(self):

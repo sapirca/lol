@@ -22,11 +22,14 @@ import json
 # from configs.config_conceptual import config as basic_config
 from configs.config_kivsee import config as basic_config
 from animation.animation_manager import AnimationManager
+from animation.compound_effects_manager import CompoundEffectsManager
 from controller.actions import (
     ActionRegistry, UpdateAnimationAction, GetAnimationAction,
     AddToMemoryAction, QuestionAction, MemorySuggestionAction,
     AnswerUserAction, GenerateBeatBasedEffectAction, RemoveMemoryAction,
-    UpdateMemoryAction, GetMusicStructureAction)
+    UpdateMemoryAction, GetMusicStructureAction, SaveCompoundEffectAction,
+    GetCompoundEffectAction, GetCompoundEffectsKeysAndTagsAction,
+    GetRandomEffectAction, DeleteRandomEffectAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -67,6 +70,9 @@ class LogicPlusPlus:
             self.selected_framework = self.config.get("framework", None)
             self.animation_manager = AnimationManager(self.selected_framework,
                                                       self.msgs)
+
+        # Initialize compound effects manager
+        self.compound_effects_manager = CompoundEffectsManager()
 
         # Get the framework's schema and create the main schema
         framework_schema = self.animation_manager.get_response_object()
@@ -115,6 +121,26 @@ class LogicPlusPlus:
         self.action_registry.register_action(
             "get_music_structure",
             GetMusicStructureAction(self.song_provider, self.msgs))
+
+        # Register compound effects actions
+        self.action_registry.register_action(
+            "save_compound_effect",
+            SaveCompoundEffectAction(self.compound_effects_manager, self.msgs))
+        self.action_registry.register_action(
+            "get_compound_effect",
+            GetCompoundEffectAction(self.compound_effects_manager, self.msgs))
+        self.action_registry.register_action(
+            "get_compound_effects_keys_and_tags",
+            GetCompoundEffectsKeysAndTagsAction(self.compound_effects_manager,
+                                                self.msgs))
+
+        # Register random effect actions
+        self.action_registry.register_action(
+            "get_random_effect",
+            GetRandomEffectAction(self.compound_effects_manager, self.msgs))
+        self.action_registry.register_action(
+            "delete_random_effect",
+            DeleteRandomEffectAction(self.compound_effects_manager, self.msgs))
 
     def shutdown(self, requested_shutdown_snapshot_dir=None):
         if not requested_shutdown_snapshot_dir:

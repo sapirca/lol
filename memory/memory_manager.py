@@ -1,7 +1,8 @@
 import os
 import json
 
-MEMORY_BASE_PATH = "/Users/sapir/repos/lol/memory"
+# MEMORY_BASE_PATH = "/Users/sapir/repos/lol/memory"
+MEMORY_BASE_PATH = "./memory"
 
 
 class MemoryManager:
