@@ -155,7 +155,8 @@ class SongProvider:
         bars_file_path = os.path.join(SONGS_BASE_PATH, song_name,
                                       f"{song_name}_bars.txt")
 
-        description = f"A list of {song_name} bars and their corresponding start time in seconds:\n"
+        description = f"A list of {song_name} bars and "
+        description += "their corresponding start time in seconds:\n"
         description += "Label | Seconds\n"
 
         return self._read_file_content(bars_file_path, "Bars", description)

@@ -8,7 +8,7 @@ from memory.memory_manager import MemoryManager
 from controller.message_streamer import TAG_SYSTEM_INTERNAL
 from music.song_provider import SongProvider
 from schemes.main_schema import MainSchema
-from animation.frameworks.kivsee.compound_effects import beat_based_effects as bb_effects
+from animation.frameworks.kivsee.layers import brightness_layer as bb_effects
 
 
 class Action(ABC):
