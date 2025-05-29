@@ -7,6 +7,6 @@ config = {
     "framework": "kivsee",
     "song_name": "aladdin",
     "auto_render": True,
-    "print_internal_messages": False,
+    "print_internal_messages": True,
     "show_all_animations": False,
 }

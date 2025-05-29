@@ -4,9 +4,12 @@ from animation.frameworks.kivsee.kivsee_sequence import KivseeSequence
 import os
 from datetime import datetime
 from pathlib import Path
+import base64
+from animation.frameworks.kivsee.renderer.proto.effects_pb2 import AnimationProto
+from animation.frameworks.kivsee.renderer.proto.stats_request import RING_OBJECT_PROTO
 from constants import ANIMATION_OUT_TEMP_DIR, SNAPSHOTS_DIR
 
-from schemes.kivsee_scheme.effects_scheme import AnimationProto
+from google.protobuf.json_format import ParseDict
 
 # Kivsee-sapir IP 10.0.1.204
 # VNC?
@@ -17,6 +20,9 @@ from schemes.kivsee_scheme.effects_scheme import AnimationProto
 RASPBERRY_PI_IP = "192.168.1.12"
 SEQUENCE_URL = f"http://{RASPBERRY_PI_IP}:8082"
 TRIGGER_URL = f"http://{RASPBERRY_PI_IP}:8083"
+SIMULATION_URL = f"http://{RASPBERRY_PI_IP}:8084"
+
+PUT_ANIMATION_URL_TEMPLATE = "{SEQUENCE_URL}/triggers/{animation_name}/objects/{element_name}"
 
 # Define all possible elements. This list is used if an effect's 'elements' field is empty,
 # implying it should apply to all configured elements.
@@ -64,6 +70,126 @@ class Render:
             f.write(json.dumps(animation_payload, indent=2))
             f.write("\n" + "=" * 50 + "\n")
 
+    def store_single_animation(self, animation_name: str, element_name: str,
+                               animation_payload: dict) -> bool:
+        try:
+            url = PUT_ANIMATION_URL_TEMPLATE.format(
+                SEQUENCE_URL=SEQUENCE_URL,
+                animation_name=animation_name,
+                element_name=element_name)
+            print(
+                f"Storing animation for element: {element_name} at URL: {url}")
+
+            response = self._put_request(url, animation_payload)
+
+            response_text = f"Store animation for {element_name} response: {response.status_code}, {response.text}"
+            print(response_text)
+            # Save animation response to files
+            self._save_animation_log(self.log_dir, element_name,
+                                     animation_payload, response_text)
+
+            print(f"Successfully stored animation for element: {element_name}")
+            return True
+        except Exception as e:
+            print(f"Error storing animation for {element_name}: {str(e)}")
+            return False
+
+    def _convert_animation_to_proto(self, element_name: str,
+                                    animation_payload: dict) -> dict:
+
+        message = ParseDict(animation_payload, AnimationProto())
+        serialized_message = message.SerializeToString()
+        return serialized_message
+
+    def get_animation_proto(self, element_name: str,
+                            animation_payload: dict) -> dict:
+
+        animation_name = "conversion_path"
+        url = PUT_ANIMATION_URL_TEMPLATE.format(SEQUENCE_URL=SEQUENCE_URL,
+                                                animation_name=animation_name,
+                                                element_name=element_name)
+
+        try:
+            response = self._put_request(url, animation_payload)
+            response = requests.get(
+                url, headers={"accept": "application/x-protobuf"})
+            if response.status_code == 200:
+                return response.content
+            else:
+                print(
+                    f"Failed to get animation proto: {response.status_code}, {response.text}"
+                )
+                return None
+        except Exception as e:
+            print(f"Error getting animation proto: {str(e)}")
+            return None
+
+    CONVERSION_NAME = "name_json_to_proto"
+
+    def _get_animation_stats(self, animations_per_element: dict,
+                             start_time: int, end_time: int) -> dict:
+        all_protos = []
+        for element_name, animation_data in animations_per_element.items():
+            # proto = self.get_animation_proto(element_name, animation_data)
+            proto = self._convert_animation_to_proto(element_name,
+                                                     animation_data)
+            if proto:
+                # Create the thing entry using the template structure with hardcoded object_proto
+                thing_entry = {
+                    "thingName": element_name,
+                    "sequenceProto": base64.b64encode(proto).decode('utf-8'),
+                    "objectProto": RING_OBJECT_PROTO,
+                }
+                all_protos.append(thing_entry)
+
+        if not all_protos:
+            print("No valid protos found to analyze")
+            return None
+
+        try:
+            url = f"{SIMULATION_URL}/sequence/stats"
+            # Create the request payload using the template structure
+            request_payload = {
+                "things": all_protos,
+                "startTimeMs": start_time,
+                "endTimeMs": end_time
+            }
+
+            response = requests.post(url, json=request_payload)
+            if response.status_code == 200:
+                stats = response.json()
+                print("Animation stats:", json.dumps(stats, indent=2))
+                return stats
+            else:
+                print(
+                    f"Failed to get animation stats: {response.status_code}, {response.text}"
+                )
+                return None
+        except Exception as e:
+            print(f"Error getting animation stats: {str(e)}")
+            return None
+
+    def get_animation_stats(self,
+                            lol_animation_data: dict,
+                            start_time: int = 0,
+                            end_time: int = 100000) -> dict:
+        """
+        Wrapper method that preprocesses the animation data before getting stats.
+        
+        Args:
+            lol_animation_data (dict): The raw animation data to analyze
+            start_time (int): Start time in milliseconds for the stats analysis
+            end_time (int): End time in milliseconds for the stats analysis
+            
+        Returns:
+            dict: The animation stats or None if there was an error
+        """
+        preprocessed_animation_data = self.preprocess_animation(
+            lol_animation_data)
+        return self._get_animation_stats(
+            preprocessed_animation_data["animation_data_per_element"],
+            start_time, end_time)
+
     def store_animation(self, preprocessed_animation_data: dict):
         """
         Sends POST requests to store the animation data for each element.
@@ -80,38 +206,14 @@ class Render:
                 "No animation data generated for any element. Skipping storage."
             )
             return
-        # current_log_path = self.log_dir / f"{self.timestamp}"
-        current_log_path = self.log_dir
-        current_log_path.mkdir(exist_ok=True)
+
+        # current_log_path = self.log_dir
+        # current_log_path.mkdir(exist_ok=True)
+
         # Iterate through each element and its specific animation payload
         for element_name, animation_payload in animations_per_element.items():
-            try:
-                # Create AnimationProto for this element
-                # animation_proto = AnimationProto(**animation_payload)
-
-                # Store the animation using the same URL structure as before
-                url = f"{SEQUENCE_URL}/triggers/{animation_name}/objects/{element_name}"
-                print(
-                    f"Storing animation for element: {element_name} at URL: {url}"
-                )
-                # print(
-                #     f"Payload for {element_name}: {json.dumps(animation_payload, indent=2)}"
-                # )
-
-                response = self._put_request(url, animation_payload)
-
-                response_text = f"Store animation for {element_name} response: {response.status_code}, {response.text}"
-                print(response_text)
-                # Save animation response to files
-                self._save_animation_log(current_log_path, element_name,
-                                         animation_payload, response_text)
-
-                print(
-                    f"Successfully stored animation for element: {element_name}"
-                )
-            except Exception as e:
-                print(f"Error storing animation for {element_name}: {str(e)}")
-                continue
+            self.store_single_animation(animation_name, element_name,
+                                        animation_payload)
 
     def trigger_animation(self,
                           animation_data: dict,
@@ -204,16 +306,13 @@ class Render:
 
             return MockResponse()
 
-    def load_and_print_animation(self, playback_offest: int = 0):
-        """
-        Loads animation data from the default animation file, preprocesses it, and then renders it.
-        """
-        animation_file_path = self.sequence_manager.get_animation_filename()
+    def get_animation_data(self) -> dict:
         try:
+            animation_file_path = self.sequence_manager.get_animation_filename(
+            )
             with open(animation_file_path, 'r') as file:
                 animation_data = json.load(file)
-
-            self.render(animation_data, playback_offest)
+            return animation_data
         except FileNotFoundError:
             print(f"Error: Animation file not found at {animation_file_path}.")
             print(
@@ -223,6 +322,19 @@ class Render:
             print(f"Error decoding JSON from {animation_file_path}: {e}")
         except Exception as e:
             print(f"An unexpected error occurred while loading animation: {e}")
+
+    def load_and_get_stats(self) -> dict:
+        start_time = 0
+        end_time = 100000
+        animation_data = self.get_animation_data()
+        return self.get_animation_stats(animation_data, start_time, end_time)
+
+    def load_and_print_animation(self, playback_offest: int = 0):
+        """
+        Loads animation data from the default animation file, preprocesses it, and then renders it.
+        """
+        animation_data = self.get_animation_data()
+        self.render(animation_data, playback_offest)
 
     def load_from_snapshot(self, snapshot_dir: str, playback_offest: int = 0):
         """
@@ -366,9 +478,86 @@ class Render:
         }
 
 
+def test_stats(render):
+    animation_data = {
+        "name": "test_animation",
+        "animation_data_per_element": {
+            "ring1": {
+                "name":
+                "test_animation",
+                "duration_ms":
+                1000,
+                "num_repeats":
+                1,
+                "effects": [{
+                    "effect_config": {
+                        "start_time": 0,
+                        "end_time": 1501,
+                        "segments": "all"
+                    },
+                    "const_color": {
+                        "color": {
+                            "hue": 0.0,
+                            "sat": 1.0,
+                            "val": 1.0
+                        }
+                    }
+                }, {
+                    "effect_config": {
+                        "start_time": 1501,
+                        "end_time": 2428,
+                        "segments": "all"
+                    },
+                    "const_color": {
+                        "color": {
+                            "hue": 0.1,
+                            "sat": 1.0,
+                            "val": 1.0
+                        }
+                    }
+                }, {
+                    "effect_config": {
+                        "start_time": 81000,
+                        "end_time": 85000,
+                        "segments": "all"
+                    },
+                    "brightness": {
+                        "mult_factor": {
+                            "linear": {
+                                "start": 1.0,
+                                "end": 0.0
+                            }
+                        }
+                    }
+                }, {
+                    "effect_config": {
+                        "start_time": 81000,
+                        "end_time": 85000,
+                        "segments": "all"
+                    },
+                    "const_color": {
+                        "color": {
+                            "hue": 0.7,
+                            "sat": 0.9,
+                            "val": 1.0
+                        }
+                    }
+                }],
+            }
+        }
+    }
+    stats = render._get_animation_stats(
+        animation_data["animation_data_per_element"], 0, 1000)
+    print("Animation stats:", stats)
+
+
 def main():
     render = Render()
-    render.load_and_print_animation(playback_offest=14406)
+    # render.load_and_print_animation(playback_offest=14406)
+
+    render.load_and_get_stats()
+    # Example of getting animation stats
+    # test_stats(render)
 
 
 if __name__ == "__main__":

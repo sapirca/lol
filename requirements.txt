@@ -2,9 +2,10 @@ requests
 openai
 tiktoken
 anthropic
-# google-generativeai
-google-genai
+google-generativeai
+# google-genai
 #python>=3.9
 instructor
 # llamaapi ?
 pydantic
+protobuf

@@ -154,6 +154,9 @@ This project integrates multiple LLM backends including OpenAI's GPT, Anthropic'
    - Check the logs in the terminal for any errors.
    - Ensure the `lol_secrets.py` file is correctly configured with valid API keys.
 
+5. **Install Protobuf**:
+   pip install protobuf
+
 ---
 
 <!-- ## Additional Notes
