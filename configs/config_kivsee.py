@@ -6,7 +6,4 @@ config = {
     # "model_config": MODEL_CONFIGS["claude-3-5-haiku"],
     "framework": "kivsee",
     "song_name": "aladdin",
-    "auto_render": True,
-    "print_internal_messages": True,
-    "show_all_animations": False,
 }

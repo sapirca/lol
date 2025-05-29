@@ -116,7 +116,7 @@ class Formatter:
             print(f"Error getting song info: {e}")
 
         # Add animation sequences based on config
-        show_all = self.config.get("show_all_animations", False)
+        show_all = self.config.get("send_llm_all_animations", False)
         if show_all:
             all_sequences = self.animation_manager.get_all_sequences()
             if all_sequences:

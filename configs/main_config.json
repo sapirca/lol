@@ -1,0 +1,5 @@
+{
+    "print_internal_messages": true,
+    "auto_render": true,
+    "send_llm_all_animations": false
+}

@@ -36,6 +36,40 @@ import threading
 from schemes.system_schema import SummarizationResponse
 
 
+def load_and_merge_configs(snapshot_config_path=None):
+    """Load and merge main config with snapshot config if provided."""
+    # Load main config
+    main_config_path = os.path.join("configs", "main_config.json")
+    try:
+        with open(main_config_path, "r") as f:
+            main_config = json.load(f)
+    except Exception as e:
+        logging.error(f"Error loading main config: {e}")
+        raise RuntimeError(f"Error loading main config: {e}")
+
+    # If no snapshot config provided, return main config
+    if snapshot_config_path is None:
+        snapshot_config = basic_config
+    else:
+        try:
+            with open(snapshot_config_path, "r") as f:
+                snapshot_config = json.load(f)
+        except Exception as e:
+            logging.error(f"Error loading snapshot config: {e}")
+            raise RuntimeError(f"Error loading snapshot config: {e}")
+
+    # Check for duplicate keys
+    duplicate_keys = set(main_config.keys()) & set(snapshot_config.keys())
+    if duplicate_keys:
+        raise RuntimeError(
+            f"Duplicate keys found in configs: {duplicate_keys}. Snapshot config path: {snapshot_config_path}"
+        )
+
+    # Merge configs (snapshot config takes precedence)
+    merged_config = {**main_config, **snapshot_config}
+    return merged_config
+
+
 class LogicPlusPlus:
 
     def __init__(self, snapshot_dir=None, restart_config=None):
@@ -66,7 +100,7 @@ class LogicPlusPlus:
                     f"Failed to load snapshot from {snapshot_dir}: {e}")
         else:
             # Default initialization if no snapshot is provided
-            self.config = basic_config
+            self.config = load_and_merge_configs()
             self.selected_framework = self.config.get("framework", None)
             self.animation_manager = AnimationManager(self.selected_framework,
                                                       self.msgs)
@@ -205,6 +239,7 @@ class LogicPlusPlus:
         return chat_history
 
     def _load_from_snapshot(self, snapshot_dir):
+        """Load configuration and messages from a snapshot directory."""
         if not os.path.exists(snapshot_dir):
             raise FileNotFoundError(
                 f"Snapshot directory '{snapshot_dir}' does not exist.")
@@ -230,14 +265,9 @@ class LogicPlusPlus:
             self.logger.error(f"Error loading messages: {e}")
             raise ValueError(f"Error loading messages: {e}")
 
-        # Load configuration
+        # Load and merge configurations
         snapshot_config_file = os.path.join(snapshot_dir, CONFIG_FILE)
-        try:
-            with open(snapshot_config_file, "r") as file:
-                self.config = json.load(file)
-        except Exception as e:
-            self.logger.error(f"Error loading configuration: {e}")
-            raise ValueError(f"Error loading configuration: {e}")
+        self.config = load_and_merge_configs(snapshot_config_file)
 
         # Load animations
         self.selected_framework = self.config.get("framework", None)

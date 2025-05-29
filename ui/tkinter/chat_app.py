@@ -311,7 +311,12 @@ def run_backend_communication(user_message):
 def update_chat_window(tag, sender, message):
     """Updates the chat window with a new message."""
     append_message_to_window(sender, message, context=False, visible=True)
-    chat_window.see(tk.END)  # Make sure to scroll to bottom after each message
+    chat_window.see(tk.END)
+    # if controller and controller.config.get("print_internal_messages", False):
+    #     append_message_to_window(sender, message, True, True)
+    # else:
+    #     append_message_to_window(sender, message, True, tag
+    #                              != TAG_SYSTEM_INTERNAL)
 
 
 def enable_ui():
@@ -324,12 +329,14 @@ def enable_ui():
 
 
 def handle_auto_continue(auto_continue_value):
-    """Handles auto-continue functionality."""
+    """Handle auto-continue checkbox state change."""
     update_chat_window(get_label_tag(TYPE_SYSTEM),
                        get_sender_name(TYPE_SYSTEM),
                        "Automatically continuing conversation...")
     # Schedule the next backend communication
     thread_pool.submit(run_backend_communication, auto_continue_value)
+    # if controller and controller.config.get("auto_render", False):
+    #     restart_with_latest_sequence()
 
 
 def close_current_chat():
