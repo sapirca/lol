@@ -72,12 +72,13 @@ class AnimationManager:
         else:
             print("Replay method is not available for this framework.")
 
-    def render(self, animation_sequence):
-        if self.renderer:
-            self.renderer.render(animation_data=animation_sequence,
-                                 playback_offest=0)
-        else:
-            print("Render method is not available for this framework.")
+    def render(self, animation_data, store_animation=False):
+        """Render the animation using the current framework's renderer."""
+        if not self.renderer:
+            self.renderer = self._create_renderer()
+        return self.renderer.render(animation_data,
+                                    0,
+                                    store_animation=store_animation)
 
     def stop_rendering(self):
         if self.renderer:
@@ -96,11 +97,7 @@ class AnimationManager:
 
     def get_latest_sequence_with_step(self):
         """Returns the latest sequence and its step number."""
-        result = self.sequence_manager.get_latest_sequence_with_step()
-        if not result:
-            return None
-        sequence, step = result
-        return f"{sequence}", step
+        return self.sequence_manager.get_latest_sequence_with_step()
 
     def get_sequence_by_step(self, step_number: int):
         return self.sequence_manager.get_sequence_with_step(step_number)

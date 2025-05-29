@@ -1075,11 +1075,11 @@ def handle_stop():
     chat_window.config(state=original_state)
 
 
-def handle_render():
+def handle_render(store_animation=False):
     original_state = chat_window.cget("state")
     chat_window.config(state=tk.NORMAL)
     if controller:
-        response = controller.render()
+        response = controller.render(store_animation=store_animation)
         update_chat_window(get_label_tag(TYPE_SYSTEM),
                            get_sender_name(TYPE_SYSTEM), response)
     else:
@@ -1093,10 +1093,21 @@ def handle_render():
 stop_button = tk.Button(animation_header, text="Stop", command=handle_stop)
 stop_button.pack(side=tk.RIGHT, padx=5)
 
-render_button = tk.Button(animation_header,
-                          text="Render",
-                          command=handle_render)
+render_button = tk.Button(
+    animation_header,
+    text="Render",
+    command=lambda: handle_render(store_animation_var.get()))
 render_button.pack(side=tk.RIGHT, padx=5)
+
+# Add store animation checkbox
+store_animation_var = tk.BooleanVar(value=False)
+store_animation_checkbox = tk.Checkbutton(animation_header,
+                                          text="Store Animation",
+                                          variable=store_animation_var,
+                                          bg="#2c2c2c",
+                                          fg="#ffffff",
+                                          selectcolor="#2c2c2c")
+store_animation_checkbox.pack(side=tk.RIGHT, padx=5)
 
 # Create a scrolled text widget for the animation data
 animation_window = scrolledtext.ScrolledText(

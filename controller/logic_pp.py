@@ -398,18 +398,19 @@ class LogicPlusPlus:
                                   "Auto-continuing with action result",
                                   context=False)
 
-    def render(self):
+    def render(self, store_animation=False):
         """Render the current animation sequence."""
         try:
-            latest_sequence, latest_step = self.animation_manager.get_latest_sequence_with_step(
-            )
-            if not latest_sequence:
+            result = self.animation_manager.get_latest_sequence_with_step()
+            if not result:
                 self.logger.warning(
                     "No animation sequence available to render.")
                 return "No animation sequence available to render."
 
+            latest_sequence, latest_step = result
             animation_json = json.loads(latest_sequence)
-            self.animation_manager.render(animation_json)
+            self.animation_manager.render(animation_json,
+                                          store_animation=store_animation)
             self.logger.info(
                 f"Animation step {latest_step} rendered successfully.")
             return f"Animation step {latest_step} rendered successfully."

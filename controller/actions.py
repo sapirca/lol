@@ -90,7 +90,7 @@ class UpdateAnimationAction(Action):
             if not animation_json:
                 return "Error: No animation JSON provided for preview."
 
-            self.animation_manager.render(animation_json)
+            self.animation_manager.render(animation_json, store_animation=True)
             return "Animation preview rendered successfully."
         except Exception as e:
             return f"Error rendering animation preview: {e}"

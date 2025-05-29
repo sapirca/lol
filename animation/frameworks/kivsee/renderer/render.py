@@ -368,7 +368,10 @@ class Render:
 
         self.render(animation_data, playback_offest)
 
-    def render(self, animation_data: dict, playback_offest: int):
+    def render(self,
+               animation_data: dict,
+               playback_offest: int,
+               store_animation: bool = False):
         """
         Orchestrates the preprocessing, storing, and triggering of the animation.
         """
@@ -379,9 +382,11 @@ class Render:
         print("Rendering animation...")
         # Preprocess the animation data to group effects by element
         preprocessed_animation_data = self.preprocess_animation(animation_data)
-        self.store_animation(preprocessed_animation_data)
-        # self.trigger_animation(preprocessed_animation_data, playback_offest)
-        # animation_name = animation_data.get("name", "default_animation")
+
+        if store_animation:
+            self.store_animation(preprocessed_animation_data)
+
+        # Trigger the song immediately
         self.trigger_song(preprocessed_animation_data['name'], playback_offest)
 
     def preprocess_animation(self, input_data: dict) -> dict:
