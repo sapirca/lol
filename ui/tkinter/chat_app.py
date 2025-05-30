@@ -992,6 +992,11 @@ def reduce_tokens():
 
 def handle_confirmation(confirmed: bool):
     """Handle user confirmation of an action."""
+    pending_info = controller.action_registry.get_pending_action_info()
+    if pending_info and pending_info.get("turn") == "llm":
+        # If it's LLM's turn, set auto-continue
+        controller.msgs.set_control_flag("auto_continue", True)
+
     if confirmed:
         # Execute the pending action
         result = controller.action_registry.execute_pending_action()
@@ -1000,6 +1005,7 @@ def handle_confirmation(confirmed: bool):
             update_chat_window(
                 get_label_tag(TYPE_SYSTEM), get_sender_name(TYPE_SYSTEM),
                 f"Executing action: {result.get('message', '')}")
+            handle_auto_continue("")
     else:
         # Cancel the pending action
         controller.action_registry.cancel_pending_action()
@@ -1013,8 +1019,6 @@ def handle_confirmation(confirmed: bool):
     update_animation_data()
     # Re-enable the UI
     enable_ui()
-    controller.msgs.set_control_flag("auto_continue", True)
-    handle_auto_continue("remove this parameter")
 
 
 # Create the main window

@@ -928,11 +928,9 @@ class ActionRegistry:
 
         params_dict = action._get_params_dict(self._pending_params)
         return {
-            "action_name":
-            self._pending_action,
-            "confirmation_type":
-            params_dict.get("confirmation_type",
-                            ConfirmationType.ASK_EVERY_TIME)
+            "action_name": self._pending_action,
+            "turn": params_dict.get("turn"),
+            "confirmation_type": params_dict.get("confirmation_type")
         }
 
     def execute_pending_action(self):
