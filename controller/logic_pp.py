@@ -343,10 +343,24 @@ class LogicPlusPlus:
 
     def _communicate_internal(self, user_input):
         """Internal communication method that contains the original communicate logic."""
-        # if self._pending_memory:
-        #     result = self.handle_memory_approval(user_input)
-        #     self.msgs.add_visible(TAG_SYSTEM, result, context=False)
-        #     return
+        # Check if we're auto-continuing with an action result
+        control_flags = self.msgs.get_and_clear_control_flags()
+        if control_flags.get("auto_continue"):
+            # Get the last action result and add it to messages
+            last_result = self.action_registry.get_last_action_result()
+            if last_result and "data" in last_result:
+                self.msgs.add_invisible(
+                    TAG_ACTION_RESULTS,
+                    "Here's the action result:\n " +
+                    json.dumps(last_result["data"], indent=2),
+                    context=True)
+                self.msgs.add_invisible(
+                    TAG_ACTION_RESULTS,
+                    "Please process the action result and continue.",
+                    context=True)
+                self.msgs.add_visible(TAG_SYSTEM,
+                                      "Processing action result...",
+                                      context=False)
 
         backend = self.select_backend()
         messages = self.formatter.build_messages()
@@ -362,10 +376,6 @@ class LogicPlusPlus:
         response_message = ""
         action_tag = f"[Action: \"{model_response.action.name}\"]: "
         response_message += action_tag + model_response.reasoning
-        # if model_response.action:
-        #     response_message += "\n\nI will execute action:\n" + model_response.action.name
-        # else:
-        #     response_message += "\n\nNo action to execute.\n"
 
         # Execute single action for this turn and handle its result
         result = self.action_registry.execute_action(
@@ -387,22 +397,13 @@ class LogicPlusPlus:
                                   response_message,
                                   context=True)
 
-        # If there's data in the result, send it back to LLM for processing
-        if "data" in result:
-            self.msgs.add_invisible(TAG_ACTION_RESULTS,
-                                    json.dumps(result["data"], indent=2),
-                                    context=True)
-        # Check if immediate response is needed for this action type
-        params_dict = model_response.action.params.model_dump() if hasattr(
-            model_response.action.params,
-            'model_dump') else model_response.action.params
-
-        if params_dict.get("immediate_response", False):
-            self.msgs.set_control_flag("auto_continue",
-                                       json.dumps(result, indent=2))
-            self.msgs.add_visible(TAG_SYSTEM,
-                                  "Auto-continuing with action result",
-                                  context=False)
+            # If there's data in the result, send it back to LLM for processing
+            if "data" in result:
+                self.msgs.add_invisible(TAG_ACTION_RESULTS,
+                                        json.dumps(result["data"], indent=2),
+                                        context=True)
+                # # Set auto-continue flag to process the result
+                # self.msgs.set_control_flag("auto_continue", True)
 
     def render(self, store_animation=False):
         """Render the current animation sequence."""

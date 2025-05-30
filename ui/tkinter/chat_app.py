@@ -319,26 +319,9 @@ def send_message(event=None):
 def run_backend_communication(user_message):
     """Runs the backend communication in a separate thread."""
     try:
-        # Send message to backend
         controller.communicate(user_message)
-
         refresh()
-
-        # Get any control flags
-        control_flags = controller.msgs.get_and_clear_control_flags()
-
-        # Handle control flags
-        if control_flags.get("auto_continue"):
-            auto_continue_value = control_flags["auto_continue"]
-            root.after(0, lambda: handle_auto_continue(auto_continue_value))
-        elif control_flags.get("wait_for_approval"):
-            # UI is already showing the approval message from messages
-            pass
-        else:
-            # If no special flags, just enable the UI
-            root.after(0, enable_ui)
-
-        # Update animation data after processing all messages
+        root.after(0, enable_ui)
         root.after(0, update_animation_data)
 
     except Exception as e:
@@ -1030,6 +1013,8 @@ def handle_confirmation(confirmed: bool):
     update_animation_data()
     # Re-enable the UI
     enable_ui()
+    controller.msgs.set_control_flag("auto_continue", True)
+    handle_auto_continue("remove this parameter")
 
 
 # Create the main window

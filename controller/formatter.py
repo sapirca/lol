@@ -83,20 +83,6 @@ class Formatter:
                 "content": f"# Your Memory: {memory}"
             })
 
-        # Add message history
-        for message in self.message_streamer.messages:
-            if message['context']:
-                role = self._determine_role(message['tag'])
-                messages.append({"role": role, "content": message['content']})
-
-        # Save the whole prompt to a file
-        # with open("prompts/prompt_with_all_messages.md", "w") as file:
-        #     for message in messages:
-        #         file.write(f"\n{'='*80}\n")
-        #         file.write(f"Role: {message['role']}\n\n")
-        #         file.write(f"{message['content']}\n")
-
-        # Add song info if available
         try:
             song_name = self.config.get("song_name")
             if song_name:
@@ -143,6 +129,12 @@ class Formatter:
                     "content":
                     "# Latest Animation Sequence:\nNo animation sequences have been generated yet."
                 })
+
+        # Add message history
+        for message in self.message_streamer.messages:
+            if message['context']:
+                role = self._determine_role(message['tag'])
+                messages.append({"role": role, "content": message['content']})
 
         # Save the whole prompt to a file
         with open("prompts/prompt_with_all_messages_music_and_animation.md",
@@ -198,7 +190,7 @@ IMPORTANT: Do not include any animation code in your response. Only describe the
             'user_input': 'user',
             'assistant': 'assistant',
             'system': 'system',
-            'action_results': 'system',
+            'action_results': 'user',  # TODO(Sapir): Change to system ?
             'initial_prompt_context': 'system'
         }
         return role_mapping.get(tag, 'system')
