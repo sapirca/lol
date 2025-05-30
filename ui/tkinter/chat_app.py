@@ -179,6 +179,47 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context,
     chat_window.insert(tk.END, message[last_end:], message_tag)
     chat_window.insert(tk.END, "\n\n")
 
+    # Add confirmation buttons if this is an assistant message that requires confirmation
+    if type_name == TYPE_ASSISTANT and controller and controller.action_registry:
+        # Check for pending action instead of last action result
+        pending_info = controller.action_registry.get_pending_action_info()
+        if pending_info and pending_info[
+                "confirmation_type"] != "no-action-required":
+            # Create a frame for the buttons
+            button_frame = tk.Frame(chat_window, bg="#2c2c2c")
+            chat_window.window_create(tk.END, window=button_frame)
+
+            # Create the OK button
+            ok_button = tk.Button(
+                button_frame,
+                text="Run",
+                command=lambda: handle_confirmation(True),
+                bg="#4CAF50",  # Green color
+                fg="white",
+                font=(CHAT_FONT, 12),
+                padx=10,
+                pady=5,
+                relief=tk.RAISED,
+                borderwidth=2)
+            ok_button.pack(side=tk.LEFT, padx=5)
+
+            # Create the No button
+            no_button = tk.Button(
+                button_frame,
+                text="Cancel",
+                command=lambda: handle_confirmation(False),
+                bg="#f44336",  # Red color
+                fg="white",
+                font=(CHAT_FONT, 12),
+                padx=10,
+                pady=5,
+                relief=tk.RAISED,
+                borderwidth=2)
+            no_button.pack(side=tk.LEFT, padx=5)
+
+            # Add a separator line
+            chat_window.insert(tk.END, "\n" + "─" * 50 + "\n\n")
+
     # Automatically scroll to the bottom
     chat_window.see(tk.END)
 
@@ -964,6 +1005,31 @@ def reduce_tokens():
         chat_window.config(state=tk.DISABLED)
         enable_ui()
         reduce_tokens_button.config(state=tk.NORMAL)
+
+
+def handle_confirmation(confirmed: bool):
+    """Handle user confirmation of an action."""
+    if confirmed:
+        # Execute the pending action
+        result = controller.action_registry.execute_pending_action()
+        if result:
+            # Add a system message about the action being executed
+            update_chat_window(
+                get_label_tag(TYPE_SYSTEM), get_sender_name(TYPE_SYSTEM),
+                f"Executing action: {result.get('message', '')}")
+    else:
+        # Cancel the pending action
+        controller.action_registry.cancel_pending_action()
+        # Add a system message about the action being cancelled
+        update_chat_window(get_label_tag(TYPE_SYSTEM),
+                           get_sender_name(TYPE_SYSTEM),
+                           "Action cancelled by user")
+
+    # Refresh the UI and update animation data
+    refresh()
+    update_animation_data()
+    # Re-enable the UI
+    enable_ui()
 
 
 # Create the main window

@@ -90,14 +90,13 @@ class Formatter:
                 messages.append({"role": role, "content": message['content']})
 
         # Save the whole prompt to a file
-        with open("prompts/prompt_with_all_messages.md", "w") as file:
-            for message in messages:
-                file.write(f"\n{'='*80}\n")
-                file.write(f"Role: {message['role']}\n\n")
-                file.write(f"{message['content']}\n")
+        # with open("prompts/prompt_with_all_messages.md", "w") as file:
+        #     for message in messages:
+        #         file.write(f"\n{'='*80}\n")
+        #         file.write(f"Role: {message['role']}\n\n")
+        #         file.write(f"{message['content']}\n")
 
-
-# Add song info if available
+        # Add song info if available
         try:
             song_name = self.config.get("song_name")
             if song_name:
@@ -137,6 +136,21 @@ class Formatter:
                     "content":
                     f"# Latest Animation Sequence:\n Make sure to maintain a consistent animation, only change the part of animation that the user asked for. In case of doubt, ask the user for clarification.\n{latest_sequence}"
                 })
+            else:
+                messages.append({
+                    "role":
+                    "system",
+                    "content":
+                    "# Latest Animation Sequence:\nNo animation sequences have been generated yet."
+                })
+
+        # Save the whole prompt to a file
+        with open("prompts/prompt_with_all_messages_music_and_animation.md",
+                  "w") as file:
+            for message in messages:
+                file.write(f"\n{'='*80}\n")
+                file.write(f"Role: {message['role']}\n\n")
+                file.write(f"{message['content']}\n")
 
         return messages
 

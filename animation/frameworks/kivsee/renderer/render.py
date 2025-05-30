@@ -483,77 +483,77 @@ class Render:
         }
 
 
-def test_stats(render):
-    animation_data = {
-        "name": "test_animation",
-        "animation_data_per_element": {
-            "ring1": {
-                "name":
-                "test_animation",
-                "duration_ms":
-                1000,
-                "num_repeats":
-                1,
-                "effects": [{
-                    "effect_config": {
-                        "start_time": 0,
-                        "end_time": 1501,
-                        "segments": "all"
-                    },
-                    "const_color": {
-                        "color": {
-                            "hue": 0.0,
-                            "sat": 1.0,
-                            "val": 1.0
-                        }
-                    }
-                }, {
-                    "effect_config": {
-                        "start_time": 1501,
-                        "end_time": 2428,
-                        "segments": "all"
-                    },
-                    "const_color": {
-                        "color": {
-                            "hue": 0.1,
-                            "sat": 1.0,
-                            "val": 1.0
-                        }
-                    }
-                }, {
-                    "effect_config": {
-                        "start_time": 81000,
-                        "end_time": 85000,
-                        "segments": "all"
-                    },
-                    "brightness": {
-                        "mult_factor": {
-                            "linear": {
-                                "start": 1.0,
-                                "end": 0.0
-                            }
-                        }
-                    }
-                }, {
-                    "effect_config": {
-                        "start_time": 81000,
-                        "end_time": 85000,
-                        "segments": "all"
-                    },
-                    "const_color": {
-                        "color": {
-                            "hue": 0.7,
-                            "sat": 0.9,
-                            "val": 1.0
-                        }
-                    }
-                }],
-            }
-        }
-    }
-    stats = render._get_animation_stats(
-        animation_data["animation_data_per_element"], 0, 1000)
-    print("Animation stats:", stats)
+# def test_stats(render):
+#     animation_data = {
+#         "name": "test_animation",
+#         "animation_data_per_element": {
+#             "ring1": {
+#                 "name":
+#                 "test_animation",
+#                 "duration_ms":
+#                 1000,
+#                 "num_repeats":
+#                 1,
+#                 "effects": [{
+#                     "effect_config": {
+#                         "start_time": 0,
+#                         "end_time": 1501,
+#                         "segments": "all"
+#                     },
+#                     "const_color": {
+#                         "color": {
+#                             "hue": 0.0,
+#                             "sat": 1.0,
+#                             "val": 1.0
+#                         }
+#                     }
+#                 }, {
+#                     "effect_config": {
+#                         "start_time": 1501,
+#                         "end_time": 2428,
+#                         "segments": "all"
+#                     },
+#                     "const_color": {
+#                         "color": {
+#                             "hue": 0.1,
+#                             "sat": 1.0,
+#                             "val": 1.0
+#                         }
+#                     }
+#                 }, {
+#                     "effect_config": {
+#                         "start_time": 81000,
+#                         "end_time": 85000,
+#                         "segments": "all"
+#                     },
+#                     "brightness": {
+#                         "mult_factor": {
+#                             "linear": {
+#                                 "start": 1.0,
+#                                 "end": 0.0
+#                             }
+#                         }
+#                     }
+#                 }, {
+#                     "effect_config": {
+#                         "start_time": 81000,
+#                         "end_time": 85000,
+#                         "segments": "all"
+#                     },
+#                     "const_color": {
+#                         "color": {
+#                             "hue": 0.7,
+#                             "sat": 0.9,
+#                             "val": 1.0
+#                         }
+#                     }
+#                 }],
+#             }
+#         }
+#     }
+#     stats = render._get_animation_stats(
+#         animation_data["animation_data_per_element"], 0, 1000)
+#     print("Animation stats:", stats)
 
 
 def main():

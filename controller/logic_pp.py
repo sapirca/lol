@@ -367,18 +367,24 @@ class LogicPlusPlus:
         # else:
         #     response_message += "\n\nNo action to execute.\n"
 
-        self.msgs.add_visible(TAG_ASSISTANT, response_message, context=True)
-
         # Execute single action for this turn and handle its result
         result = self.action_registry.execute_action(
             model_response.action.name, model_response.action.params)
 
         if result["status"] == "error":
-            error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
-            self.msgs.add_visible(TAG_SYSTEM, error_msg, context=True)
-        else:
             self.msgs.add_visible(TAG_ASSISTANT,
-                                  result.get("message", "No message? Debug!"),
+                                  response_message,
+                                  context=True)
+            error_msg = f"Error executing action {model_response.action.name}: {result['message']}"
+            self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
+            self.msgs.add_visible(TAG_SYSTEM_INTERNAL,
+                                  error_msg + "\n Consider trying again.",
+                                  context=True)
+        else:
+            response_message += "\n\n" + result.get("message",
+                                                    "No message? Debug!")
+            self.msgs.add_visible(TAG_ASSISTANT,
+                                  response_message,
                                   context=True)
 
         # If there's data in the result, send it back to LLM for processing

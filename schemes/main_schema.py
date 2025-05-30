@@ -3,39 +3,57 @@ from typing import List, Literal, Union, Optional, Dict, Any, Annotated, TypeVar
 from typing_extensions import TypeAlias
 import json  # Import the json module
 import re  # Import regex module
+from enum import Enum
 
 # Generic type for framework-specific animation schema
 T = TypeVar('T', bound=BaseModel)
 
 
+class ConfirmationType(str, Enum):
+    ASK_EVERY_TIME = "ask-every-time"
+    AUTO_RUN = "auto-run"
+    NO_ACTION_REQUIRED = "no-action-required"
+
+
+class BaseActionParams(BaseModel):
+    confirmation_type: ConfirmationType = Field(
+        description=
+        "How this action should be handled regarding user confirmation. "
+        "ask-every-time: Always ask for confirmation, "
+        "auto-run: Run automatically but still refresh UI, "
+        "no-action-required: No confirmation needed (for informational actions)"
+    )
+
+    @validator('confirmation_type', pre=True)
+    def convert_confirmation_type(cls, v):
+        if isinstance(v, str):
+            try:
+                return ConfirmationType(v)
+            except ValueError:
+                raise ValueError(
+                    f"Invalid confirmation type: {v}. Must be one of {[e.value for e in ConfirmationType]}"
+                )
+        return v
+
+    class Config:
+        use_enum_values = True
+
+
 # Action parameter models
-class UpdateAnimationParams(BaseModel, Generic[T]):
+class UpdateAnimationParams(BaseActionParams, Generic[T]):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
     animation_sequence: T = Field(
         description=
         "The animation data to be processed - will be validated against framework-specific schema."
     )
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for update_animation as it requires user confirmation")
 
 
-class GetAnimationParams(BaseModel):
+class GetAnimationParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.AUTO_RUN
     step_number: int = Field(
         description=
         "The step number of the animation to retrieve. If this parameter is missing, unknown to you or invalid (< 0), do not execute this action. Instead, use AskUserAction to ask the user for a valid step number.",
         ge=0)
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False to prevent the LLM from being stuck in infinite loop")
-
-
-class AddToMemoryParams(BaseModel):
-    key: str = Field(
-        description="The key under which to store the memory value")
-    value: str = Field(description="The value to store in memory")
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for add_to_memory as it requires user confirmation")
 
 
 # class InformUserParams(BaseModel):
@@ -49,35 +67,27 @@ class AddToMemoryParams(BaseModel):
 #         "Always False for inform_user as it's a one-way communication")
 
 
-class QuestionParams(BaseModel):
+class QuestionParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
     message: str = Field(
         description="The question or clarification request for the user")
     is_clarification: bool = Field(
         description=
         "Whether this is a clarification request (True) or a new question (False)",
         default=False)
-    immediate_response: Literal[False] = Field(
-        description="Always False for questions as they require user response")
 
 
-class MemorySuggestionParams(BaseModel):
-    message: str = Field(description="The memory suggestion for the user")
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for memory suggestion as it requires user response")
-
-
-class AnswerUserParams(BaseModel):
+class AnswerUserParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
     message: str = Field(description="The answer to the user's question")
-    immediate_response: Literal[False] = Field(
-        description="Always False for answer_user as it's a direct response")
 
 
-class GenerateBeatBasedEffectParams(BaseModel):
+class GenerateBeatBasedEffectParams(BaseActionParams):
     """
     This action generates the data for the BrightnessEffectConfig. The brightness effect is synchronized to the beat, also taking into account the time frame that is specified by the start_time_ms and end_time_ms parameters.
     This data can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow.
     """
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
     beat_based_effect_type: Literal[
         "breath", "soft_pulse", "strobe", "fade_in_out", "blink",
         "blink_and_fade_out", "fade_in_and_disappear"] = Field(
@@ -87,35 +97,38 @@ class GenerateBeatBasedEffectParams(BaseModel):
     end_time_ms: int = Field(
         description="The end time in milliseconds for the effect", ge=0)
     bpm: int = Field(description="The beats per minute of the song", gt=0)
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False to prevent the LLM from being stuck in infinite loop")
 
 
-class RemoveMemoryParams(BaseModel):
+class MemorySuggestionParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
+    message: str = Field(description="The memory suggestion for the user")
+
+
+class AddToMemoryParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
+    key: str = Field(
+        description="The key under which to store the memory value")
+    value: str = Field(description="The value to store in memory")
+
+
+class RemoveMemoryParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
     key: str = Field(description="The key of the memory entry to remove")
-    immediate_response: Literal[False] = Field(
-        description="Always False for remove_memory as it's a direct operation"
-    )
 
 
-class UpdateMemoryParams(BaseModel):
+class UpdateMemoryParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
     key: str = Field(description="The key of the memory entry to update")
     value: str = Field(description="The new value to set or append")
-    immediate_response: Literal[False] = Field(
-        description="Always False for update_memory as it's a direct operation"
-    )
 
 
-class GetMusicStructureParams(BaseModel):
+class GetMusicStructureParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
     structure_type: Literal[
         "lyrics", "key_points", "drum_pattern",
         "beats"] = Field(description="The type of music structure to retrieve")
     song_name: str = Field(
         description="The name of the song to get the structure for")
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for get_music_structure as it's a direct operation")
 
 
 # Action models with specific parameter types
@@ -124,14 +137,49 @@ class UpdateAnimationAction(BaseModel, Generic[T]):
     params: UpdateAnimationParams[T]
 
 
+class SaveCompoundEffectParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
+    name: str = Field(description="The name of the compound effect to save")
+    effects: List[Any] = Field(
+        description=
+        "The list of EffectProto objects that make up the compound effect")
+    tags: List[str] = Field(
+        description="The tags to associate with this compound effect")
+
+
+class GetCompoundEffectParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
+    name: str = Field(
+        description="The name of the compound effect to retrieve")
+
+
+class GetCompoundEffectsKeysAndTagsParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
+
+
+# // Random effects
+class GetRandomEffectParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
+    number: int = Field(
+        description="The number of the random effect to retrieve", ge=0)
+
+
+class DeleteRandomEffectParams(BaseActionParams):
+    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
+    number: int = Field(
+        description="The number of the random effect to delete", ge=0)
+
+
+# Animation Actions
 class GetAnimationAction(BaseModel):
     name: Literal["get_animation"]
     params: GetAnimationParams
 
 
-class AddToMemoryAction(BaseModel):
-    name: Literal["add_to_memory"]
-    params: AddToMemoryParams
+# General Actions
+class AnswerUserAction(BaseModel):
+    name: Literal["answer_user"]
+    params: AnswerUserParams
 
 
 class QuestionAction(BaseModel):
@@ -139,19 +187,10 @@ class QuestionAction(BaseModel):
     params: QuestionParams
 
 
-class MemorySuggestionAction(BaseModel):
-    name: Literal["memory_suggestion"]
-    params: MemorySuggestionParams
-
-
-class AnswerUserAction(BaseModel):
-    name: Literal["answer_user"]
-    params: AnswerUserParams
-
-
-class GenerateBeatBasedEffectAction(BaseModel):
-    name: Literal["generate_beat_based_effect"]
-    params: GenerateBeatBasedEffectParams
+#  Memory Actions
+class AddToMemoryAction(BaseModel):
+    name: Literal["add_to_memory"]
+    params: AddToMemoryParams
 
 
 class RemoveMemoryAction(BaseModel):
@@ -164,39 +203,26 @@ class UpdateMemoryAction(BaseModel):
     params: UpdateMemoryParams
 
 
+class MemorySuggestionAction(BaseModel):
+    name: Literal["memory_suggestion"]
+    params: MemorySuggestionParams
+
+
+# // Music Retrieval (by type: lyrics, key-points, beats…)
 class GetMusicStructureAction(BaseModel):
     name: Literal["get_music_structure"]
     params: GetMusicStructureParams
 
 
-class SaveCompoundEffectParams(BaseModel):
-    name: str = Field(description="The name of the compound effect to save")
-    effects: List[Any] = Field(
-        description=
-        "The list of EffectProto objects that make up the compound effect")
-    tags: List[str] = Field(
-        description="The tags to associate with this compound effect")
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for save_compound_effect as it's a direct operation")
+# // Abstract Animation
+class GenerateBeatBasedEffectAction(BaseModel):
+    name: Literal["generate_beat_based_effect"]
+    params: GenerateBeatBasedEffectParams
 
 
-class GetCompoundEffectParams(BaseModel):
-    name: str = Field(
-        description="The name of the compound effect to retrieve")
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for get_compound_effect as it's a direct operation")
+# // Compound Effects
 
 
-class GetCompoundEffectsKeysAndTagsParams(BaseModel):
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for get_compound_effects_keys_and_tags as it's a direct operation"
-    )
-
-
-# Action models with specific parameter types
 class SaveCompoundEffectAction(BaseModel):
     name: Literal["save_compound_effect"]
     params: SaveCompoundEffectParams
@@ -210,22 +236,6 @@ class GetCompoundEffectAction(BaseModel):
 class GetCompoundEffectsKeysAndTagsAction(BaseModel):
     name: Literal["get_compound_effects_keys_and_tags"]
     params: GetCompoundEffectsKeysAndTagsParams
-
-
-class GetRandomEffectParams(BaseModel):
-    number: int = Field(
-        description="The number of the random effect to retrieve", ge=0)
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for get_random_effect as it's a direct operation")
-
-
-class DeleteRandomEffectParams(BaseModel):
-    number: int = Field(
-        description="The number of the random effect to delete", ge=0)
-    immediate_response: Literal[False] = Field(
-        description=
-        "Always False for delete_random_effect as it's a direct operation")
 
 
 # Action models with specific parameter types

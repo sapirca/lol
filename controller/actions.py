@@ -7,7 +7,7 @@ from configs.config_kivsee import config as basic_config
 from memory.memory_manager import MemoryManager
 from controller.message_streamer import TAG_SYSTEM_INTERNAL
 from music.song_provider import SongProvider
-from schemes.main_schema import MainSchema
+from schemes.main_schema import MainSchema, ConfirmationType
 from animation.frameworks.kivsee.layers import brightness_layer as bb_effects
 
 
@@ -18,7 +18,7 @@ class Action(ABC):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.message_streamer = message_streamer
         self._purpose = "No purpose specified"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {}
 
     @property
@@ -27,9 +27,9 @@ class Action(ABC):
         return self._purpose
 
     @property
-    def requires_confirmation(self) -> bool:
-        """Get whether this action requires confirmation."""
-        return self._requires_confirmation
+    def confirmation_type(self) -> ConfirmationType:
+        """Get the confirmation type for this action."""
+        return self._confirmation_type
 
     @property
     def returns(self) -> Dict[str, str]:
@@ -68,7 +68,6 @@ class UpdateAnimationAction(Action):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
         self._purpose = "Create or update an animation sequence. This action will add the animation to the sequence manager."
-        self._requires_confirmation = True
         self._returns = {
             # "step_number":
             # "The step number that will be assigned if confirmed",
@@ -108,7 +107,7 @@ class UpdateAnimationAction(Action):
             result = {
                 "status": "success",
                 "message": result_message,
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 # "data": {
                 #     "step_number": current_steps_count
                 # }
@@ -128,7 +127,7 @@ class UpdateAnimationAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error adding animation sequence: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("update_animation", error_result)
             return error_result
@@ -140,7 +139,7 @@ class GetAnimationAction(Action):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
         self._purpose = "Retrieve an existing animation sequence by step number"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "step_number": "The requested step number",
             "animation": "The animation sequence data"
@@ -162,7 +161,7 @@ class GetAnimationAction(Action):
                 result = {
                     "status": "success",
                     "message": f"Retrieved animation for step {step_number}",
-                    "requires_confirmation": False,
+                    "confirmation_type": params_dict["confirmation_type"],
                     "data": {
                         "step_number": step_number,
                         "animation": animation
@@ -172,7 +171,7 @@ class GetAnimationAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No animation found for step {step_number}",
-                    "requires_confirmation": False
+                    "confirmation_type": params_dict["confirmation_type"]
                 }
             self._log_action_result("get_animation", result)
             return result
@@ -180,7 +179,7 @@ class GetAnimationAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving animation: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("get_animation", error_result)
             return error_result
@@ -192,7 +191,7 @@ class AddToMemoryAction(Action):
         super().__init__(message_streamer)
         self.memory_manager = memory_manager
         self._purpose = "Add information to the system's memory"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "key": "The key under which the value was stored",
             "value": "The value that was stored"
@@ -215,7 +214,7 @@ class AddToMemoryAction(Action):
             result = {
                 "status": "success",
                 "message": f"Memory saved:\n {{\"{key}\": \"{value}\"}}",
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 "data": {
                     "key": key,
                     "value": value
@@ -227,7 +226,7 @@ class AddToMemoryAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error adding to memory: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("add_to_memory", error_result)
             return error_result
@@ -249,14 +248,14 @@ class ClarificationAction(Action):
             return {
                 "status": "success",
                 "message": params_dict["message"],
-                "requires_confirmation": True,  # Always requires user response
+                "confirmation_type": self.confirmation_type,
                 "message_type": "clarification"
             }
         except Exception as e:
             return {
                 "status": "error",
                 "message": f"Error processing clarification action: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": self.confirmation_type
             }
 
 
@@ -265,7 +264,7 @@ class QuestionAction(Action):
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
         self._purpose = "Ask a question to the user"
-        self._requires_confirmation = True
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             # "question": "The question that was asked",
             # "is_clarification": "Whether this is a clarification question"
@@ -284,7 +283,7 @@ class QuestionAction(Action):
             result = {
                 "status": "success",
                 "message": params_dict["message"],
-                "requires_confirmation": True,  # Always requires user response
+                "confirmation_type": params_dict["confirmation_type"],
                 # "message_type": "question",
                 # "data": {
                 #     "question": params_dict["message"],
@@ -297,7 +296,7 @@ class QuestionAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error processing question action: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("question", error_result)
             return error_result
@@ -308,7 +307,7 @@ class MemorySuggestionAction(Action):
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
         self._purpose = "Suggest information to be stored in memory"
-        self._requires_confirmation = True
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {"suggestion": "The suggested information to store"}
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -322,7 +321,7 @@ class MemorySuggestionAction(Action):
             result = {
                 "status": "success",
                 "message": params_dict["message"],
-                "requires_confirmation": True,  # Always requires user response
+                "confirmation_type": params_dict["confirmation_type"],
                 "message_type": "memory_suggestion",
                 # "data": {
                 #     "suggestion": params_dict["message"]
@@ -335,7 +334,7 @@ class MemorySuggestionAction(Action):
                 "status": "error",
                 "message":
                 f"Error processing memory suggestion action: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("memory_suggestion", error_result)
             return error_result
@@ -347,7 +346,6 @@ class AnswerUserAction(Action):
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
         self._purpose = "Answer a user's question directly without requiring further actions"
-        self._requires_confirmation = False
         self._returns = {}
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -361,7 +359,7 @@ class AnswerUserAction(Action):
             result = {
                 "status": "success",
                 "message": params_dict["message"],
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
             }
             self._log_action_result("answer_user", result)
             return result
@@ -369,7 +367,7 @@ class AnswerUserAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error processing answer action: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("answer_user", error_result)
             return error_result
@@ -381,7 +379,7 @@ class GenerateBeatBasedEffectAction(Action):
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
         self._purpose = "Get beat-based brightness effects for a given time range and BPM"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "EffectConfig":
             "The time frame of the relevant effect config",
@@ -437,14 +435,14 @@ class GenerateBeatBasedEffectAction(Action):
                 return {
                     "status": "error",
                     "message": f"Unknown effect type: {effect_type}",
-                    "requires_confirmation": False
+                    "confirmation_type": params_dict["confirmation_type"]
                 }
 
             result = {
                 "status": "success",
                 "message":
                 f"Generated a [{effect_type} effect] for time range {start_time_ms}-{end_time_ms}ms at {bpm} BPM",
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 "data": {
                     "EffectConfig": {
                         "start_time": start_time_ms,
@@ -460,7 +458,7 @@ class GenerateBeatBasedEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error getting beat-based effects: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("get_beat_based_effects", error_result)
             return error_result
@@ -473,7 +471,7 @@ class RemoveMemoryAction(Action):
         super().__init__(message_streamer)
         self.memory_manager = memory_manager
         self._purpose = "Remove a memory entry by its key"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "key": "The key that was removed",
             "success": "Whether the removal was successful"
@@ -495,7 +493,7 @@ class RemoveMemoryAction(Action):
                     "status": "success",
                     "message":
                     f"Successfully removed memory entry with key: {key}",
-                    "requires_confirmation": False,
+                    "confirmation_type": params_dict["confirmation_type"],
                     "data": {
                         "key": key,
                         "success": True
@@ -505,7 +503,7 @@ class RemoveMemoryAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No memory entry found with key: {key}",
-                    "requires_confirmation": False,
+                    "confirmation_type": params_dict["confirmation_type"],
                     "data": {
                         "key": key,
                         "success": False
@@ -518,7 +516,7 @@ class RemoveMemoryAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error removing memory: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("remove_memory", error_result)
             return error_result
@@ -531,7 +529,7 @@ class UpdateMemoryAction(Action):
         super().__init__(message_streamer)
         self.memory_manager = memory_manager
         self._purpose = "Update an existing memory entry or create a new one"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "key": "The key that was updated",
             "value": "The new value after update",
@@ -559,7 +557,7 @@ class UpdateMemoryAction(Action):
                 "status": "success",
                 "message":
                 f"{'Created' if was_created else 'Updated'} memory entry with key: {key}",
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 "data": {
                     "key": key,
                     "value": value,
@@ -573,7 +571,7 @@ class UpdateMemoryAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error updating memory: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("update_memory", error_result)
             return error_result
@@ -586,7 +584,7 @@ class GetMusicStructureAction(Action):
         super().__init__(message_streamer)
         self.song_provider = song_provider
         self._purpose = "Get specific aspects of music structure (lyrics, key points, drum pattern, beats/bars)"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "structure_type": "The type of structure requested",
             "data": "The requested music structure data"
@@ -619,7 +617,7 @@ class GetMusicStructureAction(Action):
             result = {
                 "status": "success",
                 "message": f"Retrieved {structure_type} structure data",
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 "data": {
                     "structure_type": structure_type,
                     "data": data
@@ -632,7 +630,7 @@ class GetMusicStructureAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error getting music structure: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("get_music_structure", error_result)
             return error_result
@@ -645,7 +643,7 @@ class SaveCompoundEffectAction(Action):
         super().__init__(message_streamer)
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Save a compound effect with a name and tags"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "name": "The name of the saved compound effect",
             "tags": "The tags associated with the compound effect",
@@ -674,7 +672,7 @@ class SaveCompoundEffectAction(Action):
                 "status": "success" if success else "error",
                 "message":
                 f"{'Successfully saved' if success else 'Failed to save'} compound effect '{name}'",
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 "data": {
                     "name": name,
                     "tags": tags,
@@ -687,7 +685,7 @@ class SaveCompoundEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error saving compound effect: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("save_compound_effect", error_result)
             return error_result
@@ -700,7 +698,7 @@ class GetCompoundEffectAction(Action):
         super().__init__(message_streamer)
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Get a compound effect by its name"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "name": "The name of the compound effect",
             "effects": "The list of effects in the compound effect",
@@ -723,7 +721,7 @@ class GetCompoundEffectAction(Action):
                 result = {
                     "status": "success",
                     "message": f"Retrieved compound effect '{name}'",
-                    "requires_confirmation": False,
+                    "confirmation_type": params_dict["confirmation_type"],
                     "data": {
                         "name": compound_effect.name,
                         "effects": compound_effect.effects,
@@ -734,7 +732,7 @@ class GetCompoundEffectAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No compound effect found with name '{name}'",
-                    "requires_confirmation": False
+                    "confirmation_type": params_dict["confirmation_type"]
                 }
 
             self._log_action_result("get_compound_effect", result)
@@ -743,7 +741,7 @@ class GetCompoundEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving compound effect: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("get_compound_effect", error_result)
             return error_result
@@ -756,7 +754,7 @@ class GetCompoundEffectsKeysAndTagsAction(Action):
         super().__init__(message_streamer)
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Get all compound effect names and their associated tags"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "effects": "Dictionary mapping effect names to their tags"
         }
@@ -766,13 +764,14 @@ class GetCompoundEffectsKeysAndTagsAction(Action):
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         try:
+            params_dict = self._get_params_dict(params)
             effects = self.compound_effects_manager.get_all_effects_keys_and_tags(
             )
 
             result = {
                 "status": "success",
                 "message": f"Retrieved {len(effects)} compound effects",
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 "data": {
                     "effects": effects
                 }
@@ -784,7 +783,7 @@ class GetCompoundEffectsKeysAndTagsAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving compound effects: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("get_compound_effects_keys_and_tags",
                                     error_result)
@@ -798,7 +797,7 @@ class GetRandomEffectAction(Action):
         super().__init__(message_streamer)
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Get a random effect from the random bank by its number"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "number": "The number of the random effect",
             "effect": "The random effect data"
@@ -820,7 +819,7 @@ class GetRandomEffectAction(Action):
                 result = {
                     "status": "success",
                     "message": f"Retrieved random effect {number}",
-                    "requires_confirmation": False,
+                    "confirmation_type": params_dict["confirmation_type"],
                     "data": {
                         "number": number,
                         "effect": effect
@@ -830,7 +829,7 @@ class GetRandomEffectAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No random effect found with number {number}",
-                    "requires_confirmation": False
+                    "confirmation_type": params_dict["confirmation_type"]
                 }
 
             self._log_action_result("get_random_effect", result)
@@ -839,7 +838,7 @@ class GetRandomEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving random effect: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("get_random_effect", error_result)
             return error_result
@@ -852,7 +851,7 @@ class DeleteRandomEffectAction(Action):
         super().__init__(message_streamer)
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Delete a random effect from the random bank by its number"
-        self._requires_confirmation = False
+        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {
             "number": "The number of the deleted random effect",
             "success": "Whether the deletion was successful"
@@ -875,7 +874,7 @@ class DeleteRandomEffectAction(Action):
                 "status": "success" if success else "error",
                 "message":
                 f"{'Successfully deleted' if success else 'Failed to delete'} random effect {number}",
-                "requires_confirmation": False,
+                "confirmation_type": params_dict["confirmation_type"],
                 "data": {
                     "number": number,
                     "success": success
@@ -887,89 +886,152 @@ class DeleteRandomEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error deleting random effect: {str(e)}",
-                "requires_confirmation": False
+                "confirmation_type": params_dict["confirmation_type"]
             }
             self._log_action_result("delete_random_effect", error_result)
             return error_result
 
 
 class ActionRegistry:
+    """Registry for all available actions in the system."""
 
     def __init__(self):
         self._actions = {}
-        self._pending_confirmation = None
+        self._pending_action = None
+        self._pending_params = None
+        self._last_action_result = None
 
     def register_action(self, name: str, action: Action):
+        """Register a new action with the given name."""
         self._actions[name] = action
 
     def get_action(self, name: str) -> Optional[Action]:
+        """Get an action by name."""
         return self._actions.get(name)
+
+    def get_last_action_result(self) -> Optional[Dict[str, Any]]:
+        """Get the result of the last executed action."""
+        return self._last_action_result
+
+    def has_pending_action(self) -> bool:
+        """Check if there is a pending action waiting for confirmation."""
+        return self._pending_action is not None
+
+    def get_pending_action_info(self) -> Optional[Dict[str, Any]]:
+        """Get information about the pending action."""
+        if not self.has_pending_action():
+            return None
+
+        action = self._actions.get(self._pending_action)
+        # if not action:
+        #     return None
+
+        params_dict = action._get_params_dict(self._pending_params)
+        return {
+            "action_name":
+            self._pending_action,
+            "confirmation_type":
+            params_dict.get("confirmation_type",
+                            ConfirmationType.ASK_EVERY_TIME)
+        }
+
+    def execute_pending_action(self):
+        """Execute the pending action with its parameters."""
+        if self._pending_action and self._pending_params:
+            action = self._actions.get(self._pending_action)
+            if action:
+                # Now we actually execute the action
+                result = action.execute(self._pending_params)
+                self._last_action_result = result
+                # Clear pending state after execution
+                self._pending_action = None
+                self._pending_params = None
+                return result
+        return None
+
+    def cancel_pending_action(self):
+        """Cancel the pending action."""
+        self._pending_action = None
+        self._pending_params = None
+        self._last_action_result = {
+            "status": "cancelled",
+            "message": "Action cancelled by user",
+            "confirmation_type": "no-action-required"
+        }
 
     def execute_action(self, name: str, params: Dict[str,
                                                      Any]) -> Dict[str, Any]:
-        action = self.get_action(name)
+        """Store an action for later execution after confirmation."""
+        action = self._actions.get(name)
         if not action:
             return {
                 "status": "error",
                 "message": f"Action {name} not found",
-                "requires_confirmation": False
+                "confirmation_type": ConfirmationType.ASK_EVERY_TIME
             }
 
         if not action.validate_params(params):
             return {
                 "status": "error",
                 "message": f"Invalid parameters for action {name}",
-                "requires_confirmation": False
+                "confirmation_type": ConfirmationType.ASK_EVERY_TIME
             }
 
-        result = action.execute(params)
-        result['name'] = name
+        try:
+            # Get the confirmation type from the params
+            params_dict = action._get_params_dict(params)
+            confirmation_type = params_dict.get(
+                "confirmation_type", ConfirmationType.ASK_EVERY_TIME)
 
-        # Store pending confirmation if needed
-        if result.get("requires_confirmation", False):
-            self._pending_confirmation = (action, params)
-        else:
-            self._pending_confirmation = None
+            # For actions that don't require confirmation, execute immediately
+            if confirmation_type == ConfirmationType.NO_ACTION_REQUIRED:
+                result = action.execute(params)
+                self._last_action_result = result
+                # Clear any pending action when executing a no-confirmation action
+                self._pending_action = None
+                self._pending_params = None
+                return result
 
-        return result
+            # For actions that require confirmation, store them for later execution
+            self._pending_action = name
+            # Convert params to dict if it's a Pydantic model
+            if hasattr(params, 'model_dump'):
+                self._pending_params = params.model_dump()
+            else:
+                self._pending_params = params
+
+            # Return a pending confirmation result
+            return {
+                "status": "pending_confirmation",
+                "message":
+                f"Action '{name}' requires confirmation before execution",
+                "confirmation_type": confirmation_type,
+            }
+
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error preparing action {name}: {str(e)}",
+                "confirmation_type": ConfirmationType.ASK_EVERY_TIME
+            }
+            self._last_action_result = error_result
+            # Clear pending state on error
+            self._pending_action = None
+            self._pending_params = None
+            return error_result
 
     def get_actions_documentation(self) -> str:
-        """Generate documentation for all registered actions."""
-        lines = ["Available Actions:", ""]
-
-        for i, (name, action) in enumerate(self._actions.items(), 1):
-            lines.append(f"{i}. {name}")
-            lines.append(f"   - Purpose: {action.purpose}")
-
-            # Get parameter schema from the action's class
-            params_schema = None
-            for base in action.__class__.__bases__:
-                if hasattr(base, '__annotations__'):
-                    params_schema = base.__annotations__.get('params', None)
-                    if params_schema:
-                        break
-
-            if params_schema:
-                lines.append("   - Parameters:")
-                lines.append("     ```python")
-                lines.append(f"     {params_schema.__name__}:")
-                for field_name, field in params_schema.__fields__.items():
-                    lines.append(
-                        f"       {field_name}: {field.type_.__name__}  # {field.field_info.description}"
-                    )
-                lines.append("     ```")
-
-            lines.append(
-                f"   - Requires confirmation: {'Yes' if action.requires_confirmation else 'No'}"
-            )
-
+        """Get documentation for all registered actions."""
+        lines = []
+        for name, action in self._actions.items():
+            lines.append(f"Action: {name}")
+            lines.append(f"  - Purpose: {action.purpose}")
+            lines.append(f"  - Confirmation type: {action.confirmation_type}")
             if action.returns:
-                lines.append("   - Returns:")
-                for return_name, return_desc in action.returns.items():
-                    lines.append(f"     - {return_name}: {return_desc}")
-
+                lines.append("  - Returns:")
+                for key, desc in action.returns.items():
+                    lines.append(f"    - {key}: {desc}")
             lines.append("")
-
         return "\n".join(lines)
 
     def get_result_format_documentation(self) -> str:
@@ -982,7 +1044,7 @@ class ActionRegistry:
             "    \"action\": str,  # Name of the executed action",
             "    \"status\": Literal[\"success\", \"error\"],  # Result status",
             "    \"message\": str,  # Human-readable message",
-            "    \"requires_confirmation\": bool,  # Whether user confirmation is needed",
+            "    \"confirmation_type\": Literal[\"ask_every_time\", \"ask_once\", \"no_confirmation\"],  # Confirmation type",
             "    \"data\": Optional[Dict[str, Any]]  # Action-specific return data (only on success)",
             "  }", "  ```",
             "- Use these results to make informed decisions in your next response",
