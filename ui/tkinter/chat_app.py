@@ -357,6 +357,9 @@ def handle_auto_continue(auto_continue_value):
     update_chat_window(get_label_tag(TYPE_SYSTEM),
                        get_sender_name(TYPE_SYSTEM),
                        "Automatically continuing conversation...")
+    # Disable UI while auto-continuing
+    send_button.configure(state=tk.DISABLED)
+    user_input.config(state=tk.DISABLED)
     # Schedule the next backend communication
     thread_pool.submit(run_backend_communication, auto_continue_value)
     # if controller and controller.config.get("auto_render", False):
