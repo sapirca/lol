@@ -43,13 +43,24 @@ class BaseActionParams(BaseModel):
                 )
         return v
 
+    @validator('turn', pre=True)
+    def convert_turn(cls, v):
+        if isinstance(v, str):
+            try:
+                return TurnType(v)
+            except ValueError:
+                raise ValueError(
+                    f"Invalid turn type: {v}. Must be one of {[e.value for e in TurnType]}"
+                )
+        return v
+
     class Config:
         use_enum_values = True
 
 
 # Action parameter models
 class UpdateAnimationParams(BaseActionParams, Generic[T]):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
+    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
     turn: TurnType = TurnType.USER
     animation_sequence: T = Field(
         description=

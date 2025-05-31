@@ -53,6 +53,18 @@ def create_layer_animation(layer_type: str, elements: List[str],
             color_1=kwargs.get("color_1", "0.0"),
             color_2=kwargs.get("color_2", "0.5"),
             elements=elements)
+    elif layer_type == "alternate_between_multiple_elements":
+        base_effect = create_alternate_between_multiple_elements(
+            elements=elements,
+            color_1=kwargs.get("color_1", "0.0"),
+            color_2=kwargs.get("color_2", "0.5"))
+    elif layer_type == "segmented_alternate_color":
+        base_effect = create_segmeneted_alternate_color_multiple_elements(
+            elements=elements,
+            start_time_ms=start_time_ms,
+            end_time_ms=end_time_ms,
+            color_1=kwargs.get("color_1", "0.0"),
+            color_2=kwargs.get("color_2", "0.5"))
     elif layer_type == "snow_sparkle":
         base_effect = create_snow_sparkle_elements(elements=elements,
                                                    start_time_ms=start_time_ms,
@@ -70,6 +82,23 @@ def create_layer_animation(layer_type: str, elements: List[str],
             end_time_ms=end_time_ms,
             bpm=bpm,
             elements=elements)
+    elif layer_type == "blink_and_fade_out":
+        base_effect = create_blink_and_fade_out_effect_by_the_beat(
+            start_time_ms=start_time_ms,
+            end_time_ms=end_time_ms,
+            bpm=bpm,
+            elements=elements)
+    elif layer_type == "fade_in_and_disappear":
+        base_effect = create_fade_in_and_disappear_effect_by_the_beat(
+            start_time_ms=start_time_ms,
+            end_time_ms=end_time_ms,
+            bpm=bpm,
+            elements=elements)
+    elif layer_type == "fade_in_out":
+        base_effect = create_fade_in_out_effect(start_time_ms=start_time_ms,
+                                                end_time_ms=end_time_ms,
+                                                bpm=bpm,
+                                                elements=elements)
     elif layer_type == "dot_mask":
         base_effect = create_dot_masking(start_time_ms=start_time_ms,
                                          end_time_ms=end_time_ms,
@@ -83,8 +112,10 @@ def create_layer_animation(layer_type: str, elements: List[str],
         raise ValueError(f"Unknown layer type: {layer_type}")
 
     # Add color effect to layers that don't have their own color
-    if layer_type not in ["alternate_color", "snow_sparkle"
-                          ]:  # Skip layers that already have color
+    if layer_type not in [
+            "alternate_color", "alternate_between_multiple_elements",
+            "segmented_alternate_color", "snow_sparkle"
+    ]:  # Skip layers that already have color
         color_effect = create_color_effect(start_time_ms=start_time_ms,
                                            end_time_ms=end_time_ms,
                                            color=kwargs.get("color", "0.0"))
@@ -223,34 +254,45 @@ def main():
     # Create a layered animation configuration
     layers_config = [
         {
-            "type": "alternate_color",
+            "type": "alternate_between_multiple_elements",
             "elements": elements,
             "color_1": "0.0",  # Red
             "color_2": "0.5"  # Blue
         },
-        {
-            "type": "alternate_color",
-            "elements": elements[::2],  # Even rings
-            "color_1": "0.0",  # Red
-            "color_2": "0.33"  # Green
-        },
-        {
-            "type": "breath",
-            "elements": elements[::3],  # Every third ring
-            "color": "0.1"
-        },
-        {
-            "type": "dot_mask",
-            "elements":
-            elements[1::3],  # Every third ring starting from second
-            "sparsity": 0.3,
-            "color": "0.5"  # Yellow
-        },
-        {
-            "type": "snow_sparkle",
-            "elements": elements[1::2],  # Odd rings
-            "color": "0.67"  # Purple
-        },
+        # {
+        #     "type": "segmented_alternate_color",
+        #     "elements": elements[::2],  # Even rings
+        #     "color_1": "0.0",  # Red
+        #     "color_2": "0.33"  # Green
+        # },
+        # {
+        #     "type": "blink_and_fade_out",
+        #     "elements": elements[::3],  # Every third ring
+        #     "color": "0.1"  # Orange
+        # },
+        # {
+        #     "type": "fade_in_and_disappear",
+        #     "elements":
+        #     elements[1::3],  # Every third ring starting from second
+        #     "color": "0.5"  # Yellow
+        # },
+        # {
+        #     "type": "fade_in_out",
+        #     "elements": elements[1::2],  # Odd rings
+        #     "color": "0.67"  # Purple
+        # },
+        # {
+        #     "type": "dot_mask",
+        #     "elements": elements[::2],  # Even rings
+        #     "sparsity": 0.3,
+        #     "color": "0.8"  # Pink
+        # },
+        # {
+        #     "type": "round_mask",
+        #     "elements": elements[1::2],  # Odd rings
+        #     "sparsity": 0.4,
+        #     "color": "0.9"  # White
+        # }
     ]
 
     # Create and render the animation
@@ -258,9 +300,9 @@ def main():
         layers_config=layers_config,
         elements=elements,
         bpm=120,  # 120 beats per minute
-        animation_name="sparkle_animation",
+        animation_name="complex_animation",
         base_start_time=0,
-        time_increment=2000,  # 1 second between layers
+        time_increment=2000,  # 2 seconds between layers
         playback_offset=0)
 
 

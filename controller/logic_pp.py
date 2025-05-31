@@ -131,8 +131,11 @@ class LogicPlusPlus:
         """Register all available actions"""
         self.action_registry.register_action(
             "update_animation",
-            UpdateAnimationAction(self.animation_manager, self.msgs,
-                                  self.config.song_name))
+            UpdateAnimationAction(
+                self.animation_manager,
+                self.msgs,
+                song_name="aladdin",
+            ))
         self.action_registry.register_action(
             "get_animation",
             GetAnimationAction(self.animation_manager, self.msgs))
@@ -418,7 +421,7 @@ class LogicPlusPlus:
             latest_sequence, latest_step = result
             animation_json = json.loads(latest_sequence)
             self.animation_manager.render(animation_json,
-                                          song_name=self.config.song_name,
+                                          song_name="aladdin",
                                           store_animation=store_animation)
             self.logger.info(
                 f"Animation step {latest_step} rendered successfully.")

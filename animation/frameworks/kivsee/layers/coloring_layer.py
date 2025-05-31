@@ -43,14 +43,14 @@ def create_alternate_between_multiple_elements(
         color_2: float) -> Dict[str, Union[str, List[str], Dict]]:
 
     effect_configs = {}
-    for element in elements:
+    for idx, element in enumerate(elements):
         effect_configs[element] = {
             "effect_config": {
                 "segments": "all",
             },
             "const_color": {
                 "color": {
-                    "hue": color_1 if element % 2 == 0 else color_2,
+                    "hue": color_1 if idx % 2 == 0 else color_2,
                     "sat": 1.0,
                     "val": 1.0,
                 }
@@ -65,8 +65,8 @@ def create_segmeneted_alternate_color_multiple_elements(
         color_2: float) -> Dict[str, Union[str, List[str], Dict]]:
 
     effect_configs = {}
-    for element in elements:
-        if element % 2 == 0:
+    for idx, element in enumerate(elements):
+        if idx % 2 == 0:
             effect_configs[element] = create_alternate_effect(
                 start_time_ms, end_time_ms, color_1, color_2, [element])
         else:
