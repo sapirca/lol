@@ -20,11 +20,11 @@ Musical Context:
 
 Action: update_animation
   - Purpose: Create or update an animation sequence. This action will add the animation to the sequence manager.
-  - Confirmation type: ConfirmationType.ASK_EVERY_TIME
+  - Confirmation type: ConfirmationType.NO_ACTION_REQUIRED
 
 Action: get_animation
   - Purpose: Retrieve an existing animation sequence by step number
-  - Confirmation type: ConfirmationType.ASK_EVERY_TIME
+  - Confirmation type: ConfirmationType.AUTO_RUN
   - Returns:
     - step_number: The requested step number
     - animation: The animation sequence data
@@ -38,17 +38,17 @@ Action: add_to_memory
 
 Action: question
   - Purpose: Ask a question to the user
-  - Confirmation type: ConfirmationType.ASK_EVERY_TIME
+  - Confirmation type: ConfirmationType.NO_ACTION_REQUIRED
 
 Action: memory_suggestion
   - Purpose: Suggest information to be stored in memory
-  - Confirmation type: ConfirmationType.ASK_EVERY_TIME
+  - Confirmation type: ConfirmationType.NO_ACTION_REQUIRED
   - Returns:
     - suggestion: The suggested information to store
 
 Action: answer_user
   - Purpose: Answer a user's question directly without requiring further actions
-  - Confirmation type: ConfirmationType.ASK_EVERY_TIME
+  - Confirmation type: ConfirmationType.NO_ACTION_REQUIRED
 
 Action: generate_beat_based_effect
   - Purpose: Get beat-based brightness effects for a given time range and BPM
@@ -319,6 +319,4 @@ No animation sequences have been generated yet.
 ================================================================================
 Role: user
 
-I want you to generate animation with purple and green and do not dare to use yellow during the song
-also white
-let's start with the first bar
+what is the music structure info?

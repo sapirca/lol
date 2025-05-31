@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, Union, List
 import json
 import logging
+import typing
 from animation.animation_manager import AnimationManager
-from configs.config_kivsee import config as basic_config
 from memory.memory_manager import MemoryManager
 from controller.message_streamer import TAG_SYSTEM_INTERNAL
 from music.song_provider import SongProvider
@@ -65,11 +65,13 @@ class Action(ABC):
 class UpdateAnimationAction(Action):
 
     def __init__(self, animation_manager: AnimationManager, message_streamer,
-                 song_name: str):
+                 config: Dict[str, Any]):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
         self._purpose = "Create or update an animation sequence. This action will add the animation to the sequence manager."
-        self._song_name = song_name
+        self.config = config
+        self._song_name = config.get("song_name")
+        self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
         self._returns = {
             # "step_number":
             # "The step number that will be assigned if confirmed",
@@ -92,7 +94,7 @@ class UpdateAnimationAction(Action):
                 return "Error: No animation JSON provided for preview."
 
             self.animation_manager.render(animation_json,
-                                          self.song_name,
+                                          self._song_name,
                                           store_animation=True)
             return "Animation preview rendered successfully."
         except Exception as e:
@@ -111,14 +113,14 @@ class UpdateAnimationAction(Action):
             result = {
                 "status": "success",
                 "message": result_message,
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 # "data": {
                 #     "step_number": current_steps_count
                 # }
             }
 
             # Auto-render if configured
-            if basic_config.get("auto_render", False):
+            if self.config.get("auto_render", False):
                 render_result = self.render_preview(
                     params_dict["animation_sequence"])
                 result[
@@ -131,7 +133,7 @@ class UpdateAnimationAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error adding animation sequence: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("update_animation", error_result)
             return error_result
@@ -143,7 +145,7 @@ class GetAnimationAction(Action):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
         self._purpose = "Retrieve an existing animation sequence by step number"
-        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._confirmation_type = ConfirmationType.AUTO_RUN
         self._returns = {
             "step_number": "The requested step number",
             "animation": "The animation sequence data"
@@ -165,7 +167,7 @@ class GetAnimationAction(Action):
                 result = {
                     "status": "success",
                     "message": f"Retrieved animation for step {step_number}",
-                    "confirmation_type": params_dict["confirmation_type"],
+                    "confirmation_type": self.confirmation_type,
                     "data": {
                         "step_number": step_number,
                         "animation": animation
@@ -175,7 +177,7 @@ class GetAnimationAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No animation found for step {step_number}",
-                    "confirmation_type": params_dict["confirmation_type"]
+                    "confirmation_type": self.confirmation_type
                 }
             self._log_action_result("get_animation", result)
             return result
@@ -183,7 +185,7 @@ class GetAnimationAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving animation: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("get_animation", error_result)
             return error_result
@@ -218,7 +220,7 @@ class AddToMemoryAction(Action):
             result = {
                 "status": "success",
                 "message": f"Memory saved:\n {{\"{key}\": \"{value}\"}}",
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "data": {
                     "key": key,
                     "value": value
@@ -230,7 +232,7 @@ class AddToMemoryAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error adding to memory: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("add_to_memory", error_result)
             return error_result
@@ -268,7 +270,7 @@ class QuestionAction(Action):
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
         self._purpose = "Ask a question to the user"
-        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
         self._returns = {
             # "question": "The question that was asked",
             # "is_clarification": "Whether this is a clarification question"
@@ -287,7 +289,7 @@ class QuestionAction(Action):
             result = {
                 "status": "success",
                 "message": params_dict["message"],
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 # "message_type": "question",
                 # "data": {
                 #     "question": params_dict["message"],
@@ -300,7 +302,7 @@ class QuestionAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error processing question action: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("question", error_result)
             return error_result
@@ -311,7 +313,7 @@ class MemorySuggestionAction(Action):
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
         self._purpose = "Suggest information to be stored in memory"
-        self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
         self._returns = {"suggestion": "The suggested information to store"}
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -325,7 +327,7 @@ class MemorySuggestionAction(Action):
             result = {
                 "status": "success",
                 "message": params_dict["message"],
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "message_type": "memory_suggestion",
                 # "data": {
                 #     "suggestion": params_dict["message"]
@@ -338,7 +340,7 @@ class MemorySuggestionAction(Action):
                 "status": "error",
                 "message":
                 f"Error processing memory suggestion action: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("memory_suggestion", error_result)
             return error_result
@@ -350,6 +352,7 @@ class AnswerUserAction(Action):
     def __init__(self, message_streamer):
         super().__init__(message_streamer)
         self._purpose = "Answer a user's question directly without requiring further actions"
+        self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
         self._returns = {}
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -363,7 +366,7 @@ class AnswerUserAction(Action):
             result = {
                 "status": "success",
                 "message": params_dict["message"],
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
             }
             self._log_action_result("answer_user", result)
             return result
@@ -371,7 +374,7 @@ class AnswerUserAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error processing answer action: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("answer_user", error_result)
             return error_result
@@ -439,14 +442,14 @@ class GenerateBeatBasedEffectAction(Action):
                 return {
                     "status": "error",
                     "message": f"Unknown effect type: {effect_type}",
-                    "confirmation_type": params_dict["confirmation_type"]
+                    "confirmation_type": self.confirmation_type
                 }
 
             result = {
                 "status": "success",
                 "message":
                 f"Generated a [{effect_type} effect] for time range {start_time_ms}-{end_time_ms}ms at {bpm} BPM",
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "data": {
                     "EffectConfig": {
                         "start_time": start_time_ms,
@@ -462,7 +465,7 @@ class GenerateBeatBasedEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error getting beat-based effects: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("get_beat_based_effects", error_result)
             return error_result
@@ -497,7 +500,7 @@ class RemoveMemoryAction(Action):
                     "status": "success",
                     "message":
                     f"Successfully removed memory entry with key: {key}",
-                    "confirmation_type": params_dict["confirmation_type"],
+                    "confirmation_type": self.confirmation_type,
                     "data": {
                         "key": key,
                         "success": True
@@ -507,7 +510,7 @@ class RemoveMemoryAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No memory entry found with key: {key}",
-                    "confirmation_type": params_dict["confirmation_type"],
+                    "confirmation_type": self.confirmation_type,
                     "data": {
                         "key": key,
                         "success": False
@@ -520,7 +523,7 @@ class RemoveMemoryAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error removing memory: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("remove_memory", error_result)
             return error_result
@@ -561,7 +564,7 @@ class UpdateMemoryAction(Action):
                 "status": "success",
                 "message":
                 f"{'Created' if was_created else 'Updated'} memory entry with key: {key}",
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "data": {
                     "key": key,
                     "value": value,
@@ -575,7 +578,7 @@ class UpdateMemoryAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error updating memory: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("update_memory", error_result)
             return error_result
@@ -621,7 +624,7 @@ class GetMusicStructureAction(Action):
             result = {
                 "status": "success",
                 "message": f"Retrieved {structure_type} structure data",
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "data": {
                     "structure_type": structure_type,
                     "data": data
@@ -634,7 +637,7 @@ class GetMusicStructureAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error getting music structure: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("get_music_structure", error_result)
             return error_result
@@ -676,7 +679,7 @@ class SaveCompoundEffectAction(Action):
                 "status": "success" if success else "error",
                 "message":
                 f"{'Successfully saved' if success else 'Failed to save'} compound effect '{name}'",
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "data": {
                     "name": name,
                     "tags": tags,
@@ -689,7 +692,7 @@ class SaveCompoundEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error saving compound effect: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("save_compound_effect", error_result)
             return error_result
@@ -725,7 +728,7 @@ class GetCompoundEffectAction(Action):
                 result = {
                     "status": "success",
                     "message": f"Retrieved compound effect '{name}'",
-                    "confirmation_type": params_dict["confirmation_type"],
+                    "confirmation_type": self.confirmation_type,
                     "data": {
                         "name": compound_effect.name,
                         "effects": compound_effect.effects,
@@ -736,7 +739,7 @@ class GetCompoundEffectAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No compound effect found with name '{name}'",
-                    "confirmation_type": params_dict["confirmation_type"]
+                    "confirmation_type": self.confirmation_type
                 }
 
             self._log_action_result("get_compound_effect", result)
@@ -745,7 +748,7 @@ class GetCompoundEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving compound effect: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("get_compound_effect", error_result)
             return error_result
@@ -775,7 +778,7 @@ class GetCompoundEffectsKeysAndTagsAction(Action):
             result = {
                 "status": "success",
                 "message": f"Retrieved {len(effects)} compound effects",
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "data": {
                     "effects": effects
                 }
@@ -787,7 +790,7 @@ class GetCompoundEffectsKeysAndTagsAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving compound effects: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("get_compound_effects_keys_and_tags",
                                     error_result)
@@ -823,7 +826,7 @@ class GetRandomEffectAction(Action):
                 result = {
                     "status": "success",
                     "message": f"Retrieved random effect {number}",
-                    "confirmation_type": params_dict["confirmation_type"],
+                    "confirmation_type": self.confirmation_type,
                     "data": {
                         "number": number,
                         "effect": effect
@@ -833,7 +836,7 @@ class GetRandomEffectAction(Action):
                 result = {
                     "status": "error",
                     "message": f"No random effect found with number {number}",
-                    "confirmation_type": params_dict["confirmation_type"]
+                    "confirmation_type": self.confirmation_type
                 }
 
             self._log_action_result("get_random_effect", result)
@@ -842,7 +845,7 @@ class GetRandomEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error retrieving random effect: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("get_random_effect", error_result)
             return error_result
@@ -878,7 +881,7 @@ class DeleteRandomEffectAction(Action):
                 "status": "success" if success else "error",
                 "message":
                 f"{'Successfully deleted' if success else 'Failed to delete'} random effect {number}",
-                "confirmation_type": params_dict["confirmation_type"],
+                "confirmation_type": self.confirmation_type,
                 "data": {
                     "number": number,
                     "success": success
@@ -890,7 +893,7 @@ class DeleteRandomEffectAction(Action):
             error_result = {
                 "status": "error",
                 "message": f"Error deleting random effect: {str(e)}",
-                "confirmation_type": params_dict["confirmation_type"]
+                "confirmation_type": self.confirmation_type
             }
             self._log_action_result("delete_random_effect", error_result)
             return error_result
@@ -934,7 +937,7 @@ class ActionRegistry:
         return {
             "action_name": self._pending_action,
             "turn": params_dict.get("turn"),
-            "confirmation_type": params_dict.get("confirmation_type")
+            "confirmation_type": action.confirmation_type
         }
 
     def execute_pending_action(self):
@@ -981,9 +984,8 @@ class ActionRegistry:
 
         try:
             # Get the confirmation type from the params
-            params_dict = action._get_params_dict(params)
-            confirmation_type = params_dict.get(
-                "confirmation_type", ConfirmationType.ASK_EVERY_TIME)
+            # params_dict = action._get_params_dict(params)
+            confirmation_type = action.confirmation_type
 
             # For actions that don't require confirmation, execute immediately
             if confirmation_type == ConfirmationType.NO_ACTION_REQUIRED:

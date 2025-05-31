@@ -134,7 +134,7 @@ class LogicPlusPlus:
             UpdateAnimationAction(
                 self.animation_manager,
                 self.msgs,
-                song_name="aladdin",
+                config=self.config,
             ))
         self.action_registry.register_action(
             "get_animation",
@@ -235,7 +235,7 @@ class LogicPlusPlus:
                     (message['timestamp'], message['content'], message['tag'],
                      message['visible'], message['context']))
             else:
-                content_trimmed = message['content'][:30] + "..."
+                content_trimmed = message['content'][:60] + "..."
                 chat_history.append(
                     (message['timestamp'],
                      f"{message['tag']} {content_trimmed}", message['tag'],
@@ -344,6 +344,30 @@ class LogicPlusPlus:
 
     def add_user_input_to_chat(self, user_input):
         self.msgs.add_visible(TAG_USER_INPUT, user_input, context=True)
+
+    def _add_action_result_to_messages(self, result, prefix="Action"):
+        """Helper method to add action results to messages."""
+        if result:
+            # Add the action result message
+            self.msgs.add_visible(TAG_ACTION_RESULTS,
+                                  f"{prefix}: {result.get('message', '')}",
+                                  context=True)
+            # Add the data if present
+            if "data" in result:
+                self.msgs.add_invisible(TAG_ACTION_RESULTS,
+                                        json.dumps(result["data"], indent=2),
+                                        context=True)
+        return result
+
+    def execute_pending_action(self):
+        """Execute the pending action in the action registry."""
+        result = self.action_registry.execute_pending_action()
+        return self._add_action_result_to_messages(result, "Action executed")
+
+    def cancel_pending_action(self):
+        """Cancel the pending action in the action registry."""
+        result = self.action_registry.cancel_pending_action()
+        return self._add_action_result_to_messages(result, "Action cancelled")
 
     def _communicate_internal(self, user_input):
         """Internal communication method that contains the original communicate logic."""
@@ -495,3 +519,11 @@ class LogicPlusPlus:
         except Exception as e:
             self.logger.error(f"Error reducing tokens: {e}")
             return f"Error reducing tokens: {str(e)}"
+
+    def get_pending_action_info(self):
+        """Get information about the pending action from the action registry."""
+        return self.action_registry.get_pending_action_info()
+
+    def get_last_action_result(self):
+        """Get the last action result from the action registry."""
+        return self.action_registry.get_last_action_result()

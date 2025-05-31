@@ -21,38 +21,6 @@ class TurnType(str, Enum):
 
 
 class BaseActionParams(BaseModel):
-    confirmation_type: ConfirmationType = Field(
-        description=
-        "How this action should be handled regarding user confirmation. "
-        "ask-every-time: Always ask for confirmation, "
-        "auto-run: Run automatically but still refresh UI, "
-        "no-action-required: No confirmation needed (for informational actions)"
-    )
-    turn: TurnType = Field(
-        description="Whose turn is it to act next - LLM or USER",
-        default=TurnType.USER)
-
-    @validator('confirmation_type', pre=True)
-    def convert_confirmation_type(cls, v):
-        if isinstance(v, str):
-            try:
-                return ConfirmationType(v)
-            except ValueError:
-                raise ValueError(
-                    f"Invalid confirmation type: {v}. Must be one of {[e.value for e in ConfirmationType]}"
-                )
-        return v
-
-    @validator('turn', pre=True)
-    def convert_turn(cls, v):
-        if isinstance(v, str):
-            try:
-                return TurnType(v)
-            except ValueError:
-                raise ValueError(
-                    f"Invalid turn type: {v}. Must be one of {[e.value for e in TurnType]}"
-                )
-        return v
 
     class Config:
         use_enum_values = True
@@ -60,8 +28,6 @@ class BaseActionParams(BaseModel):
 
 # Action parameter models
 class UpdateAnimationParams(BaseActionParams, Generic[T]):
-    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
-    turn: TurnType = TurnType.USER
     animation_sequence: T = Field(
         description=
         "The animation data to be processed - will be validated against framework-specific schema."
@@ -69,8 +35,6 @@ class UpdateAnimationParams(BaseActionParams, Generic[T]):
 
 
 class GetAnimationParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.AUTO_RUN
-    turn: TurnType = TurnType.LLM
     step_number: int = Field(
         description=
         "The step number of the animation to retrieve. If this parameter is missing, unknown to you or invalid (< 0), do not execute this action. Instead, use AskUserAction to ask the user for a valid step number.",
@@ -89,8 +53,6 @@ class GetAnimationParams(BaseActionParams):
 
 
 class QuestionParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
-    turn: TurnType = TurnType.USER
     message: str = Field(
         description="The question or clarification request for the user")
     is_clarification: bool = Field(
@@ -100,8 +62,6 @@ class QuestionParams(BaseActionParams):
 
 
 class AnswerUserParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
-    turn: TurnType = TurnType.USER
     message: str = Field(description="The answer to the user's question")
 
 
@@ -110,8 +70,6 @@ class GenerateBeatBasedEffectParams(BaseActionParams):
     This action generates the data for the BrightnessEffectConfig. The brightness effect is synchronized to the beat, also taking into account the time frame that is specified by the start_time_ms and end_time_ms parameters.
     This data can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow.
     """
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
     beat_based_effect_type: Literal[
         "breath", "soft_pulse", "strobe", "fade_in_out", "blink",
         "blink_and_fade_out", "fade_in_and_disappear"] = Field(
@@ -124,35 +82,25 @@ class GenerateBeatBasedEffectParams(BaseActionParams):
 
 
 class MemorySuggestionParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.NO_ACTION_REQUIRED
-    turn: TurnType = TurnType.USER
     message: str = Field(description="The memory suggestion for the user")
 
 
 class AddToMemoryParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
     key: str = Field(
         description="The key under which to store the memory value")
     value: str = Field(description="The value to store in memory")
 
 
 class RemoveMemoryParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
     key: str = Field(description="The key of the memory entry to remove")
 
 
 class UpdateMemoryParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
     key: str = Field(description="The key of the memory entry to update")
     value: str = Field(description="The new value to set or append")
 
 
 class GetMusicStructureParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.LLM
     structure_type: Literal[
         "lyrics", "key_points", "drum_pattern",
         "beats"] = Field(description="The type of music structure to retrieve")
@@ -161,8 +109,6 @@ class GetMusicStructureParams(BaseActionParams):
 
 
 class SaveCompoundEffectParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
     name: str = Field(description="The name of the compound effect to save")
     effects: List[Any] = Field(
         description=
@@ -172,28 +118,21 @@ class SaveCompoundEffectParams(BaseActionParams):
 
 
 class GetCompoundEffectParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
     name: str = Field(
         description="The name of the compound effect to retrieve")
 
 
 class GetCompoundEffectsKeysAndTagsParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
+    pass
 
 
 # // Random effects
 class GetRandomEffectParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.USER
     number: int = Field(
         description="The number of the random effect to retrieve", ge=0)
 
 
 class DeleteRandomEffectParams(BaseActionParams):
-    confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.LLM
     number: int = Field(
         description="The number of the random effect to delete", ge=0)
 

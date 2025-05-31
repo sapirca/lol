@@ -180,9 +180,9 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context,
     chat_window.insert(tk.END, "\n\n")
 
     # Add confirmation buttons if this is an assistant message that requires confirmation
-    if type_name == TYPE_ASSISTANT and controller and controller.action_registry:
+    if type_name == TYPE_ASSISTANT and controller:
         # Check for pending action instead of last action result
-        pending_info = controller.action_registry.get_pending_action_info()
+        pending_info = controller.get_pending_action_info()
         if pending_info and pending_info[
                 "confirmation_type"] != "no-action-required":
             # Create a frame for the buttons
@@ -268,9 +268,9 @@ def refresh():
     # Update UI with new messages
     for tag, message, context, visible in new_messages:
         # Determine message type based on tag
-        if tag == TAG_USER_INPUT:
+        if tag == TAG_USER_INPUT or tag == TAG_ACTION_RESULTS:
             type_name = TYPE_USER
-        elif tag == TAG_ASSISTANT or tag == TAG_ACTION_RESULTS:
+        elif tag == TAG_ASSISTANT:
             type_name = TYPE_ASSISTANT
         elif tag == TAG_SYSTEM_INTERNAL:
             type_name = TYPE_INTERNAL
@@ -992,23 +992,22 @@ def reduce_tokens():
 
 def handle_confirmation(confirmed: bool):
     """Handle user confirmation of an action."""
-    pending_info = controller.action_registry.get_pending_action_info()
+    pending_info = controller.get_pending_action_info()
+    auto_continue = False
     if pending_info and pending_info.get("turn") == "llm":
-        # If it's LLM's turn, set auto-continue
-        controller.msgs.set_control_flag("auto_continue", True)
+        auto_continue = True
 
     if confirmed:
         # Execute the pending action
-        result = controller.action_registry.execute_pending_action()
+        result = controller.execute_pending_action()
         if result:
             # Add a system message about the action being executed
             update_chat_window(
                 get_label_tag(TYPE_SYSTEM), get_sender_name(TYPE_SYSTEM),
                 f"Executing action: {result.get('message', '')}")
-            handle_auto_continue("")
     else:
         # Cancel the pending action
-        controller.action_registry.cancel_pending_action()
+        controller.cancel_pending_action()
         # Add a system message about the action being cancelled
         update_chat_window(get_label_tag(TYPE_SYSTEM),
                            get_sender_name(TYPE_SYSTEM),
@@ -1017,6 +1016,11 @@ def handle_confirmation(confirmed: bool):
     # Refresh the UI and update animation data
     refresh()
     update_animation_data()
+    if auto_continue:
+        # If it's LLM's turn, set auto-continue
+        controller.msgs.set_control_flag("auto_continue", True)
+        handle_auto_continue("")
+
     # Re-enable the UI
     enable_ui()
 
