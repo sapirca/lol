@@ -72,12 +72,13 @@ class AnimationManager:
         else:
             print("Replay method is not available for this framework.")
 
-    def render(self, animation_data, store_animation=False):
+    def render(self, animation_data, song_name, store_animation=False):
         """Render the animation using the current framework's renderer."""
         if not self.renderer:
             self.renderer = self._create_renderer()
         return self.renderer.render(animation_data,
-                                    0,
+                                    animation_name=song_name,
+                                    playback_offest=0,
                                     store_animation=store_animation)
 
     def stop_rendering(self):

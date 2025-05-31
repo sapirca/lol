@@ -50,7 +50,7 @@ class BaseActionParams(BaseModel):
 # Action parameter models
 class UpdateAnimationParams(BaseActionParams, Generic[T]):
     confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.LLM
+    turn: TurnType = TurnType.USER
     animation_sequence: T = Field(
         description=
         "The animation data to be processed - will be validated against framework-specific schema."
@@ -59,7 +59,7 @@ class UpdateAnimationParams(BaseActionParams, Generic[T]):
 
 class GetAnimationParams(BaseActionParams):
     confirmation_type: ConfirmationType = ConfirmationType.AUTO_RUN
-    turn: TurnType = TurnType.USER
+    turn: TurnType = TurnType.LLM
     step_number: int = Field(
         description=
         "The step number of the animation to retrieve. If this parameter is missing, unknown to you or invalid (< 0), do not execute this action. Instead, use AskUserAction to ask the user for a valid step number.",
@@ -100,7 +100,7 @@ class GenerateBeatBasedEffectParams(BaseActionParams):
     This data can be put into the animation for any element you want, make sure to put this alongside a coloring like const_color or rainbow.
     """
     confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.LLM
+    turn: TurnType = TurnType.USER
     beat_based_effect_type: Literal[
         "breath", "soft_pulse", "strobe", "fade_in_out", "blink",
         "blink_and_fade_out", "fade_in_and_disappear"] = Field(
@@ -120,7 +120,7 @@ class MemorySuggestionParams(BaseActionParams):
 
 class AddToMemoryParams(BaseActionParams):
     confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.LLM
+    turn: TurnType = TurnType.USER
     key: str = Field(
         description="The key under which to store the memory value")
     value: str = Field(description="The value to store in memory")
@@ -128,13 +128,13 @@ class AddToMemoryParams(BaseActionParams):
 
 class RemoveMemoryParams(BaseActionParams):
     confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.LLM
+    turn: TurnType = TurnType.USER
     key: str = Field(description="The key of the memory entry to remove")
 
 
 class UpdateMemoryParams(BaseActionParams):
     confirmation_type: ConfirmationType = ConfirmationType.ASK_EVERY_TIME
-    turn: TurnType = TurnType.LLM
+    turn: TurnType = TurnType.USER
     key: str = Field(description="The key of the memory entry to update")
     value: str = Field(description="The new value to set or append")
 
@@ -147,12 +147,6 @@ class GetMusicStructureParams(BaseActionParams):
         "beats"] = Field(description="The type of music structure to retrieve")
     song_name: str = Field(
         description="The name of the song to get the structure for")
-
-
-# Action models with specific parameter types
-class UpdateAnimationAction(BaseModel, Generic[T]):
-    name: Literal["update_animation"]
-    params: UpdateAnimationParams[T]
 
 
 class SaveCompoundEffectParams(BaseActionParams):
@@ -191,6 +185,12 @@ class DeleteRandomEffectParams(BaseActionParams):
     turn: TurnType = TurnType.LLM
     number: int = Field(
         description="The number of the random effect to delete", ge=0)
+
+
+# Action models with specific parameter types
+class UpdateAnimationAction(BaseModel, Generic[T]):
+    name: Literal["update_animation"]
+    params: UpdateAnimationParams[T]
 
 
 # Animation Actions

@@ -64,10 +64,12 @@ class Action(ABC):
 
 class UpdateAnimationAction(Action):
 
-    def __init__(self, animation_manager: AnimationManager, message_streamer):
+    def __init__(self, animation_manager: AnimationManager, message_streamer,
+                 song_name: str):
         super().__init__(message_streamer)
         self.animation_manager = animation_manager
         self._purpose = "Create or update an animation sequence. This action will add the animation to the sequence manager."
+        self._song_name = song_name
         self._returns = {
             # "step_number":
             # "The step number that will be assigned if confirmed",
@@ -89,7 +91,9 @@ class UpdateAnimationAction(Action):
             if not animation_json:
                 return "Error: No animation JSON provided for preview."
 
-            self.animation_manager.render(animation_json, store_animation=True)
+            self.animation_manager.render(animation_json,
+                                          self.song_name,
+                                          store_animation=True)
             return "Animation preview rendered successfully."
         except Exception as e:
             return f"Error rendering animation preview: {e}"

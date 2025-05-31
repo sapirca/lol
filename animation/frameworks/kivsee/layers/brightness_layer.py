@@ -3,18 +3,20 @@ from typing import List, Dict, Union, Optional
 
 
 def create_breath_effect_by_the_beat(
-        start_time_ms: int, end_time_ms: int,
-        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+        start_time_ms: int, end_time_ms: int, bpm: int,
+        elements: List[str]) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
     repeat_num = duration_ms / beats_per_duration_ms
-
-    # Only keep 2 digits after the decimal point
     repeat_num_by_the_beat = round(repeat_num / 2, 3)
 
-    effect_config = {
+    effect_config = [{
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+        },
         "brightness": {
             "mult_factor": {
                 "sin": {
@@ -25,20 +27,28 @@ def create_breath_effect_by_the_beat(
                 }
             },
         },
-    }
-    return effect_config
+    }]
+
+    effect_configs = {}
+    for element in elements:
+        effect_configs[element] = effect_config
+    return effect_configs
 
 
 def create_blink_effect_by_the_beat(
-        start_time_ms: int, end_time_ms: int,
-        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+        start_time_ms: int, end_time_ms: int, bpm: int,
+        elements: List[str]) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
     repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
-    effect_config = {
+    effect_config = [{
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+        },
         "brightness": {
             "mult_factor": {
                 "repeat": {
@@ -60,20 +70,28 @@ def create_blink_effect_by_the_beat(
                 }
             },
         },
-    }
-    return effect_config
+    }]
+
+    effect_configs = {}
+    for element in elements:
+        effect_configs[element] = effect_config
+    return effect_configs
 
 
 def create_blink_and_fade_out_effect_by_the_beat(
-        start_time_ms: int, end_time_ms: int,
-        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+        start_time_ms: int, end_time_ms: int, bpm: int,
+        elements: List[str]) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
     repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
-    effect_config = {
+    effect_config = [{
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+        },
         "brightness": {
             "mult_factor": {
                 "repeat": {
@@ -87,20 +105,28 @@ def create_blink_and_fade_out_effect_by_the_beat(
                 },
             },
         },
-    }
-    return effect_config
+    }]
+
+    effect_configs = {}
+    for element in elements:
+        effect_configs[element] = effect_config
+    return effect_configs
 
 
 def create_fade_in_and_disappear_effect_by_the_beat(
-        start_time_ms: int, end_time_ms: int,
-        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+        start_time_ms: int, end_time_ms: int, bpm: int,
+        elements: List[str]) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
     repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
-    effect_config = {
+    effect_config = [{
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+        },
         "brightness": {
             "mult_factor": {
                 "repeat": {
@@ -114,13 +140,17 @@ def create_fade_in_and_disappear_effect_by_the_beat(
                 },
             },
         },
-    }
-    return effect_config
+    }]
+
+    effect_configs = {}
+    for element in elements:
+        effect_configs[element] = effect_config
+    return effect_configs
 
 
 def create_soft_pulse_effect(
-        start_time_ms: int, end_time_ms: int, intensity: float,
-        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+        start_time_ms: int, end_time_ms: int, intensity: float, bpm: int,
+        elements: List[str]) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
@@ -129,7 +159,12 @@ def create_soft_pulse_effect(
     intensity_normalized = max(min(intensity, 0.0), 1.0)
     min_intensity = 1.0 - intensity_normalized
     repeat_num_by_the_beat = round(repeat_num / 2, 3)
-    effect_config = {
+
+    effect_config = [{
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+        },
         "brightness": {
             "mult_factor": {
                 "sin": {
@@ -140,19 +175,28 @@ def create_soft_pulse_effect(
                 }
             }
         }
-    }
-    return effect_config
+    }]
+
+    effect_configs = {}
+    for element in elements:
+        effect_configs[element] = effect_config
+    return effect_configs
 
 
-def create_strobe_effect(start_time_ms: int, end_time_ms: int,
-                         bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+def create_strobe_effect(
+        start_time_ms: int, end_time_ms: int, bpm: int,
+        elements: List[str]) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
     repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
-    effect_config = {
+    effect_config = [{
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+        },
         "brightness": {
             "mult_factor": {
                 "repeat": {
@@ -192,20 +236,28 @@ def create_strobe_effect(start_time_ms: int, end_time_ms: int,
                 }
             }
         }
-    }
-    return effect_config
+    }]
+
+    effect_configs = {}
+    for element in elements:
+        effect_configs[element] = effect_config
+    return effect_configs
 
 
 def create_fade_in_out_effect(
-        start_time_ms: int, end_time_ms: int,
-        bpm: int) -> Dict[str, Union[str, List[str], Dict]]:
+        start_time_ms: int, end_time_ms: int, bpm: int,
+        elements: List[str]) -> Dict[str, Union[str, List[str], Dict]]:
     duration_ms = end_time_ms - start_time_ms
     beats_per_second = bpm / 60
     beats_per_duration_ms = 1000 / beats_per_second
 
     repeat_num = round(duration_ms / beats_per_duration_ms, 3)
 
-    effect_config = {
+    effect_config = [{
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+        },
         "brightness": {
             "mult_factor": {
                 "repeat": {
@@ -229,5 +281,9 @@ def create_fade_in_out_effect(
                 }
             }
         }
-    }
-    return effect_config
+    }]
+
+    effect_configs = {}
+    for element in elements:
+        effect_configs[element] = effect_config
+    return effect_configs

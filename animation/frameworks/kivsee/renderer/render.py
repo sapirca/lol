@@ -215,14 +215,11 @@ class Render:
             self.store_single_animation(animation_name, element_name,
                                         animation_payload)
 
-    def trigger_animation(self,
-                          animation_data: dict,
-                          playback_offest: int = 0):
+    def trigger_animation(self, animation_name: str, playback_offest: int = 0):
         """
         Triggers the animation by sending a POST request.
         Requires only the animation name.
         """
-        animation_name = animation_data.get("name", "default_animation")
         url = f"{TRIGGER_URL}/trigger/{animation_name}"
         print(f"Trigger animation URL: {url}")
         response = self._post_request(url,
@@ -329,14 +326,19 @@ class Render:
         animation_data = self.get_animation_data()
         return self.get_animation_stats(animation_data, start_time, end_time)
 
-    def load_and_print_animation(self, playback_offest: int = 0):
+    def load_and_print_animation(self,
+                                 animation_name: str,
+                                 playback_offest: int = 0):
         """
         Loads animation data from the default animation file, preprocesses it, and then renders it.
         """
         animation_data = self.get_animation_data()
-        self.render(animation_data, playback_offest)
+        self.render(animation_data, animation_name, playback_offest)
 
-    def load_from_snapshot(self, snapshot_dir: str, playback_offest: int = 0):
+    def load_from_snapshot(self,
+                           snapshot_dir: str,
+                           animation_name: str,
+                           playback_offest: int = 0):
         """
         Loads animation data from a snapshot directory's animations folder, preprocesses it, and then renders it.
         
@@ -366,17 +368,21 @@ class Render:
         if not animation_data:
             raise ValueError("No animations found in the snapshot directory.")
 
-        self.render(animation_data, playback_offest)
+        self.render(animation_data, animation_name, playback_offest)
+
+    def render_unpacked_animation(self, preprocessed_animation_data: dict):
+        self.store_animation(preprocessed_animation_data)
+        self.trigger_animation(preprocessed_animation_data['name'])
 
     def render(self,
                animation_data: dict,
+               animation_name: str,
                playback_offest: int,
                store_animation: bool = False):
         """
         Orchestrates the preprocessing, storing, and triggering of the animation.
         """
-        # Hardcode the animation name to 'aladdin'
-        animation_data['name'] = 'aladdin'
+        animation_data['name'] = animation_name
         print(f"Hardcoded animation name to: {animation_data['name']}")
 
         print("Rendering animation...")
@@ -481,79 +487,6 @@ class Render:
             "name": animation_name,
             "animation_data_per_element": animations_per_element
         }
-
-
-# def test_stats(render):
-#     animation_data = {
-#         "name": "test_animation",
-#         "animation_data_per_element": {
-#             "ring1": {
-#                 "name":
-#                 "test_animation",
-#                 "duration_ms":
-#                 1000,
-#                 "num_repeats":
-#                 1,
-#                 "effects": [{
-#                     "effect_config": {
-#                         "start_time": 0,
-#                         "end_time": 1501,
-#                         "segments": "all"
-#                     },
-#                     "const_color": {
-#                         "color": {
-#                             "hue": 0.0,
-#                             "sat": 1.0,
-#                             "val": 1.0
-#                         }
-#                     }
-#                 }, {
-#                     "effect_config": {
-#                         "start_time": 1501,
-#                         "end_time": 2428,
-#                         "segments": "all"
-#                     },
-#                     "const_color": {
-#                         "color": {
-#                             "hue": 0.1,
-#                             "sat": 1.0,
-#                             "val": 1.0
-#                         }
-#                     }
-#                 }, {
-#                     "effect_config": {
-#                         "start_time": 81000,
-#                         "end_time": 85000,
-#                         "segments": "all"
-#                     },
-#                     "brightness": {
-#                         "mult_factor": {
-#                             "linear": {
-#                                 "start": 1.0,
-#                                 "end": 0.0
-#                             }
-#                         }
-#                     }
-#                 }, {
-#                     "effect_config": {
-#                         "start_time": 81000,
-#                         "end_time": 85000,
-#                         "segments": "all"
-#                     },
-#                     "const_color": {
-#                         "color": {
-#                             "hue": 0.7,
-#                             "sat": 0.9,
-#                             "val": 1.0
-#                         }
-#                     }
-#                 }],
-#             }
-#         }
-#     }
-#     stats = render._get_animation_stats(
-#         animation_data["animation_data_per_element"], 0, 1000)
-#     print("Animation stats:", stats)
 
 
 def main():

@@ -13,28 +13,38 @@ def create_snow_sparkle(
     beats_per_duration_ms = 1000 / beats_per_second
 
     repeat_num = duration_ms / beats_per_duration_ms
-
-    # Only keep 2 digits after the decimal point
     repeat_num_by_the_beat = round(repeat_num / 2, 3)
 
-    effect_config = {
+    effect_config = [{
         "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
             "segments": "b1",
         },
-        "const_value": {
-            "hue": 0.0,
-            "sat": 0.0,
-            "val": 1.0,
+        "const_color": {
+            "color": {
+                "hue": 0.0,
+                "sat": 0.0,
+                "val": 1.0,
+            }
+        },
+    }, {
+        "effect_config": {
+            "start_time": start_time_ms,
+            "end_time": end_time_ms,
+            "segments": "b1",
         },
         "brightness": {
-            "sin": {
-                "min": 0.0,
-                "max": 1.0,
-                "phase": phase,
-                "repeats": repeat_num_by_the_beat,
-            },
+            "mult_factor": {
+                "sin": {
+                    "min": 0.0,
+                    "max": 1.0,
+                    "phase": phase,
+                    "repeats": repeat_num_by_the_beat,
+                },
+            }
         }
-    }
+    }]
     return effect_config
 
 
