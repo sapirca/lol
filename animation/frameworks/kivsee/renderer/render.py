@@ -320,9 +320,7 @@ class Render:
         except Exception as e:
             print(f"An unexpected error occurred while loading animation: {e}")
 
-    def load_and_get_stats(self) -> dict:
-        start_time = 0
-        end_time = 100000
+    def load_and_get_stats(self, start_time: int, end_time: int) -> dict:
         animation_data = self.get_animation_data()
         return self.get_animation_stats(animation_data, start_time, end_time)
 
@@ -493,7 +491,7 @@ def main():
     render = Render()
     # render.load_and_print_animation(playback_offest=14406)
 
-    render.load_and_get_stats()
+    render.load_and_get_stats(0, 1501)
     # Example of getting animation stats
     # test_stats(render)
 
