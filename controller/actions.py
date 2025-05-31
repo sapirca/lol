@@ -7,7 +7,7 @@ from animation.animation_manager import AnimationManager
 from memory.memory_manager import MemoryManager
 from controller.message_streamer import TAG_SYSTEM_INTERNAL
 from music.song_provider import SongProvider
-from schemes.main_schema import MainSchema, ConfirmationType
+from schemes.main_schema import MainSchema, ConfirmationType, TurnType
 from animation.frameworks.kivsee.layers import brightness_layer as bb_effects
 
 
@@ -20,6 +20,7 @@ class Action(ABC):
         self._purpose = "No purpose specified"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
         self._returns = {}
+        self._turn = TurnType.LLM  # Default to LLM turn
 
     @property
     def purpose(self) -> str:
@@ -35,6 +36,11 @@ class Action(ABC):
     def returns(self) -> Dict[str, str]:
         """Get the return values of this action."""
         return self._returns
+
+    @property
+    def turn(self) -> TurnType:
+        """Get the turn type for this action."""
+        return self._turn
 
     def _get_params_dict(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Convert params to dictionary if it's a Pydantic model"""
@@ -72,6 +78,7 @@ class UpdateAnimationAction(Action):
         self.config = config
         self._song_name = config.get("song_name")
         self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
+        self._turn = TurnType.USER
         self._returns = {
             # "step_number":
             # "The step number that will be assigned if confirmed",
@@ -146,6 +153,7 @@ class GetAnimationAction(Action):
         self.animation_manager = animation_manager
         self._purpose = "Retrieve an existing animation sequence by step number"
         self._confirmation_type = ConfirmationType.AUTO_RUN
+        self._turn = TurnType.LLM
         self._returns = {
             "step_number": "The requested step number",
             "animation": "The animation sequence data"
@@ -202,6 +210,7 @@ class AddToMemoryAction(Action):
             "key": "The key under which the value was stored",
             "value": "The value that was stored"
         }
+        self._turn = TurnType.LLM
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -242,6 +251,7 @@ class ClarificationAction(Action):
 
     def __init__(self):
         super().__init__()
+        self._turn = TurnType.LLM
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
@@ -271,6 +281,7 @@ class QuestionAction(Action):
         super().__init__(message_streamer)
         self._purpose = "Ask a question to the user"
         self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
+        self._turn = TurnType.LLM
         self._returns = {
             # "question": "The question that was asked",
             # "is_clarification": "Whether this is a clarification question"
@@ -314,6 +325,7 @@ class MemorySuggestionAction(Action):
         super().__init__(message_streamer)
         self._purpose = "Suggest information to be stored in memory"
         self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
+        self._turn = TurnType.USER
         self._returns = {"suggestion": "The suggested information to store"}
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -353,6 +365,7 @@ class AnswerUserAction(Action):
         super().__init__(message_streamer)
         self._purpose = "Answer a user's question directly without requiring further actions"
         self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
+        self._turn = TurnType.USER
         self._returns = {}
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
@@ -387,6 +400,7 @@ class GenerateBeatBasedEffectAction(Action):
         super().__init__(message_streamer)
         self._purpose = "Get beat-based brightness effects for a given time range and BPM"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.LLM
         self._returns = {
             "EffectConfig":
             "The time frame of the relevant effect config",
@@ -479,6 +493,7 @@ class RemoveMemoryAction(Action):
         self.memory_manager = memory_manager
         self._purpose = "Remove a memory entry by its key"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.USER
         self._returns = {
             "key": "The key that was removed",
             "success": "Whether the removal was successful"
@@ -537,6 +552,7 @@ class UpdateMemoryAction(Action):
         self.memory_manager = memory_manager
         self._purpose = "Update an existing memory entry or create a new one"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.USER
         self._returns = {
             "key": "The key that was updated",
             "value": "The new value after update",
@@ -592,6 +608,7 @@ class GetMusicStructureAction(Action):
         self.song_provider = song_provider
         self._purpose = "Get specific aspects of music structure (lyrics, key points, drum pattern, beats/bars)"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.LLM
         self._returns = {
             "structure_type": "The type of structure requested",
             "data": "The requested music structure data"
@@ -651,6 +668,7 @@ class SaveCompoundEffectAction(Action):
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Save a compound effect with a name and tags"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.USER
         self._returns = {
             "name": "The name of the saved compound effect",
             "tags": "The tags associated with the compound effect",
@@ -706,6 +724,7 @@ class GetCompoundEffectAction(Action):
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Get a compound effect by its name"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.LLM
         self._returns = {
             "name": "The name of the compound effect",
             "effects": "The list of effects in the compound effect",
@@ -762,6 +781,7 @@ class GetCompoundEffectsKeysAndTagsAction(Action):
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Get all compound effect names and their associated tags"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.LLM
         self._returns = {
             "effects": "Dictionary mapping effect names to their tags"
         }
@@ -805,6 +825,7 @@ class GetRandomEffectAction(Action):
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Get a random effect from the random bank by its number"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.LLM
         self._returns = {
             "number": "The number of the random effect",
             "effect": "The random effect data"
@@ -859,6 +880,7 @@ class DeleteRandomEffectAction(Action):
         self.compound_effects_manager = compound_effects_manager
         self._purpose = "Delete a random effect from the random bank by its number"
         self._confirmation_type = ConfirmationType.ASK_EVERY_TIME
+        self._turn = TurnType.LLM
         self._returns = {
             "number": "The number of the deleted random effect",
             "success": "Whether the deletion was successful"
@@ -936,8 +958,9 @@ class ActionRegistry:
         params_dict = action._get_params_dict(self._pending_params)
         return {
             "action_name": self._pending_action,
-            "turn": params_dict.get("turn"),
-            "confirmation_type": action.confirmation_type
+            "turn": action.turn,
+            "confirmation_type": action.confirmation_type,
+            "params_dict": params_dict
         }
 
     def execute_pending_action(self):

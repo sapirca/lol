@@ -372,23 +372,22 @@ class LogicPlusPlus:
     def _communicate_internal(self, user_input):
         """Internal communication method that contains the original communicate logic."""
         # Check if we're auto-continuing with an action result
-        control_flags = self.msgs.get_and_clear_control_flags()
-        if control_flags.get("auto_continue"):
-            # Get the last action result and add it to messages
-            last_result = self.action_registry.get_last_action_result()
-            if last_result and "data" in last_result:
-                self.msgs.add_invisible(
-                    TAG_ACTION_RESULTS,
-                    "Here's the action result:\n " +
-                    json.dumps(last_result["data"], indent=2),
-                    context=True)
-                self.msgs.add_invisible(
-                    TAG_ACTION_RESULTS,
-                    "Please process the action result and continue.",
-                    context=True)
-                self.msgs.add_visible(TAG_SYSTEM,
-                                      "Processing action result...",
-                                      context=False)
+        # control_flags = self.msgs.get_and_clear_control_flags()
+        # if control_flags.get("auto_continue"):
+        #     # Get the last action result and add it to messages
+        #     last_result = self.action_registry.get_last_action_result()
+        #     if last_result:
+        #         # Add the action result using the helper method
+        #         self._add_action_result_to_messages(
+        #             last_result, "Processing previous action result")
+        #         # Add additional context for LLM processing
+        #         self.msgs.add_invisible(
+        #             TAG_ACTION_RESULTS,
+        #             "Please process the action result and continue.",
+        #             context=True)
+        #         self.msgs.add_visible(TAG_SYSTEM,
+        #                               "Processing action result...",
+        #                               context=False)
 
         backend = self.select_backend()
         messages = self.formatter.build_messages()

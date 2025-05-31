@@ -994,17 +994,17 @@ def handle_confirmation(confirmed: bool):
     """Handle user confirmation of an action."""
     pending_info = controller.get_pending_action_info()
     auto_continue = False
-    if pending_info and pending_info.get("turn") == "llm":
-        auto_continue = True
-
     if confirmed:
+        if pending_info and pending_info.get("turn") == "llm":
+            auto_continue = True
+
         # Execute the pending action
         result = controller.execute_pending_action()
-        if result:
-            # Add a system message about the action being executed
-            update_chat_window(
-                get_label_tag(TYPE_SYSTEM), get_sender_name(TYPE_SYSTEM),
-                f"Executing action: {result.get('message', '')}")
+        # if result:
+        #     # Add a system message about the action being executed
+        #     update_chat_window(
+        #         get_label_tag(TYPE_SYSTEM), get_sender_name(TYPE_SYSTEM),
+        #         f"Executing action: {result.get('message', '')}")
     else:
         # Cancel the pending action
         controller.cancel_pending_action()
