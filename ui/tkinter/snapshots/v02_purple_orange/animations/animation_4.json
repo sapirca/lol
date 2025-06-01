@@ -1,0 +1,4703 @@
+{
+    "animation": {
+        "effects": [
+            {
+                "effect_number": 1,
+                "title": "Beat 0 Base",
+                "beat_and_bar": "Bar 0: beat 0",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1502,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Initial purple base layer fading in"
+            },
+            {
+                "effect_number": 2,
+                "title": "Beat 0 Segment Overlay",
+                "beat_and_bar": "Bar 0: beat 0",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1502,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b1 segment overlay with pulsing brightness"
+            },
+            {
+                "effect_number": 3,
+                "title": "Beat 1",
+                "beat_and_bar": "Bar 0: beat 1",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 1502,
+                    "end_time": 1933,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient with updown pattern building to cymbal"
+            },
+            {
+                "effect_number": 4,
+                "title": "First Cymbal Base",
+                "beat_and_bar": "Bar 0: beat 2 (Cymbal)",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 1933,
+                    "end_time": 2429,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 2.0,
+                            "diff_per_step": -0.1,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Bright white flash base for first cymbal crash"
+            },
+            {
+                "effect_number": 5,
+                "title": "First Cymbal Accent",
+                "beat_and_bar": "Bar 0: beat 2 (Cymbal)",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 1933,
+                    "end_time": 2429,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 3.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b2 segment accents on odd rings during cymbal crash"
+            },
+            {
+                "effect_number": 6,
+                "title": "Beat 3",
+                "beat_and_bar": "Bar 0: beat 3",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 2429,
+                    "end_time": 3356,
+                    "segments": "b1"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.9,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Purple gradient transition with b1 segments after cymbal"
+            },
+            {
+                "effect_number": 7,
+                "title": "Beat 4",
+                "beat_and_bar": "Bar 0: beat 4",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 3356,
+                    "end_time": 4283,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 0.9,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Gentle purple pulse on odd rings with b1 segments"
+            },
+            {
+                "effect_number": 8,
+                "title": "Beat 4 Complement",
+                "beat_and_bar": "Bar 0: beat 4",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 3356,
+                    "end_time": 4283,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 0.9,
+                            "phase": 0.5,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Complementary yellow pulse on even rings with b2 segments"
+            },
+            {
+                "effect_number": 9,
+                "title": "Beat 5 Pre-Cymbal",
+                "beat_and_bar": "Bar 0: beat 5",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 4283,
+                    "end_time": 5652,
+                    "segments": "centric"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient centric pattern building to second cymbal"
+            },
+            {
+                "effect_number": 10,
+                "title": "Second Cymbal Base",
+                "beat_and_bar": "Bar 0: beat 5 (Cymbal)",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 5652,
+                    "end_time": 6137,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 2.0,
+                            "diff_per_step": -0.1,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Bright white flash base for second cymbal crash"
+            },
+            {
+                "effect_number": 11,
+                "title": "Second Cymbal Accent",
+                "beat_and_bar": "Bar 0: beat 5 (Cymbal)",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 5652,
+                    "end_time": 6137,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 3.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b2 segment accents on even rings during cymbal crash"
+            },
+            {
+                "effect_number": 12,
+                "title": "Beat 6",
+                "beat_and_bar": "Bar 0: beat 6",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 6137,
+                    "end_time": 7064,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.5
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake transition on odd rings with random segments"
+            },
+            {
+                "effect_number": 13,
+                "title": "Beat 6 Complement",
+                "beat_and_bar": "Bar 0: beat 6",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 6137,
+                    "end_time": 7064,
+                    "segments": "arc"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Orange-yellow gradient on even rings with arc segments"
+            },
+            {
+                "effect_number": 14,
+                "title": "Beat 7",
+                "beat_and_bar": "Bar 0: beat 7",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 7064,
+                    "end_time": 7991,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Purple-orange transition before violin with updown pattern"
+            },
+            {
+                "effect_number": 15,
+                "title": "Beat 8 - Violin Start",
+                "beat_and_bar": "Bar 1: beat 8",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 7991,
+                    "end_time": 8918,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.25
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake beginning on odd rings"
+            },
+            {
+                "effect_number": 16,
+                "title": "Beat 8 Complement",
+                "beat_and_bar": "Bar 1: beat 8",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 7991,
+                    "end_time": 8918,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.75
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Orange snake beginning in opposite direction"
+            },
+            {
+                "effect_number": 17,
+                "title": "Beat 9 - Violin Building",
+                "beat_and_bar": "Bar 1: beat 9",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 8918,
+                    "end_time": 9845,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.25,
+                            "end": 0.5
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.2,
+                            "end": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake growing with violin"
+            },
+            {
+                "effect_number": 18,
+                "title": "Beat 9 Complement",
+                "beat_and_bar": "Bar 1: beat 9",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 8918,
+                    "end_time": 9845,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.75,
+                            "end": 0.5
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.2,
+                            "end": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Orange snake growing in opposite direction"
+            },
+            {
+                "effect_number": 19,
+                "title": "Beat 10 - Up Down Violin Start",
+                "beat_and_bar": "Bar 1: beat 10",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 9845,
+                    "end_time": 10772,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 0.9,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple-orange updown pattern with gentle pulse"
+            },
+            {
+                "effect_number": 20,
+                "title": "Beat 10 Segment Overlay",
+                "beat_and_bar": "Bar 1: beat 10",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 9845,
+                    "end_time": 10772,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow b1 segment overlay with faster pulsing"
+            },
+            {
+                "effect_number": 21,
+                "title": "Beat 11 - Up Down Violin Continue",
+                "beat_and_bar": "Bar 1: beat 11",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 10772,
+                    "end_time": 11699,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple-orange updown pattern with stronger pulse"
+            },
+            {
+                "effect_number": 22,
+                "title": "Beat 11 Segment Overlay",
+                "beat_and_bar": "Bar 1: beat 11",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 10772,
+                    "end_time": 11699,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow b2 segment overlay with faster pulsing"
+            },
+            {
+                "effect_number": 23,
+                "title": "Beat 12 - Decreasing Violin Start",
+                "beat_and_bar": "Bar 2: beat 12",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 11699,
+                    "end_time": 12626,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.5,
+                            "end": 0.25
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.3,
+                            "end": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake shrinking for decreasing violin on odd rings"
+            },
+            {
+                "effect_number": 24,
+                "title": "Beat 12 Complement",
+                "beat_and_bar": "Bar 2: beat 12",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 11699,
+                    "end_time": 12626,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.5,
+                            "end": 0.75
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.3,
+                            "end": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Orange snake shrinking in opposite direction for decreasing violin on even rings"
+            },
+            {
+                "effect_number": 25,
+                "title": "Beat 13 - Decreasing Violin Continue",
+                "beat_and_bar": "Bar 2: beat 13",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 12626,
+                    "end_time": 13553,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.25,
+                            "end": 0.0
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.2,
+                            "end": 0.1
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake disappearing for decreasing violin on odd rings"
+            },
+            {
+                "effect_number": 26,
+                "title": "Beat 13 Complement",
+                "beat_and_bar": "Bar 2: beat 13",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 12626,
+                    "end_time": 13553,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.75,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.2,
+                            "end": 0.1
+                        }
+                    }
+                },
+                "effect_summary": "Orange snake disappearing in opposite direction for decreasing violin on even rings"
+            },
+            {
+                "effect_number": 27,
+                "title": "Beat 14 - Vanishing Sound Base",
+                "beat_and_bar": "Bar 2: beat 14",
+                "elements": [
+                    "ring7"
+                ],
+                "effect_config": {
+                    "start_time": 13553,
+                    "end_time": 13703,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Quick yellow flash on ring7 starting the vanishing sequence"
+            },
+            {
+                "effect_number": 28,
+                "title": "Beat 14 - Vanishing Sound Ring 8",
+                "beat_and_bar": "Bar 2: beat 14",
+                "elements": [
+                    "ring8"
+                ],
+                "effect_config": {
+                    "start_time": 13703,
+                    "end_time": 13853,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Quick purple flash on ring8 continuing the vanishing sequence"
+            },
+            {
+                "effect_number": 29,
+                "title": "Beat 14 - Vanishing Sound Ring 9",
+                "beat_and_bar": "Bar 2: beat 14",
+                "elements": [
+                    "ring9"
+                ],
+                "effect_config": {
+                    "start_time": 13853,
+                    "end_time": 14003,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Quick orange flash on ring9 continuing the vanishing sequence"
+            },
+            {
+                "effect_number": 30,
+                "title": "Beat 14 - Vanishing Sound Ring 10",
+                "beat_and_bar": "Bar 2: beat 14",
+                "elements": [
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 14003,
+                    "end_time": 14153,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.65,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Quick blue-purple flash on ring10 continuing the vanishing sequence"
+            },
+            {
+                "effect_number": 31,
+                "title": "Beat 14 - Vanishing Sound Ring 11",
+                "beat_and_bar": "Bar 2: beat 14",
+                "elements": [
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 14153,
+                    "end_time": 14303,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Quick yellow-orange flash on ring11 continuing the vanishing sequence"
+            },
+            {
+                "effect_number": 32,
+                "title": "Beat 14 - Vanishing Sound Ring 12",
+                "beat_and_bar": "Bar 2: beat 14",
+                "elements": [
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 14303,
+                    "end_time": 14480,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.6
+                        }
+                    }
+                },
+                "effect_summary": "Final purple flash on ring12 completing the vanishing sequence"
+            },
+            {
+                "effect_number": 33,
+                "title": "Beat 15 - Almost Gone",
+                "beat_and_bar": "Bar 2: beat 15",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 14480,
+                    "end_time": 15140,
+                    "segments": "rand"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.4,
+                            "end": 0.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange-yellow gradient fading to darkness with random segments before intro sound"
+            },
+            {
+                "effect_number": 34,
+                "title": "Oh I Base",
+                "beat_and_bar": "Bar 2: Lyrics Start",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 15140,
+                    "end_time": 15427,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Purple gradient base for 'Oh I' lyric"
+            },
+            {
+                "effect_number": 35,
+                "title": "Oh I Overlay",
+                "beat_and_bar": "Bar 2: Lyrics Start",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 15140,
+                    "end_time": 15427,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange centric pattern overlay with pulsing for 'Oh I' lyric"
+            },
+            {
+                "effect_number": 36,
+                "title": "Come",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 15427,
+                    "end_time": 15849,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient pulse with updown pattern for 'come' lyric"
+            },
+            {
+                "effect_number": 37,
+                "title": "From Base",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 15849,
+                    "end_time": 16334,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.5
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Orange snake effect base on odd rings for 'from' lyric"
+            },
+            {
+                "effect_number": 38,
+                "title": "From Overlay",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 15849,
+                    "end_time": 16334,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b1 segment overlay with pulsing for 'from' lyric"
+            },
+            {
+                "effect_number": 39,
+                "title": "A Land",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 16334,
+                    "end_time": 16761,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient updown pattern for 'a land' lyric"
+            },
+            {
+                "effect_number": 40,
+                "title": "From Base",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 16761,
+                    "end_time": 17183,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.5
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake effect base on even rings for second 'from' lyric"
+            },
+            {
+                "effect_number": 41,
+                "title": "From Overlay",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 16761,
+                    "end_time": 17183,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b2 segment overlay with pulsing for second 'from' lyric"
+            },
+            {
+                "effect_number": 42,
+                "title": "A",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 17183,
+                    "end_time": 17330,
+                    "segments": "b1"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": {
+                            "value": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Brief yellow-orange gradient flash with b1 segments for 'a' lyric"
+            },
+            {
+                "effect_number": 43,
+                "title": "Far Away Base",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 17330,
+                    "end_time": 18157,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Purple-orange snake effect base for 'far away' lyric"
+            },
+            {
+                "effect_number": 44,
+                "title": "Far Away Overlay",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 17330,
+                    "end_time": 18157,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow centric pattern overlay with pulsing for 'far away' lyric"
+            },
+            {
+                "effect_number": 45,
+                "title": "Place",
+                "beat_and_bar": "Bar 2: Lyrics Continue",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 18157,
+                    "end_time": 18889,
+                    "segments": "rand"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient fading with random segments for 'place' lyric"
+            },
+            {
+                "effect_number": 46,
+                "title": "Intro Sound Base",
+                "beat_and_bar": "Bar 2: beat 21",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 18889,
+                    "end_time": 20928,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange-yellow gradient base building for storytelling"
+            },
+            {
+                "effect_number": 47,
+                "title": "Intro Sound Overlay",
+                "beat_and_bar": "Bar 2: beat 21",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 18889,
+                    "end_time": 20928,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake overlay with updown pattern for storytelling"
+            },
+            {
+                "effect_number": 48,
+                "title": "Decreasing Sound",
+                "beat_and_bar": "Bar 3: beat 24",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 20928,
+                    "end_time": 21432,
+                    "segments": "centric"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.9,
+                            "end": 0.0
+                        }
+                    }
+                },
+                "effect_summary": "Fading orange-yellow gradient with centric pattern for decreasing sound"
+            },
+            {
+                "effect_number": 49,
+                "title": "Silent Moment Base",
+                "beat_and_bar": "Bar 3: beats 24-25",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 21432,
+                    "end_time": 22309,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 0.9,
+                        "val": 0.8
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": {
+                            "value": 0.0
+                        }
+                    }
+                },
+                "effect_summary": "Almost complete darkness for silent moment"
+            },
+            {
+                "effect_number": 50,
+                "title": "Silent Moment Subtle Accent",
+                "beat_and_bar": "Bar 3: beats 24-25",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 21432,
+                    "end_time": 22309,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.1,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Very subtle orange pulsing on b1 segments during silence"
+            },
+            {
+                "effect_number": 51,
+                "title": "Intro Fading In",
+                "beat_and_bar": "Bar 3: beats 25-26",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 22309,
+                    "end_time": 22823,
+                    "segments": "centric"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient light fading in with centric pattern for intro sound"
+            },
+            {
+                "effect_number": 52,
+                "title": "Increasing Storytelling Base",
+                "beat_and_bar": "Bar 3-4: beats 26-32",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 22836,
+                    "end_time": 28413,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.12
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Growing intensity with orange-yellow snake effect base for 'flat and immense' lyrics"
+            },
+            {
+                "effect_number": 53,
+                "title": "Increasing Storytelling Overlay",
+                "beat_and_bar": "Bar 3-4: beats 26-32",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 22836,
+                    "end_time": 28413,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b1 segment overlay with pulsing for storytelling"
+            },
+            {
+                "effect_number": 54,
+                "title": "Increasing Storytelling Complement Base",
+                "beat_and_bar": "Bar 3-4: beats 26-32",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 22836,
+                    "end_time": 28413,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 1.0,
+                            "max": 0.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Growing intensity with purple snake effect base on even rings"
+            },
+            {
+                "effect_number": 55,
+                "title": "Increasing Storytelling Complement Overlay",
+                "beat_and_bar": "Bar 3-4: beats 26-32",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 22836,
+                    "end_time": 28413,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b2 segment overlay with pulsing on even rings"
+            },
+            {
+                "effect_number": 56,
+                "title": "Peak Sound Base",
+                "beat_and_bar": "Bar 4: beat 32",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 28413,
+                    "end_time": 28832,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "const_value": {
+                            "value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Bright yellow base flash for peak sound"
+            },
+            {
+                "effect_number": 57,
+                "title": "Peak Sound Overlay",
+                "beat_and_bar": "Bar 4: beat 32",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 28413,
+                    "end_time": 28832,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 3.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b1 segment accents during peak sound"
+            },
+            {
+                "effect_number": 58,
+                "title": "Fadeout",
+                "beat_and_bar": "Bar 4: beats 32-33",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 28832,
+                    "end_time": 29598,
+                    "segments": "centric"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.0
+                        }
+                    }
+                },
+                "effect_summary": "Fading purple gradient with centric pattern for 'home' lyric fadeout"
+            },
+            {
+                "effect_number": 59,
+                "title": "Wind Intro Base",
+                "beat_and_bar": "Bar 4: beats 33-34",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 29740,
+                    "end_time": 30217,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Gentle orange-yellow gradient base glow for wind intro"
+            },
+            {
+                "effect_number": 60,
+                "title": "Wind Intro Overlay",
+                "beat_and_bar": "Bar 4: beats 33-34",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 29740,
+                    "end_time": 30217,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Purple updown pattern overlay for wind intro"
+            },
+            {
+                "effect_number": 61,
+                "title": "Wind Right Base",
+                "beat_and_bar": "Bar 4: beats 34-36",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 30217,
+                    "end_time": 31602,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Yellow snake effect base for right wind sounds"
+            },
+            {
+                "effect_number": 62,
+                "title": "Wind Right Overlay",
+                "beat_and_bar": "Bar 4: beats 34-36",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 30217,
+                    "end_time": 31602,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b1 segment overlay with pulsing for right wind sounds"
+            },
+            {
+                "effect_number": 63,
+                "title": "Wind Left Base",
+                "beat_and_bar": "Bar 4-5: beats 36-38",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 32108,
+                    "end_time": 33020,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 1.0,
+                            "max": 0.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake effect base for left wind sounds"
+            },
+            {
+                "effect_number": 64,
+                "title": "Wind Left Overlay",
+                "beat_and_bar": "Bar 4-5: beats 36-38",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 32108,
+                    "end_time": 33020,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.65,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        }
+                    }
+                },
+                "effect_summary": "Blue-purple b2 segment overlay with pulsing for left wind sounds"
+            },
+            {
+                "effect_number": 65,
+                "title": "Sand Reference Base",
+                "beat_and_bar": "Bar 5: beats 38-39",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 33422,
+                    "end_time": 33947,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient base pulsing for 'sand' lyric"
+            },
+            {
+                "effect_number": 66,
+                "title": "Sand Reference Overlay",
+                "beat_and_bar": "Bar 5: beats 38-39",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 33422,
+                    "end_time": 33947,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 4.0,
+                            "diff_per_step": 0.0,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Sand-colored random segments for 'sand' lyric"
+            },
+            {
+                "effect_number": 67,
+                "title": "Glass Reference Base",
+                "beat_and_bar": "Bar 5: beats 39-40",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 34314,
+                    "end_time": 35192,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Shimmering purple gradient base for 'glass' lyric"
+            },
+            {
+                "effect_number": 68,
+                "title": "Glass Reference Overlay",
+                "beat_and_bar": "Bar 5: beats 39-40",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 34314,
+                    "end_time": 35192,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 6.0,
+                            "diff_per_step": -0.03,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "White b1 segment sparkles for 'glass' lyric"
+            },
+            {
+                "effect_number": 69,
+                "title": "Is Right Base",
+                "beat_and_bar": "Bar 5: beats 40-41",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 35192,
+                    "end_time": 35860,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange-yellow gradient base for 'is right' lyric"
+            },
+            {
+                "effect_number": 70,
+                "title": "Is Right Overlay",
+                "beat_and_bar": "Bar 5: beats 40-41",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 35192,
+                    "end_time": 35860,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple updown pattern overlay with pulsing for 'is right' lyric"
+            },
+            {
+                "effect_number": 71,
+                "title": "Come On Down Base",
+                "beat_and_bar": "Bar 5: beats 41-43",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 36728,
+                    "end_time": 38011,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient base for 'come on down' lyrics"
+            },
+            {
+                "effect_number": 72,
+                "title": "Come On Down Overlay",
+                "beat_and_bar": "Bar 5: beats 41-43",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 36728,
+                    "end_time": 38011,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake overlay with centric pattern for 'come on down' lyrics"
+            },
+            {
+                "effect_number": 73,
+                "title": "Stop On By Base",
+                "beat_and_bar": "Bar 5: beats 43-44",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 38011,
+                    "end_time": 39116,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple gradient base with pulsing for 'stop on by' lyrics"
+            },
+            {
+                "effect_number": 74,
+                "title": "Stop On By Overlay",
+                "beat_and_bar": "Bar 5: beats 43-44",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 38011,
+                    "end_time": 39116,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b1 segment overlay with offset pulsing for 'stop on by' lyrics"
+            },
+            {
+                "effect_number": 75,
+                "title": "Hop A Carpet Base",
+                "beat_and_bar": "Bar 5-6: beats 44-46",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 39125,
+                    "end_time": 40023,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Orange snake effect base for 'hop a carpet' lyrics"
+            },
+            {
+                "effect_number": 76,
+                "title": "Hop A Carpet Overlay",
+                "beat_and_bar": "Bar 5-6: beats 44-46",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 39125,
+                    "end_time": 40023,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b2 segment overlay with pulsing for 'hop a carpet' lyrics"
+            },
+            {
+                "effect_number": 77,
+                "title": "And Fly Base",
+                "beat_and_bar": "Bar 6: beats 46-47",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 40018,
+                    "end_time": 40941,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient snake base for 'and fly' lyrics"
+            },
+            {
+                "effect_number": 78,
+                "title": "And Fly Overlay",
+                "beat_and_bar": "Bar 6: beats 46-47",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 40018,
+                    "end_time": 40941,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple updown pattern overlay for 'and fly' lyrics"
+            },
+            {
+                "effect_number": 79,
+                "title": "Increasing Animation Before Drop Base",
+                "beat_and_bar": "Bar 6: beats 47-49",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 40941,
+                    "end_time": 45098,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Intensifying purple-orange gradient base building to the drop"
+            },
+            {
+                "effect_number": 80,
+                "title": "Increasing Animation Before Drop Overlay",
+                "beat_and_bar": "Bar 6: beats 47-49",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 40941,
+                    "end_time": 45098,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.2,
+                            "end": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Yellow snake overlay with centric pattern building to the drop"
+            },
+            {
+                "effect_number": 81,
+                "title": "Crazy Boom Base",
+                "beat_and_bar": "Bar 6: beat 52",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 45500,
+                    "end_time": 45988,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 4.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Intense white flash base for the crazy boom"
+            },
+            {
+                "effect_number": 82,
+                "title": "Crazy Boom Overlay",
+                "beat_and_bar": "Bar 6: beat 52",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 45500,
+                    "end_time": 45988,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 3.0,
+                            "diff_per_step": -0.1,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple random segment accents during crazy boom"
+            },
+            {
+                "effect_number": 83,
+                "title": "First Arabian Base",
+                "beat_and_bar": "Bar 6: beats 53-54",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 46922,
+                    "end_time": 49109,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.1,
+                            "max": 0.15,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.7,
+                            "max": 0.75,
+                            "phase": 0.5,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        }
+                    },
+                    "tail_length": {
+                        "sin": {
+                            "min": 0.3,
+                            "max": 0.5,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "effect_summary": "Ecstatic rainbow snake effect base for first 'Arabian' lyrics"
+            },
+            {
+                "effect_number": 84,
+                "title": "First Arabian Overlay",
+                "beat_and_bar": "Bar 6: beats 53-54",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 46922,
+                    "end_time": 49109,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 12.0,
+                            "diff_per_step": -0.02,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "White sparkle random segment overlay for first 'Arabian' lyrics"
+            },
+            {
+                "effect_number": 85,
+                "title": "First Arabian Complement Base",
+                "beat_and_bar": "Bar 6: beats 53-54",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 46922,
+                    "end_time": 49109,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.7,
+                            "max": 0.75,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.1,
+                            "max": 0.15,
+                            "phase": 0.5,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 1.0,
+                            "max": 0.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        }
+                    },
+                    "tail_length": {
+                        "sin": {
+                            "min": 0.3,
+                            "max": 0.5,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "effect_summary": "Complementary rainbow snake effect base for first 'Arabian'"
+            },
+            {
+                "effect_number": 86,
+                "title": "First Arabian Complement Overlay",
+                "beat_and_bar": "Bar 6: beats 53-54",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 46922,
+                    "end_time": 49109,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 12.0,
+                            "diff_per_step": -0.02,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "White sparkle b2 segment overlay for complementary 'Arabian'"
+            },
+            {
+                "effect_number": 87,
+                "title": "First Nights Base",
+                "beat_and_bar": "Bar 7: beats 56-58",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 49200,
+                    "end_time": 50633,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "linear": {
+                            "start": 0.1,
+                            "end": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "linear": {
+                            "start": 0.15,
+                            "end": 0.75
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        }
+                    }
+                },
+                "effect_summary": "Rapidly pulsing rainbow base for 'nights' lyrics"
+            },
+            {
+                "effect_number": 88,
+                "title": "First Nights Overlay",
+                "beat_and_bar": "Bar 7: beats 56-58",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 49200,
+                    "end_time": 50633,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake updown pattern overlay for 'nights' lyrics"
+            },
+            {
+                "effect_number": 89,
+                "title": "First Arabian Days Base",
+                "beat_and_bar": "Bar 7: beats 58-60",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 50633,
+                    "end_time": 52487,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.2,
+                            "phase": 0.0,
+                            "repeats": 12.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.6,
+                            "max": 0.8,
+                            "phase": 0.5,
+                            "repeats": 12.0
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 8.0,
+                            "diff_per_step": 0.0,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Jittery colorful flashes base for 'Arabian days'"
+            },
+            {
+                "effect_number": 90,
+                "title": "First Arabian Days Overlay",
+                "beat_and_bar": "Bar 7: beats 58-60",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 50633,
+                    "end_time": 52487,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 16.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow random segment overlay with rapid pulsing for 'Arabian days'"
+            },
+            {
+                "effect_number": 91,
+                "title": "First Arabian Days Complement Base",
+                "beat_and_bar": "Bar 7: beats 58-60",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 50633,
+                    "end_time": 52487,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.6,
+                            "max": 0.8,
+                            "phase": 0.0,
+                            "repeats": 12.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.2,
+                            "phase": 0.5,
+                            "repeats": 12.0
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 8.0,
+                            "diff_per_step": 0.0,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Complementary jittery colorful flashes base for 'Arabian days'"
+            },
+            {
+                "effect_number": 92,
+                "title": "First Arabian Days Complement Overlay",
+                "beat_and_bar": "Bar 7: beats 58-60",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 50633,
+                    "end_time": 52487,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 16.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b2 segment overlay with rapid pulsing for complementary 'Arabian days'"
+            },
+            {
+                "effect_number": 93,
+                "title": "More Often",
+                "beat_and_bar": "Bar 7: beats 60-62",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 52867,
+                    "end_time": 53804,
+                    "segments": "b1"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple gradient pulsing with b1 segments for 'more often' lyrics"
+            },
+            {
+                "effect_number": 94,
+                "title": "Than Not",
+                "beat_and_bar": "Bar 7: beats 62-64",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 53804,
+                    "end_time": 54792,
+                    "segments": "b2"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange-yellow gradient pulsing with b2 segments for 'than not' lyrics"
+            },
+            {
+                "effect_number": 95,
+                "title": "Hotter Than Hot Base",
+                "beat_and_bar": "Bar 7-8: beats 64-67",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 54988,
+                    "end_time": 56674,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.05
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.0
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Bright orange-red snake base for 'hotter than hot' lyrics"
+            },
+            {
+                "effect_number": 96,
+                "title": "Hotter Than Hot Overlay",
+                "beat_and_bar": "Bar 7-8: beats 64-67",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 54988,
+                    "end_time": 56674,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 8.0,
+                            "diff_per_step": -0.02,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Red random segment sparkles for 'hotter than hot' lyrics"
+            },
+            {
+                "effect_number": 97,
+                "title": "In A Lot Of Good Ways Base",
+                "beat_and_bar": "Bar 8: beats 67-70",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 56672,
+                    "end_time": 59903,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple-orange gradient base for 'in a lot of good ways'"
+            },
+            {
+                "effect_number": 98,
+                "title": "In A Lot Of Good Ways Overlay",
+                "beat_and_bar": "Bar 8: beats 67-70",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 56672,
+                    "end_time": 59903,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Yellow snake overlay with centric pattern for 'in a lot of good ways'"
+            },
+            {
+                "effect_number": 99,
+                "title": "Second Crazy Boom Base",
+                "beat_and_bar": "Bar 8: beats 70-71",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 59887,
+                    "end_time": 60407,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 4.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Intense white flash base for second crazy boom"
+            },
+            {
+                "effect_number": 100,
+                "title": "Second Crazy Boom Overlay",
+                "beat_and_bar": "Bar 8: beats 70-71",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 59887,
+                    "end_time": 60407,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 3.0,
+                            "diff_per_step": -0.1,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b1 segment accents during second crazy boom"
+            },
+            {
+                "effect_number": 101,
+                "title": "Second Arabian Base",
+                "beat_and_bar": "Bar 8-9: beats 71-72",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 60424,
+                    "end_time": 63674,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.1,
+                            "max": 0.15,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.7,
+                            "max": 0.75,
+                            "phase": 0.5,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        }
+                    },
+                    "tail_length": {
+                        "sin": {
+                            "min": 0.3,
+                            "max": 0.5,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "effect_summary": "Ecstatic rainbow snake effect base for second 'Arabian' lyrics"
+            },
+            {
+                "effect_number": 102,
+                "title": "Second Arabian Overlay",
+                "beat_and_bar": "Bar 8-9: beats 71-72",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 60424,
+                    "end_time": 63674,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 12.0,
+                            "diff_per_step": -0.02,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "White sparkle random segment overlay for second 'Arabian' lyrics"
+            },
+            {
+                "effect_number": 103,
+                "title": "Second Arabian Complement Base",
+                "beat_and_bar": "Bar 8-9: beats 71-72",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 60424,
+                    "end_time": 63674,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.7,
+                            "max": 0.75,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.1,
+                            "max": 0.15,
+                            "phase": 0.5,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 1.0,
+                            "max": 0.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        }
+                    },
+                    "tail_length": {
+                        "sin": {
+                            "min": 0.3,
+                            "max": 0.5,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    }
+                },
+                "effect_summary": "Complementary rainbow snake effect base for second 'Arabian'"
+            },
+            {
+                "effect_number": 104,
+                "title": "Second Arabian Complement Overlay",
+                "beat_and_bar": "Bar 8-9: beats 71-72",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 60424,
+                    "end_time": 63674,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 0.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 12.0,
+                            "diff_per_step": -0.02,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "White sparkle b2 segment overlay for complementary second 'Arabian'"
+            },
+            {
+                "effect_number": 105,
+                "title": "Second Nights Base",
+                "beat_and_bar": "Bar 9: beats 74-76",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 63674,
+                    "end_time": 65465,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "linear": {
+                            "start": 0.1,
+                            "end": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "linear": {
+                            "start": 0.15,
+                            "end": 0.75
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 8.0
+                        }
+                    }
+                },
+                "effect_summary": "Rapidly pulsing rainbow base for second 'nights' lyrics"
+            },
+            {
+                "effect_number": 106,
+                "title": "Second Nights Overlay",
+                "beat_and_bar": "Bar 9: beats 74-76",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 63674,
+                    "end_time": 65465,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 6.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Purple snake updown pattern overlay for second 'nights' lyrics"
+            },
+            {
+                "effect_number": 107,
+                "title": "Second Arabian Days Base",
+                "beat_and_bar": "Bar 9: beats 76-78",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 65465,
+                    "end_time": 67319,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.2,
+                            "phase": 0.0,
+                            "repeats": 12.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.6,
+                            "max": 0.8,
+                            "phase": 0.5,
+                            "repeats": 12.0
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 8.0,
+                            "diff_per_step": 0.0,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Jittery colorful flashes base for second 'Arabian days'"
+            },
+            {
+                "effect_number": 108,
+                "title": "Second Arabian Days Overlay",
+                "beat_and_bar": "Bar 9: beats 76-78",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 65465,
+                    "end_time": 67319,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 16.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow random segment overlay with rapid pulsing for second 'Arabian days'"
+            },
+            {
+                "effect_number": 109,
+                "title": "Second Arabian Days Complement Base",
+                "beat_and_bar": "Bar 9: beats 76-78",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 65465,
+                    "end_time": 67319,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "sin": {
+                            "min": 0.6,
+                            "max": 0.8,
+                            "phase": 0.0,
+                            "repeats": 12.0
+                        }
+                    },
+                    "hue_end": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 0.2,
+                            "phase": 0.5,
+                            "repeats": 12.0
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 8.0,
+                            "diff_per_step": 0.0,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Complementary jittery colorful flashes base for second 'Arabian days'"
+            },
+            {
+                "effect_number": 110,
+                "title": "Second Arabian Days Complement Overlay",
+                "beat_and_bar": "Bar 9: beats 76-78",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 65465,
+                    "end_time": 67319,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 16.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b2 segment overlay with rapid pulsing for complementary second 'Arabian days'"
+            },
+            {
+                "effect_number": 111,
+                "title": "Fool Off His Guard Base",
+                "beat_and_bar": "Bar 9: beats 78-80",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 67783,
+                    "end_time": 69804,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Yellow-orange gradient snake base for 'fool off his guard'"
+            },
+            {
+                "effect_number": 112,
+                "title": "Fool Off His Guard Overlay",
+                "beat_and_bar": "Bar 9: beats 78-80",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 67783,
+                    "end_time": 69804,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 4.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b1 segment overlay with offset pulsing for 'fool off his guard'"
+            },
+            {
+                "effect_number": 113,
+                "title": "Could Fall And Fall Hard Base",
+                "beat_and_bar": "Bar 9-10: beats 80-82",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 69804,
+                    "end_time": 71954,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Purple gradient snake effect base for 'could fall and fall hard'"
+            },
+            {
+                "effect_number": 114,
+                "title": "Could Fall And Fall Hard Overlay",
+                "beat_and_bar": "Bar 9-10: beats 80-82",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 69804,
+                    "end_time": 71954,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 6.0,
+                            "diff_per_step": -0.03,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange b2 segment overlay with step fading for 'could fall and fall hard'"
+            },
+            {
+                "effect_number": 115,
+                "title": "Out There On The Dunes Base",
+                "beat_and_bar": "Bar 10: beats 82-86",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 71954,
+                    "end_time": 72885,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.9
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Orange-yellow gradient snake base for 'out there on the dunes'"
+            },
+            {
+                "effect_number": 116,
+                "title": "Out There On The Dunes Overlay",
+                "beat_and_bar": "Bar 10: beats 82-86",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 71954,
+                    "end_time": 72885,
+                    "segments": "updown"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Sand-colored updown pattern overlay with pulsing for 'dunes' reference"
+            },
+            {
+                "effect_number": 117,
+                "title": "Singing Fadeout Base",
+                "beat_and_bar": "Bar 10: beats 86-87",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 72885,
+                    "end_time": 75969,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.65
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.9,
+                            "end": 0.2
+                        }
+                    }
+                },
+                "effect_summary": "Gradually fading purple gradient base for singing fadeout"
+            },
+            {
+                "effect_number": 118,
+                "title": "Singing Fadeout Overlay",
+                "beat_and_bar": "Bar 10: beats 86-87",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 72885,
+                    "end_time": 75969,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.1
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.3,
+                            "end": 0.1
+                        }
+                    }
+                },
+                "effect_summary": "Fading orange snake overlay with centric pattern for singing fadeout"
+            },
+            {
+                "effect_number": 119,
+                "title": "Stupid Sound Like Licking Base",
+                "beat_and_bar": "Bar 10: beat 87",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 75969,
+                    "end_time": 76658,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 5.0,
+                            "diff_per_step": 0.0,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Staccato yellow-orange gradient base for licking sound"
+            },
+            {
+                "effect_number": 120,
+                "title": "Stupid Sound Like Licking Overlay",
+                "beat_and_bar": "Bar 10: beat 87",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 75969,
+                    "end_time": 76658,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 8.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b1 segment flashes for licking sound"
+            },
+            {
+                "effect_number": 121,
+                "title": "Stupid Sound 2 - Yo Yo Base",
+                "beat_and_bar": "Bar 10: beat 87",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 76960,
+                    "end_time": 77406,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 5.0
+                        }
+                    }
+                },
+                "effect_summary": "Rapid orange-yellow gradient pulses base for yo-yo decreasing sound"
+            },
+            {
+                "effect_number": 122,
+                "title": "Stupid Sound 2 - Yo Yo Overlay",
+                "beat_and_bar": "Bar 10: beat 87",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 76960,
+                    "end_time": 77406,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 8.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple b2 segment flashes for yo-yo decreasing sound"
+            },
+            {
+                "effect_number": 123,
+                "title": "Final Fadeout Base",
+                "beat_and_bar": "Bar 10: beats 87-end",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 77406,
+                    "end_time": 81224,
+                    "segments": "all"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.0
+                        }
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    },
+                    "tail_length": {
+                        "linear": {
+                            "start": 0.4,
+                            "end": 0.1
+                        }
+                    }
+                },
+                "effect_summary": "Final purple-orange gradient snake base fading to darkness"
+            },
+            {
+                "effect_number": 124,
+                "title": "Final Fadeout Overlay",
+                "beat_and_bar": "Bar 10: beats 87-end",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 77406,
+                    "end_time": 81224,
+                    "segments": "centric"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.0
+                        }
+                    }
+                },
+                "effect_summary": "Yellow centric pattern overlay fading to darkness for final fadeout"
+            }
+        ],
+        "duration_ms": 81224,
+        "num_repeats": 1
+    },
+    "name": "aladdin_intro"
+}

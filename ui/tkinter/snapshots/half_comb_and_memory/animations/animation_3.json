@@ -1,0 +1,55 @@
+{
+    "animation": {
+        "effects": [
+            {
+                "effect_number": 1,
+                "beat_and_bar": "Bars 0-10",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 80000,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.08,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "repeat": {
+                            "numberOfTimes": 87.0,
+                            "funcToRepeat": {
+                                "half": {
+                                    "f1": {
+                                        "const_value": {
+                                            "value": 1.0
+                                        }
+                                    },
+                                    "f2": {
+                                        "const_value": {
+                                            "value": 0.0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "effect_summary": "Orange color blinking effect synced with beats, repeating 87 times using half function inside repeat function"
+            }
+        ],
+        "duration_ms": 80000,
+        "num_repeats": 1
+    },
+    "name": "orange_blinking"
+}

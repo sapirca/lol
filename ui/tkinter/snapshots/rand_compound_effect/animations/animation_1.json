@@ -1,0 +1,183 @@
+{
+    "animation": {
+        "effects": [
+            {
+                "effect_number": 1,
+                "beat_and_bar": "Bar 0: beats 0-4",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1000,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7670892932482936,
+                        "sat": 0.8,
+                        "val": 1.0
+                    }
+                },
+                "effect_summary": "Purple gradient with pulsing brightness and snake effects"
+            },
+            {
+                "effect_number": 2,
+                "beat_and_bar": "Bar 0: beats 0-4",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1000,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7670892932482936,
+                        "sat": 0.8,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.7692307692307693,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Pulsing brightness on b1 segments"
+            },
+            {
+                "effect_number": 3,
+                "beat_and_bar": "Bar 0: beats 0-4",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1000,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7670892932482936,
+                        "sat": 0.8,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 1.2692307692307692,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Pulsing brightness on b2 segments with phase offset"
+            },
+            {
+                "effect_number": 4,
+                "beat_and_bar": "Bar 0: beats 0-4",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1000,
+                    "segments": "arc"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7670892932482936,
+                        "sat": 0.8,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 1.153846153846154,
+                            "end": 2.153846153846154
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.5
+                        }
+                    },
+                    "cyclic": true
+                },
+                "effect_summary": "Snake effect on arc segments"
+            },
+            {
+                "effect_number": 5,
+                "beat_and_bar": "Bar 0: beats 0-4",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 1000,
+                    "segments": "rand"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7670892932482936,
+                        "sat": 0.8,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "steps": {
+                            "first_step_value": 3.384615384615385,
+                            "diff_per_step": 0.5,
+                            "num_steps": 2.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.5
+                        }
+                    },
+                    "cyclic": true
+                },
+                "effect_summary": "Snake effect on random segments with step function"
+            }
+        ],
+        "duration_ms": 1000,
+        "num_repeats": 0
+    },
+    "name": "rainbow_gradient_animation"
+}
