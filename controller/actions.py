@@ -924,23 +924,27 @@ class DeleteRandomEffectAction(Action):
 class HighLevelPlanUpdateAction(Action):
     """Action for storing a high-level animation plan."""
 
-    def __init__(self, message_streamer):
+    def __init__(self, message_streamer, animation_manager):
         super().__init__(message_streamer)
+        self.animation_manager = animation_manager
         self._purpose = "Store a high-level plan for the animation"
         self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
         self._turn = TurnType.USER
         self._returns = {
-            "plan": "The high-level plan for the animation"
+            "plan": "The high-level plan for the animation",
+            "animation_sequence": "The animation sequence to be applied"
         }
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
-        return "plan" in params_dict and isinstance(params_dict["plan"], str)
+        return ("plan" in params_dict and isinstance(params_dict["plan"], str) and
+                "animation_sequence" in params_dict)
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         try:
             params_dict = self._get_params_dict(params)
             plan = params_dict["plan"]
+            animation_sequence = params_dict["animation_sequence"]
 
             # Add the plan to memory for future reference
             self.message_streamer.add_invisible(
@@ -948,21 +952,31 @@ class HighLevelPlanUpdateAction(Action):
                 f"High-level plan:\n{plan}",
                 context=False)
             
-            # # Update the plan in the animation manager
-            # self.animation_manager.update_plan(plan)
+            # Add the animation sequence to memory for future reference
+            self.message_streamer.add_invisible(
+                TAG_SYSTEM_INTERNAL,
+                f"Animation sequence:\n{animation_sequence}",
+                context=False)
+
+            # Add the animation sequence to the animation manager
+            self.animation_manager.add_sequence(animation_sequence)
+
+            # Render the animation
+            # self.animation_manager.render(animation_sequence, song_name="current_song", store_animation=True)
 
             return {
                 "status": "success",
-                "message": f"High-level plan stored successfully.",
+                "message": f"High-level plan and animation sequence stored and rendered successfully.",
                 "confirmation_type": self.confirmation_type,
                 "data": {
-                    "plan": plan
+                    "plan": plan,
+                    "animation_sequence": animation_sequence
                 }
             }
         except Exception as e:
             error_result = {
                 "status": "error",
-                "message": f"Error storing high-level plan: {str(e)}",
+                "message": f"Error storing high-level plan and animation sequence: {str(e)}",
                 "confirmation_type": self.confirmation_type
             }
             self._log_action_result("high_level_plan_update", error_result)
@@ -1107,6 +1121,29 @@ class ActionRegistry:
                 for key, desc in action.returns.items():
                     lines.append(f"    - {key}: {desc}")
             lines.append("")
+        return "\n".join(lines)
+
+    def get_action_documentation(self, name: str) -> str:
+        """Get documentation for a specific action.
+        
+        Args:
+            name: The name of the action to get documentation for.
+            
+        Returns:
+            A string containing the documentation for the specified action.
+        """
+        action = self._actions.get(name)
+        if not action:
+            return f"Action {name} not found"
+            
+        lines = []
+        lines.append(f"Action: {name}")
+        lines.append(f"  - Purpose: {action.purpose}")
+        lines.append(f"  - Confirmation type: {action.confirmation_type}")
+        if action.returns:
+            lines.append("  - Returns:")
+            for key, desc in action.returns.items():
+                lines.append(f"    - {key}: {desc}")
         return "\n".join(lines)
 
     def get_result_format_documentation(self) -> str:

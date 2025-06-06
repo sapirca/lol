@@ -1207,6 +1207,7 @@ def show_new_chat_dialog():
                 # update_chat_window(TAG_SYSTEM, "System", status_msg)
                 # update new messages
                 refresh()
+                update_animation_data()
             
             # Start async skeleton building
             controller.build_skeleton(callback=skeleton_callback)

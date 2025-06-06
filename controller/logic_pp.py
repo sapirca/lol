@@ -150,7 +150,7 @@ class LogicPlusPlus:
             ))
         self.action_registry.register_action(
             "high_level_plan_update",
-            HighLevelPlanUpdateAction(self.msgs))
+            HighLevelPlanUpdateAction(self.msgs, self.animation_manager))
         self.action_registry.register_action(
             "get_animation",
             GetAnimationAction(self.animation_manager, self.msgs))
@@ -648,15 +648,13 @@ class LogicPlusPlus:
                     self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
                     if callback:
                         callback(error_msg)
-                    
             except Exception as e:
-                error_msg = f"Error building skeleton: {str(e)}"
+                error_msg = f"Error in skeleton generation: {str(e)}"
                 self.logger.error(error_msg)
                 self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
                 if callback:
                     callback(error_msg)
-
+        
         # Start the async process
         thread = threading.Thread(target=_build_skeleton_async)
-        thread.daemon = True  # Make thread daemon so it exits when main program exits
         thread.start()

@@ -1,7 +1,7 @@
-from typing import Dict, Any, List, Optional, Literal
-from pydantic import BaseModel, Field
 
-common_parts = """
+Generate a high-level skeleton animation for a music-synchronized light show.
+
+
 Installation Setup ("The World"):
 - Multiple physical objects called "Elements", each with an LED strip and controller
 - Each Element can be lit with specific colors, brightness, and effects
@@ -32,46 +32,7 @@ Guidelines for Animation Creation:
 3. Each beat frame is rendered independently (no state carries over)
 4. Default brightness is 1.0 when not specified
 5. Use saturated colors (sat > 0.8) for better visibility
-"""
 
-intro_prompt = f"""
-You are an AI assistant that helps users create and manage synchronized light show animations. You can control LED-equipped structures ("Elements") to create dynamic visual experiences synchronized with music.
-
-{common_parts}
-
-{{actions_doc}}
-
-Guidelines for Animation Creation:
-1. Sync animations with musical beats and sections
-2. Use color and brightness to reflect the music's emotional intent
-3. Each beat frame is rendered independently (no state carries over)
-4. Default brightness is 1.0 when not specified
-5. Use saturated colors (sat > 0.8) for better visibility
-
-Guidelines for Using Actions:
-1. You can use multiple actions in a single response
-2. Actions are executed in the order they appear in your response
-3. If an action requires confirmation (like update_animation), subsequent actions will not be executed until the user confirms
-4. Always provide clear reasoning for your actions
-5. Use get_* actions to gather necessary information before making updates
-6. When updating animations, it's recommended to get the current state first
-
-{{result_format_doc}}
-
-{{response_format_doc}}
-
-Remember:
-1. Always validate parameters before executing actions
-2. Handle errors gracefully and provide clear error messages
-3. Wait for user confirmation when required
-4. Use the action results to inform your next steps
-5. Keep responses concise and focused on the task at hand
-"""
-
-skeleton_prompt = f"""
-Generate a high-level skeleton animation for a music-synchronized light show.
-
-{common_parts}
 
 Use the action: HighLevelPlanUpdateAction to store the high-level plan and animation sequence.
 
@@ -104,4 +65,3 @@ Use the action: HighLevelPlanUpdateAction to store the high-level plan and anima
 * Include all necessary timing, effects, and transitions.
 * Ensure the sequence is synchronized with the musical structure.
 * Use appropriate effect types and patterns for each section.
-"""

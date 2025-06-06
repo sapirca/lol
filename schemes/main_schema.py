@@ -222,13 +222,14 @@ class DeleteRandomEffectAction(BaseModel):
     params: DeleteRandomEffectParams
 
 
-class HighLevelPlanUpdateParams(BaseActionParams):
+class HighLevelPlanUpdateParams(BaseActionParams, Generic[T]):
     plan: str = Field(description="The high-level plan for the animation")
+    animation_sequence: T = Field(description="The animation sequence to be applied")
 
 
-class HighLevelPlanUpdateAction(BaseModel):
+class HighLevelPlanUpdateAction(BaseModel, Generic[T]):
     name: Literal["high_level_plan_update"]
-    params: HighLevelPlanUpdateParams
+    params: HighLevelPlanUpdateParams[T]
 
 
 # Union type for all possible actions

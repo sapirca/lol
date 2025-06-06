@@ -5,7 +5,7 @@ from animation.animation_manager import AnimationManager
 from memory.memory_manager import MemoryManager
 from music.song_provider import SongProvider
 from typing import Optional, Dict, Any
-from prompts.main_prompt import intro_prompt, skeleton_prompt
+from prompts.main_prompt import intro_prompt, skeleton_prompt, common_parts
 
 
 class Formatter:
@@ -47,7 +47,7 @@ class Formatter:
             result_format_doc=result_format_doc,
             response_format_doc=response_format_doc)
 
-        print(self.formatted_intro_prompt)
+        # print("Formatter initialized successfully")
 
     def build_messages(self):
         """
@@ -58,7 +58,6 @@ class Formatter:
         messages = []
 
         # Build prompt content
-
         prompt_content = []
         if self.formatted_intro_prompt:
             prompt_content.append("# Your Task:")
@@ -86,15 +85,12 @@ class Formatter:
         try:
             song_name = self.config.get("song_name")
             if song_name:
-                # song_info = self.song_provider.get_song_structure(song_name)
                 song_info = self.song_provider.get_bars(
                     song_name) + self.song_provider.get_beats(song_name)
                 if song_info:
                     messages.append({
-                        "role":
-                        "system",
-                        "content":
-                        f"# The Song Structure:\n {song_info}"
+                        "role": "system",
+                        "content": f"# The Song Structure:\n {song_info}"
                     })
         except Exception as e:
             # Log error but continue without song info
@@ -201,16 +197,50 @@ IMPORTANT: Do not include any animation code in your response. Only describe the
         Returns:
             List of message dictionaries for the LLM.
         """
-        # Get base messages from build_messages
-        messages = self.build_messages()
+        messages = []
         
-        # Add skeleton prompt with high-level plan action
-        skeleton_message = {
+        # Add skeleton prompt
+        messages.append({
             "role": "system",
-            "content": skeleton_prompt + "\n\nIMPORTANT: You must use the 'high_level_plan_update' action for this task. This action requires a 'plan' field with your high-level plan for the animation."
-        }
+            "content": skeleton_prompt
+        })
         
-        # Add skeleton prompt to messages
-        messages.append(skeleton_message)
+        # Add music bars if song name is provided
+        song_name = self.config.get("song_name")
+        if song_name and self.song_provider:
+            try:
+                bars = self.song_provider.get_bars(song_name)
+                if bars:
+                    messages.append({
+                        "role": "system",
+                        "content": f"Music bars:\n{bars}"
+                    })
+            except Exception as e:
+                print(f"Error getting song info: {e}")
+        
+        # Add memory
+        memory_content = self.memory_manager.get_memory()
+        if memory_content:
+            messages.append({
+                "role": "system",
+                "content": f"Memory:\n{memory_content}"
+            })
+        
+        # Add action description
+        action_doc = self.action_registry.get_action_documentation("high_level_plan_update")
+        messages.append({
+            "role": "system",
+            "content": f"Action: high_level_plan_update\n{action_doc}"
+        })
+        
+        # Add response format
+        messages.append({
+            "role": "system",
+            "content": "Your response must include both the high-level plan and the animation sequence."
+        })
+        
+        # save the skeleton prompt to a file
+        with open("prompts/skeleton_prompt.md", "w") as file:
+            file.write(skeleton_prompt)
         
         return messages
