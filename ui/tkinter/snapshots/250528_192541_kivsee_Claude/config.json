@@ -1,9 +1,0 @@
-{
-    "selected_backend": "Claude",
-    "framework": "kivsee",
-    "song_name": "aladdin",
-    "model_config": {
-        "model_name": "claude-3-7-sonnet-latest",
-        "max_tokens": 64000
-    }
-}

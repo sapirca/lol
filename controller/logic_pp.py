@@ -526,3 +526,29 @@ class LogicPlusPlus:
     def get_last_action_result(self):
         """Get the last action result from the action registry."""
         return self.action_registry.get_last_action_result()
+
+    def update_config(self, new_config):
+        """Update the controller's configuration.
+        
+        Args:
+            new_config (dict): The new configuration to apply.
+        """
+        self.config.update(new_config)
+        self.selected_framework = new_config.get("framework", self.selected_framework)
+        self.selected_backend = new_config.get("selected_backend", self.selected_backend)
+        
+        # Reinitialize components that depend on config
+        self._initialize_backends()
+        self.animation_manager = AnimationManager(self.selected_framework, self.msgs)
+        self.memory_manager = MemoryManager(self.selected_framework)
+        self.response_manager = Interpreter(self.animation_manager, config=self.config)
+        self.formatter = Formatter(self.msgs, self.animation_manager, self.memory_manager, 
+                                 self.song_provider, self.action_registry, self.config)
+
+    def build_skeleton(self):
+        """Build a skeleton animation sequence for the current song.
+        This is a stub method that will be implemented later.
+        """
+        self.logger.info("Building skeleton animation sequence...")
+        # TODO: Implement skeleton building logic
+        pass

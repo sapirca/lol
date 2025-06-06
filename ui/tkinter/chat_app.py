@@ -22,6 +22,7 @@ from controller.message_streamer import (
     TAG_SYSTEM_INTERNAL,
     TAG_ACTION_RESULTS,
 )
+from constants import MODEL_CONFIGS
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -1029,6 +1030,184 @@ def handle_confirmation(confirmed: bool):
     enable_ui()
 
 
+def is_valid_chat_name(name):
+    """Validate chat name format.
+    
+    Args:
+        name (str): The chat name to validate
+        
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    # Chat name should:
+    # - Not be empty
+    # - Not contain special characters except underscore and hyphen
+    # - Not start with a number
+    # - Not contain spaces
+    if not name or not isinstance(name, str):
+        return False
+    
+    # Check if name starts with a number
+    if name[0].isdigit():
+        return False
+    
+    # Check for invalid characters
+    if not re.match(r'^[a-zA-Z0-9_-]+$', name):
+        return False
+    
+    return True
+
+
+def initialize_from_config(config, chat_name):
+    """Initialize a new chat session with the given configuration and name.
+    
+    Args:
+        config (dict): The configuration to use
+        chat_name (str): The name for the new chat
+    """
+    global controller, active_chat_snapshot, button_mapping
+    controller = LogicPlusPlus()
+    controller.update_config(config)
+    active_chat_snapshot = chat_name
+
+    chat_window.config(state=tk.NORMAL)
+    chat_window.delete("1.0", tk.END)
+
+    # Welcome message
+    message = f"Welcome to chat session: {chat_name}!"
+    update_chat_window(get_label_tag(TYPE_SYSTEM),
+                       get_sender_name(TYPE_SYSTEM), message)
+
+    # System info
+    print_system_info()
+
+    chat_window.config(state=tk.DISABLED)
+
+    # Add the new chat to the snapshot list
+    # Get the buttons frame from the canvas
+    canvas = chat_list_frame.winfo_children()[0]  # Get the canvas
+    buttons_frame = canvas.winfo_children()[0]    # Get the buttons frame
+    
+    snapshot_button = tk.Button(
+        buttons_frame,
+        text=chat_name,
+        command=lambda: save_and_load_chat_content(chat_name),
+        wraplength=260,
+        justify=tk.CENTER,
+        anchor=tk.CENTER)
+    snapshot_button.pack(fill=tk.X, pady=2, padx=2)
+    button_mapping[chat_name] = snapshot_button
+
+    update_active_chat_label(chat_name)
+    update_animation_data()
+
+
+
+def show_new_chat_dialog():
+    """Show dialog to configure new chat settings."""
+    dialog = tk.Toplevel(root)
+    dialog.title("New Chat Configuration")
+    dialog.geometry("400x550")  # Made slightly taller for new field
+    dialog.transient(root)
+    dialog.grab_set()
+
+    # Create main frame with padding
+    main_frame = tk.Frame(dialog, padx=20, pady=20)
+    main_frame.pack(fill=tk.BOTH, expand=True)
+
+    # Get current config values
+    current_config = controller.config if controller else {}
+    
+    # Chat name entry
+    tk.Label(main_frame, text="Chat Name:").pack(anchor=tk.W, pady=(0, 5))
+    chat_name_var = tk.StringVar(value="untitled")
+    chat_name_entry = tk.Entry(main_frame, textvariable=chat_name_var)
+    chat_name_entry.pack(fill=tk.X, pady=(0, 10))
+    
+    # Song selection
+    tk.Label(main_frame, text="Song:").pack(anchor=tk.W, pady=(0, 5))
+    song_var = tk.StringVar(value=current_config.get("song_name", "aladdin"))
+    song_dropdown = ttk.Combobox(main_frame, textvariable=song_var, state="readonly")
+    song_dropdown['values'] = ["aladdin", "nikki", "sandstorm"]
+    song_dropdown.pack(fill=tk.X, pady=(0, 10))
+
+    # Framework selection
+    tk.Label(main_frame, text="Framework:").pack(anchor=tk.W, pady=(0, 5))
+    framework_var = tk.StringVar(value=current_config.get("framework", "kivsee"))
+    framework_dropdown = ttk.Combobox(main_frame, textvariable=framework_var, state="readonly")
+    framework_dropdown['values'] = ["kivsee", "xlights", "conceptual"]
+    framework_dropdown.pack(fill=tk.X, pady=(0, 10))
+
+    # Backend selection
+    tk.Label(main_frame, text="Backend:").pack(anchor=tk.W, pady=(0, 5))
+    backend_var = tk.StringVar(value=current_config.get("selected_backend", "Claude"))
+    backend_dropdown = ttk.Combobox(main_frame, textvariable=backend_var, state="readonly")
+    backend_dropdown['values'] = ["Claude", "GPT", "Gemini"]
+    backend_dropdown.pack(fill=tk.X, pady=(0, 10))
+
+    # Model selection
+    tk.Label(main_frame, text="Model:").pack(anchor=tk.W, pady=(0, 5))
+    model_var = tk.StringVar()
+    model_dropdown = ttk.Combobox(main_frame, textvariable=model_var, state="readonly")
+    
+    def update_model_options(*args):
+        backend = backend_var.get()
+        model_dropdown['values'] = [k for k in MODEL_CONFIGS.keys() if k.startswith(backend.lower())]
+        if model_dropdown['values']:
+            model_var.set(model_dropdown['values'][0])
+    
+    backend_var.trace('w', update_model_options)
+    update_model_options()
+    model_dropdown.pack(fill=tk.X, pady=(0, 10))
+
+    # Start with skeleton checkbox
+    skeleton_var = tk.BooleanVar(value=False)
+    skeleton_check = tk.Checkbutton(main_frame, text="Start with a skeleton", variable=skeleton_var)
+    skeleton_check.pack(anchor=tk.W, pady=(0, 10))
+
+    # Error label for validation messages
+    error_label = tk.Label(main_frame, text="", fg="red")
+    error_label.pack(anchor=tk.W, pady=(0, 10))
+
+    def on_save():
+        chat_name = chat_name_var.get().strip()
+        if not is_valid_chat_name(chat_name):
+            error_label.config(text="Invalid chat name. Use only letters, numbers, underscore, and hyphen.")
+            return
+            
+        new_config = {
+            "song_name": song_var.get(),
+            "framework": framework_var.get(),
+            "selected_backend": backend_var.get(),
+            "model_config": MODEL_CONFIGS[model_var.get()]
+        }
+        
+        # Initialize new chat with config
+        initialize_from_config(new_config, chat_name)
+        
+        # Build skeleton if requested
+        if skeleton_var.get():
+            controller.build_skeleton()
+        
+        # # Save the chat with the new name
+        # save_chat()
+        
+        dialog.destroy()
+
+    def on_cancel():
+        dialog.destroy()
+
+    # Buttons frame
+    button_frame = tk.Frame(main_frame)
+    button_frame.pack(fill=tk.X, pady=(20, 0))
+    
+    save_button = tk.Button(button_frame, text="Save", command=on_save, width=10)
+    save_button.pack(side=tk.RIGHT, padx=5)
+    
+    cancel_button = tk.Button(button_frame, text="Cancel", command=on_cancel, width=10)
+    cancel_button.pack(side=tk.RIGHT, padx=5)
+
+
 # Create the main window
 root = tk.Tk()
 root.title("Chat App")
@@ -1102,6 +1281,13 @@ restart_button = tk.Button(buttons_frame,
                            command=lambda: restart_with_latest_sequence(),
                            width=6)
 restart_button.pack(side=tk.RIGHT, padx=5)
+
+# Add new chat button
+new_chat_button = tk.Button(buttons_frame,
+                           text="New Chat",
+                           command=show_new_chat_dialog,
+                           width=6)
+new_chat_button.pack(side=tk.RIGHT, padx=5)
 
 # Add reduce tokens button
 reduce_tokens_button = tk.Button(buttons_frame,
