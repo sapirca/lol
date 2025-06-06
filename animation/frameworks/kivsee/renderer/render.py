@@ -17,7 +17,8 @@ from google.protobuf.json_format import ParseDict
 # pi@raspberrypi
 # kivsee12
 
-RASPBERRY_PI_IP = "192.168.1.12"
+# RASPBERRY_PI_IP = "192.168.1.12"
+RASPBERRY_PI_IP = "192.168.1.27"
 SEQUENCE_URL = f"http://{RASPBERRY_PI_IP}:8082"
 TRIGGER_URL = f"http://{RASPBERRY_PI_IP}:8083"
 SIMULATION_URL = f"http://{RASPBERRY_PI_IP}:8084"

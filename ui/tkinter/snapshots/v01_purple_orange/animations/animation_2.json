@@ -1,0 +1,1032 @@
+{
+    "animation": {
+        "effects": [
+            {
+                "effect_number": 1,
+                "title": "Intro Pulse",
+                "beat_and_bar": "Bar 0: beats 0-4",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 4283,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Gentle purple pulsing with brightness to introduce the song"
+            },
+            {
+                "effect_number": 2,
+                "title": "Cymbal Flash",
+                "beat_and_bar": "Bar 0: beats 4-8",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 4283,
+                    "end_time": 7991,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Cymbal accent with bright yellow flash"
+            },
+            {
+                "effect_number": 3,
+                "title": "Violin Rise",
+                "beat_and_bar": "Bar 1: beats 8-12",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 7991,
+                    "end_time": 11699,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.75,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 0.0,
+                            "end": 1.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Increasing violet sound with snake effect"
+            },
+            {
+                "effect_number": 4,
+                "title": "Complementary Rise",
+                "beat_and_bar": "Bar 1: beats 8-12",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 7991,
+                    "end_time": 11699,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    }
+                },
+                "effect_summary": "Complementary orange snake on even rings"
+            },
+            {
+                "effect_number": 5,
+                "title": "Violin Up Down",
+                "beat_and_bar": "Bar 1-2: beats 12-16",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 11699,
+                    "end_time": 15407,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Up and down violin sound with alternating purple and orange"
+            },
+            {
+                "effect_number": 6,
+                "title": "Violin Fade",
+                "beat_and_bar": "Bar 2: beats 16-20",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 15407,
+                    "end_time": 19115,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Decreasing violin sound with fading brightness"
+            },
+            {
+                "effect_number": 7,
+                "title": "Lyrics Begin",
+                "beat_and_bar": "Bar 2-3: beats 20-24",
+                "elements": [
+                    "ring9",
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 19115,
+                    "end_time": 22823,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Lyrics start with gentle orange glow"
+            },
+            {
+                "effect_number": 8,
+                "title": "Desert Imagery",
+                "beat_and_bar": "Bar 3: beats 24-28",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 22823,
+                    "end_time": 26531,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "effect_summary": "Storytelling with yellow desert color"
+            },
+            {
+                "effect_number": 9,
+                "title": "Purple Accents",
+                "beat_and_bar": "Bar 3: beats 24-28",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 22823,
+                    "end_time": 26531,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "effect_summary": "Complementary purple accents"
+            },
+            {
+                "effect_number": 10,
+                "title": "Intensity Build",
+                "beat_and_bar": "Bar 3-4: beats 28-32",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 26531,
+                    "end_time": 30239,
+                    "segments": "centric"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Increasing intensity with orange-purple rainbow"
+            },
+            {
+                "effect_number": 11,
+                "title": "Wind Effect",
+                "beat_and_bar": "Bar 4: beats 32-36",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9"
+                ],
+                "effect_config": {
+                    "start_time": 30239,
+                    "end_time": 33947,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.5
+                        }
+                    }
+                },
+                "effect_summary": "Wind sounds with yellow-orange snake effect"
+            },
+            {
+                "effect_number": 12,
+                "title": "Wind Complement",
+                "beat_and_bar": "Bar 4: beats 32-36",
+                "elements": [
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 30239,
+                    "end_time": 33947,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 1.0,
+                            "max": 0.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.5
+                        }
+                    }
+                },
+                "effect_summary": "Wind sounds with purple complementary effect"
+            },
+            {
+                "effect_number": 13,
+                "title": "Sand Effect",
+                "beat_and_bar": "Bar 4-5: beats 36-40",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 33947,
+                    "end_time": 37655,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.15,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Sand reference with yellow pulsing brightness"
+            },
+            {
+                "effect_number": 14,
+                "title": "Lyrics Continuation",
+                "beat_and_bar": "Bar 5: beats 40-44",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 37655,
+                    "end_time": 41363,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange pulsing for lyrics continuation"
+            },
+            {
+                "effect_number": 15,
+                "title": "Lyrics Complement",
+                "beat_and_bar": "Bar 5: beats 40-44",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 37655,
+                    "end_time": 41363,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 2.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple complementary pulsing for lyrics"
+            },
+            {
+                "effect_number": 16,
+                "title": "Pre-Chorus Build",
+                "beat_and_bar": "Bar 5-6: beats 44-48",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 41363,
+                    "end_time": 45071,
+                    "segments": "centric"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Building intensity before chorus with orange-purple gradient"
+            },
+            {
+                "effect_number": 17,
+                "title": "Chorus Boom",
+                "beat_and_bar": "Bar 6: beats 48-50",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 45071,
+                    "end_time": 46950,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 3.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Ecstatic orange flash for 'Arabian' chorus start"
+            },
+            {
+                "effect_number": 18,
+                "title": "Chorus Part 1",
+                "beat_and_bar": "Bar 6-7: beats 50-56",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 46950,
+                    "end_time": 52487,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Vibrant yellow snake effect for 'Arabian nights'"
+            },
+            {
+                "effect_number": 19,
+                "title": "Chorus Part 1 Complement",
+                "beat_and_bar": "Bar 6-7: beats 50-56",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 46950,
+                    "end_time": 52487,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 1.0,
+                            "max": 0.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Complementary purple snake for chorus harmony"
+            },
+            {
+                "effect_number": 20,
+                "title": "Chorus Bridge",
+                "beat_and_bar": "Bar 7: beats 56-60",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 52487,
+                    "end_time": 59903,
+                    "segments": "updown"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.15
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 4.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange-yellow gradient with pulsing for chorus bridge"
+            },
+            {
+                "effect_number": 21,
+                "title": "Second Chorus Boom",
+                "beat_and_bar": "Bar 8: beats 60-62",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 59903,
+                    "end_time": 61757,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "steps": {
+                            "num_steps": 3.0,
+                            "diff_per_step": -0.05,
+                            "first_step_value": 1.0
+                        }
+                    }
+                },
+                "effect_summary": "Ecstatic purple flash for second 'Arabian' chorus"
+            },
+            {
+                "effect_number": 22,
+                "title": "Second Chorus Part 1",
+                "beat_and_bar": "Bar 8-9: beats 62-68",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 61757,
+                    "end_time": 67319,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Repeated yellow snake effect for second 'Arabian nights'"
+            },
+            {
+                "effect_number": 23,
+                "title": "Second Chorus Part 1 Complement",
+                "beat_and_bar": "Bar 8-9: beats 62-68",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 61757,
+                    "end_time": 67319,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "snake": {
+                    "head": {
+                        "sin": {
+                            "min": 1.0,
+                            "max": 0.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    },
+                    "tail_length": {
+                        "const_value": {
+                            "value": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Repeated complementary purple snake for second chorus"
+            },
+            {
+                "effect_number": 24,
+                "title": "Transition Section",
+                "beat_and_bar": "Bar 9-10: beats 68-74",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 67319,
+                    "end_time": 72881,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.1,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange transition with pulsing brightness"
+            },
+            {
+                "effect_number": 25,
+                "title": "Transition Complement",
+                "beat_and_bar": "Bar 9-10: beats 68-74",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 67319,
+                    "end_time": 72881,
+                    "segments": "b2"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 3.0
+                        }
+                    }
+                },
+                "effect_summary": "Purple complementary transition with offset pulsing"
+            },
+            {
+                "effect_number": 26,
+                "title": "Fade Out Start",
+                "beat_and_bar": "Bar 10: beats 74-78",
+                "elements": [
+                    "ring7",
+                    "ring9",
+                    "ring11"
+                ],
+                "effect_config": {
+                    "start_time": 72881,
+                    "end_time": 76589,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.12,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.85
+                        }
+                    }
+                },
+                "effect_summary": "Beginning of fade out with decreasing yellow brightness"
+            },
+            {
+                "effect_number": 27,
+                "title": "Fade Out Complement",
+                "beat_and_bar": "Bar 10: beats 74-78",
+                "elements": [
+                    "ring8",
+                    "ring10",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 72881,
+                    "end_time": 76589,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 1.0,
+                            "end": 0.85
+                        }
+                    }
+                },
+                "effect_summary": "Complementary purple fade out"
+            },
+            {
+                "effect_number": 28,
+                "title": "Final Fade",
+                "beat_and_bar": "Bar 10: beats 78-82",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 76589,
+                    "end_time": 80297,
+                    "segments": "centric"
+                },
+                "rainbow": {
+                    "hue_start": {
+                        "const_value": {
+                            "value": 0.1
+                        }
+                    },
+                    "hue_end": {
+                        "const_value": {
+                            "value": 0.7
+                        }
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.85,
+                            "end": 0.8
+                        }
+                    }
+                },
+                "effect_summary": "Final fade out with decreasing orange-purple gradient"
+            },
+            {
+                "effect_number": 29,
+                "title": "End Glow",
+                "beat_and_bar": "Bar 10: beats 82-87",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 80297,
+                    "end_time": 81224,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.7,
+                        "sat": 0.9,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "linear": {
+                            "start": 0.8,
+                            "end": 0.0
+                        }
+                    }
+                },
+                "effect_summary": "Final purple glow fading to darkness"
+            }
+        ],
+        "duration_ms": 81224,
+        "num_repeats": 1
+    },
+    "name": "aladdin_intro"
+}

@@ -1,0 +1,127 @@
+{
+    "animation": {
+        "effects": [
+            {
+                "effect_number": 1,
+                "beat_and_bar": "Bars 0-1",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 10000,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.0,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.25,
+                            "repeats": 11.667
+                        }
+                    }
+                },
+                "glitter": {
+                    "intensity": {
+                        "sin": {
+                            "min": 0.1,
+                            "max": 0.4,
+                            "phase": 0.0,
+                            "repeats": 5.0
+                        }
+                    },
+                    "sat_mult_factor": {
+                        "const_value": {
+                            "value": 0.9
+                        }
+                    }
+                },
+                "effect_summary": "Red color pulsing with the beat, with subtle glitter effect that varies in intensity"
+            },
+            {
+                "effect_number": 2,
+                "beat_and_bar": "Bars 1-2",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 10000,
+                    "end_time": 20000,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.08,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "sin": {
+                            "min": 0.0,
+                            "max": 1.0,
+                            "phase": 0.0,
+                            "repeats": 11.667
+                        }
+                    }
+                },
+                "glitter": {
+                    "intensity": {
+                        "const_value": {
+                            "value": 0.3
+                        }
+                    },
+                    "sat_mult_factor": {
+                        "const_value": {
+                            "value": 0.9
+                        }
+                    }
+                },
+                "alternate": {
+                    "numberOfPixels": 4,
+                    "hue_offset": {
+                        "const_value": {
+                            "value": 0.05
+                        }
+                    },
+                    "sat_mult": {
+                        "const_value": {
+                            "value": 1.0
+                        }
+                    },
+                    "brightness_mult": {
+                        "sin": {
+                            "min": 0.8,
+                            "max": 1.0,
+                            "phase": 0.5,
+                            "repeats": 8.0
+                        }
+                    }
+                },
+                "effect_summary": "Orange color breathing effect with constant glitter and alternating pattern that shifts slightly in hue"
+            }
+        ],
+        "duration_ms": 20000,
+        "num_repeats": 1
+    },
+    "name": "red_orange_animation"
+}

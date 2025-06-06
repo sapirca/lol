@@ -1,0 +1,100 @@
+{
+    "animation": {
+        "effects": [
+            {
+                "effect_number": 1,
+                "beat_and_bar": "Bars 0-10",
+                "elements": [
+                    "ring7",
+                    "ring8",
+                    "ring9",
+                    "ring10",
+                    "ring11",
+                    "ring12"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 80000,
+                    "segments": "all"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.08,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "repeat": {
+                            "numberOfTimes": 43.5,
+                            "funcToRepeat": {
+                                "half": {
+                                    "f1": {
+                                        "const_value": {
+                                            "value": 1.0
+                                        }
+                                    },
+                                    "f2": {
+                                        "const_value": {
+                                            "value": 0.0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "effect_summary": "Orange color blinking effect synced with beats, repeating 43.5 times using half function inside repeat function to align ON state with each beat"
+            },
+            {
+                "effect_number": 2,
+                "beat_and_bar": "Bars 0-10",
+                "elements": [
+                    "ring9",
+                    "ring10"
+                ],
+                "effect_config": {
+                    "start_time": 0,
+                    "end_time": 80000,
+                    "segments": "b1"
+                },
+                "const_color": {
+                    "color": {
+                        "hue": 0.33,
+                        "sat": 1.0,
+                        "val": 1.0
+                    }
+                },
+                "brightness": {
+                    "mult_factor": {
+                        "comb2": {
+                            "f1": {
+                                "sin": {
+                                    "min": 0.8,
+                                    "max": 1.0,
+                                    "phase": 0.0,
+                                    "repeats": 43.0
+                                }
+                            },
+                            "amount1": 0.6,
+                            "f2": {
+                                "sin": {
+                                    "min": 0.8,
+                                    "max": 1.0,
+                                    "phase": 0.25,
+                                    "repeats": 29.0
+                                }
+                            },
+                            "amount2": 0.4
+                        }
+                    }
+                },
+                "effect_summary": "Green color with unpredictable pulsing brightness pattern created by combining two sine functions with different frequencies and phases"
+            }
+        ],
+        "duration_ms": 80000,
+        "num_repeats": 1
+    },
+    "name": "orange_blinking"
+}
