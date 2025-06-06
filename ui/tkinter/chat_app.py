@@ -239,14 +239,21 @@ def update_active_chat_label(button_name):
     framework_info = framework_info.capitalize()
     # Get model info from config if available
     model_info = ""
-    if controller and controller.config and "model_config" in controller.config:
+    if controller and controller.config:
+        song_name = controller.config["song_name"]
+    else:
+        song_name = "song N/A"
+    
+    if "model_config" in controller.config:
         model_name = controller.config["model_config"]["model_name"]
         max_tokens = controller.config["model_config"]["max_tokens"]
-        song_name = controller.config["song_name"]
-        model_info = f" {model_name[:10]} ({max_tokens})"
+        model_info = f"| {model_name[:10]} ({max_tokens})"
+    else:
+        model_info = " | model info N/A"
+    
 
     active_chat_label.config(
-        text=f"{song_name} | {framework_info}| {model_info} | {button_name}")
+        text=f"{song_name} | {framework_info}{model_info} | {button_name}")
 
     # Update status with step number
     step_number = len(
@@ -729,6 +736,18 @@ def populate_snapshot_list():
     global button_mapping
     button_mapping = {}
 
+    # # Add untitled button first
+    # untitled_button = tk.Button(
+    #     buttons_frame,
+    #     text="untitled",
+    #     command=save_and_load_untitled_chat,
+    #     wraplength=260,  # Allow text wrapping
+    #     justify=tk.CENTER,  # Center the wrapped text
+    #     anchor=tk.CENTER)  # Center the text in button
+    # untitled_button.pack(fill=tk.X, pady=2, padx=2)
+    # button_mapping["untitled"] = untitled_button
+
+    # Add snapshot buttons
     for snapshot_folder in snapshot_folders:
         snapshot_button = tk.Button(
             buttons_frame,
@@ -740,16 +759,6 @@ def populate_snapshot_list():
             anchor=tk.CENTER)  # Center the text in button
         snapshot_button.pack(fill=tk.X, pady=2, padx=2)
         button_mapping[snapshot_folder] = snapshot_button
-
-    untitled_button = tk.Button(
-        buttons_frame,
-        text="untitled",
-        command=save_and_load_untitled_chat,
-        wraplength=260,  # Allow text wrapping
-        justify=tk.CENTER,  # Center the wrapped text
-        anchor=tk.CENTER)  # Center the text in button
-    untitled_button.pack(fill=tk.X, pady=2, padx=2)
-    button_mapping["untitled"] = untitled_button
 
     buttons_frame.bind(
         "<Configure>",
@@ -764,9 +773,13 @@ def populate_snapshot_list():
 
     canvas.bind("<Configure>", update_buttons_width)
 
-    buttons = buttons_frame.winfo_children()
-    if buttons:
-        buttons[-1].invoke()
+    # Load the last chat if snapshots exist, otherwise load untitled
+    if snapshot_folders:
+        # Sort snapshots by name (which includes timestamp) to get the most recent
+        last_snapshot = sorted(snapshot_folders)[-1]
+        _load_chat(last_snapshot)
+    else:
+        _load_untitled_chat()
 
 
 def handle_keypress(event):

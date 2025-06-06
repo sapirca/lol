@@ -37,7 +37,11 @@ from schemes.system_schema import SummarizationResponse
 
 
 def load_and_merge_configs(snapshot_config_path=None):
-    """Load and merge main config with snapshot config if provided."""
+    """Load and merge main config with snapshot config if provided.
+    
+    If no snapshot config is provided, merges basic_config with main_config.
+    If snapshot config is provided, merges it with main_config, ensuring main_config flags are preserved.
+    """
     # Load main config
     main_config_path = os.path.join("configs", "main_config.json")
     try:
@@ -47,26 +51,34 @@ def load_and_merge_configs(snapshot_config_path=None):
         logging.error(f"Error loading main config: {e}")
         raise RuntimeError(f"Error loading main config: {e}")
 
-    # If no snapshot config provided, return main config
+    # If no snapshot config provided, merge basic_config with main_config
     if snapshot_config_path is None:
-        snapshot_config = basic_config
-    else:
-        try:
-            with open(snapshot_config_path, "r") as f:
-                snapshot_config = json.load(f)
-        except Exception as e:
-            logging.error(f"Error loading snapshot config: {e}")
-            raise RuntimeError(f"Error loading snapshot config: {e}")
+        # Check for duplicate keys between basic_config and main_config
+        duplicate_keys = set(basic_config.keys()) & set(main_config.keys())
+        if duplicate_keys:
+            raise RuntimeError(
+                f"Duplicate keys found between basic_config and main_config: {duplicate_keys}"
+            )
+        # Merge configs (main_config takes precedence)
+        merged_config = {**basic_config, **main_config}
+        return merged_config
 
-    # Check for duplicate keys
-    duplicate_keys = set(main_config.keys()) & set(snapshot_config.keys())
-    if duplicate_keys:
-        raise RuntimeError(
-            f"Duplicate keys found in configs: {duplicate_keys}. Snapshot config path: {snapshot_config_path}"
-        )
+    # Load snapshot config
+    try:
+        with open(snapshot_config_path, "r") as f:
+            snapshot_config = json.load(f)
+    except Exception as e:
+        logging.error(f"Error loading snapshot config: {e}")
+        raise RuntimeError(f"Error loading snapshot config: {e}")
 
-    # Merge configs (snapshot config takes precedence)
-    merged_config = {**main_config, **snapshot_config}
+    # Create a copy of main_config to preserve its flags
+    merged_config = main_config.copy()
+    
+    # Update with snapshot config values, but preserve main_config flags
+    for key, value in snapshot_config.items():
+        if key not in merged_config:
+            merged_config[key] = value
+
     return merged_config
 
 
