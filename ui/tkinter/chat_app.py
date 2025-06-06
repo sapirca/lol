@@ -762,6 +762,8 @@ def populate_snapshot_list():
             f for f in os.listdir(SNAPSHOTS_DIR)
             if os.path.isdir(os.path.join(SNAPSHOTS_DIR, f))
         ]
+        # Sort snapshots alphabetically
+        snapshot_folders.sort()
 
     canvas = tk.Canvas(chat_list_frame, width=280)  # Set explicit canvas width
     scrollbar_y = tk.Scrollbar(chat_list_frame,
@@ -778,18 +780,7 @@ def populate_snapshot_list():
     global button_mapping
     button_mapping = {}
 
-    # # Add untitled button first
-    # untitled_button = tk.Button(
-    #     buttons_frame,
-    #     text="untitled",
-    #     command=save_and_load_untitled_chat,
-    #     wraplength=260,  # Allow text wrapping
-    #     justify=tk.CENTER,  # Center the wrapped text
-    #     anchor=tk.CENTER)  # Center the text in button
-    # untitled_button.pack(fill=tk.X, pady=2, padx=2)
-    # button_mapping["untitled"] = untitled_button
-
-    # Add snapshot buttons
+    # Add snapshot buttons in alphabetical order
     for snapshot_folder in snapshot_folders:
         snapshot_button = tk.Button(
             buttons_frame,
