@@ -247,13 +247,13 @@ def update_active_chat_label(button_name):
     if "model_config" in controller.config:
         model_name = controller.config["model_config"]["model_name"]
         max_tokens = controller.config["model_config"]["max_tokens"]
-        model_info = f"| {model_name[:10]} ({max_tokens})"
+        model_info = f"| {model_name[:10]} ({max_tokens}) "
     else:
-        model_info = " | model info N/A"
+        model_info = "| model info N/A "
     
 
     active_chat_label.config(
-        text=f"{song_name} | {framework_info}{model_info} | {button_name}")
+        text=f"{song_name} | {framework_info} {model_info}| {button_name}")
 
     # Update status with step number
     step_number = len(
@@ -384,128 +384,170 @@ def close_current_chat():
         active_chat_snapshot = None
 
 
+def show_save_name_dialog(on_save_complete=None):
+    """Show dialog for entering a snapshot name.
+    
+    Args:
+        on_save_complete (callable, optional): Function to call after save completes
+    """
+    global controller, active_chat_snapshot
+    save_popup = tk.Toplevel(root)
+    save_popup.title("Save Chat")
+    save_popup.geometry("400x200")
+    save_popup.transient(root)  # Make it modal
+    save_popup.grab_set()  # Make it modal
+
+    # Add label and entry for name
+    name_label = tk.Label(save_popup, text="Enter snapshot name:")
+    name_label.pack(pady=10)
+
+    name_entry = tk.Entry(save_popup, width=40)
+    name_entry.pack(pady=5)
+    # Pre-fill the entry with active chat name if not untitled
+    if active_chat_snapshot and active_chat_snapshot != "untitled":
+        name_entry.insert(0, active_chat_snapshot)
+    name_entry.focus_set()  # Set focus to entry
+
+    # Add checkbox frame
+    checkbox_frame = tk.Frame(save_popup)
+    checkbox_frame.pack(pady=5)
+
+    # Create checkbox with dynamic text
+    checkbox_var = tk.BooleanVar()
+    checkbox_text = "Use default name" if active_chat_snapshot == "untitled" else "Override current chat"
+    checkbox = tk.Checkbutton(checkbox_frame,
+                              text=checkbox_text,
+                              variable=checkbox_var)
+    checkbox.pack(side=tk.LEFT)
+
+    def on_checkbox_change():
+        if checkbox_var.get():
+            if active_chat_snapshot == "untitled":
+                name_entry.delete(0, tk.END)
+            else:
+                name_entry.delete(0, tk.END)
+                name_entry.insert(0, active_chat_snapshot)
+            name_entry.config(state=tk.DISABLED)
+        else:
+            name_entry.config(state=tk.NORMAL)
+
+    checkbox.config(command=on_checkbox_change)
+
+    # Add buttons frame
+    button_frame = tk.Frame(save_popup)
+    button_frame.pack(pady=20)
+
+    def on_save():
+        global controller
+        snapshot_name = name_entry.get().strip()
+        # if checkbox is checked, use the default name
+        if checkbox_var.get():
+            snapshot_name = None
+        save_popup.destroy()
+        if snapshot_name:
+            # verify that the name is legit, without spaces or special characters
+            if not re.match(r"^[a-zA-Z0-9_-]+$", snapshot_name):
+                save_status_label.config(text="Invalid name", fg="red")
+                return
+            save_message = controller.shutdown(snapshot_name)
+        else:
+            save_message = "No name provided. "
+            save_message += controller.shutdown()
+        save_status_label.config(text=save_message, fg="light gray")
+
+        # Store controller reference before clearing
+        old_controller = controller
+
+        # Clear the chat window after saving
+        chat_window.config(state=tk.NORMAL)
+        chat_window.delete("1.0", tk.END)
+        chat_window.config(state=tk.DISABLED)
+
+        # Clear the controller and active snapshot
+        controller = None
+        active_chat_snapshot = None
+
+        # Call the completion callback if provided
+        if on_save_complete:
+            on_save_complete()
+
+    def on_cancel():
+        save_popup.destroy()
+        # Call the completion callback if provided
+        if on_save_complete:
+            on_save_complete()
+
+    # Add buttons
+    save_button = tk.Button(button_frame, text="Save", command=on_save)
+    save_button.pack(side=tk.LEFT, padx=5)
+
+    cancel_button = tk.Button(button_frame,
+                              text="Cancel",
+                              command=on_cancel)
+    cancel_button.pack(side=tk.LEFT, padx=5)
+
+    # Handle window close button
+    save_popup.protocol("WM_DELETE_WINDOW", on_cancel)
+
+    # Bind Enter key to save
+    save_popup.bind("<Return>", lambda e: on_save())
+
+
 def save_chat():
     """Saves the current chat session explicitly."""
-    global controller, active_chat_snapshot
     if controller:
-        try:
-            # Create popup window for naming
-            save_popup = tk.Toplevel(root)
-            save_popup.title("Save Chat")
-            save_popup.geometry("400x200")
-            save_popup.transient(root)  # Make it modal
-            save_popup.grab_set()  # Make it modal
-
-            # Add label and entry for name
-            name_label = tk.Label(save_popup, text="Enter snapshot name:")
-            name_label.pack(pady=10)
-
-            name_entry = tk.Entry(save_popup, width=40)
-            name_entry.pack(pady=5)
-            # Pre-fill the entry with active chat name if not untitled
-            if active_chat_snapshot and active_chat_snapshot != "untitled":
-                name_entry.insert(0, active_chat_snapshot)
-            name_entry.focus_set()  # Set focus to entry
-
-            # Add checkbox frame
-            checkbox_frame = tk.Frame(save_popup)
-            checkbox_frame.pack(pady=5)
-
-            # Create checkbox with dynamic text
-            checkbox_var = tk.BooleanVar()
-            checkbox_text = "Use default name" if active_chat_snapshot == "untitled" else "Override current chat"
-            checkbox = tk.Checkbutton(checkbox_frame,
-                                      text=checkbox_text,
-                                      variable=checkbox_var)
-            checkbox.pack(side=tk.LEFT)
-
-            def on_checkbox_change():
-                if checkbox_var.get():
-                    if active_chat_snapshot == "untitled":
-                        name_entry.delete(0, tk.END)
-                    else:
-                        name_entry.delete(0, tk.END)
-                        name_entry.insert(0, active_chat_snapshot)
-                    name_entry.config(state=tk.DISABLED)
-                else:
-                    name_entry.config(state=tk.NORMAL)
-
-            checkbox.config(command=on_checkbox_change)
-
-            # Add buttons frame
-            button_frame = tk.Frame(save_popup)
-            button_frame.pack(pady=20)
-
-            def on_save():
-                global controller, active_chat_snapshot
-                snapshot_name = name_entry.get().strip()
-                # if checkbox is checked, use the default name
-                if checkbox_var.get():
-                    snapshot_name = None
-                save_popup.destroy()
-                if snapshot_name:
-                    # verify that the name is legit, without spaces or special characters
-                    if not re.match(r"^[a-zA-Z0-9_-]+$", snapshot_name):
-                        save_status_label.config(text="Invalid name", fg="red")
-                        return
-                    save_message = controller.shutdown(snapshot_name)
-                else:
-                    save_message = "No name provided. "
-                    save_message += controller.shutdown()
-                save_status_label.config(text=save_message, fg="light gray")
-
-                # Store controller reference before clearing
-                old_controller = controller
-
-                # Clear the chat window after saving
-                chat_window.config(state=tk.NORMAL)
-                chat_window.delete("1.0", tk.END)
-                chat_window.config(state=tk.DISABLED)
-
-                # Clear the controller and active snapshot
-                controller = None
-                active_chat_snapshot = None
-
-                # Load the newly saved chat
-                if snapshot_name:
-                    _load_chat(snapshot_name)
-                else:
-                    # If no name provided, use the timestamp from the save message
-                    # Extract timestamp from save message (format: "Snapshot saved: timestamp_framework_backend")
-                    match = re.search(r"Snapshot saved: (\d{6}_\d{6}_\w+_\w+)",
-                                      save_message)
-                    if match:
-                        snapshot_name = match.group(1)
-                        _load_chat(snapshot_name)
-                    else:
-                        # Fallback to untitled if we can't extract the name
-                        _load_untitled_chat()
-
-                populate_snapshot_list()  # Refresh the snapshot list
-
-            def on_cancel():
-                save_popup.destroy()
-
-            # Add buttons
-            save_button = tk.Button(button_frame, text="Save", command=on_save)
-            save_button.pack(side=tk.LEFT, padx=5)
-
-            cancel_button = tk.Button(button_frame,
-                                      text="Cancel",
-                                      command=on_cancel)
-            cancel_button.pack(side=tk.LEFT, padx=5)
-
-            # Handle window close button
-            save_popup.protocol("WM_DELETE_WINDOW", on_cancel)
-
-            # Bind Enter key to save
-            save_popup.bind("<Return>", lambda e: on_save())
-
-        except Exception as e:
-            save_status_label.config(text=f"Failed to save chat: {str(e)}",
-                                     fg="red")
+        show_save_name_dialog()
     else:
         save_status_label.config(text="No active chat to save", fg="red")
+
+
+def show_save_popup(target_snapshot):
+    """Show a warning dialog for unsaved changes."""
+    unsaved_warning = tk.Toplevel(root)
+    unsaved_warning.title("Unsaved Changes")
+    unsaved_warning.geometry("300x150")
+    unsaved_warning.transient(root)  # Make it modal
+    unsaved_warning.grab_set()  # Make it modal
+
+    label = tk.Label(
+        unsaved_warning,
+        text="Do you want to save a NEW Snapshot before discarding this chat?",
+        wraplength=250)
+    label.pack(pady=10)
+
+    button_frame = tk.Frame(unsaved_warning)
+    button_frame.pack(pady=10)
+
+    def on_yes():
+        unsaved_warning.grab_release()
+        unsaved_warning.destroy()
+        # Show save dialog and load target after save completes
+        show_save_name_dialog(lambda: _load_chat(target_snapshot))
+
+    def on_no():
+        unsaved_warning.grab_release()
+        unsaved_warning.destroy()
+        # Disable UI while loading
+        send_button.config(state=tk.DISABLED)
+        user_input.config(state=tk.DISABLED)
+        _load_chat(target_snapshot)
+
+    def on_cancel():
+        unsaved_warning.grab_release()
+        unsaved_warning.destroy()
+        enable_ui()
+
+    yes_button = tk.Button(button_frame, text="Yes", command=on_yes)
+    yes_button.pack(side=tk.LEFT, padx=5)
+
+    no_button = tk.Button(button_frame, text="No", command=on_no)
+    no_button.pack(side=tk.LEFT, padx=5)
+
+    cancel_button = tk.Button(button_frame, text="Cancel", command=on_cancel)
+    cancel_button.pack(side=tk.LEFT, padx=5)
+
+    # Handle window close button
+    unsaved_warning.protocol("WM_DELETE_WINDOW", on_cancel)
 
 
 PRIMARY_COLOR = "#BBDEFB"  # Example: Blue 100 (lighter blue)
@@ -789,57 +831,6 @@ def handle_keypress(event):
         return "break"  # Prevent default newline behavior
 
 
-def show_save_popup(target_snapshot):
-    """Show a warning dialog for unsaved changes."""
-    unsaved_warning = tk.Toplevel(root)
-    unsaved_warning.title("Unsaved Changes")
-    unsaved_warning.geometry("300x150")
-    unsaved_warning.transient(root)  # Make it modal
-    unsaved_warning.grab_set()  # Make it modal
-
-    label = tk.Label(
-        unsaved_warning,
-        text="Do you want to save a NEW Snapshot before discarding this chat?",
-        wraplength=250)
-    label.pack(pady=10)
-
-    button_frame = tk.Frame(unsaved_warning)
-    button_frame.pack(pady=10)
-
-    def on_yes():
-        unsaved_warning.grab_release()
-        unsaved_warning.destroy()
-        # First save the current chat
-        save_chat()
-        # Then load the target chat after a brief delay to ensure cleanup
-        root.after(100, lambda: _load_chat(target_snapshot))
-
-    def on_no():
-        unsaved_warning.grab_release()
-        unsaved_warning.destroy()
-        # Disable UI while loading
-        send_button.config(state=tk.DISABLED)
-        user_input.config(state=tk.DISABLED)
-        _load_chat(target_snapshot)
-
-    def on_cancel():
-        unsaved_warning.grab_release()
-        unsaved_warning.destroy()
-        enable_ui()
-
-    yes_button = tk.Button(button_frame, text="Yes", command=on_yes)
-    yes_button.pack(side=tk.LEFT, padx=5)
-
-    no_button = tk.Button(button_frame, text="No", command=on_no)
-    no_button.pack(side=tk.LEFT, padx=5)
-
-    cancel_button = tk.Button(button_frame, text="Cancel", command=on_cancel)
-    cancel_button.pack(side=tk.LEFT, padx=5)
-
-    # Handle window close button
-    unsaved_warning.protocol("WM_DELETE_WINDOW", on_cancel)
-
-
 def set_active_chat_button(button):
     global active_chat_button
     if active_chat_button:
@@ -1114,6 +1105,9 @@ def initialize_from_config(config, chat_name):
     update_active_chat_label(chat_name)
     update_animation_data()
 
+    # Save the initial state
+    save_message = controller.save_snapshot(chat_name)
+    save_status_label.config(text=save_message, fg="light gray")
 
 
 def show_new_chat_dialog():

@@ -101,7 +101,7 @@ class MemoryManager:
             return True
         return False
 
-    def shutdown(self):
+    def save_memory(self):
         """Save memory to file during shutdown."""
         self._save_memory()
 

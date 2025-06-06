@@ -319,4 +319,16 @@ No animation sequences have been generated yet.
 ================================================================================
 Role: user
 
-oh wow
+17
+
+================================================================================
+Role: assistant
+
+[Action: "get_music_structure"]: To start creating an animation for the song "Aladdin", we need to first gather information about the song structure and then create a basic animation sequence. We'll begin by getting the music structure for beats, which will help us synchronize our animation with the music.
+
+Action 'get_music_structure' requires confirmation before execution
+
+================================================================================
+Role: user
+
+fucking a it worked

@@ -103,24 +103,24 @@ class MessageStreamer:
             "timestamp": datetime.now().isoformat()
         })
 
-    def finalize(self):
-        """Save all logs to a file and add a summary log."""
-        total_sent_tokens = sum(message["tokens_estimation"]
-                                for message in self.messages
-                                if message["context"])
-        total_received_tokens = sum(message["tokens_estimation"]
-                                    for message in self.messages
-                                    if not message["context"])
+    # def finalize(self):
+    #     """Save all logs to a file and add a summary log."""
+    #     total_sent_tokens = sum(message["tokens_estimation"]
+    #                             for message in self.messages
+    #                             if message["context"])
+    #     total_received_tokens = sum(message["tokens_estimation"]
+    #                                 for message in self.messages
+    #                                 if not message["context"])
 
-        # Add a system log for the overall sent and received tokens
-        self.add_log(
-            f"Total sent tokens: {total_sent_tokens}, Total received tokens: {total_received_tokens}"
-        )
+    #     # Add a system log for the overall sent and received tokens
+    #     self.add_log(
+    #         f"Total sent tokens: {total_sent_tokens}, Total received tokens: {total_received_tokens}"
+    #     )
 
-        # TODO remove this method?
+    #     # TODO remove this method?
 
-        # with open(self.msgs_full_path, "w") as file:
-        #     json.dump(self.messages, file, indent=4)
+    #     # with open(self.msgs_full_path, "w") as file:
+    #     #     json.dump(self.messages, file, indent=4)
 
     def clear_control_flags(self):
         """Clear all control flags."""

@@ -5,7 +5,7 @@ from music.song_provider import SongProvider
 import xml.etree.ElementTree as ET
 from controller.interpreter import Interpreter
 from controller.formatter import Formatter
-from constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE
+from constants import MESSAGE_SNAPSHOT_FILE, CONFIG_FILE, SNAPSHOTS_DIR
 from controller.message_streamer import (
     MessageStreamer,
     TAG_USER_INPUT,
@@ -192,45 +192,78 @@ class LogicPlusPlus:
             "delete_random_effect",
             DeleteRandomEffectAction(self.compound_effects_manager, self.msgs))
 
-    def shutdown(self, requested_shutdown_snapshot_dir=None):
-        if not requested_shutdown_snapshot_dir:
+    def shutdown(self, snapshot_name=None):
+        """Shutdown the controller, saving state if requested and cleaning up resources.
+        
+        Args:
+            snapshot_name (str, optional): Name for the snapshot. If None, generates a timestamp-based name.
+        
+        Returns:
+            str: Message indicating the shutdown status
+        """
+        save_message = ""
+        if snapshot_name is not None:
+            save_message = self.save_snapshot(snapshot_name)
+        elif self.msgs and self.msgs.messages:
+            save_message = self.save_snapshot()
+
+        # Clean up resources
+        # if self.thread_pool:
+        #     self.thread_pool.shutdown(wait=False)
+        #     self.thread_pool = None
+
+        # Clear message history
+        if self.msgs:
+            self.msgs.messages = []
+            self.msgs = None
+
+        # Clear config
+        self.config = None
+
+        return save_message
+
+    def save_snapshot(self, snapshot_name=None):
+        """Save the current chat state to a snapshot.
+        
+        Args:
+            snapshot_name (str, optional): Name for the snapshot. If None, generates a timestamp-based name.
+        
+        Returns:
+            str: Message indicating the save status
+        """
+        if not self.msgs:
+            return "No messages to save"
+
+        # Create snapshots directory if it doesn't exist
+        os.makedirs(SNAPSHOTS_DIR, exist_ok=True)
+
+        # Generate snapshot name if not provided
+        if snapshot_name is None:
             timestamp = datetime.now().strftime("%y%m%d_%H%M%S")
-            shutdown_snapshot_dir = os.path.join(
-                self.msgs.snapshots_dir,
-                f"{timestamp}_{self.selected_framework}_{self.selected_backend}"
-            )
-            os.makedirs(shutdown_snapshot_dir, exist_ok=True)
-        else:
-            shutdown_snapshot_dir = os.path.join(
-                self.msgs.snapshots_dir, requested_shutdown_snapshot_dir)
-            if not os.path.exists(shutdown_snapshot_dir):
-                os.makedirs(shutdown_snapshot_dir, exist_ok=True)
+            snapshot_name = f"{timestamp}_{self.selected_framework}_{self.selected_backend}"
 
-        # Save configuration
-        snapshot_config_file = os.path.join(shutdown_snapshot_dir, CONFIG_FILE)
-        with open(snapshot_config_file, "w") as file:
-            json.dump(self.config, file, indent=4)
+        # Create snapshot directory
+        snapshot_dir = os.path.join(SNAPSHOTS_DIR, snapshot_name)
+        os.makedirs(snapshot_dir, exist_ok=True)
 
-        animation_suffix = self.animation_manager.get_suffix()
+        # Save messages
+        messages_path = os.path.join(snapshot_dir, "messages.json")
+        with open(messages_path, "w") as f:
+            json.dump(self.msgs.messages, f, indent=2)
 
-        # Save all animations using the new method
-        self.animation_manager.save_all_animations(shutdown_snapshot_dir,
-                                                   animation_suffix)
-
-        # Save messages to messages.json
-        messages_json_file = os.path.join(shutdown_snapshot_dir,
-                                          MESSAGE_SNAPSHOT_FILE)
-        with open(messages_json_file, "w") as file:
-            json.dump(self.msgs.messages, file,
-                      indent=4)  # Save only the messages data
+        # Save config
+        config_path = os.path.join(snapshot_dir, "config.json")
+        with open(config_path, "w") as f:
+            json.dump(self.config, f, indent=2)
 
         # Save memory
-        self.memory_manager.shutdown()
+        self.memory_manager.save_memory()
 
-        # Finalize the msgs
-        self.msgs.finalize()
+        # Save animations
+        animation_suffix = self.animation_manager.get_suffix()
+        self.animation_manager.save_all_animations(snapshot_dir, animation_suffix)
 
-        return (f"Snapshot saved: {shutdown_snapshot_dir}.")
+        return f"Snapshot saved: {snapshot_name}"
 
     def get_visible_chat(self):
         """Retrieve all visible chat messages from the message_streamer, including their tags/labels."""
