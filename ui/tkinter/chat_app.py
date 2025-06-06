@@ -241,10 +241,11 @@ def update_active_chat_label(button_name):
     if controller and controller.config and "model_config" in controller.config:
         model_name = controller.config["model_config"]["model_name"]
         max_tokens = controller.config["model_config"]["max_tokens"]
-        model_info = f" | {model_name[:10]} ({max_tokens})"
+        song_name = controller.config["song_name"]
+        model_info = f" {model_name[:10]} ({max_tokens})"
 
     active_chat_label.config(
-        text=f"{framework_info}{model_info} | {button_name}")
+        text=f"{song_name} | {framework_info}| {model_info} | {button_name}")
 
     # Update status with step number
     step_number = len(

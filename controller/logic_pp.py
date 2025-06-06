@@ -444,7 +444,7 @@ class LogicPlusPlus:
             latest_sequence, latest_step = result
             animation_json = json.loads(latest_sequence)
             self.animation_manager.render(animation_json,
-                                          song_name="aladdin",
+                                          song_name=self.config["song_name"],
                                           store_animation=store_animation)
             self.logger.info(
                 f"Animation step {latest_step} rendered successfully.")

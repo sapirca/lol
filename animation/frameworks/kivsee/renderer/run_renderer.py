@@ -1,16 +1,17 @@
 from animation.frameworks.kivsee.renderer.render import Render
+from configs.config_kivsee import config
 
 
 def main():
     render = Render()
-    render.load_from_snapshot(snapshot_dir="try_me", animation_name="aladdin")
+    render.load_from_snapshot(snapshot_dir="try_me", animation_name=config["song_name"])
 
 
 if __name__ == "__main__":
     main()
 
 # Speaker
-# 1. Understand aladdin notes
+# 1. Understand song notes
 # 2. synchronize with the right miliseconds
 # 3. beats - millis
 # 4. add offset
