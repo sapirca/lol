@@ -29,7 +29,7 @@ from controller.actions import (
     AnswerUserAction, GenerateBeatBasedEffectAction, RemoveMemoryAction,
     UpdateMemoryAction, GetMusicStructureAction, SaveCompoundEffectAction,
     GetCompoundEffectAction, GetCompoundEffectsKeysAndTagsAction,
-    GetRandomEffectAction, DeleteRandomEffectAction)
+    GetRandomEffectAction, DeleteRandomEffectAction, HighLevelPlanUpdateAction)
 from schemes.main_schema import MainSchema
 from typing import Dict, Any
 import threading
@@ -148,6 +148,9 @@ class LogicPlusPlus:
                 self.msgs,
                 config=self.config,
             ))
+        self.action_registry.register_action(
+            "high_level_plan_update",
+            HighLevelPlanUpdateAction(self.msgs))
         self.action_registry.register_action(
             "get_animation",
             GetAnimationAction(self.animation_manager, self.msgs))
@@ -590,10 +593,70 @@ class LogicPlusPlus:
         self.formatter = Formatter(self.msgs, self.animation_manager, self.memory_manager, 
                                  self.song_provider, self.action_registry, self.config)
 
-    def build_skeleton(self):
-        """Build a skeleton animation sequence for the current song.
-        This is a stub method that will be implemented later.
+    def build_skeleton(self, callback=None):
+        """Build a skeleton animation sequence for the current song asynchronously.
+        
+        This method generates a high-level skeleton animation that outlines the structure
+        and key elements of the light show, including color palette, structural framework,
+        element grouping, dynamic variations, and rhythm/contrast elements.
+        
+        Args:
+            callback: Optional callback function to be called when the skeleton is built.
+                     The callback will receive the status message as its argument.
+        
+        Returns:
+            None: The method runs asynchronously
         """
         self.logger.info("Building skeleton animation sequence...")
-        # TODO: Implement skeleton building logic
-        pass
+        
+        def _build_skeleton_async():
+            try:
+                # Get messages with skeleton prompt
+                messages = self.formatter.build_skeleton_messages()
+                
+                # Get backend and generate response
+                backend = self.select_backend()
+                try:
+                    model_response = backend.generate_response(messages)
+                    
+                    # Execute the high_level_plan_update action with the generated response
+                    result = self.action_registry.execute_action(
+                        "high_level_plan_update", model_response.action.params)
+                    
+                    if result["status"] == "error":
+                        error_msg = f"Error executing high_level_plan_update action: {result['message']}"
+                        self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
+                        if callback:
+                            callback(error_msg)
+                        return
+                    
+                    # Add success message
+                    success_msg = result.get("message", "No message? Debug!")
+                    self.msgs.add_visible(TAG_SYSTEM, success_msg, context=False)
+                    
+                    if "plan" in result["data"]:
+                        self.msgs.add_visible(TAG_ASSISTANT,
+                                              f"High-level plan:\n{result['data']['plan']}",
+                                              context=True)
+
+                    if callback:
+                        callback(success_msg)
+                    
+                except Exception as e:
+                    error_msg = f"Error generating skeleton animation: {str(e)}"
+                    self.logger.error(error_msg)
+                    self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
+                    if callback:
+                        callback(error_msg)
+                    
+            except Exception as e:
+                error_msg = f"Error building skeleton: {str(e)}"
+                self.logger.error(error_msg)
+                self.msgs.add_visible(TAG_SYSTEM, error_msg, context=False)
+                if callback:
+                    callback(error_msg)
+
+        # Start the async process
+        thread = threading.Thread(target=_build_skeleton_async)
+        thread.daemon = True  # Make thread daemon so it exits when main program exits
+        thread.start()

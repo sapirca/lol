@@ -5,7 +5,7 @@ from animation.animation_manager import AnimationManager
 from memory.memory_manager import MemoryManager
 from music.song_provider import SongProvider
 from typing import Optional, Dict, Any
-from prompts.main_prompt import intro_prompt
+from prompts.main_prompt import intro_prompt, skeleton_prompt
 
 
 class Formatter:
@@ -194,3 +194,23 @@ IMPORTANT: Do not include any animation code in your response. Only describe the
             'initial_prompt_context': 'system'
         }
         return role_mapping.get(tag, 'system')
+    
+    def build_skeleton_messages(self):
+        """Build messages for generating a skeleton animation sequence.
+        
+        Returns:
+            List of message dictionaries for the LLM.
+        """
+        # Get base messages from build_messages
+        messages = self.build_messages()
+        
+        # Add skeleton prompt with high-level plan action
+        skeleton_message = {
+            "role": "system",
+            "content": skeleton_prompt + "\n\nIMPORTANT: You must use the 'high_level_plan_update' action for this task. This action requires a 'plan' field with your high-level plan for the animation."
+        }
+        
+        # Add skeleton prompt to messages
+        messages.append(skeleton_message)
+        
+        return messages

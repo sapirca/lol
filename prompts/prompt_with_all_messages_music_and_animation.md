@@ -22,6 +22,12 @@ Action: update_animation
   - Purpose: Create or update an animation sequence. This action will add the animation to the sequence manager.
   - Confirmation type: ConfirmationType.NO_ACTION_REQUIRED
 
+Action: high_level_plan_update
+  - Purpose: Store a high-level plan for the animation
+  - Confirmation type: ConfirmationType.NO_ACTION_REQUIRED
+  - Returns:
+    - plan: The high-level plan for the animation
+
 Action: get_animation
   - Purpose: Retrieve an existing animation sequence by step number
   - Confirmation type: ConfirmationType.AUTO_RUN
@@ -315,17 +321,3 @@ Role: system
 
 # Latest Animation Sequence:
 No animation sequences have been generated yet.
-
-================================================================================
-Role: user
-
-I want you to write/suggsest a text for a prompt asking the LLM to start with basic skeleton animation that is high level 
-
-High Level - 
-choose thje Coloring plaette for the entire song
-Duplications + with twists
-Darkness moments for tension + Ecstasy 
-Groups of elements
-divide between notes
-Gradient colors
-Spatial order - alternate between two sides, or wind transition

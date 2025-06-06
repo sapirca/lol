@@ -1187,14 +1187,29 @@ def show_new_chat_dialog():
         # Initialize new chat with config
         initialize_from_config(new_config, chat_name)
         
-        # Build skeleton if requested
-        if skeleton_var.get():
-            controller.build_skeleton()
-        
         # # Save the chat with the new name
         # save_chat()
         
         dialog.destroy()
+        
+        # Build skeleton if requested
+        if skeleton_var.get():
+            # Disable the send button while processing
+            send_button.config(state=tk.DISABLED)
+            
+            # Add initial system message
+            update_chat_window(TAG_SYSTEM, "System", "Generating high level plan... Please wait for LLM response")
+            
+            def skeleton_callback(status_msg):
+                # Re-enable the send button
+                send_button.config(state=tk.NORMAL)
+                # Update the UI with the status
+                # update_chat_window(TAG_SYSTEM, "System", status_msg)
+                # update new messages
+                refresh()
+            
+            # Start async skeleton building
+            controller.build_skeleton(callback=skeleton_callback)
 
     def on_cancel():
         dialog.destroy()

@@ -921,6 +921,54 @@ class DeleteRandomEffectAction(Action):
             return error_result
 
 
+class HighLevelPlanUpdateAction(Action):
+    """Action for storing a high-level animation plan."""
+
+    def __init__(self, message_streamer):
+        super().__init__(message_streamer)
+        self._purpose = "Store a high-level plan for the animation"
+        self._confirmation_type = ConfirmationType.NO_ACTION_REQUIRED
+        self._turn = TurnType.USER
+        self._returns = {
+            "plan": "The high-level plan for the animation"
+        }
+
+    def validate_params(self, params: Dict[str, Any]) -> bool:
+        params_dict = self._get_params_dict(params)
+        return "plan" in params_dict and isinstance(params_dict["plan"], str)
+
+    def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params_dict = self._get_params_dict(params)
+            plan = params_dict["plan"]
+
+            # Add the plan to memory for future reference
+            self.message_streamer.add_invisible(
+                TAG_SYSTEM_INTERNAL,
+                f"High-level plan:\n{plan}",
+                context=False)
+            
+            # # Update the plan in the animation manager
+            # self.animation_manager.update_plan(plan)
+
+            return {
+                "status": "success",
+                "message": f"High-level plan stored successfully.",
+                "confirmation_type": self.confirmation_type,
+                "data": {
+                    "plan": plan
+                }
+            }
+        except Exception as e:
+            error_result = {
+                "status": "error",
+                "message": f"Error storing high-level plan: {str(e)}",
+                "confirmation_type": self.confirmation_type
+            }
+            self._log_action_result("high_level_plan_update", error_result)
+            return error_result
+
+
 class ActionRegistry:
     """Registry for all available actions in the system."""
 

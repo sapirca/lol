@@ -222,6 +222,15 @@ class DeleteRandomEffectAction(BaseModel):
     params: DeleteRandomEffectParams
 
 
+class HighLevelPlanUpdateParams(BaseActionParams):
+    plan: str = Field(description="The high-level plan for the animation")
+
+
+class HighLevelPlanUpdateAction(BaseModel):
+    name: Literal["high_level_plan_update"]
+    params: HighLevelPlanUpdateParams
+
+
 # Union type for all possible actions
 ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetAnimationAction, AddToMemoryAction,
@@ -234,7 +243,8 @@ ActionType: TypeAlias = Annotated[Union[UpdateAnimationAction[T],
                                         GetCompoundEffectAction,
                                         GetCompoundEffectsKeysAndTagsAction,
                                         GetRandomEffectAction,
-                                        DeleteRandomEffectAction],
+                                        DeleteRandomEffectAction,
+                                        HighLevelPlanUpdateAction],
                                   Field(discriminator='name')]
 
 

@@ -56,3 +56,34 @@ Remember:
 4. Use the action results to inform your next steps
 5. Keep responses concise and focused on the task at hand
 """
+
+
+skeleton_prompt = """
+Generate a high-level skeleton animation for a music-synchronized light show.
+
+Use the action: HighLevelPlanUpdateAction to store the high-level plan.
+
+**Animation Plan:**
+
+**Color Palette:** Select a cohesive 3-5 color palette that reflects the song's emotional arc.
+
+**Structural Framework:**
+* Divide the animation into sections corresponding to the song's structure (e.g., intro, verse, chorus).
+* Establish a base pattern for each section, duplicating and varying it for similar musical parts.
+* Integrate strategic moments of darkness for tension and bright, expansive visuals for release.
+
+**Element Grouping & Interaction:**
+* Define logical ring groupings (e.g., odd/even, inner/outer, left/right).
+* Plan the interaction and transitions of these groups throughout the show, such as alternating sides or creating spiral effects.
+* Specify active rings for each section.
+
+**Dynamic Variation:**
+* Incorporate smooth gradient color transitions between sections.
+* Synchronize brightness pulses with key musical beats or notes.
+* Implement spatial progressions, like movement from inside to out or left to right.
+
+**Rhythm & Contrast:**
+* Balance simple visual moments with complex, high-energy effects.
+* Create visual echoes that reflect musical phrases.
+* Employ darkness to build anticipation for significant musical moments.
+"""
