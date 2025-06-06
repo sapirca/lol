@@ -955,7 +955,6 @@ def reduce_tokens():
         # Disable UI while processing
         send_button.config(state=tk.DISABLED)
         user_input.config(state=tk.DISABLED)
-        reduce_tokens_button.config(state=tk.DISABLED)
 
         # Call controller to reduce tokens
         result = controller.reduce_tokens()
@@ -987,7 +986,6 @@ def reduce_tokens():
     finally:
         chat_window.config(state=tk.DISABLED)
         enable_ui()
-        reduce_tokens_button.config(state=tk.NORMAL)
 
 
 def handle_confirmation(confirmed: bool):
@@ -1105,7 +1103,13 @@ def show_new_chat_dialog():
     """Show dialog to configure new chat settings."""
     dialog = tk.Toplevel(root)
     dialog.title("New Chat Configuration")
-    dialog.geometry("400x550")  # Made slightly taller for new field
+    width, height = 400, 550
+    dialog.geometry(f"{width}x{height}")
+    # Center the window
+    dialog.update_idletasks()
+    x = (dialog.winfo_screenwidth() // 2) - (width // 2)
+    y = (dialog.winfo_screenheight() // 2) - (height // 2)
+    dialog.geometry(f"{width}x{height}+{x}+{y}")
     dialog.transient(root)
     dialog.grab_set()
 
@@ -1273,26 +1277,34 @@ buttons_frame.pack(side=tk.RIGHT)
 save_button = tk.Button(buttons_frame, text="Save", command=save_chat, width=6)
 save_button.pack(side=tk.RIGHT, padx=5)
 
-# Add restart with latest sequence button
-restart_button = tk.Button(buttons_frame,
-                           text="Restart+",
-                           command=lambda: restart_with_latest_sequence(),
-                           width=6)
-restart_button.pack(side=tk.RIGHT, padx=5)
+# Add a single 'Run' button that opens an action menu dialog
+def show_action_menu():
+    action_dialog = tk.Toplevel(root)
+    action_dialog.title("Choose Action")
+    # Set size
+    width, height = 250, 240
+    action_dialog.geometry(f"{width}x{height}")
+    # Center the window
+    action_dialog.update_idletasks()
+    x = (action_dialog.winfo_screenwidth() // 2) - (width // 2)
+    y = (action_dialog.winfo_screenheight() // 2) - (height // 2)
+    action_dialog.geometry(f"{width}x{height}+{x}+{y}")
+    action_dialog.transient(root)
+    action_dialog.grab_set()
 
-# Add new chat button
-new_chat_button = tk.Button(buttons_frame,
-                           text="New Chat",
-                           command=show_new_chat_dialog,
-                           width=6)
-new_chat_button.pack(side=tk.RIGHT, padx=5)
+    tk.Label(action_dialog, text="Select an action to run:", font=(CHAT_FONT, 12)).pack(pady=10)
 
-# Add reduce tokens button
-reduce_tokens_button = tk.Button(buttons_frame,
-                                 text="Summarize",
-                                 command=lambda: reduce_tokens(),
-                                 width=6)
-reduce_tokens_button.pack(side=tk.RIGHT, padx=5)
+    def run_and_close(action_func):
+        action_dialog.destroy()
+        action_func()
+
+    tk.Button(action_dialog, text="New Chat", width=18, command=lambda: run_and_close(show_new_chat_dialog)).pack(pady=5)
+    tk.Button(action_dialog, text="Latest Animation", width=18, command=lambda: run_and_close(restart_with_latest_sequence)).pack(pady=5)
+    tk.Button(action_dialog, text="Summary + Latest Animation", width=18, command=lambda: run_and_close(reduce_tokens)).pack(pady=5)
+    tk.Button(action_dialog, text="Cancel", width=18, command=action_dialog.destroy).pack(pady=10)
+
+chat_options_button = tk.Button(buttons_frame, text="New Chat Options", command=show_action_menu, width=12)
+chat_options_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a header frame for the animation panel
 animation_header = tk.Frame(animation_frame, bg="#2c2c2c")
