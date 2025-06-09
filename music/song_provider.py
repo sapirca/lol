@@ -1,6 +1,6 @@
 import os
 
-SONGS_BASE_PATH = "/Users/sapir/repos/lol/music/songs"
+SONGS_BASE_PATH = "/Users/sapir/repos/lol/music/song_structure"
 
 
 class SongProvider:
