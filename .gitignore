@@ -15,6 +15,8 @@ ui/tkinter/snapshots/
 ui/tkinter/snapshots/periodic_snapshot.json
 prompts/prompt_with_all_messages.md
 
+music/*/*.wav
+music/utils/output/
 # Environment variables
 .env
 

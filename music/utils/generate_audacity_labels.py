@@ -12,11 +12,12 @@ def generate_labels(bpm, duration, label_type, bars_per_phrase=8):
     """Generate labels based on BPM and duration."""
     beat_duration = calculate_beat_duration(bpm)
     labels = []
+    offset = 10.2
     
     if label_type == "beats":
         # Generate beat labels
         for i in range(int(duration / beat_duration) + 1):
-            start_time = i * beat_duration
+            start_time = offset + i * beat_duration
             end_time = start_time
             labels.append(f"{start_time:.6f}\t{end_time:.6f}\tb {i}")
             
@@ -24,15 +25,15 @@ def generate_labels(bpm, duration, label_type, bars_per_phrase=8):
         # Generate bar labels (4 beats per bar)
         bar_duration = beat_duration * 4
         for i in range(int(duration / bar_duration) + 1):
-            start_time = i * bar_duration
+            start_time = offset + i * bar_duration
             end_time = start_time
-            labels.append(f"{start_time:.6f}\t{end_time:.6f}\tbar {i}")
+            labels.append(f"{start_time:.6f}\t{end_time:.6f}\tbr {i}")
             
     elif label_type == "phrase":
         # Generate phrase labels (bars_per_phrase bars per phrase)
         phrase_duration = beat_duration * 4 * bars_per_phrase
         for i in range(int(duration / phrase_duration) + 1):
-            start_time = i * phrase_duration
+            start_time = offset + i * phrase_duration
             end_time = start_time
             labels.append(f"{start_time:.6f}\t{end_time:.6f}\tphrase {i}")
     
@@ -61,9 +62,9 @@ def main():
     # Set default output filename if not provided
     if not args.output:
         if args.type == "phrase":
-            args.output = f"{args.song}_{int(args.bpm)}bpm_{args.type}{args.bars_per_phrase}_labels.txt"
+            args.output = f"{args.song}_{args.type}{args.bars_per_phrase}_labels.txt"
         else:
-            args.output = f"{args.song}_{int(args.bpm)}bpm_{args.type}_labels.txt"
+            args.output = f"{args.song}_{args.type}_labels.txt"
     
     # Write to file in the output directory
     output_path = os.path.join(output_dir, args.output)

@@ -9,6 +9,7 @@ Generate beat labels for a 120 BPM song that's 180 seconds long:
 ```bash
 python music/utils/generate_audacity_labels.py --bpm 120 --duration 180 --type beats --song "song_name"
 ```
+<!-- python music/utils/generate_audacity_labels.py --bpm 94 --duration 232 --type phrase --song "infrasound" -->
 
 ### Generate Bar Labels
 Generate bar labels and save to a custom file:
