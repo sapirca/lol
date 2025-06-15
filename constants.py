@@ -10,6 +10,7 @@ LOG_INTERVAL_IN_SECONDS = 60
 
 # Snapshots
 SNAPSHOTS_DIR = "ui/tkinter/snapshots"
+FLASK_SNAPSHOTS_DIR = "ui/flask/snapshots"
 MESSAGE_SNAPSHOT_FILE = "messages.json"
 CONFIG_FILE = "config.json"
 

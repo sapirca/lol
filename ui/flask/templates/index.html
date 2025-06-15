@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="sidebar">
+        <h2>Chats</h2>
+        <ul id="snapshot-list">
+            {% for snapshot in snapshots %}
+                <li><a href="#" data-snapshot-name="{{ snapshot }}">{{ snapshot }}</a></li>
+            {% else %}
+                <li>No chats found.</li>
+            {% endfor %}
+        </ul>
+        <button id="new-chat-button" style="margin-bottom: 10px;">New Chat</button>
+        <div id="advanced-actions" style="padding-top: 10px; border-top: 1px solid #ccc; margin-top:10px;">
+            <h4 style="margin-top:0; margin-bottom: 5px; font-size: 0.9em;">Advanced Actions:</h4>
+            <button id="restart-latest-button" class="sidebar-button">Restart w/ Latest Anim</button>
+            <button id="reduce-tokens-button" class="sidebar-button">Summarize & Restart</button>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div id="active-chat-info">
+            Current Chat: <span id="current-chat-name">{{ active_snapshot if active_snapshot else 'None' }}</span>
+            <button id="save-chat-button" style="margin-left: 15px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Save Chat</button>
+        </div>
+        <div id="chat-container">
+            <div id="chat-window">
+                {% for message in chat_history %}
+                    <div class="message">
+                        <span class="sender">{{ message.sender }}:</span>
+                        <span class="text">{{ message.text }}</span>
+                    </div>
+                {% else %}
+                    <div class="message system">Select a chat to view messages or start a new one.</div>
+                {% endfor %}
+            </div>
+            <div id="input-area">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+    <div id="animation-panel">
+        <div id="animation-header-container"> <!-- Changed from animation-header to a new container -->
+            <h3 id="animation-header-title">Animation Data</h3>
+            <div id="animation-controls">
+                <input type="checkbox" id="store-animation-checkbox" name="store_animation" title="Store animation on render">
+                <label for="store-animation-checkbox">Store</label>
+                <button id="render-button" title="Render Animation">Render</button>
+                <button id="stop-button" title="Stop Animation">Stop</button>
+            </div>
+        </div>
+        <pre id="animation-content">No animation data loaded yet.</pre>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

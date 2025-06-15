@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Chat Configuration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { display: block; /* Override flex for this form page if main style.css sets it */ }
+        .form-container { max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f9f9f9; border: 1px solid #ccc; border-radius: 5px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box; }
+        input[type="checkbox"] { margin-right: 5px; }
+        .form-buttons { margin-top: 20px; }
+        .form-buttons button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; margin-right: 10px; }
+        .form-buttons button[type="submit"]:hover { background-color: #0056b3; }
+        .form-buttons a { text-decoration: none; padding: 10px 15px; background-color: #6c757d; color: white; border-radius: 3px; }
+        .form-buttons a:hover { background-color: #5a6268; }
+        .error-message { color: red; font-size: 0.9em; margin-bottom: 10px; }
+        #chat_name_error { font-size: 0.8em; color: #dc3545; margin-top: -10px; margin-bottom: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>New Chat Configuration</h2>
+
+        <!-- Placeholder for displaying errors from server (e.g., if redirect passes error messages) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="error-message category-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form id="newChatForm" action="{{ url_for('create_new_chat_route') }}" method="POST">
+            <label for="chat_name">Chat Name:</label>
+            <input type="text" id="chat_name" name="chat_name" required >
+            <div id="chat_name_error">Chat name must be unique, start with a letter (or 'chat_'), and use only a-z, A-Z, 0-9, _, -. Max 50 chars.</div>
+
+
+            <label for="song_name">Song:</label>
+            <select id="song_name" name="song_name">
+                {% for song in songs %}
+                <option value="{{ song }}">{{ song | capitalize }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="framework">Framework:</label>
+            <select id="framework" name="framework">
+                {% for fw in frameworks %}
+                <option value="{{ fw }}">{{ fw | capitalize }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="backend">Backend:</label>
+            <select id="backend" name="backend">
+                {% for be in backends %}
+                <option value="{{ be }}">{{ be }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="model">Model:</label>
+            <select id="model" name="model" required>
+                <!-- Options will be populated by JavaScript -->
+            </select>
+
+            <div>
+                <input type="checkbox" id="start_with_skeleton" name="start_with_skeleton" value="on">
+                <label for="start_with_skeleton" style="display: inline; font-weight: normal;">Start with a skeleton plan</label>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit">Create Chat</button>
+                <a href="{{ url_for('index') }}">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const modelConfigs = JSON.parse('{{ model_configs_json | default("{}") | safe }}');
+        const backendSelect = document.getElementById('backend');
+        const modelSelect = document.getElementById('model');
+        const chatNameInput = document.getElementById('chat_name');
+        const chatNameErrorDiv = document.getElementById('chat_name_error');
+        const existingChatNames = JSON.parse('{{ existing_chat_names_json | default("[]") | safe }}');
+        const newChatForm = document.getElementById('newChatForm');
+
+        function updateModelOptions() {
+            const selectedBackend = backendSelect.value;
+            modelSelect.innerHTML = '';
+
+            let firstModelKey = null;
+            for (const key in modelConfigs) {
+                if (modelConfigs[key].backend === selectedBackend) {
+                    if (!firstModelKey) firstModelKey = key; // Select first as default
+                    const option = document.createElement('option');
+                    option.value = key; // Store the main key
+                    option.textContent = modelConfigs[key].model_name + (modelConfigs[key].max_tokens ? ` (${modelConfigs[key].max_tokens} tokens)` : '');
+                    modelSelect.appendChild(option);
+                }
+            }
+             if (firstModelKey) modelSelect.value = firstModelKey; // Set default selection
+        }
+
+        function validateChatName() {
+            const name = chatNameInput.value;
+            let isValid = true;
+            let errorMessage = "";
+
+            if (!name || name.length > 50) {
+                isValid = false;
+                errorMessage = "Chat name is required (max 50 characters).";
+            } else if (name[0].match(/[0-9]/) && !name.startsWith("chat_")) {
+                 isValid = false;
+                 errorMessage = "Name cannot start with a digit unless it's 'chat_...'.";
+            } else if (!/^[a-zA-Z0-9_-]+$/.test(name)) {
+                isValid = false;
+                errorMessage = "Name can only contain letters, numbers, underscores, and hyphens.";
+            } else if (existingChatNames.includes(name)) {
+                isValid = false;
+                errorMessage = "This chat name already exists. Please choose another.";
+            }
+
+            if (!isValid) {
+                chatNameErrorDiv.textContent = errorMessage;
+                chatNameErrorDiv.style.display = 'block';
+                chatNameInput.setCustomValidity(errorMessage); // For HTML5 validation pop-up
+            } else {
+                chatNameErrorDiv.style.display = 'none';
+                chatNameInput.setCustomValidity(""); // Clear custom validity
+            }
+            return isValid;
+        }
+
+        if (backendSelect) backendSelect.addEventListener('change', updateModelOptions);
+        if (chatNameInput) chatNameInput.addEventListener('input', validateChatName); // Validate on input
+
+        newChatForm.addEventListener('submit', function(event) {
+            if (!validateChatName()) {
+                event.preventDefault(); // Prevent form submission if chat name is invalid
+                // Focus on chat name input if it's invalid
+                chatNameInput.focus();
+                alert("Please fix the errors in the form before submitting.");
+            }
+            // Additional client-side validation can be added here for other fields if needed
+        });
+
+        // Initial population of model dropdown
+        if (Object.keys(modelConfigs).length > 0) { // Ensure modelConfigs is not empty
+             updateModelOptions();
+        } else {
+            // Handle case where modelConfigs might be empty (e.g. if constants failed to load)
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "No models available - check server configuration";
+            modelSelect.appendChild(option);
+            modelSelect.disabled = true;
+        }
+    </script>
+</body>
+</html>
