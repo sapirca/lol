@@ -30,10 +30,7 @@ This directory contains a simple web-based chat interface.
         ```
 
 4.  **Install dependencies:**
-    The only external dependency for this basic UI is Flask.
-    ```bash
-    pip install Flask
-    ```
+    pip install -r requirements.txt
 
 5.  **Run the Flask application:**
     ```bash
