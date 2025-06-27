@@ -191,31 +191,25 @@ def append_message_to_window_w_timestamp(timestamp, sender, message, context,
             chat_window.window_create(tk.END, window=button_frame)
 
             # Create the OK button
-            ok_button = tk.Button(
-                button_frame,
-                text="Run",
-                command=lambda: handle_confirmation(True),
-                bg="#4CAF50",  # Green color
-                fg="white",
-                font=(CHAT_FONT, 12),
-                padx=10,
-                pady=5,
-                relief=tk.RAISED,
-                borderwidth=2)
+            ok_button = tk.Button(button_frame,
+                                  text="Run",
+                                  command=lambda: handle_confirmation(True),
+                                  font=(CHAT_FONT, 12),
+                                  padx=10,
+                                  pady=5,
+                                  relief=tk.RAISED,
+                                  borderwidth=2)
             ok_button.pack(side=tk.LEFT, padx=5)
 
             # Create the No button
-            no_button = tk.Button(
-                button_frame,
-                text="Cancel",
-                command=lambda: handle_confirmation(False),
-                bg="#f44336",  # Red color
-                fg="white",
-                font=(CHAT_FONT, 12),
-                padx=10,
-                pady=5,
-                relief=tk.RAISED,
-                borderwidth=2)
+            no_button = tk.Button(button_frame,
+                                  text="Cancel",
+                                  command=lambda: handle_confirmation(False),
+                                  font=(CHAT_FONT, 12),
+                                  padx=10,
+                                  pady=5,
+                                  relief=tk.RAISED,
+                                  borderwidth=2)
             no_button.pack(side=tk.LEFT, padx=5)
 
             # Add a separator line
@@ -243,14 +237,13 @@ def update_active_chat_label(button_name):
         song_name = controller.config["song_name"]
     else:
         song_name = "song N/A"
-    
+
     if "model_config" in controller.config:
         model_name = controller.config["model_config"]["model_name"]
         max_tokens = controller.config["model_config"]["max_tokens"]
         model_info = f"| {model_name[:10]} ({max_tokens}) "
     else:
         model_info = "| model info N/A "
-    
 
     active_chat_label.config(
         text=f"{song_name} | {framework_info} {model_info}| {button_name}")
@@ -481,9 +474,7 @@ def show_save_name_dialog(on_save_complete=None):
     save_button = tk.Button(button_frame, text="Save", command=on_save)
     save_button.pack(side=tk.LEFT, padx=5)
 
-    cancel_button = tk.Button(button_frame,
-                              text="Cancel",
-                              command=on_cancel)
+    cancel_button = tk.Button(button_frame, text="Cancel", command=on_cancel)
     cancel_button.pack(side=tk.LEFT, padx=5)
 
     # Handle window close button
@@ -1039,15 +1030,15 @@ def is_valid_chat_name(name):
     # - Not contain spaces
     if not name or not isinstance(name, str):
         return False
-    
+
     # Check if name starts with a number
     if name[0].isdigit():
         return False
-    
+
     # Check for invalid characters
     if not re.match(r'^[a-zA-Z0-9_-]+$', name):
         return False
-    
+
     return True
 
 
@@ -1079,8 +1070,8 @@ def initialize_from_config(config, chat_name):
     # Add the new chat to the snapshot list
     # Get the buttons frame from the canvas
     canvas = chat_list_frame.winfo_children()[0]  # Get the canvas
-    buttons_frame = canvas.winfo_children()[0]    # Get the buttons frame
-    
+    buttons_frame = canvas.winfo_children()[0]  # Get the buttons frame
+
     snapshot_button = tk.Button(
         buttons_frame,
         text=chat_name,
@@ -1119,52 +1110,66 @@ def show_new_chat_dialog():
 
     # Get current config values
     current_config = controller.config if controller else {}
-    
+
     # Chat name entry
     tk.Label(main_frame, text="Chat Name:").pack(anchor=tk.W, pady=(0, 5))
     chat_name_var = tk.StringVar(value="untitled")
     chat_name_entry = tk.Entry(main_frame, textvariable=chat_name_var)
     chat_name_entry.pack(fill=tk.X, pady=(0, 10))
-    
+
     # Song selection
     tk.Label(main_frame, text="Song:").pack(anchor=tk.W, pady=(0, 5))
     song_var = tk.StringVar(value=current_config.get("song_name", "aladdin"))
-    song_dropdown = ttk.Combobox(main_frame, textvariable=song_var, state="readonly")
+    song_dropdown = ttk.Combobox(main_frame,
+                                 textvariable=song_var,
+                                 state="readonly")
     song_dropdown['values'] = ["aladdin", "nikki", "sandstorm"]
     song_dropdown.pack(fill=tk.X, pady=(0, 10))
 
     # Framework selection
     tk.Label(main_frame, text="Framework:").pack(anchor=tk.W, pady=(0, 5))
-    framework_var = tk.StringVar(value=current_config.get("framework", "kivsee"))
-    framework_dropdown = ttk.Combobox(main_frame, textvariable=framework_var, state="readonly")
+    framework_var = tk.StringVar(
+        value=current_config.get("framework", "kivsee"))
+    framework_dropdown = ttk.Combobox(main_frame,
+                                      textvariable=framework_var,
+                                      state="readonly")
     framework_dropdown['values'] = ["kivsee", "xlights", "conceptual"]
     framework_dropdown.pack(fill=tk.X, pady=(0, 10))
 
     # Backend selection
     tk.Label(main_frame, text="Backend:").pack(anchor=tk.W, pady=(0, 5))
-    backend_var = tk.StringVar(value=current_config.get("selected_backend", "Claude"))
-    backend_dropdown = ttk.Combobox(main_frame, textvariable=backend_var, state="readonly")
+    backend_var = tk.StringVar(
+        value=current_config.get("selected_backend", "Claude"))
+    backend_dropdown = ttk.Combobox(main_frame,
+                                    textvariable=backend_var,
+                                    state="readonly")
     backend_dropdown['values'] = ["Claude", "GPT", "Gemini"]
     backend_dropdown.pack(fill=tk.X, pady=(0, 10))
 
     # Model selection
     tk.Label(main_frame, text="Model:").pack(anchor=tk.W, pady=(0, 5))
     model_var = tk.StringVar()
-    model_dropdown = ttk.Combobox(main_frame, textvariable=model_var, state="readonly")
-    
+    model_dropdown = ttk.Combobox(main_frame,
+                                  textvariable=model_var,
+                                  state="readonly")
+
     def update_model_options(*args):
         backend = backend_var.get()
-        model_dropdown['values'] = [k for k in MODEL_CONFIGS.keys() if k.startswith(backend.lower())]
+        model_dropdown['values'] = [
+            k for k in MODEL_CONFIGS.keys() if k.startswith(backend.lower())
+        ]
         if model_dropdown['values']:
             model_var.set(model_dropdown['values'][0])
-    
+
     backend_var.trace('w', update_model_options)
     update_model_options()
     model_dropdown.pack(fill=tk.X, pady=(0, 10))
 
     # Start with skeleton checkbox
     skeleton_var = tk.BooleanVar(value=False)
-    skeleton_check = tk.Checkbutton(main_frame, text="Start with a skeleton", variable=skeleton_var)
+    skeleton_check = tk.Checkbutton(main_frame,
+                                    text="Start with a skeleton",
+                                    variable=skeleton_var)
     skeleton_check.pack(anchor=tk.W, pady=(0, 10))
 
     # Error label for validation messages
@@ -1174,32 +1179,37 @@ def show_new_chat_dialog():
     def on_save():
         chat_name = chat_name_var.get().strip()
         if not is_valid_chat_name(chat_name):
-            error_label.config(text="Invalid chat name. Use only letters, numbers, underscore, and hyphen.")
+            error_label.config(
+                text=
+                "Invalid chat name. Use only letters, numbers, underscore, and hyphen."
+            )
             return
-            
+
         new_config = {
             "song_name": song_var.get(),
             "framework": framework_var.get(),
             "selected_backend": backend_var.get(),
             "model_config": MODEL_CONFIGS[model_var.get()]
         }
-        
+
         # Initialize new chat with config
         initialize_from_config(new_config, chat_name)
-        
+
         # # Save the chat with the new name
         # save_chat()
-        
+
         dialog.destroy()
-        
+
         # Build skeleton if requested
         if skeleton_var.get():
             # Disable the send button while processing
             send_button.config(state=tk.DISABLED)
-            
+
             # Add initial system message
-            update_chat_window(TAG_SYSTEM, "System", "Generating high level plan... Please wait for LLM response")
-            
+            update_chat_window(
+                TAG_SYSTEM, "System",
+                "Generating high level plan... Please wait for LLM response")
+
             def skeleton_callback(status_msg):
                 # Re-enable the send button
                 send_button.config(state=tk.NORMAL)
@@ -1208,7 +1218,7 @@ def show_new_chat_dialog():
                 # update new messages
                 refresh()
                 update_animation_data()
-            
+
             # Start async skeleton building
             controller.build_skeleton(callback=skeleton_callback)
 
@@ -1218,11 +1228,17 @@ def show_new_chat_dialog():
     # Buttons frame
     button_frame = tk.Frame(main_frame)
     button_frame.pack(fill=tk.X, pady=(20, 0))
-    
-    save_button = tk.Button(button_frame, text="Save", command=on_save, width=10)
+
+    save_button = tk.Button(button_frame,
+                            text="Save",
+                            command=on_save,
+                            width=10)
     save_button.pack(side=tk.RIGHT, padx=5)
-    
-    cancel_button = tk.Button(button_frame, text="Cancel", command=on_cancel, width=10)
+
+    cancel_button = tk.Button(button_frame,
+                              text="Cancel",
+                              command=on_cancel,
+                              width=10)
     cancel_button.pack(side=tk.RIGHT, padx=5)
 
 
@@ -1293,6 +1309,7 @@ buttons_frame.pack(side=tk.RIGHT)
 save_button = tk.Button(buttons_frame, text="Save", command=save_chat, width=6)
 save_button.pack(side=tk.RIGHT, padx=5)
 
+
 # Add a single 'Run' button that opens an action menu dialog
 def show_action_menu():
     action_dialog = tk.Toplevel(root)
@@ -1308,18 +1325,38 @@ def show_action_menu():
     action_dialog.transient(root)
     action_dialog.grab_set()
 
-    tk.Label(action_dialog, text="Select an action to run:", font=(CHAT_FONT, 12)).pack(pady=10)
+    tk.Label(action_dialog,
+             text="Select an action to run:",
+             font=(CHAT_FONT, 12)).pack(pady=10)
 
     def run_and_close(action_func):
         action_dialog.destroy()
         action_func()
 
-    tk.Button(action_dialog, text="New Chat", width=18, command=lambda: run_and_close(show_new_chat_dialog)).pack(pady=5)
-    tk.Button(action_dialog, text="Latest Animation", width=18, command=lambda: run_and_close(restart_with_latest_sequence)).pack(pady=5)
-    tk.Button(action_dialog, text="Summary + Latest Animation", width=18, command=lambda: run_and_close(reduce_tokens)).pack(pady=5)
-    tk.Button(action_dialog, text="Cancel", width=18, command=action_dialog.destroy).pack(pady=10)
+    tk.Button(action_dialog,
+              text="New Chat",
+              width=18,
+              command=lambda: run_and_close(show_new_chat_dialog)).pack(pady=5)
+    tk.Button(
+        action_dialog,
+        text="Latest Animation",
+        width=18,
+        command=lambda: run_and_close(restart_with_latest_sequence)).pack(
+            pady=5)
+    tk.Button(action_dialog,
+              text="Summary + Latest Animation",
+              width=18,
+              command=lambda: run_and_close(reduce_tokens)).pack(pady=5)
+    tk.Button(action_dialog,
+              text="Cancel",
+              width=18,
+              command=action_dialog.destroy).pack(pady=10)
 
-chat_options_button = tk.Button(buttons_frame, text="New Chat Options", command=show_action_menu, width=12)
+
+chat_options_button = tk.Button(buttons_frame,
+                                text="New Chat Options",
+                                command=show_action_menu,
+                                width=12)
 chat_options_button.pack(side=tk.RIGHT, padx=5)
 
 # Create a header frame for the animation panel
