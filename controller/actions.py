@@ -937,8 +937,8 @@ class HighLevelPlanUpdateAction(Action):
 
     def validate_params(self, params: Dict[str, Any]) -> bool:
         params_dict = self._get_params_dict(params)
-        return ("plan" in params_dict and isinstance(params_dict["plan"], str) and
-                "animation_sequence" in params_dict)
+        return ("plan" in params_dict and isinstance(params_dict["plan"], str)
+                and "animation_sequence" in params_dict)
 
     def execute(self, params: Dict[str, Any]) -> Dict[str, Any]:
         try:
@@ -947,36 +947,40 @@ class HighLevelPlanUpdateAction(Action):
             animation_sequence = params_dict["animation_sequence"]
 
             # Add the plan to memory for future reference
-            self.message_streamer.add_invisible(
-                TAG_SYSTEM_INTERNAL,
-                f"High-level plan:\n{plan}",
-                context=False)
-            
+            self.message_streamer.add_invisible(TAG_SYSTEM_INTERNAL,
+                                                f"High-level plan:\n{plan}",
+                                                context=False)
+
             # Add the animation sequence to memory for future reference
+            animation_sequence_pretty = json.dumps(
+                animation_sequence, indent=4) if not isinstance(
+                    animation_sequence, str) else animation_sequence
             self.message_streamer.add_invisible(
                 TAG_SYSTEM_INTERNAL,
-                f"Animation sequence:\n{animation_sequence}",
+                f"Animation sequence:\n{animation_sequence_pretty}",
                 context=False)
 
             # Add the animation sequence to the animation manager
-            self.animation_manager.add_sequence(animation_sequence)
+            self.animation_manager.add_sequence(animation_sequence_pretty)
 
             # Render the animation
-            # self.animation_manager.render(animation_sequence, song_name="current_song", store_animation=True)
+            # self.animation_manager.render(animation_sequence_pretty, song_name="current_song", store_animation=True)
 
             return {
                 "status": "success",
-                "message": f"High-level plan and animation sequence stored and rendered successfully.",
+                "message":
+                f"High-level plan and animation sequence stored and rendered successfully.",
                 "confirmation_type": self.confirmation_type,
                 "data": {
                     "plan": plan,
-                    "animation_sequence": animation_sequence
+                    "animation_sequence": animation_sequence_pretty
                 }
             }
         except Exception as e:
             error_result = {
                 "status": "error",
-                "message": f"Error storing high-level plan and animation sequence: {str(e)}",
+                "message":
+                f"Error storing high-level plan and animation sequence: {str(e)}",
                 "confirmation_type": self.confirmation_type
             }
             self._log_action_result("high_level_plan_update", error_result)
@@ -1135,7 +1139,7 @@ class ActionRegistry:
         action = self._actions.get(name)
         if not action:
             return f"Action {name} not found"
-            
+
         lines = []
         lines.append(f"Action: {name}")
         lines.append(f"  - Purpose: {action.purpose}")
