@@ -9,3 +9,4 @@ instructor
 # llamaapi ?
 pydantic
 protobuf
+Flask
