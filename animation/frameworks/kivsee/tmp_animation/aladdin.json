@@ -30,7 +30,7 @@
                     "spiral_small"
                 ],
                 "effect_config": {
-                    "start_time": 1501,
+                    "start_time": 0,
                     "end_time": 2428,
                     "segments": "spiral2"
                 },

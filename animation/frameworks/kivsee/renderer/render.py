@@ -19,24 +19,41 @@ from google.protobuf.json_format import ParseDict
 
 # RASPBERRY_PI_IP = "192.168.1.12"
 # RASPBERRY_PI_IP = "192.168.1.27"
+# RASPBERRY_PI_IP = "10.100.102.30"
+
+# RASPBERRY_PI_IP = "10.0.1.204"
 RASPBERRY_PI_IP = "10.100.102.30"
 SEQUENCE_URL = f"http://{RASPBERRY_PI_IP}:8082"
 TRIGGER_URL = f"http://{RASPBERRY_PI_IP}:8083"
 SIMULATION_URL = f"http://{RASPBERRY_PI_IP}:8084"
+OBJECT_URL = f"http://{RASPBERRY_PI_IP}:8081"
 
+
+# Get and print the content of the specified URL
+def get_url_content(url):
+    try:
+        print(f"Fetching content from URL: {url}")
+        response = requests.get(url)
+        print(f"Status code: {response.status_code}")
+        print("Content:")
+        print(response.text)
+    except Exception as e:
+        print(f"Error fetching URL content: {e}")
+
+GET_OBJECT_URL = f"{OBJECT_URL}/thing/{{thing_name}}"
+GET_ANIMATION_URL = f"{SEQUENCE_URL}/triggers/{{animation_name}}/objects/{{thing_name}}"
 PUT_ANIMATION_URL_TEMPLATE = "{SEQUENCE_URL}/triggers/{animation_name}/objects/{element_name}"
 
 # Define all possible elements. This list is used if an effect's 'elements' field is empty,
 # implying it should apply to all configured elements.
-all_elements = [
-    "ring1", "ring2", "ring3", "ring4", "ring5", "ring6", "ring7", "ring8",
-    "ring9", "ring10", "ring11", "ring12"
-]
+# all_elements = [
+#     "ring1", "ring2", "ring3", "ring4", "ring5", "ring6", "ring7", "ring8",
+#     "ring9", "ring10", "ring11", "ring12"
+# ]
 
 # TODO(sapir): pull the offset from the song file
 ADD_OFFSET = False
 offset = 575
-
 
 class Render:
 
@@ -311,6 +328,7 @@ class Render:
             )
             with open(animation_file_path, 'r') as file:
                 animation_data = json.load(file)
+
             return animation_data
         except FileNotFoundError:
             print(f"Error: Animation file not found at {animation_file_path}.")
@@ -377,7 +395,7 @@ class Render:
     def render(self,
                animation_data: dict,
                animation_name: str,
-               playback_offest: int,
+               playback_offest: int = 0,
                store_animation: bool = False):
         """
         Orchestrates the preprocessing, storing, and triggering of the animation.
@@ -449,11 +467,11 @@ class Render:
             # Determine which elements this effect applies to
             effect_elements = effect.get("elements", [])
             if not effect_elements:
-                # If the 'elements' list is empty, apply this effect to all elements defined globally.
+                # If the 'elements' list is empty, apply this effect to the special "all" element.
                 print(
-                    f"Effect {effect.get('effect_number', 'N/A')} has no specific elements, applying to all: {all_elements}"
+                    f"Effect {effect.get('effect_number', 'N/A')} has no specific elements, applying to element: 'all'"
                 )
-                effect_elements = all_elements
+                effect_elements = ["all"]
 
             # Create separate EffectProtos for each effect type
             split_effects = []
