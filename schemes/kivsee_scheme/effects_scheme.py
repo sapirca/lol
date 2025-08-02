@@ -185,6 +185,40 @@ class SnakeEffectConfig(BaseModel):
                          description="Whether the snake is cyclic.")
 
 
+# >>>>>>>>>>>>>>>>>>>>>>>>
+# Define the possible worlds and their elements
+ELEMENT_WORLDS = {
+    "rings": [
+        "ring7", "ring8", "ring9", "ring10", "ring11", "ring12"
+    ],
+    "spirals": [
+        "spiral_big", "spiral_small",
+    ],
+    "orchids": [
+        "orchid1", "orchid2", "orchid3",
+    ]
+}
+
+SEGMENTS_WORLDS = {
+    "rings": [
+        "centric", "updown", "arc", "ind", "b1", "b2", "rand", "all"
+    ],
+    # "spiral_big": [
+    #     "spiral1", "spiral2", "spiral3", "spiral4", "spiral5", "outline", "spiral6",
+    #     "subout1", "subout2", "subout3", "subout4", "subout5", "subout6", "subout7",
+    #     "subout8", "subout9", "subout10"
+    # ],
+    # "spiral_small": [
+    "spirals": [
+        "spiral1", "spiral2", "spiral3", "outline",
+        "subout1", "subout2", "subout3", "subout4", "subout5", "subout6", "subout7",
+        "subout8", "subout9", "subout10"
+    ],
+    "orchids": [
+        "leaf1", "leaf2", "stem", "petal1", "petal2", "petal3"
+    ]
+}
+
 class EffectConfig(BaseModel):
     start_time: int = Field(
         ...,
@@ -199,11 +233,29 @@ class EffectConfig(BaseModel):
     segments: str = Field(
         ...,
         description=
-        "Specifies the segments of LEDs to which the effect will be applied. This allows targeting specific subsets of LEDs for more variety in the animation. For example, 'b1' might represent every 4th LED. The default segment is 'all', which means the effect will apply to all LEDs of the element.",
-        enum=["centric", "updown", "arc", "ind", "b1", "b2", "rand", "all"])
+        "Specifies the segments of LEDs to which the effect will be applied. The valid segments depend on the selected world."
+    )
+
+    # _world: typing.ClassVar[str] = "rings"
+    _world: typing.ClassVar[str] = "spirals"
+    _segments: typing.ClassVar[typing.List[str]] = SEGMENTS_WORLDS.get(_world, [])
+    @classmethod
+    def set_world(cls, world: str):
+        if world not in SEGMENTS_WORLDS:
+            raise ValueError(f"Unknown world: {world}")
+        cls._world = world
+        cls._segments = SEGMENTS_WORLDS.get(world, [])
+
+    @model_validator(mode="after")
+    def check_segments_valid_for_world(self):
+        valid_segments = SEGMENTS_WORLDS.get(self._world, [])
+        if self.segments not in valid_segments:
+            raise ValueError(
+                f"Segment '{self.segments}' is not valid for world '{self._world}'. Valid segments: {valid_segments}"
+            )
+        return self
 
 
-# >>>>>>>>>>>>>>>>>>>>>>>>
 class EffectProto(BaseModel):
     """
     Represents a single effect in the animation sequence.
@@ -227,13 +279,11 @@ class EffectProto(BaseModel):
         "if relevant, write the beat and bar this effect is applied to. e.g., 'Bar 2: 11th beat'."
     )
 
-    elements: typing.List[typing.Literal[
-        "ring7", "ring8", "ring9", "ring10", "ring11", "ring12"]] = Field(
-            default_factory=list,
-            min_length=1,
-            description=
-            "Specifies the list of elements (rings) to which this effect applies. The art installation consists of six sequentially arranged rings, numbered 7 through 12, categorized based on their arrangement and characteristics. Categories include all rings, odd/even rings, left/right sides, center rings, and outer rings. For example, odd rings [ring7, ring9, ring11], even rings [ring8, ring10, ring12], or outer rings [ring7, ring8, ring11, ring12]. This allows for creating diverse animations by targeting specific rings or combinations. For example, you can animate rings sequentially, alternate between left and right, or create patterns that move across the rings for more dynamic effects. In your response, list all the rings you want to animate."
-        )
+    elements: typing.List[str] = Field(
+        default_factory=list,
+        min_length=1,
+        description="Specifies the list of elements to which this effect applies. The valid elements depend on the selected world."
+    )
     effect_config: EffectConfig = Field(
         default_factory=EffectConfig,
         description="General configuration for the effect.")
@@ -269,6 +319,25 @@ class EffectProto(BaseModel):
         description=
         "A brief summary of what this effect does. Focus on which colors the user see and which patterns and motions (e.g. rapid blinking pink snake, with green b1 segment). Provides a visual overview so that the user can understand which one is it.."
     )
+
+    _world: typing.ClassVar[str] = "rings"  # default world
+
+    @classmethod
+    def set_world(cls, world: str):
+        if world not in ELEMENT_WORLDS:
+            raise ValueError(f"Unknown world: {world}")
+        cls._world = world
+        EffectConfig.set_world(world)
+
+    @model_validator(mode="after")
+    def check_elements_valid_for_world(self):
+        valid_elements = ELEMENT_WORLDS.get(self._world, [])
+        for el in self.elements:
+            if el not in valid_elements:
+                raise ValueError(
+                    f"Element '{el}' is not valid for world '{self._world}'. Valid elements: {valid_elements}"
+                )
+        return self
 
     @model_validator(mode="after")
     def check_one_of_effect(self):
@@ -307,7 +376,13 @@ class KivseeSchema(BaseModel):
                                       description="The whole animation.")
     name: str = Field(
         default="",
-        description=
-        ("The animation title. If the user specifies the song name as 'some_name', "
-         "you should put 'some_name' here. The name must not contain spaces or special characters; "
-         "it should only include letters, numbers, and underscores (_)."))
+        description=(
+            "The animation title. If the user specifies the song name as 'some_name', "
+            "you should put 'some_name' here. The name must not contain spaces or special characters; "
+            "it should only include letters, numbers, and underscores (_)."))
+
+    def __init__(self, *args, world: str = "rings", **data):
+        if world not in ELEMENT_WORLDS:
+            raise ValueError(f"Unknown world: {world}")
+        EffectProto.set_world(world)
+        super().__init__(*args, **data)

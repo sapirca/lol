@@ -6,11 +6,11 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/ui/tkinter/chat_app.py",
-            "console": "integratedTerminal",
-            "python": "/opt/miniconda3/envs/lol_agent/bin/python",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
-            }
+            // "console": "integratedTerminal",
+            // "cwd": "${workspaceFolder}",
+            // "env": {
+            //     "PYTHONPATH": "${workspaceFolder}"
+            // }
         },
         {
             "name": "Debug Current File",
@@ -18,10 +18,9 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "python": "/opt/miniconda3/envs/lol_agent/bin/python",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
-            }
+            // "env": {
+            //     "PYTHONPATH": "${workspaceFolder}"
+            // }
         }
     ]
 }

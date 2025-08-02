@@ -18,9 +18,11 @@ RAND_BANK_PATH = "./animation/compounds/rand_bank"
 
 class CompoundEffectsManager:
 
-    def __init__(self, storage_dir: str = AI_BANK_PATH):
-        """Initialize the compound effects manager with a storage directory"""
+    def __init__(self, storage_dir: str = AI_BANK_PATH, world: str = "rings"):
+        """Initialize the compound effects manager with a storage directory and world"""
         self.storage_dir = storage_dir
+        self.world = world
+        EffectProto.set_world(world)  # Set the world for validation
         self._ensure_storage_dir()
         self._effects: Dict[str, CompoundEffect] = {}
         self._load_effects()
@@ -37,6 +39,8 @@ class CompoundEffectsManager:
                     with open(os.path.join(self.storage_dir, filename),
                               'r') as f:
                         effect_data = json.load(f)
+                        # Set world before deserializing
+                        EffectProto.set_world(self.world)
                         compound_effect = CompoundEffect(**effect_data)
                         self._effects[compound_effect.name] = compound_effect
                 except Exception as e:
