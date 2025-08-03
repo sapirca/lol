@@ -84,7 +84,7 @@ def load_and_merge_configs(snapshot_config_path=None):
 
 class LogicPlusPlus:
 
-    def __init__(self, snapshot_dir=None, restart_config=None):
+    def __init__(self, snapshot_dir=None, restart_config=None, new_config=None):
         """Initialize the LogicPlusPlus, optionally loading from a snapshot or restarting with latest sequence."""
         self.logger = logging.getLogger("LogicPlusPPlusLogger")
         self._pending_memory = None
@@ -111,11 +111,17 @@ class LogicPlusPlus:
                 raise RuntimeError(
                     f"Failed to load snapshot from {snapshot_dir}: {e}")
         else:
-            # Default initialization if no snapshot is provided
-            self.config = load_and_merge_configs()
+            if new_config is not None:
+                self.config = new_config
+            else:
+                # Default initialization if no snapshot is provided
+                self.config = load_and_merge_configs()
             self.selected_framework = self.config.get("framework", None)
-            self.animation_manager = AnimationManager(self.selected_framework,
-                                                      self.msgs)
+            self.animation_manager = AnimationManager(
+                framework_name=self.selected_framework,
+                message_streamer=self.msgs,
+                config=self.config  # Pass config (contains world)
+            )
 
         # Initialize compound effects manager
         self.compound_effects_manager = CompoundEffectsManager()
@@ -323,8 +329,11 @@ class LogicPlusPlus:
 
         # Load animations
         self.selected_framework = self.config.get("framework", None)
-        self.animation_manager = AnimationManager(self.selected_framework,
-                                                  self.msgs)
+        self.animation_manager = AnimationManager(
+            framework_name=self.selected_framework,
+            message_streamer=self.msgs,
+            config=self.config  # Pass config (contains world)
+        )
         try:
             animations = []
             for animation_file in sorted(os.listdir(animations_dir)):
@@ -520,8 +529,11 @@ class LogicPlusPlus:
         self.selected_framework = self.config.get("framework", None)
 
         # Initialize new animation manager
-        self.animation_manager = AnimationManager(self.selected_framework,
-                                                  self.msgs)
+        self.animation_manager = AnimationManager(
+            framework_name=self.selected_framework,
+            message_streamer=self.msgs,
+            config=self.config  # Pass config (contains world)
+        )
 
         # Get latest sequence from old controller
         latest_sequence = old_controller.animation_manager.get_latest_sequence(
@@ -586,8 +598,12 @@ class LogicPlusPlus:
         self.selected_backend = new_config.get("selected_backend", self.selected_backend)
         
         # Reinitialize components that depend on config
+        self.animation_manager = AnimationManager(
+            framework_name=self.selected_framework,
+            message_streamer=self.msgs,
+            config=self.config  # Pass updated config (contains world)
+        )
         self._initialize_backends()
-        self.animation_manager = AnimationManager(self.selected_framework, self.msgs)
         self.memory_manager = MemoryManager(self.selected_framework)
         self.response_manager = Interpreter(self.animation_manager, config=self.config)
         self.formatter = Formatter(self.msgs, self.animation_manager, self.memory_manager, 

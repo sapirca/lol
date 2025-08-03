@@ -22,7 +22,7 @@ class CompoundEffectsManager:
         """Initialize the compound effects manager with a storage directory and world"""
         self.storage_dir = storage_dir
         self.world = world
-        EffectProto.set_world(world)  # Set the world for validation
+        # EffectProto.set_world(world)  # Set the world for validation
         self._ensure_storage_dir()
         self._effects: Dict[str, CompoundEffect] = {}
         self._load_effects()
@@ -40,7 +40,7 @@ class CompoundEffectsManager:
                               'r') as f:
                         effect_data = json.load(f)
                         # Set world before deserializing
-                        EffectProto.set_world(self.world)
+                        # EffectProto.set_world(self.world)
                         compound_effect = CompoundEffect(**effect_data)
                         self._effects[compound_effect.name] = compound_effect
                 except Exception as e:

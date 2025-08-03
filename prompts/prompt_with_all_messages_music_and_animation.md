@@ -335,4 +335,4 @@ No animation sequences have been generated yet.
 ================================================================================
 Role: user
 
-hi how are you
+conts color spiral_big spiral1 spiral2

@@ -23,6 +23,7 @@ from controller.message_streamer import (
     TAG_ACTION_RESULTS,
 )
 from constants import MODEL_CONFIGS
+from schemes.kivsee_scheme.effects_scheme import ELEMENT_WORLDS
 
 # Alignment flags
 USER_ALIGNMENT = "left"
@@ -1059,7 +1060,14 @@ def initialize_from_config(config, chat_name):
         chat_name (str): The name for the new chat
     """
     global controller, active_chat_snapshot, button_mapping
-    controller = LogicPlusPlus()
+    
+    # No need to set world in EffectProto directly - it will be handled by KivseeFramework
+    controller = LogicPlusPlus(new_config=config)
+    
+    # # Ensure world is in config before updating
+    # if "world" not in config:
+    #     config["world"] = "rings"  # Default world
+        
     controller.update_config(config)
     active_chat_snapshot = chat_name
 
@@ -1126,6 +1134,13 @@ def show_new_chat_dialog():
     chat_name_entry = tk.Entry(main_frame, textvariable=chat_name_var)
     chat_name_entry.pack(fill=tk.X, pady=(0, 10))
     
+    # World selection
+    tk.Label(main_frame, text="World:").pack(anchor=tk.W, pady=(0, 5))
+    world_var = tk.StringVar(value=current_config.get("world", "rings"))
+    world_dropdown = ttk.Combobox(main_frame, textvariable=world_var, state="readonly")
+    world_dropdown['values'] = list(ELEMENT_WORLDS.keys())
+    world_dropdown.pack(fill=tk.X, pady=(0, 10))
+
     # Song selection
     tk.Label(main_frame, text="Song:").pack(anchor=tk.W, pady=(0, 5))
     song_var = tk.StringVar(value=current_config.get("song_name", "aladdin"))
@@ -1181,7 +1196,8 @@ def show_new_chat_dialog():
             "song_name": song_var.get(),
             "framework": framework_var.get(),
             "selected_backend": backend_var.get(),
-            "model_config": MODEL_CONFIGS[model_var.get()]
+            "model_config": MODEL_CONFIGS[model_var.get()],
+            "world": world_var.get()  # Add world to config
         }
         
         # Initialize new chat with config

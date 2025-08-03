@@ -8,7 +8,8 @@ from pydantic import BaseModel
 from pydantic import Field
 from pydantic import model_validator
 import typing
-
+# from typing import Literal, List, Optional, Type
+import copy
 
 # Base template for float function configurations - now empty as per your instruction
 class FloatFunctionTemplate(BaseModel):
@@ -230,30 +231,31 @@ class EffectConfig(BaseModel):
         description=
         "End time of the effect in milliseconds. The end of a bar is the begining of the next bar, use the miliseconds from the list of bars you provided in the prompt."
     )
-    segments: str = Field(
-        ...,
+    segments: typing.List[str] = Field(
+        default_factory=list,
+        min_length=1,
         description=
-        "Specifies the segments of LEDs to which the effect will be applied. The valid segments depend on the selected world."
+        "Specifies a List of the segments of LEDs to which the effect will be applied."
     )
 
     # _world: typing.ClassVar[str] = "rings"
-    _world: typing.ClassVar[str] = "spirals"
-    _segments: typing.ClassVar[typing.List[str]] = SEGMENTS_WORLDS.get(_world, [])
-    @classmethod
-    def set_world(cls, world: str):
-        if world not in SEGMENTS_WORLDS:
-            raise ValueError(f"Unknown world: {world}")
-        cls._world = world
-        cls._segments = SEGMENTS_WORLDS.get(world, [])
+    # _world: typing.ClassVar[str] = "spirals"
+    # _segments: typing.ClassVar[typing.List[str]] = SEGMENTS_WORLDS.get(_world, [])
+    # @classmethod
+    # def set_world(cls, world: str):
+    #     if world not in SEGMENTS_WORLDS:
+    #         raise ValueError(f"Unknown world: {world}")
+    #     cls._world = world
+    #     cls._segments = SEGMENTS_WORLDS.get(world, [])
 
-    @model_validator(mode="after")
-    def check_segments_valid_for_world(self):
-        valid_segments = SEGMENTS_WORLDS.get(self._world, [])
-        if self.segments not in valid_segments:
-            raise ValueError(
-                f"Segment '{self.segments}' is not valid for world '{self._world}'. Valid segments: {valid_segments}"
-            )
-        return self
+    # @model_validator(mode="after")
+    # def check_segments_valid_for_world(self):
+    #     valid_segments = SEGMENTS_WORLDS.get(self._world, [])
+    #     if self.segments not in valid_segments:
+    #         raise ValueError(
+    #             f"Segment '{self.segments}' is not valid for world '{self._world}'. Valid segments: {valid_segments}"
+    #         )
+    #     return self
 
 
 class EffectProto(BaseModel):
@@ -320,24 +322,24 @@ class EffectProto(BaseModel):
         "A brief summary of what this effect does. Focus on which colors the user see and which patterns and motions (e.g. rapid blinking pink snake, with green b1 segment). Provides a visual overview so that the user can understand which one is it.."
     )
 
-    _world: typing.ClassVar[str] = "rings"  # default world
+    # _world: typing.ClassVar[str] = "rings"  # default world
 
-    @classmethod
-    def set_world(cls, world: str):
-        if world not in ELEMENT_WORLDS:
-            raise ValueError(f"Unknown world: {world}")
-        cls._world = world
-        EffectConfig.set_world(world)
+    # @classmethod
+    # def set_world(cls, world: str):
+    #     if world not in ELEMENT_WORLDS:
+    #         raise ValueError(f"Unknown world: {world}")
+    #     cls._world = world
+    #     EffectConfig.set_world(world)
 
-    @model_validator(mode="after")
-    def check_elements_valid_for_world(self):
-        valid_elements = ELEMENT_WORLDS.get(self._world, [])
-        for el in self.elements:
-            if el not in valid_elements:
-                raise ValueError(
-                    f"Element '{el}' is not valid for world '{self._world}'. Valid elements: {valid_elements}"
-                )
-        return self
+    # @model_validator(mode="after")
+    # def check_elements_valid_for_world(self):
+    #     valid_elements = ELEMENT_WORLDS.get(self._world, [])
+    #     for el in self.elements:
+    #         if el not in valid_elements:
+    #             raise ValueError(
+    #                 f"Element '{el}' is not valid for world '{self._world}'. Valid elements: {valid_elements}"
+    #             )
+    #     return self
 
     @model_validator(mode="after")
     def check_one_of_effect(self):
@@ -354,7 +356,9 @@ class EffectProto(BaseModel):
 
 class AnimationProto(BaseModel):
     effects: typing.List[EffectProto] = Field(
-        default_factory=list, description="List of effects in the animation.")
+        default_factory=list, 
+        min_length=1,
+        description="List of effects in the animation.")
     duration_ms: int = Field(
         default=0,
         description=
@@ -381,8 +385,70 @@ class KivseeSchema(BaseModel):
             "you should put 'some_name' here. The name must not contain spaces or special characters; "
             "it should only include letters, numbers, and underscores (_)."))
 
-    def __init__(self, *args, world: str = "rings", **data):
-        if world not in ELEMENT_WORLDS:
-            raise ValueError(f"Unknown world: {world}")
-        EffectProto.set_world(world)
-        super().__init__(*args, **data)
+    # def __init__(self, *args, world: str = "rings", **data):
+    #     if world not in ELEMENT_WORLDS:
+    #         raise ValueError(f"Unknown world: {world}")
+    #     EffectProto.set_world(world)
+    #     super().__init__(*args, **data)
+
+
+from typing import Literal, List, Optional, Type
+from pydantic import create_model, Field
+
+# --- World Configurations and Base Schemas ---
+# ELEMENT_WORLDS = {
+#     "rings": ("ring7", "ring8", "ring9"),
+#     "spirals": ("spiral_big", "spiral_small"),
+# }
+# SEGMENTS_WORLDS = {
+#     "rings": ("centric", "updown", "arc"),
+#     "spirals": ("spiral1", "spiral2", "outline"),
+# }
+
+# --- The Factory Function (Pydantic V1 Compatible) ---
+def create_kivsee_schema(world: str) -> Type[BaseModel]:
+    """
+    Factory that builds and returns a dynamic Pydantic CLASS using
+    Pydantic V1 patterns.
+    """
+    if world not in ELEMENT_WORLDS or world not in SEGMENTS_WORLDS:
+        raise ValueError(f"Unknown world: {world}")
+
+    # Create the dynamic Literal types for validation
+    # ElementLiterals = Literal[ELEMENT_WORLDS[world]]
+    # SegmentLiterals = Literal[SEGMENTS_WORLDS[world]]
+    ElementLiterals = Literal[*ELEMENT_WORLDS[world]]
+    SegmentLiterals = Literal[*SEGMENTS_WORLDS[world]]
+
+    
+    # --- Use create_model for all dynamic classes ---
+    # This is a cleaner pattern and often works better with static analyzers.
+    
+    DynamicEffectConfig = create_model(
+        'DynamicEffectConfig',
+        start_time=(int, ...),
+        end_time=(int, ...),
+        segments=(List[SegmentLiterals], Field(..., min_length=1))
+    )
+
+    DynamicEffectProto = create_model(
+        'DynamicEffectProto',
+        effect_number=(int, ...),
+        elements=(List[ElementLiterals], Field(..., min_length=1)),
+        effect_config=(DynamicEffectConfig, ...)
+    )
+
+    DynamicAnimationProto = create_model(
+        'DynamicAnimationProto',
+        effects=(List[DynamicEffectProto], ...),
+        duration_ms=(int, 0)
+    )
+
+    # Final model creation remains the same
+    FinalKivseeSchema = create_model(
+        f'KivseeSchema_{world.capitalize()}',
+        animation=(DynamicAnimationProto, Field(default_factory=DynamicAnimationProto)),
+        name=(str, Field(default=""))
+    )
+    
+    return FinalKivseeSchema

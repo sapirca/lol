@@ -11,7 +11,7 @@ from instructor.exceptions import InstructorRetryException
 import google.generativeai as genai
 from constants import MODEL_CONFIGS
 
-MAX_RETRIES = 3
+MAX_RETRIES = 1
 INSTRACTOR_RETRIES = 0
 
 

@@ -226,8 +226,8 @@ class Render:
             )
             return
 
-        # current_log_path = self.log_dir
-        # current_log_path.mkdir(exist_ok=True)
+        current_log_path = self.log_dir
+        current_log_path.mkdir(exist_ok=True)
 
         # Iterate through each element and its specific animation payload
         for element_name, animation_payload in animations_per_element.items():
@@ -464,6 +464,14 @@ class Render:
                 slim_config["end_time"] = slim_config.get("end_time",
                                                           0) + offset
 
+            # --- Support for segments as a list ---
+            # If effect_config exists and has 'segments', ensure it's a list
+            # effect_config = base_slim_effect.get("effect_config", {})
+            
+            # if "segments" in effect_config and isinstance(effect_config["segments"], list):
+            #     # Convert single segment dict to a list with one item
+            #     effect_config["segments"] = [effect_config["segments"]
+            
             # Determine which elements this effect applies to
             effect_elements = effect.get("elements", [])
             if not effect_elements:

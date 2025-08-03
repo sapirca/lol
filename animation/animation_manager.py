@@ -15,18 +15,19 @@ import os
 
 class AnimationManager:
 
-    def __init__(self, framework_name, message_streamer):
+    def __init__(self, framework_name, message_streamer, config=None):
         self.framework_name = framework_name
         self.framework: Framework = None
         # TODO(sapir): rename to sequence_db
         self.sequence_manager: Sequence = None
         self.message_streamer = message_streamer
+        self.config = config or {}
         self._load_animation_framework()
 
     def _load_animation_framework(self):
         if self.framework_name == 'kivsee':
             self.sequence_manager = KivseeSequence()
-            self.framework = KivseeFramework()
+            self.framework = KivseeFramework(config=self.config)  # Pass config to KivseeFramework
             self.renderer = Render()
         elif self.framework_name == 'xlights':
             self.sequence_manager = XlightsSequence(XLIGHTS_SEQUENCE_PATH)
