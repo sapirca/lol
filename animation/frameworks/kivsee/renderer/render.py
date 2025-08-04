@@ -466,11 +466,14 @@ class Render:
 
             # --- Support for segments as a list ---
             # If effect_config exists and has 'segments', ensure it's a list
-            # effect_config = base_slim_effect.get("effect_config", {})
+            effect_config = base_slim_effect.get("effect_config", {})
             
-            # if "segments" in effect_config and isinstance(effect_config["segments"], list):
-            #     # Convert single segment dict to a list with one item
-            #     effect_config["segments"] = [effect_config["segments"]
+            if "segments" in effect_config and isinstance(effect_config["segments"], list):
+                # If segments is not a list, convert it to a list with one item
+                effect_config["segments"] = effect_config["segments"][0]
+            else:
+                print(f"the type of segmenets is: {type(effect_config.get('segments'))}")
+                
             
             # Determine which elements this effect applies to
             effect_elements = effect.get("elements", [])
@@ -495,6 +498,7 @@ class Render:
                         effect_type: effect[effect_type]
                     }
                     split_effects.append(split_effect)
+
 
             # Add effects to each element
             for element in effect_elements:

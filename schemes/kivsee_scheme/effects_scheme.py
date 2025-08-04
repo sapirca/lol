@@ -422,26 +422,43 @@ def create_kivsee_schema(world: str) -> Type[BaseModel]:
 
     
     # --- Use create_model for all dynamic classes ---
-    # This is a cleaner pattern and often works better with static analyzers.
-    
+    # Only override the specific fields that need to be dynamic (elements, segments)
+
+    # Build EffectConfig fields, replacing 'segments' with Literal-based field
+    effect_config_fields = {
+        name: (field.annotation, field.default if field.default is not None else ...)
+        for name, field in EffectConfig.model_fields.items()
+        if name != "segments"
+    }
+    effect_config_fields["segments"] = (List[SegmentLiterals], Field(..., min_length=1))
     DynamicEffectConfig = create_model(
         'DynamicEffectConfig',
-        start_time=(int, ...),
-        end_time=(int, ...),
-        segments=(List[SegmentLiterals], Field(..., min_length=1))
+        **effect_config_fields
     )
 
+    # Build EffectProto fields, replacing 'elements' and 'effect_config'
+    effect_proto_fields = {
+        name: (field.annotation, field.default if field.default is not None else ...)
+        for name, field in EffectProto.model_fields.items()
+        if name not in ("elements", "effect_config")
+    }
+    effect_proto_fields["elements"] = (List[ElementLiterals], Field(..., min_length=1))
+    effect_proto_fields["effect_config"] = (DynamicEffectConfig, Field(default_factory=DynamicEffectConfig))
     DynamicEffectProto = create_model(
         'DynamicEffectProto',
-        effect_number=(int, ...),
-        elements=(List[ElementLiterals], Field(..., min_length=1)),
-        effect_config=(DynamicEffectConfig, ...)
+        **effect_proto_fields
     )
 
+    # Build AnimationProto fields (no dynamic fields needed)
+    animation_proto_fields = {
+        name: (field.annotation, field.default if field.default is not None else ...)
+        for name, field in AnimationProto.model_fields.items()
+        if name != "effects"
+    }
+    animation_proto_fields["effects"] = (List[DynamicEffectProto], Field(..., min_length=1))
     DynamicAnimationProto = create_model(
         'DynamicAnimationProto',
-        effects=(List[DynamicEffectProto], ...),
-        duration_ms=(int, 0)
+        **animation_proto_fields
     )
 
     # Final model creation remains the same
