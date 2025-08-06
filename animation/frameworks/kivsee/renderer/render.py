@@ -61,7 +61,7 @@ class Render:
                  sequence_service_url: str = None,
                  snapshot_dir: str = None):
         self.sequence_service_url = sequence_service_url if sequence_service_url else SEQUENCE_URL
-        self.log_dir = Path("animation_logs")
+        self.log_dir = Path("animation/frameworks/kivsee/renderer/animation_logs")
         self.log_dir.mkdir(exist_ok=True)
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.log_file = self.log_dir / f"animation_log_{self.timestamp}.txt"

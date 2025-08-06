@@ -9,7 +9,7 @@ secrets.py
 outputs/
 tests/output/
 
-animation_logs/*
+animation/frameworks/kivsee/renderer/animation_logs/*
 # ingore periodic snapshots
 ui/tkinter/snapshots/
 ui/tkinter/snapshots/periodic_snapshot.json
